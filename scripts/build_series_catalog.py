@@ -178,9 +178,18 @@ _TOKEN_SHAPES = (
 
 def _period_shaped(segment: str) -> bool:
     """Whether a segment merely LOOKS like a period token (any grammar
-    shape), regardless of whether it denotes a real in-window date."""
+    shape), regardless of whether it denotes a real in-window date.
+    Mirrors the parser's ``after_<words>_`` qualifier stripping so
+    qualified out-of-window noise is flagged too."""
     if segment.startswith("after_"):
-        segment = segment[len("after_"):]
+        rest = segment[len("after_"):]
+        while rest:
+            if any(shape.fullmatch(rest) for shape in _TOKEN_SHAPES):
+                return True
+            if "_" not in rest:
+                return False
+            rest = rest.split("_", 1)[1]
+        return False
     return any(shape.fullmatch(segment) for shape in _TOKEN_SHAPES)
 
 
@@ -811,6 +820,11 @@ def _reserved_segment_problem(identifier: object) -> str | None:
     """Why an identifier is unusable as a concept/series name, else None."""
     if not isinstance(identifier, str) or not identifier:
         return f"identifier {identifier!r} must be a nonempty string"
+    if identifier != identifier.strip():
+        return (
+            f"identifier {identifier!r} carries surrounding whitespace — "
+            "cosmetic variants would fork one series into parallel UUIDs"
+        )
     if "{P}" in identifier.split("."):
         return (
             f"identifier {identifier!r} contains the reserved placeholder "
@@ -843,6 +857,11 @@ def _dimension_problem(value: object, allowed: tuple[str, ...],
             not isinstance(field_value, str) or not field_value
         ):
             return f"{what}.{field} must be a nonempty string or null"
+        if isinstance(field_value, str) and field_value != field_value.strip():
+            return (
+                f"{what}.{field} carries surrounding whitespace — cosmetic "
+                "variants would fork one series into parallel UUIDs"
+            )
     for field in required:
         if value.get(field) is None:
             return f"{what}.{field} is required when {what} is present"
@@ -1369,6 +1388,7 @@ def build_catalog(
                 "rid_patterns": set(),
                 "suspects": set(),
                 "stripped": set(),
+                "geo_names": set(),
                 "units": Counter(),
                 "period_types": Counter(),
                 "geography": ident["geography"],
@@ -1392,6 +1412,13 @@ def build_catalog(
         bucket["rid_patterns"] |= ident["rid_patterns"]
         bucket["suspects"] |= ident["suspects"]
         bucket["stripped"] |= ident["stripped"]
+        bucket["geo_names"] |= ident["geo_names"]
+        if len(bucket["geo_names"]) > 1:
+            raise SystemExit(
+                f"geography name conflict within identity {canon_key}: "
+                f"{sorted(bucket['geo_names'])} — alias-merged observations "
+                "disagree about what this place is called; correct upstream"
+            )
         bucket["units"] += ident["units"]
         bucket["period_types"] += ident["period_types"]
         bucket["sources"] |= ident["sources"]

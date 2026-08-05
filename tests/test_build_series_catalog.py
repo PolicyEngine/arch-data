@@ -1875,3 +1875,61 @@ def test_geography_name_conflict_is_a_hard_error(
     fake["geography"] = dict(US, name="Canada")
     with pytest.raises(SystemExit, match="geography name conflict"):
         _build(tmp_path, [us, fake])
+
+
+def test_whitespace_identity_fields_never_fork(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Ninth-review repro: vintage "current " minted a parallel UUID beside
+    # vintage "current".
+    padded = _row("agency.rate", period={"type": "month", "value": "2026-06"})
+    padded["geography"] = dict(US, vintage="current ")
+    with pytest.raises(SystemExit, match="surrounding whitespace"):
+        _build(tmp_path, [_row("agency.rate"), padded])
+    spaced_concept = _row(" agency.rate", rid="agency.rate.first_print")
+    with pytest.raises(SystemExit, match="surrounding whitespace"):
+        _build(tmp_path, [spaced_concept])
+    registry_path = tmp_path / "registry.jsonl"
+    registry_path.write_text(
+        json.dumps(
+            _mint("agency.rate", U1,
+                  geography={"level": "country", "id": "0100000US",
+                             "vintage": "current "})
+        ) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="surrounding whitespace"):
+        bsc.UuidRegistry.load(registry_path)
+    with pytest.raises(SystemExit, match="surrounding whitespace"):
+        _build(
+            tmp_path,
+            [_row("agency.rate")],
+            docket={"series": [{"series": "docket.name ",
+                                "cadence": "monthly"}]},
+        )
+
+
+def test_alias_merged_buckets_check_display_names(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Ninth-review repro: alias-linked spellings smuggled contradictory
+    # geography names past the per-bucket conflict check.
+    first, _ = _build(tmp_path, [_row("agency.rate")])
+    first["series"][0]["aliases"] = ["agency.alt"]
+    canada = _row("agency.alt",
+                  period={"type": "month", "value": "2026-06"})
+    canada["geography"] = dict(US, name="Canada")
+    with pytest.raises(SystemExit, match="geography name conflict"):
+        _build(tmp_path, [_row("agency.rate"), canada], existing=first)
+
+
+@pytest.mark.parametrize(
+    "segment", ["after_mpc_9999_13", "after_release_fy0000",
+                "after_mpc_q1_9999"],
+)
+def test_qualified_out_of_window_tokens_are_flagged(segment: str) -> None:
+    pattern = bsc.family_pattern(
+        f"agency.rate.{segment}", {"type": "month", "value": "2026-05"}
+    )
+    assert pattern == f"agency.rate.{segment}"
+    assert bsc.suspect_segments(pattern) == [segment]
