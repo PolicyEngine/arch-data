@@ -103,6 +103,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import unicodedata
 import uuid as uuid_module
 from collections import Counter
 
@@ -314,7 +315,7 @@ def period_token_variants(period: dict) -> set[str]:
     if ptype == "fiscal_year":
         if value.isdigit() and _valid_year(int(value)):
             tokens.add(f"fy{value}")
-    elif ptype == "year":
+    elif ptype in ("year", "calendar_year", "tax_year"):
         # Bare years are deliberately not in the token grammar (too
         # collision-prone to strip by shape), but a segment spelling the
         # row's OWN annual period is a direct variant and must strip, or
@@ -384,10 +385,18 @@ def period_descriptor(period: dict | None) -> tuple | None:
                 return None
             return ("span", (end - dt.timedelta(days=6), end))
         return None
-    if ptype == "year":
+    if ptype in ("year", "calendar_year"):
         if value.isdigit() and _valid_year(int(value)):
             year = int(value)
             return ("year", year, (dt.date(year, 1, 1), dt.date(year, 12, 31)))
+        return None
+    if ptype == "tax_year":
+        # Jurisdiction-dependent bounds (UK April-to-April vs US calendar):
+        # no calendar window is assumed, so only direct spellings of the
+        # row's own year strip; every other date-shaped segment stays and
+        # is flagged.
+        if value.isdigit() and _valid_year(int(value)):
+            return ("tax_year", int(value))
         return None
     return None
 
@@ -403,6 +412,8 @@ def _matches_period(token: tuple, period_desc: tuple) -> bool:
     Fiscal-year tokens match a fiscal-year period only on equal years; mixed
     fiscal/calendar comparisons use the US federal fiscal calendar.
     """
+    if period_desc[0] == "tax_year":
+        return False
     if token[0] == "fiscal_year" and period_desc[0] == "fiscal_year":
         return token[1] == period_desc[1]
     if token[0] == "fiscal_year" and period_desc[0] == "year":
@@ -592,8 +603,11 @@ def build_identities(rows: list[dict]) -> dict[tuple[str, str, str], dict]:
         period = raw_period or {}
         if period:
             ptype = period.get("type")
+            # Mirrors arch/core.py ALLOWED_PERIOD_TYPES, plus the docket's
+            # generic "year".
             if ptype not in (
-                "month", "quarter", "week_ending", "fiscal_year", "year"
+                "month", "quarter", "week_ending", "fiscal_year",
+                "calendar_year", "tax_year", "year",
             ):
                 raise SystemExit(
                     f"observation row {index}: unknown period type {ptype!r}"
@@ -816,6 +830,19 @@ class ExistingCatalog:
         return None
 
 
+def _cosmetic_problem(value: str) -> str | None:
+    """Unicode-cosmetic variants (NFC vs NFD spellings, zero-width or
+    control characters) would fork one series into parallel UUIDs while
+    rendering identically; identity strings must be NFC with no
+    invisible/format/control characters."""
+    if unicodedata.normalize("NFC", value) != value:
+        return "is not NFC-normalized"
+    for ch in value:
+        if unicodedata.category(ch) in ("Cc", "Cf"):
+            return f"contains an invisible character U+{ord(ch):04X}"
+    return None
+
+
 def _reserved_segment_problem(identifier: object) -> str | None:
     """Why an identifier is unusable as a concept/series name, else None."""
     if not isinstance(identifier, str) or not identifier:
@@ -825,6 +852,9 @@ def _reserved_segment_problem(identifier: object) -> str | None:
             f"identifier {identifier!r} carries surrounding whitespace — "
             "cosmetic variants would fork one series into parallel UUIDs"
         )
+    cosmetic = _cosmetic_problem(identifier)
+    if cosmetic:
+        return f"identifier {identifier!r} {cosmetic}"
     if "{P}" in identifier.split("."):
         return (
             f"identifier {identifier!r} contains the reserved placeholder "
@@ -862,6 +892,10 @@ def _dimension_problem(value: object, allowed: tuple[str, ...],
                 f"{what}.{field} carries surrounding whitespace — cosmetic "
                 "variants would fork one series into parallel UUIDs"
             )
+        if isinstance(field_value, str):
+            cosmetic = _cosmetic_problem(field_value)
+            if cosmetic:
+                return f"{what}.{field} {cosmetic}"
     for field in required:
         if value.get(field) is None:
             return f"{what}.{field} is required when {what} is present"
@@ -1363,7 +1397,20 @@ def build_catalog(
         for line in observation_lines
         if line.strip()
     ]
-    identities = build_identities(rows)
+    # The journal is append-only: a correction appends a row whose
+    # assertionVersion.supersedes names the version it replaces. Series
+    # identity must follow the supersede-aware CURRENT view (the same one
+    # the ledger's aggregate-fact validation uses), or superseded
+    # assertions would keep stale identities alive forever.
+    try:
+        from check_thesis_facts_append import effective_current_rows
+    except ImportError as exc:  # pragma: no cover - environment guard
+        raise SystemExit(
+            "cannot import the supersede-aware current view from "
+            f"check_thesis_facts_append (receipt package required): {exc}"
+        )
+    current_rows = effective_current_rows(rows)
+    identities = build_identities(current_rows)
 
     # Canonicalize each observed bucket through the existing catalog: an
     # exact identity hit, a same-dimension curated-alias hit, or a
@@ -1821,6 +1868,7 @@ def build_catalog(
         "generator_version": GENERATOR_VERSION,
         "observations_sha256": hashlib.sha256(raw).hexdigest(),
         "observation_rows": len(rows),
+        "current_assertion_rows": len(current_rows),
         "docket_seed_sha256": (
             hashlib.sha256(docket_raw).hexdigest() if docket_raw else None
         ),

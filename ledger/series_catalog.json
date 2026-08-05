@@ -3,6 +3,7 @@
   "generator_version": 3,
   "observations_sha256": "b0c29d7cb2aee323a5d30f8196eb59f62aa396066070131c5048740659d5e241",
   "observation_rows": 171,
+  "current_assertion_rows": 171,
   "docket_seed_sha256": "64202291e6a7b82510f1628c52d0bbd9f78246cae1342798025fb805856bb60b",
   "uuid_registry_sha256": "2858ea996975ff706ea12c112743f011dbd888c53f517535a57582194750f8f5",
   "suspect_segments": [],

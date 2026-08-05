@@ -1933,3 +1933,64 @@ def test_qualified_out_of_window_tokens_are_flagged(segment: str) -> None:
     )
     assert pattern == f"agency.rate.{segment}"
     assert bsc.suspect_segments(pattern) == [segment]
+
+
+def test_unicode_cosmetic_twins_never_fork(tmp_path: pathlib.Path) -> None:
+    # Tenth-review repro: NFC café vs NFD cafe + combining acute
+    # minted two identities; a zero-width suffix did the same.
+    nfd = "agency.café.rate"
+    with pytest.raises(SystemExit, match="not NFC-normalized"):
+        _build(tmp_path, [_row(nfd, rid="agency.cafe.rate.first_print")])
+    hidden = "agency.rate​"
+    with pytest.raises(SystemExit, match="invisible character U\\+200B"):
+        _build(tmp_path, [_row(hidden, rid="agency.rate.first_print")])
+    padded_dim = _row("agency.rate")
+    padded_dim["entity"] = {"name": "economy", "role": "aggre​gate"}
+    with pytest.raises(SystemExit, match="invisible character"):
+        _build(tmp_path, [padded_dim])
+    registry_path = tmp_path / "registry.jsonl"
+    registry_path.write_text(
+        json.dumps(_mint(nfd, U1)) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(SystemExit, match="not NFC-normalized"):
+        bsc.UuidRegistry.load(registry_path)
+
+
+def test_superseded_assertions_leave_the_catalog(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Tenth-review repro: a unit correction (append + supersedes link)
+    # previously hard-errored as a unit conflict because identity was
+    # built from raw journal lines instead of the current view.
+    original = _row("agency.rate", unit="percent")
+    original["assertionVersion"] = {"id": "av-1"}
+    correction = _row("agency.rate", unit="index_points")
+    correction["assertionVersion"] = {"id": "av-2", "supersedes": "av-1"}
+    catalog, _ = _build(tmp_path, [original, correction])
+    assert len(catalog["series"]) == 1
+    row = catalog["series"][0]
+    assert row["unit"] == "index_points"
+    assert row["observation_count"] == 1
+    assert catalog["observation_rows"] == 2
+    assert catalog["current_assertion_rows"] == 1
+
+
+def test_arch_annual_period_types_accepted(tmp_path: pathlib.Path) -> None:
+    rows = [
+        _row("agency.calendar.total.2025",
+             rid="agency.calendar.total.2025.final",
+             period={"type": "calendar_year", "value": "2025"}),
+        _row("irs.actc.total_claims.2027",
+             rid="irs.actc.total_claims.2027.first_print",
+             period={"type": "tax_year", "value": "2027"}),
+    ]
+    catalog, _ = _build(tmp_path, rows)
+    concepts = sorted(r["concept"] for r in catalog["series"])
+    assert concepts == ["agency.calendar.total", "irs.actc.total_claims"]
+    # A tax year assumes no calendar bounds: a same-number fy token stays
+    # in the identity and is flagged for curation.
+    flagged = bsc.family_pattern(
+        "irs.actc.fy2027.total", {"type": "tax_year", "value": "2027"}
+    )
+    assert flagged == "irs.actc.fy2027.total"
+    assert bsc.suspect_segments(flagged) == ["fy2027"]
