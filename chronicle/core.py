@@ -16,7 +16,18 @@ from typing import Any
 
 Scalar = str | int | float | bool | None
 
-ALLOWED_PERIOD_TYPES = {"calendar_year", "tax_year", "fiscal_year", "month"}
+# Year-typed periods store one integer. Split-label years store the opening
+# year of the publisher's label: UK fiscal year FY2024-25 is fiscal_year 2024
+# (packages/hmrc/vat_firm_targets_2024_25) and academic year AY 2024/25 is
+# academic_year 2024 (#131). Publishers that label a fiscal year with a single
+# year keep that label year (US federal FY2025 -> 2025).
+ALLOWED_PERIOD_TYPES = {
+    "calendar_year",
+    "tax_year",
+    "fiscal_year",
+    "academic_year",
+    "month",
+}
 ALLOWED_GEOGRAPHY_LEVELS = {
     "country",
     "region",

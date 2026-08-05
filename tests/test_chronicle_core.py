@@ -53,6 +53,16 @@ def test_valid_fact_passes_validation():
     assert validate_facts([_fact()]).valid
 
 
+def test_academic_year_period_type_is_valid():
+    fact = _fact(period=PeriodDimension(type="academic_year", value=2024))
+    assert validate_fact(fact) == ()
+
+
+def test_unknown_period_type_is_rejected():
+    fact = _fact(period=PeriodDimension(type="school_year", value=2024))
+    assert any(issue.code == "malformed_period" for issue in validate_fact(fact))
+
+
 def test_stable_key_ignores_human_label():
     fact = _fact()
     relabeled = _fact(label="A different display label")

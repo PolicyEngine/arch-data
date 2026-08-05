@@ -116,7 +116,8 @@
       ],
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Publisher-asserted period kind; the ledger.core.ALLOWED_PERIOD_TYPES vocabulary: calendar_year, tax_year, fiscal_year, academic_year, month. Split-label years store the opening year of the publisher's label (UK FY2024-25 -> fiscal_year 2024; AY 2024/25 -> academic_year 2024)."
         },
         "value": {
           "type": [
