@@ -771,7 +771,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 201
+    assert len(committed["series"]) == 202
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1134,8 +1134,14 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
         for row in catalog["series"]
     )
     digest = hashlib.sha256("\n".join(lines).encode()).hexdigest()
+    # Updated 2026-08-05 alongside five registry events: two docket
+    # placeholders enriched by their first observations (retire+succeeds,
+    # UUIDs preserved: bls.jolts.hires_rate,
+    # census.construction_spending.total_mom) and one fresh mint
+    # (irs.actc.total_claims docket placeholder). 201 prior bindings all
+    # unchanged.
     assert digest == (
-        "2d2552e88662eb654597999ac92f750cadbed882703324c6f9ca1f1e3ac15345"
+        "e4bba9ffc3ce4653886d6bcb7b616c7936485e9a3e1a46290c5efc98534b250d"
     )
 
 

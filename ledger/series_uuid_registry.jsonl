@@ -199,3 +199,8 @@
 {"concept": "usaspending.dod.small_business_contract_obligation_share", "geography": null, "entity": null, "uuid": "91e3b668-cb4b-4682-94a5-7ae404a6565d"}
 {"concept": "usaspending.dod.unique_prime_contract_recipients", "geography": null, "entity": null, "uuid": "96d17026-b54c-4409-98c9-339b6725fde7"}
 {"concept": "usda.fsa.crp.enrolled_acres_total", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "4266e63f-dbf3-4c86-be8d-44315dbe32e3"}
+{"concept": "bls.jolts.hires_rate", "geography": null, "entity": null, "uuid": "3bddc6d0-e581-42dc-9c13-b731a9ede21f", "retired": true, "note": "docket placeholder enriched by first observed identity"}
+{"concept": "census.construction_spending.total_mom", "geography": null, "entity": null, "uuid": "63222847-045a-4784-bd89-4d7878a2a6d8", "retired": true, "note": "docket placeholder enriched by first observed identity"}
+{"concept": "bls.jolts.hires_rate", "geography": {"level": "country", "id": "0100000US", "vintage": "current"}, "entity": {"name": "economy", "role": "aggregate"}, "uuid": "3bddc6d0-e581-42dc-9c13-b731a9ede21f", "succeeds": {"concept": "bls.jolts.hires_rate", "geography": null, "entity": null}}
+{"concept": "census.construction_spending.total_mom", "geography": {"level": "country", "id": "0100000US", "vintage": "current"}, "entity": {"name": "economy", "role": "aggregate"}, "uuid": "63222847-045a-4784-bd89-4d7878a2a6d8", "succeeds": {"concept": "census.construction_spending.total_mom", "geography": null, "entity": null}}
+{"concept": "irs.actc.total_claims", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "23396038-b31d-43cd-be08-4aa9fe916b56"}
