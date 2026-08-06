@@ -2182,3 +2182,36 @@ def test_fiscal_labels_never_assume_a_jurisdiction() -> None:
     assert bsc.family_pattern(
         "agency.total.fy2025", {"type": "fiscal_year", "value": 2025}
     ) == "agency.total.{P}"
+
+
+def test_self_succeeds_is_forbidden(tmp_path: pathlib.Path) -> None:
+    # Thirteenth-review repro: retire -> self-succeeds -> retire ->
+    # reclaim changed an exact identity's UUID with zero ceremony.
+    fresh = "dddddddd-4444-4444-8444-444444444444"
+    self_key = {"concept": "abs.labour.unemployment_rate",
+                "geography": None, "entity": None}
+    events = [
+        _mint("abs.labour.unemployment_rate", U1),
+        dict(_mint("abs.labour.unemployment_rate", U1), retired=True,
+             note="withdrawn for the forgery"),
+        dict(_mint("abs.labour.unemployment_rate", U1), succeeds=self_key),
+        dict(_mint("abs.labour.unemployment_rate", U1), retired=True,
+             note="second retirement"),
+        dict(_mint("abs.labour.unemployment_rate", fresh), reclaimed=True,
+             note="fresh uuid without ceremony"),
+    ]
+    path = tmp_path / "registry.jsonl"
+    path.write_text(
+        "".join(json.dumps(e) + "\n" for e in events), encoding="utf-8"
+    )
+    with pytest.raises(SystemExit, match="succeeds ITSELF"):
+        bsc.UuidRegistry.load(path)
+
+
+def test_check_compares_bytes_not_text(tmp_path: pathlib.Path) -> None:
+    argv = _repo(tmp_path, [_row("bls.cps.unemployment_rate")])
+    assert bsc.main(argv) == 0
+    catalog_path = tmp_path / "catalog.json"
+    crlf = catalog_path.read_bytes().replace(b"\n", b"\r\n")
+    catalog_path.write_bytes(crlf)
+    assert bsc.main(argv + ["--check"]) == 1  # byte drift is drift

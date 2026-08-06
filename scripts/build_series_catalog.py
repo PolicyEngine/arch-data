@@ -1249,6 +1249,12 @@ class UuidRegistry:
         reserved = _reserved_segment_problem(succeeds.get("concept"))
         if reserved:
             return f"line {lineno}: succeeds {reserved}"
+        if self.entry_key(succeeds) == key:
+            return (
+                f"line {lineno}: {key} succeeds ITSELF — self-handover "
+                "would forge consumption and unlock a ceremony-free "
+                "reclaim of a fresh UUID"
+            )
         for what, allowed in (
             ("geography", ("level", "id", "vintage")),
             ("entity", ("name", "role")),
@@ -2256,12 +2262,11 @@ def main(argv: list[str] | None = None) -> int:
         failures.extend(identity_changes)
         catalog["uuid_registry_sha256"] = registry.sha256()
         body = render(catalog)
-        current = (
-            args.catalog.read_text(encoding="utf-8")
-            if args.catalog.exists()
-            else ""
+        current_bytes = (
+            args.catalog.read_bytes() if args.catalog.exists() else b""
         )
-        if current != body:
+        current = current_bytes.decode("utf-8", errors="replace")
+        if current_bytes != body.encode("utf-8"):
             failures.append(
                 "series_catalog.json is stale for these inputs; regenerate "
                 "with scripts/build_series_catalog.py"
