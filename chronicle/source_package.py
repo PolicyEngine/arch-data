@@ -80,6 +80,7 @@ SOURCE_PACKAGE_ALIASES = {
     "bea-regional-state-personal-income-components-2024": Path(
         "bea/regional_personal_income_state"
     ),
+    "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-salary-sacrifice-relief-2024": Path("hmrc/salary_sacrifice_relief_2024_25"),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
