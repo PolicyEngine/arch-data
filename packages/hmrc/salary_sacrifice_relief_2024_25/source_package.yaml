@@ -1,0 +1,428 @@
+# Tax year 2024-25 edition (updated 2026-07-30) - a newer vintage than the
+# dead asset policyengine-uk-data pins (its runtime download now returns
+# status gone and silently drops these targets). Headline Total-sector/
+# Total-scheme rows only; by-rate NICs splits include [z]-suppressed cells
+# and are not ported. uk-data's 3 percent p.a. uprating of the old base is
+# a computed series the facts-only ADR excludes. Period stores the opening
+# year (2024 to 2025 -> tax_year 2024).
+schema_version: ledger.source_package.v1
+package_id: hmrc-salary-sacrifice-relief-2024
+label: 'HMRC salary sacrifice pension contributions: income tax and NICs relief, tax year
+  2024-25'
+artifact:
+  source_name: hmrc
+  source_table: 'Private pension statistics Tables 6.1 and 6.2: salary sacrifice pension contributions,
+    income tax and NICs relief, tax year 2024 to 2025'
+  resource_package: db
+  resource_directory: data/hmrc/salary_sacrifice_relief_2024_25
+  manifest: manifest.yaml
+  vintage: private_pension_statistics_2026_07
+  extracted_at: '2026-08-06'
+  extraction_method: delimited text full-row parse with selected source-row cells
+  parser: delimited_text_full_rows
+  artifact_year: 2025
+record_sets:
+- record_set_id: hmrc.ss_relief.ty2024.it_relief_total
+  provenance_class: administrative
+  record_set_spec_id: hmrc.ss_relief.ty2024.it_relief_total.v1
+  source_record_id_prefix: hmrc.ss_relief.ty2024.it_relief_total
+  sheet_name: Tables_6_1_and_6_2
+  period_type: tax_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: pension_contribution_reliefs
+  groupby_dimension: hmrc.ss_relief_line
+  rows:
+  - value_id: it_relief_total
+    label: Income tax relief on salary sacrificed contributions, total
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: G
+    expected_row_header: Total
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 4
+      expected_value: Income Tax
+      label: income tax or NICs
+    - column: C
+      row: 4
+      expected_value: Salary sacrificed contributions
+      label: contribution type
+    - column: D
+      row: 4
+      expected_value: Not applicable
+      label: NICs relief class
+    - column: E
+      row: 4
+      expected_value: Total
+      label: sector
+    - column: F
+      row: 4
+      expected_value: Total
+      label: scheme type
+    - column: A
+      row: 4
+      expected_value: 2024 to 2025
+      label: tax year
+  measures:
+  - measure_id: relief
+    label: Income tax relief on salary sacrificed contributions, total
+    ordinal: 0
+    column: H
+    source_column_id: value_of_relief
+    expected_column_header_row: 1
+    expected_column_header: value_of_relief
+    concept: hmrc.ss_income_tax_relief_total
+    source_concept: hmrc.ss_income_tax_relief_total
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
+    concept_evidence_notes: 'Private pension statistics (updated 2026-07-30), tidy CSV Tables
+      6.1/6.2, tax year 2024 to 2025, GBP million; row: Income tax relief on salary sacrificed
+      contributions, total.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: hmrc.ss_relief.ty2024.it_relief_basic_rate
+  provenance_class: administrative
+  record_set_spec_id: hmrc.ss_relief.ty2024.it_relief_basic_rate.v1
+  source_record_id_prefix: hmrc.ss_relief.ty2024.it_relief_basic_rate
+  sheet_name: Tables_6_1_and_6_2
+  period_type: tax_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: pension_contribution_reliefs
+  groupby_dimension: hmrc.ss_relief_line
+  rows:
+  - value_id: it_relief_basic_rate
+    label: Income tax relief, basic rate
+    ordinal: 0
+    row_number: 29
+    expected_row_header_column: G
+    expected_row_header: Basic Rate
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 29
+      expected_value: Income Tax
+      label: income tax or NICs
+    - column: C
+      row: 29
+      expected_value: Salary sacrificed contributions
+      label: contribution type
+    - column: D
+      row: 29
+      expected_value: Not applicable
+      label: NICs relief class
+    - column: E
+      row: 29
+      expected_value: Total
+      label: sector
+    - column: F
+      row: 29
+      expected_value: Total
+      label: scheme type
+    - column: A
+      row: 29
+      expected_value: 2024 to 2025
+      label: tax year
+  measures:
+  - measure_id: relief
+    label: Income tax relief, basic rate
+    ordinal: 0
+    column: H
+    source_column_id: value_of_relief
+    expected_column_header_row: 1
+    expected_column_header: value_of_relief
+    concept: hmrc.ss_income_tax_relief_basic_rate
+    source_concept: hmrc.ss_income_tax_relief_basic_rate
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
+    concept_evidence_notes: 'Private pension statistics (updated 2026-07-30), tidy CSV Tables
+      6.1/6.2, tax year 2024 to 2025, GBP million; row: Income tax relief, basic rate.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: hmrc.ss_relief.ty2024.it_relief_higher_rate
+  provenance_class: administrative
+  record_set_spec_id: hmrc.ss_relief.ty2024.it_relief_higher_rate.v1
+  source_record_id_prefix: hmrc.ss_relief.ty2024.it_relief_higher_rate
+  sheet_name: Tables_6_1_and_6_2
+  period_type: tax_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: pension_contribution_reliefs
+  groupby_dimension: hmrc.ss_relief_line
+  rows:
+  - value_id: it_relief_higher_rate
+    label: Income tax relief, higher rate
+    ordinal: 0
+    row_number: 34
+    expected_row_header_column: G
+    expected_row_header: Higher Rate
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 34
+      expected_value: Income Tax
+      label: income tax or NICs
+    - column: C
+      row: 34
+      expected_value: Salary sacrificed contributions
+      label: contribution type
+    - column: D
+      row: 34
+      expected_value: Not applicable
+      label: NICs relief class
+    - column: E
+      row: 34
+      expected_value: Total
+      label: sector
+    - column: F
+      row: 34
+      expected_value: Total
+      label: scheme type
+    - column: A
+      row: 34
+      expected_value: 2024 to 2025
+      label: tax year
+  measures:
+  - measure_id: relief
+    label: Income tax relief, higher rate
+    ordinal: 0
+    column: H
+    source_column_id: value_of_relief
+    expected_column_header_row: 1
+    expected_column_header: value_of_relief
+    concept: hmrc.ss_income_tax_relief_higher_rate
+    source_concept: hmrc.ss_income_tax_relief_higher_rate
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
+    concept_evidence_notes: 'Private pension statistics (updated 2026-07-30), tidy CSV Tables
+      6.1/6.2, tax year 2024 to 2025, GBP million; row: Income tax relief, higher rate.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: hmrc.ss_relief.ty2024.it_relief_additional_rate
+  provenance_class: administrative
+  record_set_spec_id: hmrc.ss_relief.ty2024.it_relief_additional_rate.v1
+  source_record_id_prefix: hmrc.ss_relief.ty2024.it_relief_additional_rate
+  sheet_name: Tables_6_1_and_6_2
+  period_type: tax_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: pension_contribution_reliefs
+  groupby_dimension: hmrc.ss_relief_line
+  rows:
+  - value_id: it_relief_additional_rate
+    label: Income tax relief, additional rate
+    ordinal: 0
+    row_number: 39
+    expected_row_header_column: G
+    expected_row_header: Additional Rate
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 39
+      expected_value: Income Tax
+      label: income tax or NICs
+    - column: C
+      row: 39
+      expected_value: Salary sacrificed contributions
+      label: contribution type
+    - column: D
+      row: 39
+      expected_value: Not applicable
+      label: NICs relief class
+    - column: E
+      row: 39
+      expected_value: Total
+      label: sector
+    - column: F
+      row: 39
+      expected_value: Total
+      label: scheme type
+    - column: A
+      row: 39
+      expected_value: 2024 to 2025
+      label: tax year
+  measures:
+  - measure_id: relief
+    label: Income tax relief, additional rate
+    ordinal: 0
+    column: H
+    source_column_id: value_of_relief
+    expected_column_header_row: 1
+    expected_column_header: value_of_relief
+    concept: hmrc.ss_income_tax_relief_additional_rate
+    source_concept: hmrc.ss_income_tax_relief_additional_rate
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
+    concept_evidence_notes: 'Private pension statistics (updated 2026-07-30), tidy CSV Tables
+      6.1/6.2, tax year 2024 to 2025, GBP million; row: Income tax relief, additional rate.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: hmrc.ss_relief.ty2024.nics_relief_employee
+  provenance_class: administrative
+  record_set_spec_id: hmrc.ss_relief.ty2024.nics_relief_employee.v1
+  source_record_id_prefix: hmrc.ss_relief.ty2024.nics_relief_employee
+  sheet_name: Tables_6_1_and_6_2
+  period_type: tax_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: pension_contribution_reliefs
+  groupby_dimension: hmrc.ss_relief_line
+  rows:
+  - value_id: nics_relief_employee
+    label: Class 1 primary (employee) NICs relief
+    ordinal: 0
+    row_number: 44
+    expected_row_header_column: G
+    expected_row_header: Total
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 44
+      expected_value: NICs
+      label: income tax or NICs
+    - column: C
+      row: 44
+      expected_value: Salary sacrificed contributions
+      label: contribution type
+    - column: D
+      row: 44
+      expected_value: Class 1 Primary (employee)
+      label: NICs relief class
+    - column: E
+      row: 44
+      expected_value: Total
+      label: sector
+    - column: F
+      row: 44
+      expected_value: Total
+      label: scheme type
+    - column: A
+      row: 44
+      expected_value: 2024 to 2025
+      label: tax year
+  measures:
+  - measure_id: relief
+    label: Class 1 primary (employee) NICs relief
+    ordinal: 0
+    column: H
+    source_column_id: value_of_relief
+    expected_column_header_row: 1
+    expected_column_header: value_of_relief
+    concept: hmrc.ss_nics_relief_employee
+    source_concept: hmrc.ss_nics_relief_employee
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
+    concept_evidence_notes: 'Private pension statistics (updated 2026-07-30), tidy CSV Tables
+      6.1/6.2, tax year 2024 to 2025, GBP million; row: Class 1 primary (employee) NICs relief.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: hmrc.ss_relief.ty2024.nics_relief_employer
+  provenance_class: administrative
+  record_set_spec_id: hmrc.ss_relief.ty2024.nics_relief_employer.v1
+  source_record_id_prefix: hmrc.ss_relief.ty2024.nics_relief_employer
+  sheet_name: Tables_6_1_and_6_2
+  period_type: tax_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: pension_contribution_reliefs
+  groupby_dimension: hmrc.ss_relief_line
+  rows:
+  - value_id: nics_relief_employer
+    label: Class 1 secondary (employer) NICs relief
+    ordinal: 0
+    row_number: 47
+    expected_row_header_column: G
+    expected_row_header: Total
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 47
+      expected_value: NICs
+      label: income tax or NICs
+    - column: C
+      row: 47
+      expected_value: Salary sacrificed contributions
+      label: contribution type
+    - column: D
+      row: 47
+      expected_value: Class 1 Secondary (employer)
+      label: NICs relief class
+    - column: E
+      row: 47
+      expected_value: Total
+      label: sector
+    - column: F
+      row: 47
+      expected_value: Total
+      label: scheme type
+    - column: A
+      row: 47
+      expected_value: 2024 to 2025
+      label: tax year
+  measures:
+  - measure_id: relief
+    label: Class 1 secondary (employer) NICs relief
+    ordinal: 0
+    column: H
+    source_column_id: value_of_relief
+    expected_column_header_row: 1
+    expected_column_header: value_of_relief
+    concept: hmrc.ss_nics_relief_employer
+    source_concept: hmrc.ss_nics_relief_employer
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
+    concept_evidence_notes: 'Private pension statistics (updated 2026-07-30), tidy CSV Tables
+      6.1/6.2, tax year 2024 to 2025, GBP million; row: Class 1 secondary (employer) NICs
+      relief.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
