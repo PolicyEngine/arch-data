@@ -1,0 +1,2730 @@
+# OBR EFO March 2026. Values are GBP billion in the workbook (value_scale 1e9).
+# Fiscal-year periods store the opening year (FY2024-25 -> 2024), matching the
+# hmrc fy2024_25 precedent. Explicit per-year record sets (not {year}
+# templating) so the full 2024-2030 forecast surface lands in every build;
+# see PolicyEngine/ledger#135 on bundle year handling. Row labels are exact
+# cell text including OBR footnote markers (e.g. 'Incapacity benefits2').
+schema_version: ledger.source_package.v1
+package_id: obr-efo-receipts-march-2026
+label: 'OBR EFO March 2026 detailed forecast tables: receipts'
+artifact:
+  source_name: obr
+  source_table: 'EFO March 2026 detailed forecast tables: receipts'
+  resource_package: db
+  resource_directory: data/obr/efo_receipts_march_2026
+  manifest: manifest.yaml
+  vintage: efo_march_2026
+  extracted_at: '2026-08-06'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2026
+record_sets:
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2024
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2024-25
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2025
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2025-26
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2026
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2026-27
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2027
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2027-28
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2028
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2028-29
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2029
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2029-30
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.income_tax.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2030
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: income_tax
+    label: Income tax (gross of tax credits)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: B
+    expected_row_header: Income tax (gross of tax credits)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Income tax (gross of tax credits), FY2030-31
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.income_tax
+    source_concept: obr.income_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 6
+      ('Income tax (gross of tax credits)'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2024
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2024-25
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2025
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2025-26
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2026
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2026-27
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2027
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2027-28
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2028
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2028-29
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2029
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2029-30
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2030
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employee
+    label: Class 1 Employee NICs
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employee NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employee NICs, FY2030-31
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.ni_employee
+    source_concept: obr.ni_employee
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 17
+      ('Class 1 Employee NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2024
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2024-25
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2025
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2025-26
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2026
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2026-27
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2027
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2027-28
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2028
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2028-29
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2029
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2029-30
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2030
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_employer
+    label: Class 1 Employer NICs
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: Class 1 Employer NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 1 Employer NICs, FY2030-31
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.ni_employer
+    source_concept: obr.ni_employer
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 18
+      ('Class 1 Employer NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2024
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2024-25
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2025
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2025-26
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2026
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2026-27
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2027
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2027-28
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2028
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2028-29
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2029
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2029-30
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2030
+  sheet_name: '3.4'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_self_employed
+    label: Class 4 and Class 2 Self employed NICs
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: Class 4 and Class 2 Self employed NICs
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Class 4 and Class 2 Self employed NICs, FY2030-31
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.ni_self_employed
+    source_concept: obr.ni_self_employed
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.4, row 19
+      ('Class 4 and Class 2 Self employed NICs'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2024
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2024-25
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2025
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2025-26
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2026
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2026-27
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2027
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2027-28
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2028
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2028-29
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2029
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2029-30
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.ni_total.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2030
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: ni_total
+    label: National insurance contributions
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: National insurance contributions
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: National insurance contributions, FY2030-31
+    ordinal: 0
+    column: J
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.ni_total
+    source_concept: obr.ni_total
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 12
+      ('National insurance contributions'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2024
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2024-25
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2025
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2025-26
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2026
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2026-27
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2027
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2027-28
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2028
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2028-29
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2029
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2029-30
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.vat.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2030
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: vat
+    label: Value added tax
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: Value added tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Value added tax, FY2030-31
+    ordinal: 0
+    column: J
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.vat
+    source_concept: obr.vat
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 13
+      ('Value added tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2024
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2024-25
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2025
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2025-26
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2026
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2026-27
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2027
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2027-28
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2028
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2028-29
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2029
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2029-30
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2030
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: fuel_duties
+    label: Fuel duties
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Fuel duties
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Fuel duties, FY2030-31
+    ordinal: 0
+    column: J
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.fuel_duties
+    source_concept: obr.fuel_duties
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 21
+      ('Fuel duties'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2024
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2024-25
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2025
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2025-26
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2026
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2026-27
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2027
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2027-28
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2028
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2028-29
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2029
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2029-30
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2030
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: capital_gains_tax
+    label: Capital gains tax
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: Capital gains tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Capital gains tax, FY2030-31
+    ordinal: 0
+    column: J
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.capital_gains_tax
+    source_concept: obr.capital_gains_tax
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 22
+      ('Capital gains tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2024.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2024
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2024-25
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2024-25
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2025.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2025
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2025-26
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2025-26
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2026.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2026
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2026
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2026-27
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2026-27
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2027.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2027
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2027
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2027-28
+    ordinal: 0
+    column: G
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2027-28
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2028.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2028
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2028
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2028-29
+    ordinal: 0
+    column: H
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2028-29
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2029.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2029
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2029
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2029-30
+    ordinal: 0
+    column: I
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2029-30
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
+- record_set_id: obr.efo_2026_03.receipts.sdlt.fy2030
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2030.v1
+  source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2030
+  sheet_name: '3.8'
+  period_type: fiscal_year
+  period: 2030
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: public_sector_finances
+  groupby_dimension: obr.efo_line
+  rows:
+  - value_id: sdlt
+    label: Stamp duty land tax
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: Stamp duty land tax
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Stamp duty land tax, FY2030-31
+    ordinal: 0
+    column: J
+    source_column_id: amount
+    expected_column_header_row: 5
+    expected_column_header: 2030-31
+    concept: obr.sdlt
+    source_concept: obr.sdlt
+    concept_relation: source_label
+    concept_authority: obr
+    concept_evidence_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-receipts/
+    concept_evidence_notes: OBR EFO March 2026 detailed forecast tables, sheet 3.8, row 24
+      ('Stamp duty land tax'), GBP billion.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000000
+    expected_cell_type: number
