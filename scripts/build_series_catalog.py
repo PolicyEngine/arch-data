@@ -401,33 +401,26 @@ def period_descriptor(period: dict | None) -> tuple | None:
     return None
 
 
-def _fiscal_year_span(year: int) -> tuple[dt.date, dt.date]:
-    # US federal fiscal year, the only fiscal calendar in the ledger today.
-    return dt.date(year - 1, 10, 1), dt.date(year, 9, 30)
-
-
 def _matches_period(token: tuple, period_desc: tuple) -> bool:
-    """Whether a parsed token denotes the row's own period (window overlap).
+    """Whether a parsed token denotes the row's own period.
 
-    Fiscal-year tokens match a fiscal-year period only on equal years; mixed
-    fiscal/calendar comparisons use the US federal fiscal calendar.
+    Sub-year windows compare by calendar overlap. Year-grained labels
+    (fiscal, tax, calendar) agree only by NUMBER and only against
+    year-grained periods: fiscal calendars differ by jurisdiction (US
+    October-September, UK/AU April and July starts), so no calendar span
+    is ever assumed for an fy token — on month/quarter/week rows fiscal
+    labels stay in the identity and are flagged for curation.
     """
     if period_desc[0] == "tax_year":
         return False
-    if token[0] == "fiscal_year" and period_desc[0] == "fiscal_year":
-        return token[1] == period_desc[1]
-    if token[0] == "fiscal_year" and period_desc[0] == "year":
-        # Year-grained labels must agree by NUMBER: fy2025 on a calendar-
-        # 2024 row overlaps three months, but treating that as "the row's
-        # own period" merged adjacent years end to end.
-        return token[1] == period_desc[1]
-    a = _fiscal_year_span(token[1]) if token[0] == "fiscal_year" else token[1]
+    if token[0] == "fiscal_year":
+        if period_desc[0] in ("fiscal_year", "year"):
+            return token[1] == period_desc[1]
+        return False
     if period_desc[0] == "fiscal_year":
-        b = _fiscal_year_span(period_desc[1])
-    elif period_desc[0] == "year":
-        b = period_desc[2]
-    else:
-        b = period_desc[1]
+        return False
+    b = period_desc[2] if period_desc[0] == "year" else period_desc[1]
+    a = token[1]
     return a[0] <= b[1] and b[0] <= a[1]
 
 
@@ -768,9 +761,21 @@ class ExistingCatalog:
             self.by_dim.setdefault((key[1], key[2]), []).append(row)
             if row.get("status") == "docket-only":
                 self.docket_rows.append(row)
+        alias_holders = Counter(
+            alias for row in self.rows for alias in row.get("aliases", [])
+        )
+        canonical = {row["concept"] for row in self.rows}
+        # A name that resolves to more than one row — several alias
+        # holders, or an alias colliding with any canonical concept —
+        # never drives name-based resolution in any tier.
+        self.ambiguous_names = {
+            alias
+            for alias, count in alias_holders.items()
+            if count > 1 or alias in canonical
+        }
 
     def _row_names(self, row: dict) -> set[str]:
-        return {row["concept"], *row.get("aliases", [])}
+        return {row["concept"], *row.get("aliases", [])} - self.ambiguous_names
 
     def match(
         self,
@@ -997,6 +1002,29 @@ class UuidRegistry:
             if not isinstance(entry, dict):
                 problems.append(f"line {lineno}: not an object")
                 continue
+            unknown_fields = set(entry) - {
+                "concept", "geography", "entity", "uuid",
+                "supersedes", "note", "retired", "revived", "succeeds",
+                "reclaimed",
+            }
+            if unknown_fields:
+                problems.append(
+                    f"line {lineno}: undeclared event fields "
+                    f"{sorted(unknown_fields)}"
+                )
+                continue
+            null_fields = [
+                field
+                for field in ("supersedes", "note", "retired", "revived",
+                              "succeeds", "reclaimed")
+                if field in entry and entry[field] is None
+            ]
+            if null_fields:
+                problems.append(
+                    f"line {lineno}: null-valued marker fields "
+                    f"{sorted(null_fields)} — omit absent markers entirely"
+                )
+                continue
             reserved = _reserved_segment_problem(entry.get("concept"))
             if reserved:
                 problems.append(f"line {lineno}: {reserved}")
@@ -1040,6 +1068,17 @@ class UuidRegistry:
                     f"line {lineno}: {key} mixes "
                     "supersede/retire/revive/succeeds markers"
                 )
+            elif succeeds is not None and previous is not None:
+                if not self._is_retired(previous):
+                    problems.append(
+                        f"line {lineno}: {key} has a live binding — only a "
+                        "retired identity can return via succeeds"
+                    )
+                succeeds_problem = self._succeeds_problem(
+                    lineno, key, entry, succeeds
+                )
+                if succeeds_problem:
+                    problems.append(succeeds_problem)
             elif previous is None and supersedes is None and retired is None \
                     and revived is None and reclaimed is None:
                 owner = self.uuid_owner.get(parsed)
@@ -1160,6 +1199,16 @@ class UuidRegistry:
                 problems.append(
                     f"line {lineno}: {key} re-binds without supersedes "
                     f"(prior uuid {previous['uuid']})"
+                )
+            if "note" in entry and not (
+                supersedes is not None
+                or retired is not None
+                or reclaimed is not None
+            ):
+                problems.append(
+                    f"line {lineno}: {key} carries a note on an event kind "
+                    "that takes none (notes belong to "
+                    "supersede/retire/reclaim)"
                 )
             previous_entry = self.latest.get(key)
             if previous_entry is not None:
@@ -1752,11 +1801,12 @@ def build_catalog(
                     f"string 'series': {json.dumps(entry)[:120]}"
                 )
         alias_tally = Counter(alias for row in series for alias in row["aliases"])
+        built_canonicals = {row["concept"] for row in series}
         name_rows: dict[str, list[dict]] = {}
         for row in series:
             name_rows.setdefault(row["concept"], []).append(row)
             for alias in row["aliases"]:
-                if alias_tally[alias] == 1:
+                if alias_tally[alias] == 1 and alias not in built_canonicals:
                     name_rows.setdefault(alias, []).append(row)
         seen_docket_names: set[str] = set()
         for entry in docket_series:

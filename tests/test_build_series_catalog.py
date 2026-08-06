@@ -356,7 +356,11 @@ def test_curated_alias_does_not_inherit_across_geography(
     assert stolen["series"][0]["uuid"] != first["series"][0]["uuid"]
 
 
-def test_ambiguous_alias_match_is_a_hard_error(tmp_path: pathlib.Path) -> None:
+def test_ambiguous_alias_never_drives_inheritance(
+    tmp_path: pathlib.Path,
+) -> None:
+    # A name held as an alias by two rows resolves to neither: the
+    # incoming spelling mints fresh and the ambiguity stays surfaced.
     existing = {
         "series": [
             {
@@ -375,8 +379,25 @@ def test_ambiguous_alias_match_is_a_hard_error(tmp_path: pathlib.Path) -> None:
             },
         ]
     }
-    with pytest.raises(SystemExit, match="multiple existing UUIDs"):
-        _build(tmp_path, [_row("SHARED")], existing=existing)
+    # Without a competing spelling, the double alias simply stays
+    # surfaced and resolves to nothing.
+    catalog, _ = _build(
+        tmp_path, [_row("a.one"), _row("a.two")], existing=existing
+    )
+    assert catalog["ambiguous_aliases"] == ["SHARED"]
+    assert {r["uuid"] for r in catalog["series"]} == {
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222",
+    }
+    # An incoming observation SPELLED like the ambiguous name inherits
+    # nothing; the resulting same-dimension canonical/alias collision is
+    # the contradiction hard-error, never a silent theft.
+    with pytest.raises(SystemExit, match="contradictory curation"):
+        _build(
+            tmp_path,
+            [_row("a.one"), _row("a.two"), _row("SHARED")],
+            existing=existing,
+        )
 
 
 def test_docket_placeholder_enrichment_keeps_uuid(
@@ -2064,3 +2085,100 @@ def test_assertion_version_preconditions(tmp_path: pathlib.Path) -> None:
     f["assertionVersion"] = {"id": "w", "supersedes": "missing"}
     with pytest.raises(SystemExit, match="unknown version"):
         _build(tmp_path, [f])
+
+
+def test_cross_dimension_ambiguous_alias_never_steals(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Twelfth-review repro: GB canonical agency.rate + US row aliased to
+    # it; an incoming US agency.rate observation previously inherited the
+    # US alias-holder's UUID silently. Now the ambiguous name resolves to
+    # nothing and the resulting same-dimension collision refuses loudly.
+    first, _ = _build(
+        tmp_path,
+        [_row("agency.rate", geography=dict(BRITAIN)), _row("agency.other")],
+    )
+    us_row = next(
+        r for r in first["series"] if r["concept"] == "agency.other"
+    )
+    us_row["aliases"] = ["agency.rate"]
+    with pytest.raises(SystemExit, match="contradictory curation"):
+        _build(
+            tmp_path,
+            [
+                _row("agency.rate", geography=dict(BRITAIN)),
+                _row("agency.other"),
+                _row("agency.rate"),
+            ],
+            existing=first,
+        )
+
+
+def test_reenrichment_of_a_retired_successor(tmp_path: pathlib.Path) -> None:
+    # Twelfth-review lifecycle: placeholder A/U1 -> enriched B/U1 ->
+    # B retired + A reclaimed as U2 -> B observations return. The
+    # grammar accepts B returning via succeeds on the CURRENT placeholder
+    # lineage (consuming A/U2) instead of dead-ending.
+    fresh = "dddddddd-4444-4444-8444-444444444444"
+    a_key = {"concept": "census.m3.new_orders", "geography": None,
+             "entity": None}
+    b_geo = {"level": "country", "id": "0100000US", "vintage": "current"}
+    b_ent = {"name": "economy", "role": "aggregate"}
+    events = [
+        _mint("census.m3.new_orders", U1),
+        dict(_mint("census.m3.new_orders", U1), retired=True,
+             note="placeholder enriched"),
+        dict(_mint("census.m3.new_orders", U1, geography=b_geo,
+                   entity=b_ent), succeeds=a_key),
+        dict(_mint("census.m3.new_orders", U1, geography=b_geo,
+                   entity=b_ent), retired=True,
+             note="observation withdrawn upstream"),
+        dict(_mint("census.m3.new_orders", fresh), reclaimed=True,
+             note="placeholder re-established after handover"),
+        dict(_mint("census.m3.new_orders", fresh), retired=True,
+             note="placeholder enriched again"),
+        dict(_mint("census.m3.new_orders", fresh, geography=b_geo,
+                   entity=b_ent), succeeds=a_key),
+    ]
+    path = tmp_path / "registry.jsonl"
+    path.write_text(
+        "".join(json.dumps(e) + "\n" for e in events), encoding="utf-8"
+    )
+    registry = bsc.UuidRegistry.load(path)
+    b_binding = registry.binding((
+        "census.m3.new_orders", bsc._geo_key(b_geo), bsc._entity_key(b_ent)
+    ))
+    assert b_binding == fresh and registry.is_live((
+        "census.m3.new_orders", bsc._geo_key(b_geo), bsc._entity_key(b_ent)
+    ))
+
+
+def test_registry_event_keyset_is_closed(tmp_path: pathlib.Path) -> None:
+    path = tmp_path / "registry.jsonl"
+    typo = dict(_mint("a.one", U1), supersedez=U2)
+    path.write_text(json.dumps(typo) + "\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="undeclared event fields"):
+        bsc.UuidRegistry.load(path)
+    nulled = dict(_mint("a.one", U1), retired=None)
+    path.write_text(json.dumps(nulled) + "\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="null-valued marker"):
+        bsc.UuidRegistry.load(path)
+    chatty = dict(_mint("a.one", U1), note="a mint explaining itself")
+    path.write_text(json.dumps(chatty) + "\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="takes none"):
+        bsc.UuidRegistry.load(path)
+
+
+def test_fiscal_labels_never_assume_a_jurisdiction() -> None:
+    # Twelfth-review repro: fy2026 stripped from an AU July-2026 monthly
+    # row through the hard-coded US fiscal window.
+    pattern = bsc.family_pattern(
+        "au.agency.edition.fy2026.rate",
+        {"type": "month", "value": "2026-07"},
+    )
+    assert pattern == "au.agency.edition.fy2026.rate"
+    assert bsc.suspect_segments(pattern) == ["fy2026"]
+    # Year-number agreement still strips on year-grained rows.
+    assert bsc.family_pattern(
+        "agency.total.fy2025", {"type": "fiscal_year", "value": 2025}
+    ) == "agency.total.{P}"
