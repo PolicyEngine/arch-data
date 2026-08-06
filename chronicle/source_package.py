@@ -198,6 +198,8 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
+    "ons-savings-interest-income": Path("ons/savings_interest_income"),
+    "ons-families-households-2025": Path("ons/families_households_2025"),
     "ons-uk-business-firm-targets-2025": Path("ons/uk_business_firm_targets_2025"),
     "ons-uk-business-firm-sector-targets-2025": Path(
         "ons/uk_business_firm_sector_targets_2025"

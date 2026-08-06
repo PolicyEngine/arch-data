@@ -1,0 +1,13 @@
+source_id: ons
+package_id: ons-savings-interest-income
+dataset: ons_ons-savings-interest-income
+source_page: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+table: 'UKEA time series HAXV: Households (S.14) interest (D.41) resources, current price GBP million
+  NSA'
+files:
+  2025:
+    filename: haxv.csv
+    source_url: https://www.ons.gov.uk/generator?format=csv&uri=/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    sha256: e19959488d2cfd5dcf16e58e1ea40916f6ada02a56340cc6d9099983ab3d7455
+    size_bytes: 3517
+    fetched_at: '2026-08-06T12:54:37+00:00'

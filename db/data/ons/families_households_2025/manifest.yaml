@@ -1,0 +1,12 @@
+source_id: ons
+package_id: ons-families-households-2025
+dataset: ons_ons-families-households-2025
+source_page: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+table: 'Families and households in the UK 2025, Table 7: households by type'
+files:
+  2025:
+    filename: familiesandhouseholdsuk2025.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds/current/familiesandhouseholdsuk2025.xlsx
+    sha256: a89eaa3d7f519bfa949c7cfa12f531b8c7a86c704adcb70e81f49567ae724a91
+    size_bytes: 209085
+    fetched_at: '2026-08-06T12:54:50+00:00'
