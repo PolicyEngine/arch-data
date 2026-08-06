@@ -751,6 +751,13 @@ class ExistingCatalog:
             return
         catalog = json.loads(path.read_text(encoding="utf-8"))
         for row in catalog.get("series", []):
+            for alias in row.get("aliases", []):
+                problem = _reserved_segment_problem(alias)
+                if problem:
+                    raise SystemExit(
+                        f"catalog row {row.get('concept')!r} carries an "
+                        f"invalid alias: {problem}"
+                    )
             self.rows.append(row)
             key = (
                 row["concept"],
@@ -1401,7 +1408,59 @@ def build_catalog(
     # assertionVersion.supersedes names the version it replaces. Series
     # identity must follow the supersede-aware CURRENT view (the same one
     # the ledger's aggregate-fact validation uses), or superseded
-    # assertions would keep stale identities alive forever.
+    # assertions would keep stale identities alive forever. The imported
+    # helper assumes append-gate-validated input; standalone runs get the
+    # same preconditions enforced here (unique ids, resolvable links, no
+    # cycles).
+    seen_ids: dict[str, int] = {}
+    links: dict[str, str] = {}
+    for index, row in enumerate(rows):
+        version = row.get("assertionVersion")
+        if version is None:
+            continue
+        if not isinstance(version, dict) or not isinstance(
+            version.get("id"), str
+        ) or not version["id"]:
+            raise SystemExit(
+                f"observation row {index}: assertionVersion must carry a "
+                "nonempty string id"
+            )
+        vid = version["id"]
+        if vid in seen_ids:
+            raise SystemExit(
+                f"observation row {index}: assertionVersion id {vid!r} "
+                f"duplicates row {seen_ids[vid]}"
+            )
+        seen_ids[vid] = index
+        supersedes = version.get("supersedes")
+        if supersedes is not None:
+            if not isinstance(supersedes, str) or not supersedes:
+                raise SystemExit(
+                    f"observation row {index}: assertionVersion.supersedes "
+                    "must be a nonempty string"
+                )
+            if supersedes == vid:
+                raise SystemExit(
+                    f"observation row {index}: assertionVersion {vid!r} "
+                    "supersedes itself"
+                )
+            links[vid] = supersedes
+    for vid, target in links.items():
+        if target not in seen_ids:
+            raise SystemExit(
+                f"assertionVersion {vid!r} supersedes unknown version "
+                f"{target!r}"
+            )
+    for start in links:
+        seen_chain = {start}
+        cursor = links.get(start)
+        while cursor is not None:
+            if cursor in seen_chain:
+                raise SystemExit(
+                    f"assertionVersion supersede cycle through {cursor!r}"
+                )
+            seen_chain.add(cursor)
+            cursor = links.get(cursor)
     try:
         from check_thesis_facts_append import effective_current_rows
     except ImportError as exc:  # pragma: no cover - environment guard
@@ -1842,8 +1901,33 @@ def build_catalog(
                            _entity_key(e["entity"]))
         )
 
+    canonical_names: dict[str, list[dict]] = {}
+    for row in series:
+        canonical_names.setdefault(row["concept"], []).append(row)
     alias_counts = Counter(alias for row in series for alias in row["aliases"])
-    ambiguous_aliases = sorted(a for a, n in alias_counts.items() if n > 1)
+    for row in series:
+        row_dim = (_geo_key(row.get("geography")),
+                   _entity_key(row.get("entity")))
+        for alias in row["aliases"]:
+            for other in canonical_names.get(alias, []):
+                other_dim = (_geo_key(other.get("geography")),
+                             _entity_key(other.get("entity")))
+                if other is not row and other_dim == row_dim:
+                    raise SystemExit(
+                        f"alias {alias!r} on {row['concept']!r} names the "
+                        f"canonical concept of {other['uuid']} in the same "
+                        "geography/entity — contradictory curation: finish "
+                        "the merge (delete the absorbed row) or drop the "
+                        "alias"
+                    )
+    # An alias is ambiguous when the NAME resolves to more than one row —
+    # via multiple alias holders or by colliding with any canonical
+    # concept. Ambiguous names never drive inheritance or docket claims.
+    ambiguous_aliases = sorted(
+        alias
+        for alias, count in alias_counts.items()
+        if count > 1 or alias in canonical_names
+    )
 
     catalog = {
         "comment": (

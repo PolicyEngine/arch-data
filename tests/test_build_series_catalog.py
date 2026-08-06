@@ -1994,3 +1994,73 @@ def test_arch_annual_period_types_accepted(tmp_path: pathlib.Path) -> None:
     )
     assert flagged == "irs.actc.fy2027.total"
     assert bsc.suspect_segments(flagged) == ["fy2027"]
+
+
+def test_alias_naming_a_same_dimension_canonical_is_contradictory(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Eleventh-review repro: one exact name resolving to two live UUIDs
+    # with ambiguous_aliases empty.
+    first, _ = _build(
+        tmp_path, [_row("agency.one"), _row("agency.rate")]
+    )
+    one = next(r for r in first["series"] if r["concept"] == "agency.one")
+    one["aliases"] = ["agency.rate"]
+    with pytest.raises(SystemExit, match="contradictory curation"):
+        _build(
+            tmp_path,
+            [_row("agency.one"), _row("agency.rate")],
+            existing=first,
+        )
+    # Across dimensions the collision is surfaced, not silent: the name
+    # appears in ambiguous_aliases and never drives claims.
+    gb_first, _ = _build(tmp_path, [_row("agency.gb", geography=dict(BRITAIN))])
+    gb_first["series"][0]["aliases"] = ["agency.rate"]
+    catalog, _ = _build(
+        tmp_path,
+        [_row("agency.gb", geography=dict(BRITAIN)), _row("agency.rate")],
+        existing=gb_first,
+    )
+    assert catalog["ambiguous_aliases"] == ["agency.rate"]
+
+
+def test_curated_aliases_pass_identity_string_rules(
+    tmp_path: pathlib.Path,
+) -> None:
+    first, _ = _build(tmp_path, [_row("agency.café.rate".encode("utf-8").decode())])
+    row = first["series"][0]
+    row["aliases"] = ["agency.café.rate"]  # NFD twin of the canonical
+    with pytest.raises(SystemExit, match="not NFC-normalized"):
+        _build(tmp_path, [_row("agency.café.rate")], existing=first)
+    row["aliases"] = ["agency.rate​"]
+    with pytest.raises(SystemExit, match="invisible character"):
+        _build(tmp_path, [_row("agency.café.rate")], existing=first)
+
+
+def test_assertion_version_preconditions(tmp_path: pathlib.Path) -> None:
+    # Eleventh-review repro: duplicate ids collapsed three identities to
+    # one; a two-row cycle emptied the current view. Standalone runs now
+    # enforce the append gate's preconditions themselves.
+    a = _row("agency.one")
+    a["assertionVersion"] = {"id": "dup"}
+    b = _row("agency.two")
+    b["assertionVersion"] = {"id": "dup"}
+    with pytest.raises(SystemExit, match="duplicates row"):
+        _build(tmp_path, [a, b])
+
+    c = _row("agency.one")
+    c["assertionVersion"] = {"id": "x", "supersedes": "y"}
+    d = _row("agency.two")
+    d["assertionVersion"] = {"id": "y", "supersedes": "x"}
+    with pytest.raises(SystemExit, match="supersede cycle"):
+        _build(tmp_path, [c, d])
+
+    e = _row("agency.one")
+    e["assertionVersion"] = {"id": "z", "supersedes": "z"}
+    with pytest.raises(SystemExit, match="supersedes itself"):
+        _build(tmp_path, [e])
+
+    f = _row("agency.one")
+    f["assertionVersion"] = {"id": "w", "supersedes": "missing"}
+    with pytest.raises(SystemExit, match="unknown version"):
+        _build(tmp_path, [f])
