@@ -1,0 +1,13 @@
+source_id: ons
+package_id: ons-uk-population-projections-2024
+dataset: ons_ons-uk-population-projections-2024
+source_page: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/z1zippedpopulationprojectionsdatafilesuk
+table: 2024-based national population projections, UK principal (uk_ppp), population by single year of
+  age and sex
+files:
+  2024:
+    filename: uk.zip
+    source_url: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/z1zippedpopulationprojectionsdatafilesuk/2024based/uk.zip
+    sha256: dea79703b9caddd560f1958b5a8ca12aa817b2396d244e6a2c775b1af7f48ab1
+    size_bytes: 11356080
+    fetched_at: '2026-08-06T10:14:59+00:00'
