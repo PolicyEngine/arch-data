@@ -105,6 +105,7 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
+    "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
         "cbo/revenue_projections_income_by_source_2026_02"
     ),

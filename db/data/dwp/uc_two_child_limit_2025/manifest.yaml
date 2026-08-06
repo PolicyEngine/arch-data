@@ -1,0 +1,12 @@
+source_id: dwp
+package_id: dwp-uc-two-child-limit-2025
+dataset: dwp_dwp-uc-two-child-limit-2025
+source_page: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+table: 'Universal Credit claimants: statistics on the two-child limit policy, April 2025 data tables'
+files:
+  2025:
+    filename: data-tables-two-child-limit-april-2025.ods
+    source_url: https://assets.publishing.service.gov.uk/media/68887ad01e72aed40611b030/data-tables-universal-credit-statistics-two-child-limit-april-2025.ods
+    sha256: 308e7d3dc10171253c77e34159f384bfd558a8ee1e487f4615b47f989a7b08d2
+    size_bytes: 1832271
+    fetched_at: '2026-08-06T15:01:50+00:00'
