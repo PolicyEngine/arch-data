@@ -80,6 +80,7 @@ SOURCE_PACKAGE_ALIASES = {
     "bea-regional-state-personal-income-components-2024": Path(
         "bea/regional_personal_income_state"
     ),
+    "hmrc-spi-income-bands-2023": Path("hmrc/spi_income_bands_2023_24"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-salary-sacrifice-relief-2024": Path("hmrc/salary_sacrifice_relief_2024_25"),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
@@ -103,6 +104,7 @@ SOURCE_PACKAGE_ALIASES = {
         "opgroeien/groeipakket_caseload_2025"
     ),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
+    "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
         "cbo/revenue_projections_income_by_source_2026_02"
     ),

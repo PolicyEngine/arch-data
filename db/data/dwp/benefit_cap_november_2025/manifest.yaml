@@ -1,0 +1,12 @@
+source_id: dwp
+package_id: dwp-benefit-cap-november-2025
+dataset: dwp_dwp-benefit-cap-november-2025
+source_page: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+table: 'Benefit cap: number of households capped to November 2025'
+files:
+  2025:
+    filename: benefit-cap-ods-tables-data-to-nov25.ods
+    source_url: https://assets.publishing.service.gov.uk/media/69cbeb2269dd81b3f213c688/benefit-cap-ods-tables-data-to-nov25.ods
+    sha256: a4ddddf1156446d2234605145bf04b3c3a427e3f38ec8ad15ec5e35ab65895ac
+    size_bytes: 173996
+    fetched_at: '2026-08-06T14:34:10+00:00'

@@ -1,0 +1,322 @@
+# Point-in-time Table 4 only (UC households capped at November 2025, GB
+# Total + 13 amount-capped bands). uk-data's 110,637 'benefit_capped_
+# households' is exactly this GB Total (UC-only, publisher-emitted); its
+# GBP 320.866m 'total reduction' is a computed annualization of these band
+# midpoints and is excluded per the facts-only ADR - populace can declare
+# its own annualization over the ported band distribution. Cumulative
+# (Table 5) and flows tables are backfill-lane candidates.
+schema_version: ledger.source_package.v1
+package_id: dwp-benefit-cap-november-2025
+label: 'DWP benefit cap: UC households capped at November 2025, GB total and amount-capped
+  bands (Table 4)'
+artifact:
+  source_name: dwp
+  source_table: 'Benefit cap: number of households capped to November 2025'
+  resource_package: db
+  resource_directory: data/dwp/benefit_cap_november_2025
+  manifest: manifest.yaml
+  vintage: benefit_cap_to_nov_2025
+  extracted_at: '2026-08-06'
+  extraction_method: ODS whole-workbook used-range cell parse
+  parser: ods_used_range
+  artifact_year: 2025
+record_sets:
+- record_set_id: dwp.benefit_cap.nov2025.table4.gb
+  provenance_class: administrative
+  record_set_spec_id: dwp.benefit_cap.nov2025.table4.gb.v1
+  source_record_id_prefix: dwp.benefit_cap.nov2025.table4.gb
+  sheet_name: '4'
+  period_type: month
+  period: 2025-11
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: benefit_capped_household
+  domain: benefit_cap
+  groupby_dimension: dwp.cap_amount_band
+  rows:
+  - value_id: gb_total
+    label: GB Total
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: B
+    expected_row_header: K03000001
+    table_record_kind: total
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: GB Total
+      label: area name
+  measures:
+  - measure_id: total
+    label: UC households capped, Total
+    ordinal: 0
+    column: D
+    source_column_id: total
+    expected_column_header_row: 12
+    expected_column_header: Total
+    concept: dwp.uc_capped_households_total
+    source_concept: dwp.uc_capped_households_total
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: Total.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: up_to_100
+    label: UC households capped, Up to £100
+    ordinal: 1
+    column: E
+    source_column_id: up_to_100
+    expected_column_header_row: 12
+    expected_column_header: Up to £100
+    concept: dwp.uc_capped_households_up_to_100
+    source_concept: dwp.uc_capped_households_up_to_100
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: Up to £100.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 100_01_to_200
+    label: UC households capped, £100.01 to £200
+    ordinal: 2
+    column: F
+    source_column_id: 100_01_to_200
+    expected_column_header_row: 12
+    expected_column_header: £100.01 to £200
+    concept: dwp.uc_capped_households_100_01_to_200
+    source_concept: dwp.uc_capped_households_100_01_to_200
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £100.01 to £200.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 200_01_to_300
+    label: UC households capped, £200.01 to £300
+    ordinal: 3
+    column: G
+    source_column_id: 200_01_to_300
+    expected_column_header_row: 12
+    expected_column_header: £200.01 to £300
+    concept: dwp.uc_capped_households_200_01_to_300
+    source_concept: dwp.uc_capped_households_200_01_to_300
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £200.01 to £300.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 300_01_to_400
+    label: UC households capped, £300.01 to £400
+    ordinal: 4
+    column: H
+    source_column_id: 300_01_to_400
+    expected_column_header_row: 12
+    expected_column_header: £300.01 to £400
+    concept: dwp.uc_capped_households_300_01_to_400
+    source_concept: dwp.uc_capped_households_300_01_to_400
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £300.01 to £400.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 400_01_to_500
+    label: UC households capped, £400.01 to £500
+    ordinal: 5
+    column: I
+    source_column_id: 400_01_to_500
+    expected_column_header_row: 12
+    expected_column_header: £400.01 to £500
+    concept: dwp.uc_capped_households_400_01_to_500
+    source_concept: dwp.uc_capped_households_400_01_to_500
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £400.01 to £500.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 500_01_to_600
+    label: UC households capped, £500.01 to £600
+    ordinal: 6
+    column: J
+    source_column_id: 500_01_to_600
+    expected_column_header_row: 12
+    expected_column_header: £500.01 to £600
+    concept: dwp.uc_capped_households_500_01_to_600
+    source_concept: dwp.uc_capped_households_500_01_to_600
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £500.01 to £600.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 600_01_to_700
+    label: UC households capped, £600.01 to £700
+    ordinal: 7
+    column: K
+    source_column_id: 600_01_to_700
+    expected_column_header_row: 12
+    expected_column_header: £600.01 to £700
+    concept: dwp.uc_capped_households_600_01_to_700
+    source_concept: dwp.uc_capped_households_600_01_to_700
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £600.01 to £700.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 700_01_to_800
+    label: UC households capped, £700.01 to £800
+    ordinal: 8
+    column: L
+    source_column_id: 700_01_to_800
+    expected_column_header_row: 12
+    expected_column_header: £700.01 to £800
+    concept: dwp.uc_capped_households_700_01_to_800
+    source_concept: dwp.uc_capped_households_700_01_to_800
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £700.01 to £800.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 800_01_to_900
+    label: UC households capped, £800.01 to £900
+    ordinal: 9
+    column: M
+    source_column_id: 800_01_to_900
+    expected_column_header_row: 12
+    expected_column_header: £800.01 to £900
+    concept: dwp.uc_capped_households_800_01_to_900
+    source_concept: dwp.uc_capped_households_800_01_to_900
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £800.01 to £900.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 900_01_to_1000
+    label: UC households capped, £900.01 to £1,000
+    ordinal: 10
+    column: N
+    source_column_id: 900_01_to_1000
+    expected_column_header_row: 12
+    expected_column_header: £900.01 to £1,000
+    concept: dwp.uc_capped_households_900_01_to_1000
+    source_concept: dwp.uc_capped_households_900_01_to_1000
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £900.01 to £1,000.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 1000_01_to_1100
+    label: UC households capped, £1,000.01 to £1,100
+    ordinal: 11
+    column: O
+    source_column_id: 1000_01_to_1100
+    expected_column_header_row: 12
+    expected_column_header: £1,000.01 to £1,100
+    concept: dwp.uc_capped_households_1000_01_to_1100
+    source_concept: dwp.uc_capped_households_1000_01_to_1100
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £1,000.01 to £1,100.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 1100_01_to_1200
+    label: UC households capped, £1,100.01 to £1,200
+    ordinal: 12
+    column: P
+    source_column_id: 1100_01_to_1200
+    expected_column_header_row: 12
+    expected_column_header: £1,100.01 to £1,200
+    concept: dwp.uc_capped_households_1100_01_to_1200
+    source_concept: dwp.uc_capped_households_1100_01_to_1200
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £1,100.01 to £1,200.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 1200_01_to_1300
+    label: UC households capped, £1,200.01 to £1,300
+    ordinal: 13
+    column: Q
+    source_column_id: 1200_01_to_1300
+    expected_column_header_row: 12
+    expected_column_header: £1,200.01 to £1,300
+    concept: dwp.uc_capped_households_1200_01_to_1300
+    source_concept: dwp.uc_capped_households_1200_01_to_1300
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £1,200.01 to £1,300.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 1300_01_and_above
+    label: UC households capped, £1,300.01 and above
+    ordinal: 14
+    column: R
+    source_column_id: 1300_01_and_above
+    expected_column_header_row: 12
+    expected_column_header: £1,300.01 and above
+    concept: dwp.uc_capped_households_1300_01_and_above
+    source_concept: dwp.uc_capped_households_1300_01_and_above
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025
+    concept_evidence_notes: 'Benefit cap tables to November 2025, Table 4 (point-in-time UC
+      households capped at November 2025 by amount capped per monthly assessment period),
+      GB Total row, column: £1,300.01 and above.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
