@@ -205,3 +205,9 @@
 {"concept": "census.construction_spending.total_mom", "geography": {"level": "country", "id": "0100000US", "vintage": "current"}, "entity": {"name": "economy", "role": "aggregate"}, "uuid": "63222847-045a-4784-bd89-4d7878a2a6d8", "succeeds": {"concept": "census.construction_spending.total_mom", "geography": null, "entity": null}}
 {"concept": "irs.actc.total_claims", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "23396038-b31d-43cd-be08-4aa9fe916b56"}
 {"concept": "census.spm.child_poverty_rate", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "37841d30-5bd6-42a0-aea7-fc7b6d32dbcc"}
+{"concept": "bea.private_nonresidential_fixed_investment", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "2e36a67f-ae8d-4717-a70e-9de016e28d3f"}
+{"concept": "bea.research_and_development_fixed_investment", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "3efd33de-5be6-4150-bf62-6e4a1e9a1291"}
+{"concept": "irs.actc.total_credit_amount", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "05d4b329-d6c0-4050-ab25-f1a1deddf465"}
+{"concept": "irs.soi.credit_30d.total_claims", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "f5eacf8a-ce09-4721-a92a-9b19766a0d3c"}
+{"concept": "irs.soi.credit_30d.total_credit_amount", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "c70d0bc6-d299-4727-959a-3c7bdb324861"}
+{"concept": "usaspending.dhs.title_vi.award_transaction_obligations", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "e64ea5db-b72a-4a46-8948-6142dbc59d91"}
