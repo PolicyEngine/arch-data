@@ -351,6 +351,23 @@ uv run chronicle build-suite ons-subnational-dwellings-by-tenure-2024 \
   --out /tmp/chronicle-ons-subnational-dwellings-by-tenure-2024 \
   --replace
 
+uv run chronicle validate-package hmrc-salary-sacrifice-reform-2029-headcounts --year 2025
+uv run chronicle build-suite hmrc-salary-sacrifice-reform-2029-headcounts \
+  --year 2025 \
+  --out /tmp/chronicle-hmrc-ss-headcounts \
+  --replace
+
+uv run chronicle validate-package isc-annual-census-2023 --year 2023
+uv run chronicle build-suite isc-annual-census-2023 \
+  --year 2023 \
+  --out /tmp/chronicle-isc-2023 \
+  --replace
+uv run chronicle validate-package isc-annual-census-2024 --year 2024
+uv run chronicle build-suite isc-annual-census-2024 \
+  --year 2024 \
+  --out /tmp/chronicle-isc-2024 \
+  --replace
+
 uv run chronicle validate-package ons-national-balance-sheet-land-2025 --year 2024
 uv run chronicle build-suite ons-national-balance-sheet-land-2025 \
   --year 2024 \

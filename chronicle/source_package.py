@@ -84,7 +84,12 @@ SOURCE_PACKAGE_ALIASES = {
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-salary-sacrifice-relief-2024-25": Path("hmrc/salary_sacrifice_relief_2024_25"),
+    "hmrc-salary-sacrifice-reform-2029-headcounts": Path(
+        "hmrc/salary_sacrifice_reform_2029_headcounts"
+    ),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
+    "isc-annual-census-2023": Path("isc/annual_census_2023"),
+    "isc-annual-census-2024": Path("isc/annual_census_2024"),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
     "statbel-fiscal-income-2023-nis-2025": Path(
         "statbel/fiscal_income_2023_nis_2025"
@@ -224,6 +229,9 @@ SOURCE_PACKAGE_ALIASES = {
     "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
+    "ons-national-balance-sheet-land-2025": Path(
+        "ons/national_balance_sheet_land_2025"
+    ),
     "ons-public-sector-employment-2026": Path("ons/public_sector_employment_2026"),
     "ons-savings-interest-income": Path("ons/savings_interest_income"),
     "ons-families-households-2025": Path("ons/families_households_2025"),

@@ -1,0 +1,12 @@
+source_id: isc
+package_id: isc-annual-census-2024
+dataset: isc_isc-annual-census-2024
+source_page: https://www.isc.co.uk/research/annual-census/isc-annual-census-2024/
+table: ISC annual Census 2024
+files:
+  2024:
+    filename: isc_census_2024_15may24.pdf
+    source_url: https://www.isc.co.uk/media/uukn4r3i/isc_census_2024_15may24.pdf
+    sha256: 1d9568e9a4ce02df7f0f0a3adf457bd5a7beff012cf8364512ec92b1c051e76e
+    size_bytes: 3451630
+    fetched_at: '2026-08-07T12:47:47+00:00'
