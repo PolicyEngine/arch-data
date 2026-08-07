@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 203
+    assert len(committed["series"]) == 209
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1165,7 +1165,10 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # registered census.spm.child_poverty_rate; its placeholder joins the
     # seed snapshot. All 205 prior bindings unchanged.
     assert digest == (
-        "9ecc2df99e887195b35f0f2f5106a1b0f7d9c12bd2713a8aca201b6673aedf82"
+        # 2026-08-07: +6 docket-only mints for thesis#138 wave-1 admission
+            # (bea fixed-investment x2, usaspending dhs title-vi, irs soi 30D
+            # claims+amount, irs actc amount) — see the seed diff in this commit.
+            "396e27996b2494c1defe94d834db4977c36e5b1ec179f71c198a0e20955cbd1e"
     )
 
 

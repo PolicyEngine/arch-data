@@ -1464,13 +1464,13 @@
       "catalogSlug": "additional-child-tax-credit-total-claims-ty2027-threshold-one-dollar",
       "dataPointId": "irs.actc.total_claims.2027.first_print.threshold_one_dollar",
       "conditionId": "cond.s3596-actc-threshold.enacted",
-      "conditional": "Legislation enacted by 2027-12-31 makes the IRC \u00a724(d)(1)(B)(i) earned-income threshold no more than $1 for tax year 2027."
+      "conditional": "Legislation enacted by 2027-12-31 makes the IRC §24(d)(1)(B)(i) earned-income threshold no more than $1 for tax year 2027."
      },
      {
       "catalogSlug": "additional-child-tax-credit-total-claims-ty2027-current-law",
       "dataPointId": "irs.actc.total_claims.2027.first_print.current_law",
       "conditionId": "cond.s3596-actc-threshold.current-law",
-      "conditional": "No legislation enacted by 2027-12-31 changes the IRC \u00a724(d)(1)(B)(i) earned-income threshold of $2,500 for tax year 2027; current law holds. The $2,500 operative amount is applied by IRC \u00a724(h)(6), while \u00a724(d)(1)(B)(i) contains the underlying $3,000 amount."
+      "conditional": "No legislation enacted by 2027-12-31 changes the IRC §24(d)(1)(B)(i) earned-income threshold of $2,500 for tax year 2027; current law holds. The $2,500 operative amount is applied by IRC §24(h)(6), while §24(d)(1)(B)(i) contains the underlying $3,000 amount."
      }
     ]
    },
@@ -1515,13 +1515,13 @@
       "catalogSlug": "spm-child-poverty-rate-cy2027-threshold-one-dollar",
       "dataPointId": "census.spm.child_poverty_rate.2027.first_print.threshold_one_dollar",
       "conditionId": "cond.s3596-actc-threshold.enacted",
-      "conditional": "For the CY2027 Census Supplemental Poverty Measure child-poverty outcome, legislation enacted by 2027-12-31 makes the IRC \u00a724(d)(1)(B)(i) earned-income threshold no more than $1 for tax year 2027."
+      "conditional": "For the CY2027 Census Supplemental Poverty Measure child-poverty outcome, legislation enacted by 2027-12-31 makes the IRC §24(d)(1)(B)(i) earned-income threshold no more than $1 for tax year 2027."
      },
      {
       "catalogSlug": "spm-child-poverty-rate-cy2027-current-law",
       "dataPointId": "census.spm.child_poverty_rate.2027.first_print.current_law",
       "conditionId": "cond.s3596-actc-threshold.current-law",
-      "conditional": "For the CY2027 Census Supplemental Poverty Measure child-poverty outcome, no legislation enacted by 2027-12-31 changes the IRC \u00a724(d)(1)(B)(i) earned-income threshold of $2,500 for tax year 2027; current law holds. The $2,500 operative amount is applied by IRC \u00a724(h)(6), while \u00a724(d)(1)(B)(i) contains the underlying $3,000 amount."
+      "conditional": "For the CY2027 Census Supplemental Poverty Measure child-poverty outcome, no legislation enacted by 2027-12-31 changes the IRC §24(d)(1)(B)(i) earned-income threshold of $2,500 for tax year 2027; current law holds. The $2,500 operative amount is applied by IRC §24(h)(6), while §24(d)(1)(B)(i) contains the underlying $3,000 amount."
      }
     ]
    },
@@ -1550,6 +1550,60 @@
      },
      "releasePolicy": "first_print"
     }
+   }
+  },
+  {
+   "series": "bea.private_nonresidential_fixed_investment",
+   "cadence": "quarterly",
+   "comment": "Docket-only placeholder minted 2026-08-07 for thesis#138 wave-1 ingestion admission (containment gate); observations arrive with the source adapter.",
+   "extras": {
+    "targetUnit": "usd_billions",
+    "country": "US"
+   }
+  },
+  {
+   "series": "bea.research_and_development_fixed_investment",
+   "cadence": "quarterly",
+   "comment": "Docket-only placeholder minted 2026-08-07 for thesis#138 wave-1 ingestion admission (containment gate); observations arrive with the source adapter.",
+   "extras": {
+    "targetUnit": "usd_billions",
+    "country": "US"
+   }
+  },
+  {
+   "series": "usaspending.dhs.title_vi.award_transaction_obligations",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-07 for thesis#138 wave-1 ingestion admission (containment gate); observations arrive with the source adapter.",
+   "extras": {
+    "targetUnit": "usd",
+    "country": "US"
+   }
+  },
+  {
+   "series": "irs.soi.credit_30d.total_claims",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-07 for thesis#138 wave-1 ingestion admission (containment gate); observations arrive with the source adapter.",
+   "extras": {
+    "targetUnit": "count",
+    "country": "US"
+   }
+  },
+  {
+   "series": "irs.soi.credit_30d.total_credit_amount",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-07 for thesis#138 wave-1 ingestion admission (containment gate); observations arrive with the source adapter.",
+   "extras": {
+    "targetUnit": "usd_millions",
+    "country": "US"
+   }
+  },
+  {
+   "series": "irs.actc.total_credit_amount",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-07 for thesis#138 wave-1 ingestion admission (containment gate); observations arrive with the source adapter.",
+   "extras": {
+    "targetUnit": "usd_millions",
+    "country": "US"
    }
   }
  ]
