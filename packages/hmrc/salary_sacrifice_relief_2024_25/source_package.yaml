@@ -5,6 +5,8 @@
 # and are not ported. uk-data's 3 percent p.a. uprating of the old base is
 # a computed series the facts-only ADR excludes. Period stores the opening
 # year (2024 to 2025 -> tax_year 2024).
+# Unit: GBP million per the Private pension statistics publication page
+# (tables described in GBP million; the tidy CSV itself carries no unit text).
 schema_version: ledger.source_package.v1
 package_id: hmrc-salary-sacrifice-relief-2024
 label: 'HMRC salary sacrifice pension contributions: income tax and NICs relief, tax year

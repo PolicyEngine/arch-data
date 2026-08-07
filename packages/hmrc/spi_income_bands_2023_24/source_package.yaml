@@ -5,6 +5,9 @@
 # work here. uk-data's 1.9x property-income scale (SPI-vs-ITSA coverage)
 # and its uprated projections are populace-side adjustments, not facts.
 # Same artifact populace's national HMRC stage parses (hmrc_income.py).
+# Also not ported from Table 3.7: the 'Other income' Number/Amount pair
+# (columns K/L) and both sheets' total-count column N - named exclusions,
+# backfill candidates, not derivable from the ported columns.
 schema_version: ledger.source_package.v1
 package_id: hmrc-spi-income-bands-2023
 label: 'HMRC Survey of Personal Incomes 2023-24: income counts and amounts by range of total
@@ -233,7 +236,7 @@ record_sets:
     source_concept: hmrc.spi_self_employment_income_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Self-employment
       income (Number of individuals) [Note 1]; taxpayers in thousands, amounts GBP million.'
     unit: count
@@ -251,7 +254,7 @@ record_sets:
     source_concept: hmrc.spi_self_employment_income_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Self-employment
       income (Amount) [Note 1]; taxpayers in thousands, amounts GBP million.'
     unit: gbp
@@ -269,7 +272,7 @@ record_sets:
     source_concept: hmrc.spi_employment_income_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Employment income
       (Number of individuals); taxpayers in thousands, amounts GBP million.'
     unit: count
@@ -287,7 +290,7 @@ record_sets:
     source_concept: hmrc.spi_employment_income_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Employment income
       (Amount); taxpayers in thousands, amounts GBP million.'
     unit: gbp
@@ -306,7 +309,7 @@ record_sets:
     source_concept: hmrc.spi_state_pension_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension Income
       from National Insurance contributions (Number of individuals) [Note 2]; taxpayers in
       thousands, amounts GBP million.'
@@ -326,7 +329,7 @@ record_sets:
     source_concept: hmrc.spi_state_pension_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension Income
       from National Insurance contributions (Amount) [Note 2]; taxpayers in thousands, amounts
       GBP million.'
@@ -345,7 +348,7 @@ record_sets:
     source_concept: hmrc.spi_private_pension_income_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension income
       from other pensions (Number of individuals); taxpayers in thousands, amounts GBP million.'
     unit: count
@@ -363,7 +366,7 @@ record_sets:
     source_concept: hmrc.spi_private_pension_income_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension income
       from other pensions (Amount); taxpayers in thousands, amounts GBP million.'
     unit: gbp
@@ -581,7 +584,7 @@ record_sets:
     source_concept: hmrc.spi_property_income_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Net income from
       property (Number of individuals) [Note 2]; taxpayers in thousands, amounts GBP million.'
     unit: count
@@ -599,7 +602,7 @@ record_sets:
     source_concept: hmrc.spi_property_income_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Net income from
       property (Amount) [Note 2]; taxpayers in thousands, amounts GBP million.'
     unit: gbp
@@ -618,7 +621,7 @@ record_sets:
     source_concept: hmrc.spi_savings_interest_income_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Interest from
       building societies and banks (Number of individuals) [Note 3, 4]; taxpayers in thousands,
       amounts GBP million.'
@@ -637,7 +640,7 @@ record_sets:
     source_concept: hmrc.spi_savings_interest_income_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Interest from
       building societies and banks (Amount) [Note 3, 4]; taxpayers in thousands, amounts GBP
       million.'
@@ -656,7 +659,7 @@ record_sets:
     source_concept: hmrc.spi_dividend_income_count
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Dividends (Number
       of individuals) [Note 5]; taxpayers in thousands, amounts GBP million.'
     unit: count
@@ -674,7 +677,7 @@ record_sets:
     source_concept: hmrc.spi_dividend_income_amount
     concept_relation: source_label
     concept_authority: hmrc
-    concept_evidence_url: https://www.gov.uk/government/statistics/income-tax-summarised-accounts-statistics
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
     concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Dividends (Amount)
       [Note 5]; taxpayers in thousands, amounts GBP million.'
     unit: gbp

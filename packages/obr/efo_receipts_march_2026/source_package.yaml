@@ -3,6 +3,9 @@
 # hmrc fy2024_25 precedent. Explicit per-year record sets (not {year}
 # templating) so the full 2024-2030 forecast surface lands in every build;
 # see PolicyEngine/ledger#135 on bundle year handling. Row labels are exact
+# FY2024-25 columns are labelled 'Outturn' in the workbooks, so the fy2024
+# record sets carry assertion observation; fy2025-fy2030 remain
+# source_projection. Row labels are exact
 # cell text including OBR footnote markers (e.g. 'Incapacity benefits2').
 schema_version: ledger.source_package.v1
 package_id: obr-efo-receipts-march-2026
@@ -21,7 +24,7 @@ artifact:
 record_sets:
 - record_set_id: obr.efo_2026_03.receipts.income_tax.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.income_tax.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.income_tax.fy2024
   sheet_name: '3.4'
@@ -322,7 +325,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.ni_employee.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.ni_employee.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.ni_employee.fy2024
   sheet_name: '3.4'
@@ -623,7 +626,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.ni_employer.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.ni_employer.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.ni_employer.fy2024
   sheet_name: '3.4'
@@ -924,7 +927,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.ni_self_employed.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.ni_self_employed.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.ni_self_employed.fy2024
   sheet_name: '3.4'
@@ -1225,7 +1228,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.ni_total.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.ni_total.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.ni_total.fy2024
   sheet_name: '3.8'
@@ -1526,7 +1529,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.vat.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.vat.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.vat.fy2024
   sheet_name: '3.8'
@@ -1827,7 +1830,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.fuel_duties.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.fuel_duties.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.fuel_duties.fy2024
   sheet_name: '3.8'
@@ -2128,7 +2131,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.capital_gains_tax.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.capital_gains_tax.fy2024
   sheet_name: '3.8'
@@ -2429,7 +2432,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.receipts.sdlt.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.receipts.sdlt.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.receipts.sdlt.fy2024
   sheet_name: '3.8'

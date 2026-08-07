@@ -3,6 +3,9 @@
 # hmrc fy2024_25 precedent. Explicit per-year record sets (not {year}
 # templating) so the full 2024-2030 forecast surface lands in every build;
 # see PolicyEngine/ledger#135 on bundle year handling. Row labels are exact
+# FY2024-25 columns are labelled 'Outturn' in the workbooks, so the fy2024
+# record sets carry assertion observation; fy2025-fy2030 remain
+# source_projection. Row labels are exact
 # cell text including OBR footnote markers (e.g. 'Incapacity benefits2').
 schema_version: ledger.source_package.v1
 package_id: obr-efo-expenditure-march-2026
@@ -21,7 +24,7 @@ artifact:
 record_sets:
 - record_set_id: obr.efo_2026_03.expenditure.council_tax_england.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.council_tax_england.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.council_tax_england.fy2024
   sheet_name: '4.1'
@@ -322,7 +325,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.council_tax_scotland.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.council_tax_scotland.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.council_tax_scotland.fy2024
   sheet_name: '4.1'
@@ -623,7 +626,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.council_tax_wales.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.council_tax_wales.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.council_tax_wales.fy2024
   sheet_name: '4.1'
@@ -924,7 +927,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.domestic_rates.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.domestic_rates.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.domestic_rates.fy2024
   sheet_name: '4.1'
@@ -1225,7 +1228,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.council_tax_total.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.council_tax_total.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.council_tax_total.fy2024
   sheet_name: '4.1'
@@ -1526,7 +1529,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.housing_benefit.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.housing_benefit.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.housing_benefit.fy2024
   sheet_name: '4.9'
@@ -1827,7 +1830,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.dla_and_pip.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.dla_and_pip.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.dla_and_pip.fy2024
   sheet_name: '4.9'
@@ -2128,7 +2131,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.incapacity_benefits.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.incapacity_benefits.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.incapacity_benefits.fy2024
   sheet_name: '4.9'
@@ -2429,7 +2432,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.attendance_allowance.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.attendance_allowance.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.attendance_allowance.fy2024
   sheet_name: '4.9'
@@ -2730,7 +2733,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.pension_credit.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.pension_credit.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.pension_credit.fy2024
   sheet_name: '4.9'
@@ -3031,7 +3034,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.carers_allowance.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.carers_allowance.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.carers_allowance.fy2024
   sheet_name: '4.9'
@@ -3332,7 +3335,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.statutory_maternity_pay.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.statutory_maternity_pay.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.statutory_maternity_pay.fy2024
   sheet_name: '4.9'
@@ -3633,7 +3636,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.winter_fuel_payment.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.winter_fuel_payment.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.winter_fuel_payment.fy2024
   sheet_name: '4.9'
@@ -3934,7 +3937,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.universal_credit_in_cap.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.universal_credit_in_cap.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.universal_credit_in_cap.fy2024
   sheet_name: '4.9'
@@ -4235,7 +4238,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.child_benefit.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.child_benefit.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.child_benefit.fy2024
   sheet_name: '4.9'
@@ -4536,7 +4539,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.state_pension.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.state_pension.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.state_pension.fy2024
   sheet_name: '4.9'
@@ -4837,7 +4840,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.jobseekers_allowance.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.jobseekers_allowance.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.jobseekers_allowance.fy2024
   sheet_name: '4.9'
@@ -5138,7 +5141,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.universal_credit_outside_cap.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.universal_credit_outside_cap.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.universal_credit_outside_cap.fy2024
   sheet_name: '4.9'
@@ -5439,7 +5442,7 @@ record_sets:
     expected_cell_type: number
 - record_set_id: obr.efo_2026_03.expenditure.tv_licence_fee.fy2024
   provenance_class: model_output
-  assertion: source_projection
+  assertion: observation
   record_set_spec_id: obr.efo_2026_03.expenditure.tv_licence_fee.fy2024.v1
   source_record_id_prefix: obr.efo_2026_03.expenditure.tv_licence_fee.fy2024
   sheet_name: '4.19'
