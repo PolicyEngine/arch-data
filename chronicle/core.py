@@ -20,7 +20,11 @@ Scalar = str | int | float | bool | None
 # year of the publisher's label: UK fiscal year FY2024-25 is fiscal_year 2024
 # (packages/hmrc/vat_firm_targets_2024_25) and academic year AY 2024/25 is
 # academic_year 2024 (#131). Publishers that label a fiscal year with a single
-# year keep that label year (US federal FY2025 -> 2025).
+# year keep that label year (US federal FY2024 -> 2024,
+# packages/cbo/individual_income_tax_receipts_2026_02). Caution: the EES
+# helper _academic_year_end (ledger/sources/rows.py) names value COLUMNS by
+# the academic year's END year; that is source-layout naming only and must
+# not leak into fact periods.
 ALLOWED_PERIOD_TYPES = {
     "calendar_year",
     "tax_year",

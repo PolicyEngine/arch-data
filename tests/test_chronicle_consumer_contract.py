@@ -26,11 +26,13 @@ from chronicle.core import (
     Measure,
     PeriodDimension,
     build_aggregate_constraints,
+    validate_facts,
 )
 from chronicle.harness import main
 from chronicle.jurisdictions.us.soi import build_soi_table_1_1_facts
 from chronicle.store import save_facts_jsonl
 from policyengine_chronicle.consumer import (
+    PeriodContractError,
     build_consumer_artifact,
     load_consumer_artifact,
     resolve_profile_targets,
@@ -459,6 +461,7 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
             value=100.0,
         ),
     ]
+    assert validate_facts(facts).valid  # the vocabulary gate itself
     facts_path = tmp_path / "consumer_facts.jsonl"
     write_consumer_facts_jsonl(facts, facts_path)
     rows = _load_jsonl(facts_path)
@@ -481,7 +484,7 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
                 "target_id": "soi.agi.academic_year_probe",
                 "family": "irs_soi",
                 "geography_levels": ["country"],
-                "ledger_selector": {
+                "chronicle_selector": {
                     "source_name": rows[0]["source"]["source_name"],
                     "source_measure_id": rows[0]["observed_measure"][
                         "source_measure_id"
@@ -521,6 +524,13 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
     assert resolved.basis == "fact"
     assert resolved.value == 100.0
     assert resolved.fact_period == {"type": "academic_year", "value": 2024}
+
+    with pytest.raises(PeriodContractError):
+        resolve_profile_targets(
+            artifact.profiles["academic_year_round_trip"],
+            artifact.rows,
+            {"type": "fiscal_year", "value": 2024},
+        )
 
 
 def test_consumer_fact_row_marks_decimal_values_as_decimal_strings():
