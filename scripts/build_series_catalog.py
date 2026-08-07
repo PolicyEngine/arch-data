@@ -1249,12 +1249,9 @@ class UuidRegistry:
         reserved = _reserved_segment_problem(succeeds.get("concept"))
         if reserved:
             return f"line {lineno}: succeeds {reserved}"
-        if self.entry_key(succeeds) == key:
-            return (
-                f"line {lineno}: {key} succeeds ITSELF — self-handover "
-                "would forge consumption and unlock a ceremony-free "
-                "reclaim of a fresh UUID"
-            )
+        # Dimension types must be valid BEFORE any key derivation: a
+        # string geography would otherwise crash _geo_key instead of
+        # producing a schema finding.
         for what, allowed in (
             ("geography", ("level", "id", "vintage")),
             ("entity", ("name", "role")),
@@ -1264,6 +1261,12 @@ class UuidRegistry:
             )
             if domain:
                 return f"line {lineno}: {domain}"
+        if self.entry_key(succeeds) == key:
+            return (
+                f"line {lineno}: {key} succeeds ITSELF — self-handover "
+                "would forge consumption and unlock a ceremony-free "
+                "reclaim of a fresh UUID"
+            )
         predecessor_key = self.entry_key(succeeds)
         predecessor = self.latest.get(predecessor_key)
         if predecessor is None:
@@ -1611,6 +1614,71 @@ def build_catalog(
         used_uuids[parsed] = key
         return row_uuid
 
+    def _plan_enrichment(
+        prior: dict,
+        canon_key: tuple[str, str, str],
+        geography: dict | None,
+        entity: dict | None,
+        row_uuid: str,
+    ) -> bool:
+        """Plan a retire + succeeds pair when ``prior`` is a genuine
+        placeholder whose live binding owns ``row_uuid``; True if planned.
+        """
+        prior_own_key = UuidRegistry.entry_key(prior)
+        owner_key = registry.uuid_owner.get(uuid_module.UUID(row_uuid).int)
+        prior_geo = prior.get("geography") or None
+        geo = geography or {}
+        enrichment_shaped = (
+            prior.get("status") == "docket-only"
+            and prior.get("entity") is None
+            and (
+                prior_geo is None
+                or (
+                    (prior_geo.get("level"), prior_geo.get("id"))
+                    == (geo.get("level"), geo.get("id"))
+                    and prior_geo.get("vintage")
+                    in (None, geo.get("vintage"))
+                )
+            )
+        )
+        if not (
+            enrichment_shaped
+            and owner_key == prior_own_key
+            and registry.is_live(prior_own_key)
+        ):
+            return False
+        # Docket-placeholder enrichment: the binding MOVES to the observed
+        # identity via an explicit retire + succeeds pair. UUID continuity
+        # is preserved, so no ceremony flag is needed — this holds for the
+        # first enrichment and for a re-enrichment after a withdraw/reclaim
+        # cycle (the grammar accepts succeeds on a retired successor key).
+        plan["enrich_retires"].append(
+            dict(
+                _registry_event(
+                    prior["concept"],
+                    prior.get("geography"),
+                    prior.get("entity"),
+                    row_uuid,
+                ),
+                retired=True,
+                note=(
+                    "docket placeholder enriched by first observed "
+                    "identity"
+                ),
+            )
+        )
+        plan["mints"].append(
+            dict(
+                _registry_event(canon_key[0], geography, entity, row_uuid),
+                succeeds={
+                    "concept": prior["concept"],
+                    "geography": _identity_geography(prior.get("geography")),
+                    "entity": _identity_entity(prior.get("entity")),
+                },
+            )
+        )
+        return True
+
     def resolve_uuid(
         canon_key: tuple[str, str, str],
         prior: dict | None,
@@ -1620,6 +1688,17 @@ def build_catalog(
         binding = registry.binding(canon_key)
         prior_uuid = prior["uuid"] if prior else None
         if prior_uuid and binding and prior_uuid != binding:
+            # A RETIRED successor returning on the CURRENT placeholder
+            # lineage is a re-enrichment, not a remint: plan the retire +
+            # succeeds pair instead of dead-ending on UUID ownership.
+            if (
+                prior is not None
+                and not registry.is_live(canon_key)
+                and _plan_enrichment(
+                    prior, canon_key, geography, entity, prior_uuid
+                )
+            ):
+                return prior_uuid
             # The catalog row disagrees with the registry: an explicit,
             # gated remint (the curator edited the row's uuid on purpose).
             # The replacement must be new to the registry outright.
@@ -1686,62 +1765,9 @@ def build_catalog(
         row_uuid = prior_uuid if prior_uuid else str(uuid_module.uuid4())
         owner_key = registry.uuid_owner.get(uuid_module.UUID(row_uuid).int)
         if owner_key is not None:
-            prior_own_key = (
-                UuidRegistry.entry_key(prior) if prior is not None else None
-            )
-            prior_geo = (prior or {}).get("geography") or None
-            geo = geography or {}
-            enrichment_shaped = (
-                prior is not None
-                and prior.get("status") == "docket-only"
-                and prior.get("entity") is None
-                and (
-                    prior_geo is None
-                    or (
-                        (prior_geo.get("level"), prior_geo.get("id"))
-                        == (geo.get("level"), geo.get("id"))
-                        and prior_geo.get("vintage")
-                        in (None, geo.get("vintage"))
-                    )
-                )
-            )
-            if (
-                enrichment_shaped
-                and owner_key == prior_own_key
-                and registry.is_live(owner_key)
+            if prior is not None and _plan_enrichment(
+                prior, canon_key, geography, entity, row_uuid
             ):
-                # Docket-placeholder enrichment: the binding MOVES to the
-                # observed identity via an explicit retire + succeeds pair.
-                # UUID continuity is preserved, so no ceremony flag needed.
-                plan["enrich_retires"].append(
-                    dict(
-                        _registry_event(
-                            prior["concept"],
-                            prior.get("geography"),
-                            prior.get("entity"),
-                            row_uuid,
-                        ),
-                        retired=True,
-                        note=(
-                            "docket placeholder enriched by first observed "
-                            "identity"
-                        ),
-                    )
-                )
-                plan["mints"].append(
-                    dict(
-                        _registry_event(
-                            canon_key[0], geography, entity, row_uuid
-                        ),
-                        succeeds={
-                            "concept": prior["concept"],
-                            "geography": _identity_geography(
-                                prior.get("geography")
-                            ),
-                            "entity": _identity_entity(prior.get("entity")),
-                        },
-                    )
-                )
                 return row_uuid
             raise SystemExit(
                 f"identity {canon_key} would mint uuid {row_uuid}, which "

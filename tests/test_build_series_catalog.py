@@ -2221,3 +2221,85 @@ def test_check_compares_bytes_not_text(tmp_path: pathlib.Path) -> None:
     crlf = catalog_path.read_bytes().replace(b"\n", b"\r\n")
     catalog_path.write_bytes(crlf)
     assert bsc.main(argv + ["--check"]) == 1  # byte drift is drift
+
+
+def test_builder_plans_reenrichment_of_retired_successor(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Fourteenth-review follow-up: placeholder A/U1 -> enriched B/U1 ->
+    # B retired (observation withdrawn) + A reclaimed as U2 -> B returns.
+    # The builder must plan retire(A/U2) + succeeds(B/U2) instead of
+    # aborting on UUID ownership before enrichment planning.
+    fresh = "dddddddd-4444-4444-8444-444444444444"
+    a_key = {"concept": "census.m3.new_orders", "geography": None,
+             "entity": None}
+    b_geo = {"level": "country", "id": "0100000US", "vintage": "current"}
+    b_ent = {"name": "economy", "role": "aggregate"}
+    entries = [
+        _mint("census.m3.new_orders", U1),
+        dict(_mint("census.m3.new_orders", U1), retired=True,
+             note="placeholder enriched"),
+        dict(_mint("census.m3.new_orders", U1, geography=b_geo,
+                   entity=b_ent), succeeds=a_key),
+        dict(_mint("census.m3.new_orders", U1, geography=b_geo,
+                   entity=b_ent), retired=True,
+             note="observation withdrawn upstream"),
+        dict(_mint("census.m3.new_orders", fresh), reclaimed=True,
+             note="placeholder re-established after handover"),
+    ]
+    existing = {
+        "series": [
+            {
+                "uuid": fresh,
+                "concept": "census.m3.new_orders",
+                "geography": None,
+                "entity": None,
+                "aliases": [],
+                "status": "docket-only",
+            }
+        ]
+    }
+    catalog, plan = _build(
+        tmp_path,
+        [_row("census.m3.new_orders", geography=dict(b_geo), entity=b_ent)],
+        existing=existing,
+        registry_entries=entries,
+    )
+    row = catalog["series"][0]
+    assert row["uuid"] == fresh and row["status"] == "observed"
+    retire = next(e for e in plan["enrich_retires"] if e.get("retired"))
+    succeed = next(e for e in plan["mints"] if e.get("succeeds"))
+    assert retire["uuid"] == succeed["uuid"] == fresh
+    # The staged whole must reload: succeeds lands on B's RETIRED key.
+    registry = _registry(tmp_path, entries)
+    staged = registry.stage(
+        plan["enrich_retires"] + plan["mints"] + plan["revives"]
+        + plan["supersedes"] + plan["retire_pending"]
+    )
+    b_full_key = ("census.m3.new_orders", bsc._geo_key(b_geo),
+                  bsc._entity_key(b_ent))
+    assert staged.binding(b_full_key) == fresh
+    assert staged.is_live(b_full_key)
+
+
+def test_malformed_succeeds_geography_is_a_schema_finding(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Fourteenth-review follow-up: a non-object succeeds.geography raised
+    # a raw AttributeError inside key derivation.
+    path = tmp_path / "registry.jsonl"
+    base = [
+        _mint("a.one", U1),
+        dict(_mint("a.one", U1), retired=True, note="placeholder done"),
+    ]
+    forged = dict(
+        _mint("a.one", U1, entity={"name": "economy", "role": "aggregate"}),
+        succeeds={"concept": "a.one", "geography": "not-an-object",
+                  "entity": None},
+    )
+    path.write_text(
+        "".join(json.dumps(e) + "\n" for e in base + [forged]),
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="must be an object or null"):
+        bsc.UuidRegistry.load(path)
