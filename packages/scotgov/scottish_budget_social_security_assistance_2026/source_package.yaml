@@ -1,0 +1,893 @@
+# Scottish Budget 2026-27, Table 5.08 Social Security Assistance (Level 3),
+# from the archived Chapter 5 Social Justice HTML page (the budget's Stage-2
+# supporting workbook carries only amended chapters, not Chapter 5). Full
+# published table: 18 assistance lines + total, three fiscal-year columns.
+# FY2024-25 is outturn (assertion observation); FY2025-26 ABR and FY2026-27
+# are budget allocations (assertion source_projection). Publisher '-' cells
+# (Scottish Welfare Fund FY2025-26; Two Child Limit Payment FY2024-25 and
+# FY2026-27) are skipped, not zero-filled. policyengine-uk-data transcribes
+# only the Scottish Child Payment line (455.8 / 471.0 / 484.8) and extends
+# 2027-2029 by 3% growth - that uprating is excluded per the facts-only ADR.
+# uk-data's pinned URL pages/6 now serves Chapter 4; the chapter pagination
+# drifted and this package pins pages/7 (link-rot note for the tracker).
+schema_version: ledger.source_package.v1
+package_id: scotgov-scottish-budget-social-security-assistance-2026
+label: 'Scottish Budget 2026-27 Table 5.08: social security assistance spending by line, FY2024-25
+  to FY2026-27'
+artifact:
+  source_name: scotgov
+  source_table: Scottish Budget 2026-27, Chapter 5 Social Justice, Table 5.08 Social Security
+    Assistance
+  resource_package: db
+  resource_directory: data/scotgov/scottish_budget_social_security_assistance_2026
+  manifest: manifest.yaml
+  vintage: budget_2026_27
+  extracted_at: '2026-08-07'
+  extraction_method: HTML table parse of the archived budget chapter page
+  parser: html_tables_and_text
+  artifact_year: 2026
+record_sets:
+- record_set_id: scotgov.budget_2026_27.table_5_08.fy2024
+  provenance_class: administrative
+  assertion: observation
+  record_set_spec_id: scotgov.budget_2026_27.table_5_08.fy2024.v1
+  source_record_id_prefix: scotgov.budget_2026_27.table_5_08.fy2024
+  sheet_name: table_9
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: social_security_assistance
+  groupby_dimension: scotgov.social_security_line
+  rows:
+  - value_id: scottish_welfare_fund
+    label: Scottish Welfare Fund
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Scottish Welfare Fund
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_welfare_fund
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_welfare_fund
+      label: Social security assistance line
+  - value_id: carer_support_payment
+    label: Carer Support Payment
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Carer Support Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: carer_support_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: carer_support_payment
+      label: Social security assistance line
+  - value_id: adult_disability_payment
+    label: Adult Disability Payment
+    ordinal: 2
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: Adult Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: adult_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: adult_disability_payment
+      label: Social security assistance line
+  - value_id: pension_age_disability_payment
+    label: Pension Age Disability Payment
+    ordinal: 3
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Pension Age Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: pension_age_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: pension_age_disability_payment
+      label: Social security assistance line
+  - value_id: scottish_adult_dla
+    label: Scottish Adult Disability Living Allowance
+    ordinal: 4
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Scottish Adult Disability Living Allowance
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_adult_dla
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_adult_dla
+      label: Social security assistance line
+  - value_id: child_disability_payment
+    label: Child Disability Payment
+    ordinal: 5
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Child Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: child_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: child_disability_payment
+      label: Social security assistance line
+  - value_id: industrial_injuries_disablement_scheme
+    label: Industrial Injuries Disablement Scheme
+    ordinal: 6
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Industrial Injuries Disablement Scheme
+    table_record_kind: detail
+    filters:
+      social_security_line: industrial_injuries_disablement_scheme
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: industrial_injuries_disablement_scheme
+      label: Social security assistance line
+  - value_id: severe_disablement_allowance
+    label: Severe Disablement Allowance
+    ordinal: 7
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Severe Disablement Allowance
+    table_record_kind: detail
+    filters:
+      social_security_line: severe_disablement_allowance
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: severe_disablement_allowance
+      label: Social security assistance line
+  - value_id: best_start_grant
+    label: Best Start Grant
+    ordinal: 8
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Best Start Grant
+    table_record_kind: detail
+    filters:
+      social_security_line: best_start_grant
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: best_start_grant
+      label: Social security assistance line
+  - value_id: best_start_foods
+    label: Best Start Foods
+    ordinal: 9
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Best Start Foods
+    table_record_kind: detail
+    filters:
+      social_security_line: best_start_foods
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: best_start_foods
+      label: Social security assistance line
+  - value_id: funeral_support_payment
+    label: Funeral Support Payment
+    ordinal: 10
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Funeral Support Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: funeral_support_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: funeral_support_payment
+      label: Social security assistance line
+  - value_id: job_start_payment
+    label: Job Start Payment
+    ordinal: 11
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: Job Start Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: job_start_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: job_start_payment
+      label: Social security assistance line
+  - value_id: young_carer_grant
+    label: Young Carer Grant
+    ordinal: 12
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Young Carer Grant
+    table_record_kind: detail
+    filters:
+      social_security_line: young_carer_grant
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: young_carer_grant
+      label: Social security assistance line
+  - value_id: child_winter_heating_payment
+    label: Child Winter Heating Payment
+    ordinal: 13
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Child Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: child_winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: child_winter_heating_payment
+      label: Social security assistance line
+  - value_id: scottish_child_payment
+    label: Scottish Child Payment
+    ordinal: 14
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Scottish Child Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_child_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_child_payment
+      label: Social security assistance line
+  - value_id: pension_age_winter_heating_payment
+    label: Pension Age Winter Heating Payment
+    ordinal: 15
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Pension Age Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: pension_age_winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: pension_age_winter_heating_payment
+      label: Social security assistance line
+  - value_id: winter_heating_payment
+    label: Winter Heating Payment
+    ordinal: 16
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: winter_heating_payment
+      label: Social security assistance line
+  - value_id: total_social_security_assistance
+    label: 'Total Social Security Assistance of which:'
+    ordinal: 17
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 'Total Social Security Assistance of which:'
+    table_record_kind: total
+    filters:
+      social_security_line: total_social_security_assistance
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: total_social_security_assistance
+      label: Social security assistance line
+  measures:
+  - measure_id: amount
+    label: Social security assistance, FY2024-25 outturn
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 1
+    expected_column_header: 2024-25 Outturn £m
+    concept: scotgov.social_security_assistance_spending
+    source_concept: scotgov.social_security_assistance_spending
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-budget-2026-2027/pages/7/
+    concept_evidence_notes: 'Scottish Budget 2026-27, Chapter 5 Social Justice, Table 5.08
+      Social Security Assistance (Level 3), column: 2024-25 Outturn £m. GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: scotgov.budget_2026_27.table_5_08.fy2025
+  provenance_class: administrative
+  assertion: source_projection
+  record_set_spec_id: scotgov.budget_2026_27.table_5_08.fy2025.v1
+  source_record_id_prefix: scotgov.budget_2026_27.table_5_08.fy2025
+  sheet_name: table_9
+  period_type: fiscal_year
+  period: 2025
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: social_security_assistance
+  groupby_dimension: scotgov.social_security_line
+  rows:
+  - value_id: carer_support_payment
+    label: Carer Support Payment
+    ordinal: 0
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Carer Support Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: carer_support_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: carer_support_payment
+      label: Social security assistance line
+  - value_id: adult_disability_payment
+    label: Adult Disability Payment
+    ordinal: 1
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: Adult Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: adult_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: adult_disability_payment
+      label: Social security assistance line
+  - value_id: pension_age_disability_payment
+    label: Pension Age Disability Payment
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Pension Age Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: pension_age_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: pension_age_disability_payment
+      label: Social security assistance line
+  - value_id: scottish_adult_dla
+    label: Scottish Adult Disability Living Allowance
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Scottish Adult Disability Living Allowance
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_adult_dla
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_adult_dla
+      label: Social security assistance line
+  - value_id: child_disability_payment
+    label: Child Disability Payment
+    ordinal: 4
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Child Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: child_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: child_disability_payment
+      label: Social security assistance line
+  - value_id: industrial_injuries_disablement_scheme
+    label: Industrial Injuries Disablement Scheme
+    ordinal: 5
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Industrial Injuries Disablement Scheme
+    table_record_kind: detail
+    filters:
+      social_security_line: industrial_injuries_disablement_scheme
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: industrial_injuries_disablement_scheme
+      label: Social security assistance line
+  - value_id: severe_disablement_allowance
+    label: Severe Disablement Allowance
+    ordinal: 6
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Severe Disablement Allowance
+    table_record_kind: detail
+    filters:
+      social_security_line: severe_disablement_allowance
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: severe_disablement_allowance
+      label: Social security assistance line
+  - value_id: best_start_grant
+    label: Best Start Grant
+    ordinal: 7
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Best Start Grant
+    table_record_kind: detail
+    filters:
+      social_security_line: best_start_grant
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: best_start_grant
+      label: Social security assistance line
+  - value_id: best_start_foods
+    label: Best Start Foods
+    ordinal: 8
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Best Start Foods
+    table_record_kind: detail
+    filters:
+      social_security_line: best_start_foods
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: best_start_foods
+      label: Social security assistance line
+  - value_id: funeral_support_payment
+    label: Funeral Support Payment
+    ordinal: 9
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Funeral Support Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: funeral_support_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: funeral_support_payment
+      label: Social security assistance line
+  - value_id: job_start_payment
+    label: Job Start Payment
+    ordinal: 10
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: Job Start Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: job_start_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: job_start_payment
+      label: Social security assistance line
+  - value_id: young_carer_grant
+    label: Young Carer Grant
+    ordinal: 11
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Young Carer Grant
+    table_record_kind: detail
+    filters:
+      social_security_line: young_carer_grant
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: young_carer_grant
+      label: Social security assistance line
+  - value_id: child_winter_heating_payment
+    label: Child Winter Heating Payment
+    ordinal: 12
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Child Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: child_winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: child_winter_heating_payment
+      label: Social security assistance line
+  - value_id: scottish_child_payment
+    label: Scottish Child Payment
+    ordinal: 13
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Scottish Child Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_child_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_child_payment
+      label: Social security assistance line
+  - value_id: pension_age_winter_heating_payment
+    label: Pension Age Winter Heating Payment
+    ordinal: 14
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Pension Age Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: pension_age_winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: pension_age_winter_heating_payment
+      label: Social security assistance line
+  - value_id: two_child_limit_payment
+    label: Two Child Limit Payment*
+    ordinal: 15
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Two Child Limit Payment*
+    table_record_kind: detail
+    filters:
+      social_security_line: two_child_limit_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: two_child_limit_payment
+      label: Social security assistance line
+  - value_id: winter_heating_payment
+    label: Winter Heating Payment
+    ordinal: 16
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: winter_heating_payment
+      label: Social security assistance line
+  - value_id: total_social_security_assistance
+    label: 'Total Social Security Assistance of which:'
+    ordinal: 17
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 'Total Social Security Assistance of which:'
+    table_record_kind: total
+    filters:
+      social_security_line: total_social_security_assistance
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: total_social_security_assistance
+      label: Social security assistance line
+  measures:
+  - measure_id: amount
+    label: Social security assistance, FY2025-26 Autumn Budget Revision budget
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 1
+    expected_column_header: 2025-26 ABR Budget £m
+    concept: scotgov.social_security_assistance_spending
+    source_concept: scotgov.social_security_assistance_spending
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-budget-2026-2027/pages/7/
+    concept_evidence_notes: 'Scottish Budget 2026-27, Chapter 5 Social Justice, Table 5.08
+      Social Security Assistance (Level 3), column: 2025-26 ABR Budget £m. GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: scotgov.budget_2026_27.table_5_08.fy2026
+  provenance_class: administrative
+  assertion: source_projection
+  record_set_spec_id: scotgov.budget_2026_27.table_5_08.fy2026.v1
+  source_record_id_prefix: scotgov.budget_2026_27.table_5_08.fy2026
+  sheet_name: table_9
+  period_type: fiscal_year
+  period: 2026
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: person
+  entity_role: resident_population
+  domain: social_security_assistance
+  groupby_dimension: scotgov.social_security_line
+  rows:
+  - value_id: scottish_welfare_fund
+    label: Scottish Welfare Fund
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Scottish Welfare Fund
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_welfare_fund
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_welfare_fund
+      label: Social security assistance line
+  - value_id: carer_support_payment
+    label: Carer Support Payment
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Carer Support Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: carer_support_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: carer_support_payment
+      label: Social security assistance line
+  - value_id: adult_disability_payment
+    label: Adult Disability Payment
+    ordinal: 2
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: Adult Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: adult_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: adult_disability_payment
+      label: Social security assistance line
+  - value_id: pension_age_disability_payment
+    label: Pension Age Disability Payment
+    ordinal: 3
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Pension Age Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: pension_age_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: pension_age_disability_payment
+      label: Social security assistance line
+  - value_id: scottish_adult_dla
+    label: Scottish Adult Disability Living Allowance
+    ordinal: 4
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Scottish Adult Disability Living Allowance
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_adult_dla
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_adult_dla
+      label: Social security assistance line
+  - value_id: child_disability_payment
+    label: Child Disability Payment
+    ordinal: 5
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Child Disability Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: child_disability_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: child_disability_payment
+      label: Social security assistance line
+  - value_id: industrial_injuries_disablement_scheme
+    label: Industrial Injuries Disablement Scheme
+    ordinal: 6
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Industrial Injuries Disablement Scheme
+    table_record_kind: detail
+    filters:
+      social_security_line: industrial_injuries_disablement_scheme
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: industrial_injuries_disablement_scheme
+      label: Social security assistance line
+  - value_id: severe_disablement_allowance
+    label: Severe Disablement Allowance
+    ordinal: 7
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Severe Disablement Allowance
+    table_record_kind: detail
+    filters:
+      social_security_line: severe_disablement_allowance
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: severe_disablement_allowance
+      label: Social security assistance line
+  - value_id: best_start_grant
+    label: Best Start Grant
+    ordinal: 8
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Best Start Grant
+    table_record_kind: detail
+    filters:
+      social_security_line: best_start_grant
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: best_start_grant
+      label: Social security assistance line
+  - value_id: best_start_foods
+    label: Best Start Foods
+    ordinal: 9
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Best Start Foods
+    table_record_kind: detail
+    filters:
+      social_security_line: best_start_foods
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: best_start_foods
+      label: Social security assistance line
+  - value_id: funeral_support_payment
+    label: Funeral Support Payment
+    ordinal: 10
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Funeral Support Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: funeral_support_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: funeral_support_payment
+      label: Social security assistance line
+  - value_id: job_start_payment
+    label: Job Start Payment
+    ordinal: 11
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: Job Start Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: job_start_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: job_start_payment
+      label: Social security assistance line
+  - value_id: young_carer_grant
+    label: Young Carer Grant
+    ordinal: 12
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Young Carer Grant
+    table_record_kind: detail
+    filters:
+      social_security_line: young_carer_grant
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: young_carer_grant
+      label: Social security assistance line
+  - value_id: child_winter_heating_payment
+    label: Child Winter Heating Payment
+    ordinal: 13
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Child Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: child_winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: child_winter_heating_payment
+      label: Social security assistance line
+  - value_id: scottish_child_payment
+    label: Scottish Child Payment
+    ordinal: 14
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Scottish Child Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: scottish_child_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: scottish_child_payment
+      label: Social security assistance line
+  - value_id: pension_age_winter_heating_payment
+    label: Pension Age Winter Heating Payment
+    ordinal: 15
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Pension Age Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: pension_age_winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: pension_age_winter_heating_payment
+      label: Social security assistance line
+  - value_id: winter_heating_payment
+    label: Winter Heating Payment
+    ordinal: 16
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: Winter Heating Payment
+    table_record_kind: detail
+    filters:
+      social_security_line: winter_heating_payment
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: winter_heating_payment
+      label: Social security assistance line
+  - value_id: total_social_security_assistance
+    label: 'Total Social Security Assistance of which:'
+    ordinal: 17
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 'Total Social Security Assistance of which:'
+    table_record_kind: total
+    filters:
+      social_security_line: total_social_security_assistance
+    constraints:
+    - variable: social_security_line
+      operator: ==
+      value: total_social_security_assistance
+      label: Social security assistance line
+  measures:
+  - measure_id: amount
+    label: Social security assistance, FY2026-27 budget
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 1
+    expected_column_header: 2026-27 Budget £m
+    concept: scotgov.social_security_assistance_spending
+    source_concept: scotgov.social_security_assistance_spending
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-budget-2026-2027/pages/7/
+    concept_evidence_notes: 'Scottish Budget 2026-27, Chapter 5 Social Justice, Table 5.08
+      Social Security Assistance (Level 3), column: 2026-27 Budget £m. GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number

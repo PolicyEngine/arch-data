@@ -1,0 +1,12 @@
+source_id: scotgov
+package_id: scotgov-council-tax-bands-2025
+dataset: scotgov_scotgov-council-tax-bands-2025
+source_page: https://www.gov.scot/publications/council-tax-datasets/
+table: Number of chargeable dwellings, September 2025 (CTAXBASE 2025)
+files:
+  2025:
+    filename: CTAXBASE_2025_Tables_Chargeable_Dwellings.xlsx
+    source_url: https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2019/04/council-tax-datasets/documents/number-of-chargeable-dwellings/chargeable-dwellings---september-2025-data/chargeable-dwellings---september-2025-data/govscot%3Adocument/CTAXBASE%2B2025%2B-%2BTables%2B-%2BChargeable%2BDwellings.xlsx
+    sha256: 8e431837aa37ee298c9a2b9b010b8ecbc7e3a817573a3a84f6251e6db00a591f
+    size_bytes: 18765
+    fetched_at: '2026-08-07T10:36:57+00:00'

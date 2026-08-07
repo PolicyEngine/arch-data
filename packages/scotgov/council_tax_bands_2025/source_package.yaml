@@ -1,0 +1,217 @@
+# Scottish Government CTAXBASE 2025: number of chargeable dwellings at
+# September 2025, Scotland row by council tax band A-H plus total. The
+# Scotland row is publisher-emitted as in-workbook SUM formulas over the 32
+# local-authority rows; the parser reads the publisher's cached computed
+# values (total 2,623,149). The per-LA rows are wave-3 scope (#134).
+# policyengine-uk-data downloads this workbook at runtime and falls back to
+# hardcoded 2024-25 band shares x a hardcoded total when gov.scot blocks the
+# fetch - that fallback is uk-data-computed and excluded per the facts-only
+# ADR; this package pins the September-2025 publisher bytes (the fallback
+# total matches this workbook's Scotland total exactly).
+schema_version: ledger.source_package.v1
+package_id: scotgov-council-tax-bands-2025
+label: 'Scottish Government chargeable dwellings September 2025: Scotland by council tax band
+  (CTAXBASE 2025)'
+artifact:
+  source_name: scotgov
+  source_table: Number of chargeable dwellings, September 2025 (CTAXBASE 2025)
+  resource_package: db
+  resource_directory: data/scotgov/council_tax_bands_2025
+  manifest: manifest.yaml
+  vintage: ctaxbase_2025
+  extracted_at: '2026-08-07'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2025
+record_sets:
+- record_set_id: scotgov.ctaxbase2025.chargeable_dwellings.scotland
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ctaxbase2025.chargeable_dwellings.scotland.v1
+  source_record_id_prefix: scotgov.ctaxbase2025.chargeable_dwellings.scotland
+  sheet_name: Chargeable Dwellings 2025
+  period_type: month
+  period: 2025-09
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax_stock
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Scotland
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 9
+      expected_value: Aberdeen City
+      label: first local-authority row below the Scotland total
+  measures:
+  - measure_id: band_a
+    label: Chargeable dwellings, Band A
+    ordinal: 0
+    column: B
+    source_column_id: band_a
+    expected_column_header_row: 5
+    expected_column_header: Band A
+    concept: scotgov.chargeable_dwellings_band_a
+    source_concept: scotgov.chargeable_dwellings_band_a
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band A.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_b
+    label: Chargeable dwellings, Band B
+    ordinal: 1
+    column: C
+    source_column_id: band_b
+    expected_column_header_row: 5
+    expected_column_header: Band B
+    concept: scotgov.chargeable_dwellings_band_b
+    source_concept: scotgov.chargeable_dwellings_band_b
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band B.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_c
+    label: Chargeable dwellings, Band C
+    ordinal: 2
+    column: D
+    source_column_id: band_c
+    expected_column_header_row: 5
+    expected_column_header: Band C
+    concept: scotgov.chargeable_dwellings_band_c
+    source_concept: scotgov.chargeable_dwellings_band_c
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band C.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_d
+    label: Chargeable dwellings, Band D
+    ordinal: 3
+    column: E
+    source_column_id: band_d
+    expected_column_header_row: 5
+    expected_column_header: Band D
+    concept: scotgov.chargeable_dwellings_band_d
+    source_concept: scotgov.chargeable_dwellings_band_d
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band D.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_e
+    label: Chargeable dwellings, Band E
+    ordinal: 4
+    column: F
+    source_column_id: band_e
+    expected_column_header_row: 5
+    expected_column_header: Band E
+    concept: scotgov.chargeable_dwellings_band_e
+    source_concept: scotgov.chargeable_dwellings_band_e
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band E.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_f
+    label: Chargeable dwellings, Band F
+    ordinal: 5
+    column: G
+    source_column_id: band_f
+    expected_column_header_row: 5
+    expected_column_header: Band F
+    concept: scotgov.chargeable_dwellings_band_f
+    source_concept: scotgov.chargeable_dwellings_band_f
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band F.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_g
+    label: Chargeable dwellings, Band G
+    ordinal: 6
+    column: H
+    source_column_id: band_g
+    expected_column_header_row: 5
+    expected_column_header: Band G
+    concept: scotgov.chargeable_dwellings_band_g
+    source_concept: scotgov.chargeable_dwellings_band_g
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band G.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_h
+    label: Chargeable dwellings, Band H
+    ordinal: 7
+    column: I
+    source_column_id: band_h
+    expected_column_header_row: 5
+    expected_column_header: Band H
+    concept: scotgov.chargeable_dwellings_band_h
+    source_concept: scotgov.chargeable_dwellings_band_h
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Band H.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: total
+    label: Chargeable dwellings, Total
+    ordinal: 8
+    column: J
+    source_column_id: total
+    expected_column_header_row: 5
+    expected_column_header: Total
+    concept: scotgov.chargeable_dwellings_total
+    source_concept: scotgov.chargeable_dwellings_total
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-datasets/
+    concept_evidence_notes: 'Scottish Government council tax datasets, ''Number of chargeable
+      dwellings September 2025'' (CTAXBASE 2025), sheet ''Chargeable Dwellings 2025'', Scotland
+      row, column: Total.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

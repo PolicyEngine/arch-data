@@ -1,0 +1,306 @@
+# ONS public sector employment, UK - March 2026 edition of the reference
+# table (released 2026-06-18), Table 1 headcount by sector classification,
+# UK, thousands (value_scale 1e3). Ported rows: Dec 2023 and Dec 2024, the
+# two calendar reference points policyengine-uk-data targets; earlier annual
+# and quarterly rows are backfill-lane candidates, a named exclusion. Column
+# guards pin the published series CDIDs (G6NQ/G6NT/G6NW/G7AR/G7AU/G7D6).
+# Vintage note: uk-data hand-transcribes 5,900,000 (2023) and 5,940,000
+# (2024) from an earlier /latest bulletin; ONS reclassifications have since
+# revised the series, and this edition publishes Dec 2023 = 6,089k and
+# Dec 2024 = 6,146k total public sector. The current publisher truth is what
+# lands here; the pre-revision vintage remains portable later through the
+# historical-vintage backfill lane if populace needs it.
+schema_version: ledger.source_package.v1
+package_id: ons-public-sector-employment-2026
+label: 'ONS public sector employment, UK (March 2026 edition), Table 1: headcount by sector
+  classification, December 2023 and December 2024'
+artifact:
+  source_name: ons
+  source_table: Public sector employment reference table, UK, March 2026 edition
+  resource_package: db
+  resource_directory: data/ons/public_sector_employment_2026
+  manifest: manifest.yaml
+  vintage: pse_march_2026
+  extracted_at: '2026-08-07'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2026
+record_sets:
+- record_set_id: ons.pse_march2026.table1.dec2023
+  provenance_class: survey_aggregate
+  survey_instrument: Quarterly Public Sector Employment Survey
+  record_set_spec_id: ons.pse_march2026.table1.dec2023.v1
+  source_record_id_prefix: ons.pse_march2026.table1.dec2023
+  sheet_name: Table 1
+  period_type: month
+  period: 2023-12
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: public_sector_employee
+  domain: public_sector_employment
+  groupby_dimension: ons.pse_sector_classification
+  rows:
+  - value_id: dec2023
+    label: Dec 2023
+    ordinal: 0
+    row_number: 137
+    expected_row_header_column: A
+    expected_row_header: Dec 2023
+    table_record_kind: total
+  measures:
+  - measure_id: central_government
+    label: Public sector employment headcount, Central government, Dec 2023
+    ordinal: 0
+    column: B
+    source_column_id: central_government
+    expected_column_header_row: 8
+    expected_column_header: G6NQ
+    concept: ons.pse_headcount_central_government
+    source_concept: ons.g6nq
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2023, series G6NQ (Central government).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: local_government
+    label: Public sector employment headcount, Local government, Dec 2023
+    ordinal: 1
+    column: C
+    source_column_id: local_government
+    expected_column_header_row: 8
+    expected_column_header: G6NT
+    concept: ons.pse_headcount_local_government
+    source_concept: ons.g6nt
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2023, series G6NT (Local government).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: total_general_government
+    label: Public sector employment headcount, Total general government, Dec 2023
+    ordinal: 2
+    column: D
+    source_column_id: total_general_government
+    expected_column_header_row: 8
+    expected_column_header: G6NW
+    concept: ons.pse_headcount_total_general_government
+    source_concept: ons.g6nw
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2023, series G6NW (Total general government).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: total_public_corporations
+    label: Public sector employment headcount, Total public corporations, Dec 2023
+    ordinal: 3
+    column: E
+    source_column_id: total_public_corporations
+    expected_column_header_row: 8
+    expected_column_header: G7AR
+    concept: ons.pse_headcount_total_public_corporations
+    source_concept: ons.g7ar
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2023, series G7AR (Total public corporations).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: total_public_sector
+    label: Public sector employment headcount, Total public sector, Dec 2023
+    ordinal: 4
+    column: F
+    source_column_id: total_public_sector
+    expected_column_header_row: 8
+    expected_column_header: G7AU
+    concept: ons.pse_headcount_total_public_sector
+    source_concept: ons.g7au
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2023, series G7AU (Total public sector).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: civil_service
+    label: Public sector employment headcount, Civil Service, Dec 2023
+    ordinal: 5
+    column: G
+    source_column_id: civil_service
+    expected_column_header_row: 8
+    expected_column_header: G7D6
+    concept: ons.pse_headcount_civil_service
+    source_concept: ons.g7d6
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2023, series G7D6 (Civil Service).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.pse_march2026.table1.dec2024
+  provenance_class: survey_aggregate
+  survey_instrument: Quarterly Public Sector Employment Survey
+  record_set_spec_id: ons.pse_march2026.table1.dec2024.v1
+  source_record_id_prefix: ons.pse_march2026.table1.dec2024
+  sheet_name: Table 1
+  period_type: month
+  period: 2024-12
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: public_sector_employee
+  domain: public_sector_employment
+  groupby_dimension: ons.pse_sector_classification
+  rows:
+  - value_id: dec2024
+    label: Dec 2024
+    ordinal: 0
+    row_number: 141
+    expected_row_header_column: A
+    expected_row_header: Dec 2024
+    table_record_kind: total
+  measures:
+  - measure_id: central_government
+    label: Public sector employment headcount, Central government, Dec 2024
+    ordinal: 0
+    column: B
+    source_column_id: central_government
+    expected_column_header_row: 8
+    expected_column_header: G6NQ
+    concept: ons.pse_headcount_central_government
+    source_concept: ons.g6nq
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2024, series G6NQ (Central government).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: local_government
+    label: Public sector employment headcount, Local government, Dec 2024
+    ordinal: 1
+    column: C
+    source_column_id: local_government
+    expected_column_header_row: 8
+    expected_column_header: G6NT
+    concept: ons.pse_headcount_local_government
+    source_concept: ons.g6nt
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2024, series G6NT (Local government).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: total_general_government
+    label: Public sector employment headcount, Total general government, Dec 2024
+    ordinal: 2
+    column: D
+    source_column_id: total_general_government
+    expected_column_header_row: 8
+    expected_column_header: G6NW
+    concept: ons.pse_headcount_total_general_government
+    source_concept: ons.g6nw
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2024, series G6NW (Total general government).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: total_public_corporations
+    label: Public sector employment headcount, Total public corporations, Dec 2024
+    ordinal: 3
+    column: E
+    source_column_id: total_public_corporations
+    expected_column_header_row: 8
+    expected_column_header: G7AR
+    concept: ons.pse_headcount_total_public_corporations
+    source_concept: ons.g7ar
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2024, series G7AR (Total public corporations).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: total_public_sector
+    label: Public sector employment headcount, Total public sector, Dec 2024
+    ordinal: 4
+    column: F
+    source_column_id: total_public_sector
+    expected_column_header_row: 8
+    expected_column_header: G7AU
+    concept: ons.pse_headcount_total_public_sector
+    source_concept: ons.g7au
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2024, series G7AU (Total public sector).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: civil_service
+    label: Public sector employment headcount, Civil Service, Dec 2024
+    ordinal: 5
+    column: G
+    source_column_id: civil_service
+    expected_column_header_row: 8
+    expected_column_header: G7D6
+    concept: ons.pse_headcount_civil_service
+    source_concept: ons.g7d6
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable
+    concept_evidence_notes: Public sector employment reference table, March 2026 edition,
+      Table 1 (public sector employment by sector classification, headcount, UK, thousands),
+      row Dec 2024, series G7D6 (Civil Service).
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number

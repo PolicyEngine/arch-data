@@ -1,0 +1,625 @@
+# VOA Council Tax: stock of properties, 2025 (snapshot at 31 March 2025,
+# month period 2025-03). Sheet CTSOP2.0 of the summary-tables workbook -
+# publisher-emitted national and regional rows only (England and Wales,
+# England, Wales, nine English regions). Band I exists only in Wales; the
+# England and regional Band I cells are '[z]' suppressed, so the workbook
+# splits into two record sets: bands A-I + all-properties for the rows that
+# carry Band I (England and Wales, Wales) and bands A-H + all-properties for
+# England and the regions. PCON constituency rows (the bulk of the sheet) and
+# the per-LA CTSOP1.1 zips are wave-3 scope (#134). policyengine-uk-data
+# regex-discovers this workbook's URL at runtime with no committed fallback
+# and keys the values to calendar 2025 - a populace-side timing declaration.
+schema_version: ledger.source_package.v1
+package_id: voa-council-tax-bands-2025
+label: 'VOA Council Tax stock of properties 2025: properties by band, national and regional
+  (CTSOP2.0)'
+artifact:
+  source_name: voa
+  source_table: 'Council Tax: stock of properties 2025, summary tables (band by administrative
+    area)'
+  resource_package: db
+  resource_directory: data/voa/council_tax_bands_2025
+  manifest: manifest.yaml
+  vintage: ctsop_2025
+  extracted_at: '2026-08-07'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2025
+record_sets:
+- record_set_id: voa.ctsop2025.summary.bands_with_i
+  record_set_spec_id: voa.ctsop2025.summary.bands_with_i.v1
+  source_record_id_prefix: voa.ctsop2025.summary.bands_with_i
+  provenance_class: administrative
+  sheet_name: CTSOP2.0
+  period_type: month
+  period: 2025-03
+  geography_vintage: gss_2024
+  entity: dwelling
+  entity_role: banded_property
+  domain: council_tax_stock
+  groupby_dimension: voa.geography_row
+  geography_id: K04000001
+  geography_level: country
+  geography_name: England and Wales
+  rows:
+  - value_id: engwal
+    label: England and Wales
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: C
+    expected_row_header: K04000001
+    geography_id: K04000001
+    geography_level: country
+    geography_name: England and Wales
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: ENGWAL
+      label: geography kind
+    - column: D
+      row: 6
+      expected_value: England and Wales
+      label: area name
+  - value_id: wales
+    label: Wales
+    ordinal: 1
+    row_number: 560
+    expected_row_header_column: C
+    expected_row_header: W92000004
+    geography_id: W92000004
+    geography_level: country
+    geography_name: Wales
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 560
+      expected_value: NATL
+      label: geography kind
+    - column: D
+      row: 560
+      expected_value: Wales
+      label: area name
+  measures:
+  - measure_id: band_a
+    label: Number of properties, Band A
+    ordinal: 0
+    column: E
+    source_column_id: band_a
+    expected_column_header_row: 5
+    expected_column_header: A
+    concept: voa.ct_stock_band_a
+    source_concept: voa.ct_stock_band_a
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band A.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_b
+    label: Number of properties, Band B
+    ordinal: 1
+    column: F
+    source_column_id: band_b
+    expected_column_header_row: 5
+    expected_column_header: B
+    concept: voa.ct_stock_band_b
+    source_concept: voa.ct_stock_band_b
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band B.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_c
+    label: Number of properties, Band C
+    ordinal: 2
+    column: G
+    source_column_id: band_c
+    expected_column_header_row: 5
+    expected_column_header: C
+    concept: voa.ct_stock_band_c
+    source_concept: voa.ct_stock_band_c
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band C.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_d
+    label: Number of properties, Band D
+    ordinal: 3
+    column: H
+    source_column_id: band_d
+    expected_column_header_row: 5
+    expected_column_header: D
+    concept: voa.ct_stock_band_d
+    source_concept: voa.ct_stock_band_d
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band D.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_e
+    label: Number of properties, Band E
+    ordinal: 4
+    column: I
+    source_column_id: band_e
+    expected_column_header_row: 5
+    expected_column_header: E
+    concept: voa.ct_stock_band_e
+    source_concept: voa.ct_stock_band_e
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band E.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_f
+    label: Number of properties, Band F
+    ordinal: 5
+    column: J
+    source_column_id: band_f
+    expected_column_header_row: 5
+    expected_column_header: F
+    concept: voa.ct_stock_band_f
+    source_concept: voa.ct_stock_band_f
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band F.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_g
+    label: Number of properties, Band G
+    ordinal: 6
+    column: K
+    source_column_id: band_g
+    expected_column_header_row: 5
+    expected_column_header: G
+    concept: voa.ct_stock_band_g
+    source_concept: voa.ct_stock_band_g
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band G.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_h
+    label: Number of properties, Band H
+    ordinal: 7
+    column: L
+    source_column_id: band_h
+    expected_column_header_row: 5
+    expected_column_header: H
+    concept: voa.ct_stock_band_h
+    source_concept: voa.ct_stock_band_h
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band H.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_i
+    label: Number of properties, Band I
+    ordinal: 8
+    column: M
+    source_column_id: band_i
+    expected_column_header_row: 5
+    expected_column_header: I
+    concept: voa.ct_stock_band_i
+    source_concept: voa.ct_stock_band_i
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band I.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: all_properties
+    label: Number of properties, All properties
+    ordinal: 9
+    column: N
+    source_column_id: all_properties
+    expected_column_header_row: 5
+    expected_column_header: All properties
+    concept: voa.ct_stock_all_properties
+    source_concept: voa.ct_stock_all_properties
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: All properties.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: voa.ctsop2025.summary.bands_a_to_h
+  record_set_spec_id: voa.ctsop2025.summary.bands_a_to_h.v1
+  source_record_id_prefix: voa.ctsop2025.summary.bands_a_to_h
+  provenance_class: administrative
+  sheet_name: CTSOP2.0
+  period_type: month
+  period: 2025-03
+  geography_vintage: gss_2024
+  entity: dwelling
+  entity_role: banded_property
+  domain: council_tax_stock
+  groupby_dimension: voa.geography_row
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  rows:
+  - value_id: e92000001
+    label: England
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: C
+    expected_row_header: E92000001
+    geography_id: E92000001
+    geography_level: country
+    geography_name: England
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 7
+      expected_value: NATL
+      label: geography kind
+    - column: D
+      row: 7
+      expected_value: England
+      label: area name
+  - value_id: e12000001
+    label: North East
+    ordinal: 1
+    row_number: 8
+    expected_row_header_column: C
+    expected_row_header: E12000001
+    geography_id: E12000001
+    geography_level: region
+    geography_name: North East
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 8
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 8
+      expected_value: North East
+      label: area name
+  - value_id: e12000002
+    label: North West
+    ordinal: 2
+    row_number: 36
+    expected_row_header_column: C
+    expected_row_header: E12000002
+    geography_id: E12000002
+    geography_level: region
+    geography_name: North West
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 36
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 36
+      expected_value: North West
+      label: area name
+  - value_id: e12000003
+    label: Yorkshire and The Humber
+    ordinal: 3
+    row_number: 110
+    expected_row_header_column: C
+    expected_row_header: E12000003
+    geography_id: E12000003
+    geography_level: region
+    geography_name: Yorkshire and The Humber
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 110
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 110
+      expected_value: Yorkshire and The Humber
+      label: area name
+  - value_id: e12000004
+    label: East Midlands
+    ordinal: 4
+    row_number: 165
+    expected_row_header_column: C
+    expected_row_header: E12000004
+    geography_id: E12000004
+    geography_level: region
+    geography_name: East Midlands
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 165
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 165
+      expected_value: East Midlands
+      label: area name
+  - value_id: e12000005
+    label: West Midlands
+    ordinal: 5
+    row_number: 213
+    expected_row_header_column: C
+    expected_row_header: E12000005
+    geography_id: E12000005
+    geography_level: region
+    geography_name: West Midlands
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 213
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 213
+      expected_value: West Midlands
+      label: area name
+  - value_id: e12000006
+    label: East of England
+    ordinal: 6
+    row_number: 271
+    expected_row_header_column: C
+    expected_row_header: E12000006
+    geography_id: E12000006
+    geography_level: region
+    geography_name: East of England
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 271
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 271
+      expected_value: East of England
+      label: area name
+  - value_id: e12000007
+    label: London
+    ordinal: 7
+    row_number: 333
+    expected_row_header_column: C
+    expected_row_header: E12000007
+    geography_id: E12000007
+    geography_level: region
+    geography_name: London
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 333
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 333
+      expected_value: London
+      label: area name
+  - value_id: e12000008
+    label: South East
+    ordinal: 8
+    row_number: 409
+    expected_row_header_column: C
+    expected_row_header: E12000008
+    geography_id: E12000008
+    geography_level: region
+    geography_name: South East
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 409
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 409
+      expected_value: South East
+      label: area name
+  - value_id: e12000009
+    label: South West
+    ordinal: 9
+    row_number: 501
+    expected_row_header_column: C
+    expected_row_header: E12000009
+    geography_id: E12000009
+    geography_level: region
+    geography_name: South West
+    geography_vintage: gss_2024
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 501
+      expected_value: REGL
+      label: geography kind
+    - column: D
+      row: 501
+      expected_value: South West
+      label: area name
+  measures:
+  - measure_id: band_a
+    label: Number of properties, Band A
+    ordinal: 0
+    column: E
+    source_column_id: band_a
+    expected_column_header_row: 5
+    expected_column_header: A
+    concept: voa.ct_stock_band_a
+    source_concept: voa.ct_stock_band_a
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band A.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_b
+    label: Number of properties, Band B
+    ordinal: 1
+    column: F
+    source_column_id: band_b
+    expected_column_header_row: 5
+    expected_column_header: B
+    concept: voa.ct_stock_band_b
+    source_concept: voa.ct_stock_band_b
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band B.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_c
+    label: Number of properties, Band C
+    ordinal: 2
+    column: G
+    source_column_id: band_c
+    expected_column_header_row: 5
+    expected_column_header: C
+    concept: voa.ct_stock_band_c
+    source_concept: voa.ct_stock_band_c
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band C.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_d
+    label: Number of properties, Band D
+    ordinal: 3
+    column: H
+    source_column_id: band_d
+    expected_column_header_row: 5
+    expected_column_header: D
+    concept: voa.ct_stock_band_d
+    source_concept: voa.ct_stock_band_d
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band D.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_e
+    label: Number of properties, Band E
+    ordinal: 4
+    column: I
+    source_column_id: band_e
+    expected_column_header_row: 5
+    expected_column_header: E
+    concept: voa.ct_stock_band_e
+    source_concept: voa.ct_stock_band_e
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band E.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_f
+    label: Number of properties, Band F
+    ordinal: 5
+    column: J
+    source_column_id: band_f
+    expected_column_header_row: 5
+    expected_column_header: F
+    concept: voa.ct_stock_band_f
+    source_concept: voa.ct_stock_band_f
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band F.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_g
+    label: Number of properties, Band G
+    ordinal: 6
+    column: K
+    source_column_id: band_g
+    expected_column_header_row: 5
+    expected_column_header: G
+    concept: voa.ct_stock_band_g
+    source_concept: voa.ct_stock_band_g
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band G.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: band_h
+    label: Number of properties, Band H
+    ordinal: 7
+    column: L
+    source_column_id: band_h
+    expected_column_header_row: 5
+    expected_column_header: H
+    concept: voa.ct_stock_band_h
+    source_concept: voa.ct_stock_band_h
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: Band H.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: all_properties
+    label: Number of properties, All properties
+    ordinal: 8
+    column: N
+    source_column_id: all_properties
+    expected_column_header_row: 5
+    expected_column_header: All properties
+    concept: voa.ct_stock_all_properties
+    source_concept: voa.ct_stock_all_properties
+    concept_relation: source_label
+    concept_authority: voa
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+    concept_evidence_notes: 'Council Tax: stock of properties 2025, summary tables, sheet
+      CTSOP2.0 (number of properties by Council Tax band at 31 March 2025), column: All properties.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
