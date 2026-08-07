@@ -1,0 +1,5 @@
+# Pins the PolicyEngine Cloudflare account for the `wrangler r2` calls made by
+# `chronicle publish-raw` / `publish-derived` / `fetch-artifact --upload-r2`.
+# Without a pinned account, contributors whose Cloudflare user belongs to more
+# than one account fail in non-interactive runs at the account-selection step.
+account_id = "20d90f557651969925eece96e58e24dc"

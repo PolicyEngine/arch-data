@@ -330,11 +330,18 @@ uv run chronicle scaffold-package --source-id irs_soi --package-id soi-table-1-2
 Raw source artifacts should be content-addressed and checksum-locked before a
 package spec depends on them. Tiny fixtures can stay in Git, but production raw
 files should live in private Cloudflare R2 buckets, with `manifest.yaml` and the
-hosted database carrying the queryable provenance:
+hosted database carrying the queryable provenance.
+
+The buckets live on the PolicyEngine Cloudflare account, which `wrangler.toml`
+pins via `account_id`, so a plain `wrangler login` as any account member is the
+only authentication step — no `CLOUDFLARE_ACCOUNT_ID` environment variable
+needed, even when your Cloudflare user belongs to several accounts:
 
 ```bash
-# One-time after creating the PolicyEngine Cloudflare account and running
-# `npx wrangler login`:
+# One-time per machine (opens a browser consent page):
+bunx wrangler login
+
+# One-time per account (already done for the PolicyEngine account):
 uv run chronicle bootstrap-r2 --raw-bucket ledger-raw --derived-bucket ledger-derived
 
 # Fetch/register a source artifact, write db/data/.../manifest.yaml, and upload
