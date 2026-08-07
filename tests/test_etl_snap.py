@@ -2,7 +2,7 @@
 
 Values are asserted against the trustworthy USDA FNS source package
 (``packages/usda_snap/fy69_to_current``) rather than any hardcoded table, so
-the tests cannot silently bless fabricated numbers (see PolicyEngine/ledger#77).
+the tests cannot silently bless fabricated numbers (see PolicyEngine/chronicle#77).
 """
 
 import tempfile

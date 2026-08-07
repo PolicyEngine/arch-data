@@ -20,7 +20,7 @@ from .schema import (
     TargetType,
     init_db,
 )
-from ledger.normalization import SourceFact, apply_share, as_target, target_kwargs
+from chronicle.normalization import SourceFact, apply_share, as_target, target_kwargs
 
 # State FIPS codes
 STATE_FIPS = {

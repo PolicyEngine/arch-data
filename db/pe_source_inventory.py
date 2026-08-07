@@ -1,4 +1,4 @@
-"""PolicyEngine source-file inventory for Ledger ingestion."""
+"""PolicyEngine source-file inventory for Chronicle ingestion."""
 
 from __future__ import annotations
 

@@ -4,10 +4,10 @@
 
 Build a harness that verifies source fact construction end to end:
 
-1. Ledger preserves the full source artifact behind each PolicyEngine calibration source.
-2. Ledger preserves parsed source cells, including values PE omits.
-3. Ledger emits simulator-neutral source records for published statistical values.
-4. Populace can later compose active target values from Ledger facts under declared modeling choices.
+1. Chronicle preserves the full source artifact behind each PolicyEngine calibration source.
+2. Chronicle preserves parsed source cells, including values PE omits.
+3. Chronicle emits simulator-neutral source records for published statistical values.
+4. Microcosm can later compose active target values from Chronicle facts under declared modeling choices.
 5. Each active target is bound downstream to the correct model measure: variable, count basis, filters, aggregation, units, weights, entity semantics, geography, period, and universe.
 
 This is separate from parser tests. Parser tests answer whether a spreadsheet was read correctly. The harness answers whether the parsed value became a source-backed fact with the right dimensions, constraints, provenance, and lineage.
@@ -16,32 +16,32 @@ This is separate from parser tests. Parser tests answer whether a spreadsheet wa
 
 Load-bearing rule:
 
-> Ledger can change representation. Populace can change meaning.
+> Chronicle can change representation. Microcosm can change meaning.
 
-Ledger owns source preservation and simulator-neutral source records.
+Chronicle owns source preservation and simulator-neutral source records.
 
-Ledger may:
+Chronicle may:
 
 - Store immutable artifacts, checksums, retrieval metadata, parsed sheets/tables/rows/cells.
 - Preserve raw value, raw units, source table, source row, source column, formula/display metadata, notes, and extraction method.
 - Re-express published values in canonical units and IDs when the conversion is mechanical and reversible.
-- Emit aggregate facts: source-published values that Populace may later use.
+- Emit aggregate facts: source-published values that Microcosm may later use.
 - Run source-side integrity checks, such as declared component-to-total checks.
 
-Ledger must not:
+Chronicle must not:
 
-- Store PolicyEngine, Populace, or Axiom model variable IDs in source records.
+- Store PolicyEngine, Microcosm, or Axiom model variable IDs in source records.
 - Age values to a different model year.
 - Reconcile inconsistent national/state/district values.
 - Select active targets.
 - Choose a deflator, growth factor, or source preference.
 - Apply simulator-specific calibration weighting.
 
-Populace owns active targets and model measures.
+Microcosm owns active targets and model measures.
 
-Populace may:
+Microcosm may:
 
-- Select records from Ledger.
+- Select records from Chronicle.
 - Age source records to the model year.
 - Reconcile across source granularities.
 - Decide which calibration profile is active.
@@ -52,7 +52,7 @@ Populace may:
 
 I asked ChatGPT Pro to critique the plan as a senior data/simulation architecture reviewer. The useful changes incorporated here are:
 
-- Remove model variable identity from Ledger records. Ledger records should use simulator-neutral source concepts, statistics, universes, periods, geographies, and dimensions.
+- Remove model variable identity from Chronicle records. Chronicle records should use simulator-neutral source concepts, statistics, universes, periods, geographies, and dimensions.
 - Split cell selection from semantic interpretation. A selector failure and a wrong AGI-band/universe mapping should fail different tests.
 - Add a first-class target contract layer. Correct source value plus correct model expression is not enough if their units, universes, entities, periods, or geographies do not match.
 - Treat PE parity as a pinned differential harness, not the truth oracle.
@@ -109,7 +109,7 @@ pe_usage_crosswalk
 
 ### Parsed Source Cells
 
-Ledger should preserve every parsed source cell as a generic cell record.
+Chronicle should preserve every parsed source cell as a generic cell record.
 
 ```text
 source_cell = generic parsed cell, including headers, notes, omitted cells
@@ -199,11 +199,11 @@ Rules:
 - Representation conversions are allowed only when they are mechanical and documented, e.g. thousands of dollars to dollars.
 - Canonical values should use decimal/fixed precision, not binary float.
 - `all`, `unknown`, and missing must be distinct. `all` is an explicit dimension value; `unknown` is explicit and rare; missing dimensions are invalid unless the concept schema permits them.
-- Ledger source records should not contain simulator variable IDs. They may contain source concepts, source-domain variables, statistics, universes, and dimensions.
+- Chronicle source records should not contain simulator variable IDs. They may contain source concepts, source-domain variables, statistics, universes, and dimensions.
 
 ### Target Value Recipes
 
-A target value recipe is Populace-owned. It resolves Ledger source records and transforms them into an active target value.
+A target value recipe is Microcosm-owned. It resolves Chronicle source records and transforms them into an active target value.
 
 Specs should normally use source queries, not hard-coded source record IDs. Compiled target values should store the resolved source record IDs.
 
@@ -237,7 +237,7 @@ Rules:
 
 - Aging and reconciliation methods must be named and versioned.
 - Identity/no-op recipes should be implemented first so the value side can be tested before aging.
-- The compiled value records the resolved source IDs, transform fingerprint, Ledger snapshot, and code/spec hashes.
+- The compiled value records the resolved source IDs, transform fingerprint, Chronicle snapshot, and code/spec hashes.
 
 ### Model Measure Specs
 
@@ -292,7 +292,7 @@ Rules:
 - Counts should be represented as sums of count-valued measures, not as a separate aggregation method.
 - The harness should reject non-sum count specs.
 - Aggregation should be explicit, and count targets should use `sum`.
-- Weight variable, weight entity, and entity joins must be explicit and validated. Populace should default to household weights for final dataset validation.
+- Weight variable, weight entity, and entity joins must be explicit and validated. Microcosm should default to household weights for final dataset validation.
 
 ### Target Contracts
 
@@ -353,7 +353,7 @@ Rules:
 
 ### Active Target Specs
 
-An active target spec places a target contract into a Populace calibration profile.
+An active target spec places a target contract into a Microcosm calibration profile.
 
 Example:
 
@@ -370,9 +370,9 @@ replacement_mode: improved_source_lineage
 
 Rules:
 
-- Ledger should not own active target specs.
+- Chronicle should not own active target specs.
 - Excluded source records and excluded candidate targets need explicit exclusion reasons.
-- Active target values should be reproducible from Ledger snapshot + Populace specs + transform DAG.
+- Active target values should be reproducible from Chronicle snapshot + Microcosm specs + transform DAG.
 
 ## Harness Layers
 
@@ -380,7 +380,7 @@ Rules:
 
 Purpose:
 
-Ensure every manifest row is represented in Ledger source tables.
+Ensure every manifest row is represented in Chronicle source tables.
 
 Checks:
 
@@ -429,7 +429,7 @@ Failure modes this should catch:
 
 Purpose:
 
-Ensure selected source cells are transformed into canonical Ledger source records without value loss or simulator leakage.
+Ensure selected source cells are transformed into canonical Chronicle source records without value loss or simulator leakage.
 
 Checks:
 
@@ -462,7 +462,7 @@ Optional source integrity checks:
 
 Purpose:
 
-Ensure Populace target values are reproducible from Ledger records and declared transformations.
+Ensure Microcosm target values are reproducible from Chronicle records and declared transformations.
 
 Checks:
 
@@ -471,7 +471,7 @@ Checks:
 - Transform DAG is declared and hashable.
 - Identity/no-op recipes reproduce the source record value exactly.
 - Aging/reconciliation/source-selection methods are named and versioned.
-- Target value is reproducible from Ledger snapshot + source records + transform metadata.
+- Target value is reproducible from Chronicle snapshot + source records + transform metadata.
 - Excluded records have explicit exclusion reasons.
 
 ### Layer 5: Model Measure Harness
@@ -525,9 +525,9 @@ not_yet_classified
 Checks:
 
 - Pin PE version/commit, dataset, and target files.
-- Compare Ledger source records against PE source CSV/workbook-derived values where PE has equivalents.
-- Compare Populace active target values against PE target databases/CSVs where PE has equivalents.
-- Compile equivalent Populace measure specs on the same dataset.
+- Compare Chronicle source records against PE source CSV/workbook-derived values where PE has equivalents.
+- Compare Microcosm active target values against PE target databases/CSVs where PE has equivalents.
+- Compile equivalent Microcosm measure specs on the same dataset.
 - Compare each PE-equivalent measure vector where an equivalence mapping exists.
 - Compare included/excluded target profile decisions where PE has an equivalent profile.
 - Fail on unclassified differences in entity mapping, filters, signs, units, weights, aggregation, or profile inclusion.
@@ -536,31 +536,31 @@ Scope:
 
 - Start with national SOI rows because PE has useful legacy national target machinery there.
 - Add PE local/geography-aware parity after national slices work.
-- Do not require parity for improved or intentionally changed Populace targets; those should have explicit `replacement_for` metadata and a reason.
+- Do not require parity for improved or intentionally changed Microcosm targets; those should have explicit `replacement_for` metadata and a reason.
 
 ### Layer 7: Active Target Profile Harness
 
 Purpose:
 
-Ensure Populace's active calibration profiles are explicit and reproducible.
+Ensure Microcosm's active calibration profiles are explicit and reproducible.
 
 Checks:
 
 - Every active target points to one target contract.
 - Every contract points to one target value recipe and one model measure.
-- Every compiled active target value records resolved Ledger source records.
+- Every compiled active target value records resolved Chronicle source records.
 - Aging/reconciliation/source-selection methods are declared.
 - Target value is reproducible from source records and method metadata.
 - No duplicate active target occupies the same measure/year/geography/dimension domain unless explicitly marked as alternative.
-- Profile hash is reproducible from Ledger snapshot, model adapter, measure specs, target specs, and code versions.
+- Profile hash is reproducible from Chronicle snapshot, model adapter, measure specs, target specs, and code versions.
 
 ## Database Implications
 
-Ledger source tables already store artifacts, parsed tables, columns, and rows. However, the current row-oriented storage is not sufficient for the selector harness: it does not preserve stable spreadsheet coordinates, empty-cell distinctions, formulas, displayed values, merged-header lineage, or footnotes. The next implementation step must add a real `source_cell` layer before, or alongside, source-record specs.
+Chronicle source tables already store artifacts, parsed tables, columns, and rows. However, the current row-oriented storage is not sufficient for the selector harness: it does not preserve stable spreadsheet coordinates, empty-cell distinctions, formulas, displayed values, merged-header lineage, or footnotes. The next implementation step must add a real `source_cell` layer before, or alongside, source-record specs.
 
 After `source_cell` exists, the next tables or artifacts should be source-record oriented, not active-target oriented.
 
-Candidate Ledger concepts:
+Candidate Chronicle concepts:
 
 ```text
 source_series
@@ -571,7 +571,7 @@ cell_selector_specs
 source_record_specs
 source_records
 source_record_lineage
-ledger_snapshots
+chronicle_snapshots
 ```
 
 `source_records` should include:
@@ -600,9 +600,9 @@ ledger_snapshots
 - footnotes JSON
 - lineage hash
 
-`source_records` should not include PolicyEngine, Populace, or Axiom model variable IDs.
+`source_records` should not include PolicyEngine, Microcosm, or Axiom model variable IDs.
 
-Populace-side artifacts should include:
+Microcosm-side artifacts should include:
 
 ```text
 model_adapters
@@ -634,9 +634,9 @@ Status: started through this plan.
 Tasks:
 
 - Freeze the minimum boundary rules:
-  - no model variable IDs in Ledger source records
+  - no model variable IDs in Chronicle source records
   - source specs are versioned and hashable
-  - active targets are reproducible from Ledger snapshot + Populace specs
+  - active targets are reproducible from Chronicle snapshot + Microcosm specs
   - every target has a value side, measure side, and binding contract
 - Keep `docs/pe-us-source-manifest.csv` current.
 - Add missing publisher source documents as they are discovered.
@@ -647,7 +647,7 @@ Tasks:
 
 Tasks:
 
-- Load full IRS SOI TY2023 Table 1.4 workbook into Ledger source artifacts.
+- Load full IRS SOI TY2023 Table 1.4 workbook into Chronicle source artifacts.
 - Capture artifact checksum, retrieval metadata, and storage URI.
 - Parse sheets/tables/cells.
 - Preserve headers, footnotes, raw cell values, displayed values, and omitted adjacent columns.
@@ -685,11 +685,11 @@ Tasks:
 
 Acceptance:
 
-- Ledger can reproduce all PE TY2023 Table 1.4 rows in `soi_targets.csv` at the source-value layer.
-- Ledger also exposes source records for non-targeted Table 1.4 columns/rows.
+- Chronicle can reproduce all PE TY2023 Table 1.4 rows in `soi_targets.csv` at the source-value layer.
+- Chronicle also exposes source records for non-targeted Table 1.4 columns/rows.
 - Source records have concept/statistic/universe metadata and no simulator model variable IDs.
 
-### Phase 3: Ledger Target Profile Handoff
+### Phase 3: Chronicle Target Profile Handoff
 
 Tasks:
 
@@ -703,11 +703,11 @@ Tasks:
 
 Acceptance:
 
-- Downstream systems can resolve every profile row back to Ledger source records
+- Downstream systems can resolve every profile row back to Chronicle source records
   and source artifacts.
 - Profile validation fails closed when a row includes active target values,
   model-runtime code, or unsupported operations.
-- Populace can consume the profile as a contract, but owns all active target
+- Microcosm can consume the profile as a contract, but owns all active target
   values, aging, model-measure compilation, scoring, and differential tests.
 
 ### Phase 4: Expand SOI National Family
@@ -729,7 +729,7 @@ Tasks:
 - Add CI job for source manifest smoke tests.
 - Add selector/source-record spec validation tests.
 - Add target profile validation tests.
-- Surface Ledger-owned results in the source observatory:
+- Surface Chronicle-owned results in the source observatory:
   - source coverage
   - parsed-cell coverage
   - source-record coverage
@@ -755,16 +755,16 @@ Tasks:
 Acceptance:
 
 - Source records exist for every value in PE target source files.
-- Active Populace local/geography-aware targets can be benchmarked against PE local outputs where PE local parity data exists.
-- Local-readiness report shows which source families are not yet Populace-active.
+- Active Microcosm local/geography-aware targets can be benchmarked against PE local outputs where PE local parity data exists.
+- Local-readiness report shows which source families are not yet Microcosm-active.
 
 ## Open Design Answers
 
-1. Source-record specs should live in Ledger as YAML source of truth plus compiled DB rows.
-2. Active target specs should start in Populace. Split later only when multiple adapters/profiles need independent versioning.
+1. Source-record specs should live in Chronicle as YAML source of truth plus compiled DB rows.
+2. Active target specs should start in Microcosm. Split later only when multiple adapters/profiles need independent versioning.
 3. Count targets should be sums of count-valued measures, never a separate count aggregation.
 4. PE parity should be required enough to classify differences, not enough to force exact reproduction of PE omissions or legacy shortcuts.
-5. Ledger should preserve every parsed source cell, then layer semantic source records on top. Do not automatically turn every cell into a semantic record.
+5. Chronicle should preserve every parsed source cell, then layer semantic source records on top. Do not automatically turn every cell into a semantic record.
 
 ## Recommendation
 
@@ -772,8 +772,8 @@ Start with YAML specs plus generated database records.
 
 Use:
 
-- Ledger for source artifacts, parsed cells, selectors, and simulator-neutral source records.
-- Populace for target value recipes, model measure specs, target contracts,
+- Chronicle for source artifacts, parsed cells, selectors, and simulator-neutral source records.
+- Microcosm for target value recipes, model measure specs, target contracts,
   active target profiles, and PE differential metadata.
 - PE parity as a pinned differential harness, not as the source of truth.
 
@@ -796,6 +796,6 @@ First-slice acceptance criteria:
 - Source records are simulator-neutral and contain concept/statistic/universe metadata.
 - Target profiles select source records without storing target values, runtime
   code, active support decisions, or model compiler configuration.
-- Downstream Populace recipes can reference the source records and target
+- Downstream Microcosm recipes can reference the source records and target
   profiles, but their values, model measures, fixtures, and differential checks
-  remain outside Ledger.
+  remain outside Chronicle.

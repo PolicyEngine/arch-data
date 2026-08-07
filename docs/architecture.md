@@ -1,25 +1,25 @@
-# Ledger Data Architecture
+# Chronicle Data Architecture
 
 ## Overview
 
-Ledger is PolicyEngine's source-data foundation for social simulation. It captures
+Chronicle is PolicyEngine's source-data foundation for social simulation. It captures
 source publications, preserves provenance, and represents published values as
-structured, queryable facts. Populace consumes Ledger facts to produce final
+structured, queryable facts. Microcosm consumes Chronicle facts to produce final
 calibrated simulation inputs.
 
 This document describes the source-publication pipeline from government
-statistics releases to source-backed facts and target profiles. Ledger is global at the schema,
+statistics releases to source-backed facts and target profiles. Chronicle is global at the schema,
 validation, and build-harness layer. Jurisdiction source packages such as
-`ledger-us` and `ledger-uk` emit records into that shared contract.
+`ledger-us` and `chronicle-uk` emit records into that shared contract.
 
 ## Repository Boundaries
 
 | Layer | Owns | Does not own |
 |-------|------|--------------|
-| Ledger | Source artifacts, provenance, aggregate facts, constraints, target profiles | Raw microdata storage, source reconciliation, aging, imputation, active target selection |
-| Populace Targets | Source selection, reconciliation, aging, imputation, active target sets | Source artifact storage and provenance |
-| Populace | Entity model, weights, calibration interfaces, calibrated output | Source ETL and source provenance |
-| Jurisdiction source packages | Source-specific parsers and specs that emit Ledger records | Forked fact or constraint schemas |
+| Chronicle | Source artifacts, provenance, aggregate facts, constraints, target profiles | Raw microdata storage, source reconciliation, aging, imputation, active target selection |
+| Microcosm Targets | Source selection, reconciliation, aging, imputation, active target sets | Source artifact storage and provenance |
+| Microcosm | Entity model, weights, calibration interfaces, calibrated output | Source ETL and source provenance |
+| Jurisdiction source packages | Source-specific parsers and specs that emit Chronicle records | Forked fact or constraint schemas |
 | Jurisdiction simulation packages | Model-specific adapters, variable mappings, target recipes | Source facts |
 | PolicyEngine | Policy-facing workflows and analysis tools | Source ETL or calibrated dataset generation |
 
@@ -41,24 +41,24 @@ sources/
 
 | Schema | Purpose | Example Tables |
 |--------|---------|----------------|
-| `ledger` | Source metadata and lineage | sources, files, content, fetch_log |
+| `chronicle` | Source metadata and lineage | sources, files, content, fetch_log |
 | `indices` | Source time series | series, values (CPI, wage growth) |
 | `targets` | Target inputs | strata, constraints, targets |
-| `populace` | Final calibrated data | households, persons, tax_units |
+| `microcosm` | Final calibrated data | households, persons, tax_units |
 
 ## Python Namespaces
 
-New code should use the `policyengine_ledger` namespace:
+New code should use the `policyengine_chronicle` namespace:
 
 ```python
-from policyengine_ledger.sources import SourceFile, SourceReference, query_sources
-from policyengine_ledger.facts import SourceFact
-from policyengine_ledger.targets import Target, query_targets
-from policyengine_ledger.normalization import convert_units
+from policyengine_chronicle.sources import SourceFile, SourceReference, query_sources
+from policyengine_chronicle.facts import SourceFact
+from policyengine_chronicle.targets import Target, query_targets
+from policyengine_chronicle.normalization import convert_units
 ```
 
 The `db` package contains the current SQLModel persistence and loader
-implementation behind the public `policyengine_ledger` namespace.
+implementation behind the public `policyengine_chronicle` namespace.
 
 Jurisdiction source packages should use short import namespaces and published
 distribution names with a PolicyEngine prefix:
@@ -66,10 +66,10 @@ distribution names with a PolicyEngine prefix:
 ```text
 repo: PolicyEngine/ledger-us
 distribution: policyengine-ledger-us
-import: policyengine_ledger_us
+import: policyengine_chronicle_us
 ```
 
-They should depend on `policyengine-ledger` and emit shared `ledger` objects
+They should depend on `policyengine-chronicle` and emit shared `chronicle` objects
 rather than redefining source rows/cells, source-row values, aggregate facts,
 aggregate constraints, stable keys, or DB tables.
 
@@ -81,49 +81,49 @@ source publications
  parsed-as-published cells)
       |
       v
-policyengine_ledger.sources
+policyengine_chronicle.sources
 (source lineage references)
       |
       v
-policyengine_ledger.facts
+policyengine_chronicle.facts
 (structured source claims)
       |
       |
       v
-policyengine_ledger.normalization
+policyengine_chronicle.normalization
 (units, scales, IDs, source-published arithmetic)
       |
       v
-policyengine_ledger.aggregate_facts
+policyengine_chronicle.aggregate_facts
 (published aggregate facts)
       |
       v
-policyengine_ledger.target_profiles
+policyengine_chronicle.target_profiles
       |
       v
-        Populace Targets
+        Microcosm Targets
    (selected, reconciled,
     aged active target sets)
                   |
                   v
-             populace.*
+             microcosm.*
           (final calibrated
               datasets)
 ```
 
-## Source Facts And Populace Targets
+## Source Facts And Microcosm Targets
 
-Source ETL should separate Ledger aggregate facts from Populace target composition:
+Source ETL should separate Chronicle aggregate facts from Microcosm target composition:
 
 1. Load or parse source publications into source lineage and published cells.
-2. Materialize source-backed facts in Ledger.
+2. Materialize source-backed facts in Chronicle.
 3. Apply representation-only normalization such as unit scale conversion or
    source-published total/share arithmetic.
 4. Keep the fact queryable with source and derivation metadata.
-5. Let Populace select, reconcile, age, and activate calibration target sets.
+5. Let Microcosm select, reconcile, age, and activate calibration target sets.
 
-Ledger source facts can align source-published concepts to canonical vocabulary
-terms. When a legal concept is available from Axiom, Ledger should use the Axiom
+Chronicle source facts can align source-published concepts to canonical vocabulary
+terms. When a legal concept is available from Axiom, Chronicle should use the Axiom
 term as the canonical concept key and keep the publisher's column/series concept
 as `source_concept`. For example, SOI adjusted gross income is represented as:
 
@@ -134,15 +134,15 @@ relation:          exact
 authority:         ledger-us
 ```
 
-This alignment is evidence-bearing metadata, not a Ledger dependency on Axiom
-runtime behavior. Nonlegal empirical inputs can use shared Ledger/common concepts
-and later align to Axiom or Populace where appropriate.
+This alignment is evidence-bearing metadata, not a Chronicle dependency on Axiom
+runtime behavior. Nonlegal empirical inputs can use shared Chronicle/common concepts
+and later align to Axiom or Microcosm where appropriate.
 
-The `policyengine_ledger.normalization` package owns low-assumption representation helpers:
+The `policyengine_chronicle.normalization` package owns low-assumption representation helpers:
 
 ```python
-from policyengine_ledger.facts import SourceFact
-from policyengine_ledger.normalization import convert_units
+from policyengine_chronicle.facts import SourceFact
+from policyengine_chronicle.normalization import convert_units
 
 snap_households = SourceFact(
     name="snap_households",
@@ -158,29 +158,29 @@ normalized_fact = convert_units(snap_households, 1000, "count")
 
 Projection facts from official sources such as CBO, OBR, and ONS can be loaded
 as source facts directly. PolicyEngine-owned inflation, aging, projection, or
-cross-source reconciliation assumptions belong in Populace Targets, not Ledger.
+cross-source reconciliation assumptions belong in Microcosm Targets, not Chronicle.
 
 ### Downstream Adapter Aliases
 
-Ledger variables should describe source-backed facts, not downstream simulator
-variables. If a Populace or PolicyEngine target cell names the same empirical
+Chronicle variables should describe source-backed facts, not downstream simulator
+variables. If a Microcosm or PolicyEngine target cell names the same empirical
 quantity differently, the alias belongs in the downstream adapter.
 
 For example, IRS SOI publishes nonnegative income tax liability aggregates.
-Ledger should preserve that as an SOI liability fact, while a Populace adapter
-may use it to satisfy a model target named `income_tax_positive`. Ledger should
+Chronicle should preserve that as an SOI liability fact, while a Microcosm adapter
+may use it to satisfy a model target named `income_tax_positive`. Chronicle should
 not create a duplicate source fact solely to match the model variable name.
 
-This rule also applies in reverse: if a Populace target cell is really a
+This rule also applies in reverse: if a Microcosm target cell is really a
 survey input, imputed model feature, or source-selection decision rather than a
-publisher aggregate, the cell should stay out of Ledger until a primary source
+publisher aggregate, the cell should stay out of Chronicle until a primary source
 fact and its provenance are identified.
 
 ## Downstream Target Composition
 
 ### 1. Target Inputs (from `targets.*` schema)
 
-Target inputs define source-backed aggregates that Populace may use:
+Target inputs define source-backed aggregates that Microcosm may use:
 
 ```sql
 -- targets.strata: Population subgroups
@@ -194,18 +194,18 @@ VALUES (1, 'eitc_recipients', 2500000, 2023);
 
 ### 2. Variable Mapping
 
-Ledger fact concepts are source-linked or canonical vocabulary IDs. They should not
-depend on a simulator implementation. Populace jurisdiction packages map those
+Chronicle fact concepts are source-linked or canonical vocabulary IDs. They should not
+depend on a simulator implementation. Microcosm jurisdiction packages map those
 target IDs to model variables and entities.
 
 ### 3. Target Composition
 
-Populace Targets owns composition from source-backed inputs to active target
+Microcosm Targets owns composition from source-backed inputs to active target
 sets:
 
 ```python
-target_set = populace.targets.compose(
-    inputs=ledger_targets,
+target_set = microcosm.targets.compose(
+    inputs=chronicle_targets,
     target_year=2024,
     reconciliation="scale_states_to_national",
     aging="apply_published_growth_factor",
@@ -213,7 +213,7 @@ target_set = populace.targets.compose(
 ```
 
 Every source choice, reconciliation rule, aging method, and activation rule is
-declared and versioned in Populace, not Ledger.
+declared and versioned in Microcosm, not Chronicle.
 
 ### 4. Hierarchical Constraint Building
 
@@ -227,7 +227,7 @@ aggregated:
 build_hierarchical_constraint_matrix(
     hh_df=households,      # 18,825 rows
     person_df=persons,     # 48,292 rows
-    targets=targets,       # Populace active target set
+    targets=targets,       # Microcosm active target set
 )
 
 # Returns: Constraint objects with indicators at household level
@@ -254,17 +254,17 @@ for iteration in range(max_iter):
     hh_weight = clip(hh_weight, min_weight, max_weight)
 ```
 
-### 6. Output (`populace.*` schema)
+### 6. Output (`microcosm.*` schema)
 
 ```sql
--- populace.households: Calibrated household weights
+-- microcosm.households: Calibrated household weights
 SELECT household_id, state_fips, weight, ...
-FROM populace.households;
+FROM microcosm.households;
 -- 18,825 rows
 
--- populace.persons: Linked to households
+-- microcosm.persons: Linked to households
 SELECT person_id, household_id, age, employment_income, ...
-FROM populace.persons;
+FROM microcosm.persons;
 -- 48,292 rows
 ```
 
@@ -286,13 +286,13 @@ Household (weight lives here)
 
 ## Schema Details
 
-### ledger.* (Source Lineage)
+### chronicle.* (Source Lineage)
 
 ```sql
-ledger.sources        -- institution, dataset, url, update_frequency
-ledger.files          -- r2_key, checksum, source_id, fetched_at
-ledger.content        -- parsed-as-published text/tables
-ledger.fetch_log      -- change detection, version history
+chronicle.sources        -- institution, dataset, url, update_frequency
+chronicle.files          -- r2_key, checksum, source_id, fetched_at
+chronicle.content        -- parsed-as-published text/tables
+chronicle.fetch_log      -- change detection, version history
 ```
 
 ### indices.* (Source Time Series)
@@ -302,7 +302,7 @@ indices.series      -- series_id, name, source, frequency
 indices.values      -- series_id, date, value
 ```
 
-Populace recipes can reference these source series when they choose an
+Microcosm recipes can reference these source series when they choose an
 indexing rule:
 
 ```yaml
@@ -320,13 +320,13 @@ targets.constraints      -- variable, operator, value per stratum
 targets.targets          -- stratum_id, variable, value, period, source
 ```
 
-Targets in Ledger are source-backed inputs. Active, aged, reconciled calibration
-target sets belong to Populace Targets.
+Targets in Chronicle are source-backed inputs. Active, aged, reconciled calibration
+target sets belong to Microcosm Targets.
 
-### populace.* (Final Output)
+### microcosm.* (Final Output)
 
 ```sql
-populace.households     -- calibrated household records with weights
-populace.persons        -- person records linked to households
-populace.tax_units      -- tax unit records (future)
+microcosm.households     -- calibrated household records with weights
+microcosm.persons        -- person records linked to households
+microcosm.tax_units      -- tax unit records (future)
 ```

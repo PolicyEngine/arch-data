@@ -1,6 +1,6 @@
-"""Tests for source-package alias/directory drift detection (PolicyEngine/ledger#78).
+"""Tests for source-package alias/directory drift detection (PolicyEngine/chronicle#78).
 
-``ledger build-bundle`` used to iterate a hand-maintained alias map, so a
+``chronicle build-bundle`` used to iterate a hand-maintained alias map, so a
 ``packages/*`` directory that was renamed, consolidated, or added without a
 matching alias entry was silently dropped from the merged
 ``consumer_facts.jsonl`` instead of failing. These tests pin the guard that
@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import pytest
 
-from ledger.bundle import build_bundle
-from ledger.source_package import (
+from chronicle.bundle import build_bundle
+from chronicle.source_package import (
     SourcePackageAliasDriftError,
     assert_alias_map_covers_packages,
     discover_source_package_dirs,
@@ -109,7 +109,7 @@ def test_build_bundle_fails_loudly_on_unmapped_package(tmp_path, monkeypatch):
     (non-explicit) bundle build fail loudly rather than produce a
     silently-incomplete consumer_facts.jsonl.
     """
-    import ledger.source_package as source_package
+    import chronicle.source_package as source_package
 
     packages_root = source_package.SOURCE_PACKAGE_ROOT
     planted = _write_package(packages_root, "zz_planted_source/zz_planted_package")

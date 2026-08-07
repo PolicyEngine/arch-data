@@ -1,4 +1,4 @@
-"""CLI for managing Ledger target input data."""
+"""CLI for managing Chronicle target input data."""
 
 import argparse
 from pathlib import Path
@@ -293,7 +293,7 @@ def cmd_query(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Manage Ledger target input data")
+    parser = argparse.ArgumentParser(description="Manage Chronicle target input data")
     parser.add_argument("--db", help=f"Database path (default: {DEFAULT_DB_PATH})")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
