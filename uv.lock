@@ -887,7 +887,7 @@ wheels = [
 ]
 
 [[package]]
-name = "policyengine-ledger"
+name = "policyengine-chronicle"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

@@ -1,11 +1,11 @@
 ## Summary
 
-## Ledger Governance
+## Chronicle Governance
 
 For any source package, target profile, consumer contract, schema, or source-data
 boundary change:
 
-- Approved Ledger agent role:
+- Approved Chronicle agent role:
   - `ledger-source-ingestor`
   - `ledger-target-profile-author`
   - `ledger-contract-maintainer`
@@ -16,6 +16,6 @@ boundary change:
   - `ledger-contract`:
   - `ledger-boundary`:
 
-If this PR does not touch the Ledger source-data boundary, say so here.
+If this PR does not touch the Chronicle source-data boundary, say so here.
 
 ## Tests

@@ -1,0 +1,62 @@
+schema_version: policyengine_ledger.approved_agents.v1
+owners:
+  github_team: PolicyEngine/core-developers
+approved_agents:
+  - id: ledger-source-ingestor
+    purpose: Add or update source packages that emit raw publisher-backed facts.
+    allowed_paths:
+      - packages/**
+      - chronicle/jurisdictions/**
+      - chronicle/sources/**
+      - tests/test_chronicle_*.py
+      - tests/test_source_*.py
+      - tests/test_etl_*.py
+    required_deterministic_checks:
+      - source-package validation
+      - source-cell preservation
+      - consumer-contract validation
+      - raw-facts boundary validation
+    required_judges:
+      - ledger-source-fidelity
+      - ledger-boundary
+  - id: ledger-target-profile-author
+    purpose: Add source-backed target profiles and model measurement contracts without target values.
+    allowed_paths:
+      - policyengine_chronicle/target_profiles/**
+      - chronicle/targets/**
+      - tests/test_policyengine_chronicle_target_profiles.py
+      - tests/test_us_poverty_target_coverage.py
+    required_deterministic_checks:
+      - no embedded target values
+      - sum-only operation
+      - selector references raw Chronicle facts
+    required_judges:
+      - ledger-target-profile
+      - ledger-boundary
+  - id: ledger-contract-maintainer
+    purpose: Change Chronicle schemas, identity, provenance, or consumer contracts.
+    allowed_paths:
+      - chronicle/core.py
+      - chronicle/consumer_contract.py
+      - policyengine_chronicle/**
+      - docs/schemas/**
+      - tests/test_chronicle_consumer_contract.py
+      - tests/test_chronicle_core.py
+      - tests/test_policyengine_chronicle_imports.py
+    required_deterministic_checks:
+      - schema validation
+      - consumer-contract validation
+      - package import compatibility
+      - raw-facts boundary validation
+    required_judges:
+      - ledger-contract
+      - ledger-boundary
+required_judges:
+  ledger-source-fidelity:
+    verdict: PASS if every new fact is directly traceable to publisher bytes/cells and no source values are invented.
+  ledger-target-profile:
+    verdict: PASS if profiles contain selectors and measurement contracts only, with no target values or active calibration decisions.
+  ledger-contract:
+    verdict: PASS if schema or identity changes preserve source provenance and do not move Microcosm responsibilities into Chronicle.
+  ledger-boundary:
+    verdict: PASS if reconciliation, aging, imputation, support-aware activation, and solver construction remain outside Chronicle.

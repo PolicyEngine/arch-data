@@ -1,16 +1,16 @@
 # US Poverty and Nonfiler Source-Target Coverage
 
-This document records the Ledger-side source coverage contract for US poverty and
-nonfiler calibration work. Ledger stores source-backed facts and target inputs.
-Populace owns the active calibration profile, source reconciliation, aging, and
+This document records the Chronicle-side source coverage contract for US poverty and
+nonfiler calibration work. Chronicle stores source-backed facts and target inputs.
+Microcosm owns the active calibration profile, source reconciliation, aging, and
 model variable mapping.
 
 The related machine-readable contract lives in
-`ledger.targets.us_poverty.US_POVERTY_NONFILER_TARGET_COVERAGE`.
+`chronicle.targets.us_poverty.US_POVERTY_NONFILER_TARGET_COVERAGE`.
 
 ## Main Answer
 
-Yes, many of the targets discussed for ECPS/Populace are already in Ledger:
+Yes, many of the targets discussed for ECPS/Microcosm are already in Chronicle:
 
 - BEA NIPA full-population income, transfer, tax, and pension aggregates.
 - IRS SOI filer income, deduction, credit, wage, and state/district facts.
@@ -22,17 +22,17 @@ Yes, many of the targets discussed for ECPS/Populace are already in Ledger:
   collections.
 
 The missing piece was not another legacy `policyengine-us-data` comparison. It
-was an explicit coverage gate that tells consumers which Ledger source families
+was an explicit coverage gate that tells consumers which Chronicle source families
 are hard target inputs, which are validation-only diagnostics, and which source
 packages are still missing for SPM-specific components.
 
 ## Hard Target Inputs
 
-These source families are appropriate Ledger inputs for Populace target
-composition. Populace may still decide how to reconcile, age, activate, or map
+These source families are appropriate Chronicle inputs for Microcosm target
+composition. Microcosm may still decide how to reconcile, age, activate, or map
 them to model variables.
 
-| Family | Source scope | Ledger aliases |
+| Family | Source scope | Chronicle aliases |
 |---|---|---|
 | Population by age, sex, state, and congressional district | Census PEP and ACS demographics | `census-pep-2024-national-age-sex`, `census-pep-2024-state-age-sex`, `census-acs-s0101-national-age-2024`, `census-acs-s0101-state-age-2024`, `census-acs-s0101-congressional-district-age-2024` |
 | NIPA personal income, transfers, taxes, and pensions | BEA NIPA full-population aggregates | `bea-nipa-total-wages-salaries`, `bea-nipa-personal-income-components`, `bea-nipa-personal-income-disposition`, `bea-nipa-pension-contributions` |
@@ -46,14 +46,14 @@ them to model variables.
 
 BEA NIPA is especially important for nonfilers because it is a
 full-population macro control, not an SOI-only filer target. It currently gives
-Ledger coverage for wages, proprietors' income, rental income, interest,
+Chronicle coverage for wages, proprietors' income, rental income, interest,
 dividends, UI, Social Security, SSI, SNAP, Medicare, Medicaid, TANF, personal
 taxes, disposable personal income, and pension contributions.
 
 ## Validation Only
 
 These sources are useful diagnostics, but they should not be hard targets for
-fixing CPS/Populace poverty resources:
+fixing CPS/Microcosm poverty resources:
 
 | Family | Why validation-only |
 |---|---|
@@ -73,16 +73,16 @@ These are the current poverty/SPM-specific gaps to add as source packages:
 | Housing assistance and subsidy controls | HUD Picture of Subsidized Households; HUD assisted-housing unit or expenditure tables | SPM adds capped housing subsidy resources. |
 | WIC participation and benefits | USDA FNS WIC program data | SPM adds WIC resources. |
 | School lunch and breakfast benefits | USDA FNS National School Lunch and School Breakfast program data | SPM adds school meal resources. |
-| Child support received and paid | HHS OCSE annual report tables | Small in the SPM gap, but should be modeled and ledgered for completeness. |
+| Child support received and paid | HHS OCSE annual report tables | Small in the SPM gap, but should be modeled and chronicled for completeness. |
 | Workers' compensation benefits | DOL, NASI, or state workers' compensation totals | BEA broad transfers are not a clean program-specific workers' comp target. |
 | MOOP, work expenses, and childcare expense validation | MEPS, BLS Consumer Expenditure, AHS, or childcare expenditure sources | These are SPM deductions. They should guide validation/imputation rather than be blind hard targets. |
 
 ## ECPS Gate Interpretation
 
 The old ECPS-style gate was a source-backed target coverage gate: every active
-source-backed target family needed a ledgered source family, with reviewed
-exclusions for survey/model-only variables. That idea belongs here in Ledger as
-source coverage, while Populace owns the active target profile.
+source-backed target family needed a chronicled source family, with reviewed
+exclusions for survey/model-only variables. That idea belongs here in Chronicle as
+source coverage, while Microcosm owns the active target profile.
 
 The important distinction is:
 

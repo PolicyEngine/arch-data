@@ -1,5 +1,5 @@
 """
-Supabase client for Ledger.
+Supabase client for Chronicle.
 
 Provides connection to PolicyEngine Supabase database for:
 - Source metadata and dataset registries
@@ -104,7 +104,7 @@ def query_sources(
     institution: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
-    Query data sources from the Ledger source registry.
+    Query data sources from the Chronicle source registry.
 
     Args:
         jurisdiction: Filter by jurisdiction (e.g., "us", "uk")
@@ -159,7 +159,7 @@ def query_targets(
     variable: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
-    Query Ledger target inputs.
+    Query Chronicle target inputs.
 
     Args:
         jurisdiction: Filter by jurisdiction (via stratum join)

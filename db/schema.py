@@ -156,7 +156,7 @@ class Target(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     stratum_id: int = Field(foreign_key="strata.id", index=True)
 
-    variable: str = Field(index=True, description="Ledger target input variable ID")
+    variable: str = Field(index=True, description="Chronicle target input variable ID")
     period: int = Field(index=True, description="Year")
     value: float
     target_type: TargetType = Field(default=TargetType.COUNT)
@@ -183,7 +183,7 @@ class Target(SQLModel, table=True):
 
 
 class SourceArtifact(SQLModel, table=True):
-    """A source file ingested into Ledger with provenance and checksum metadata."""
+    """A source file ingested into Chronicle with provenance and checksum metadata."""
 
     __tablename__ = "source_artifacts"
 

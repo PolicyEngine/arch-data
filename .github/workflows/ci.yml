@@ -5,8 +5,8 @@ on:
   push:
 
 jobs:
-  ledger:
-    name: Ledger checks
+  chronicle:
+    name: Chronicle checks
     runs-on: ubuntu-latest
 
     steps:
@@ -24,24 +24,24 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --all-extras
 
-      - name: Lint Ledger surface
+      - name: Lint Chronicle surface
         run: >
           uv run ruff check
-          ledger
-          policyengine_ledger
+          chronicle
+          policyengine_chronicle
           db
           scripts
           tests
 
-      - name: Test Ledger surface
+      - name: Test Chronicle surface
         run: >
           uv run pytest -q
 
       - name: Build source input database
         run: |
-          uv run ledger --db /tmp/ledger-targets-ci.db init
-          uv run ledger --db /tmp/ledger-targets-ci.db load all
-          uv run ledger --db /tmp/ledger-targets-ci.db stats
+          uv run chronicle --db /tmp/chronicle-targets-ci.db init
+          uv run chronicle --db /tmp/chronicle-targets-ci.db load all
+          uv run chronicle --db /tmp/chronicle-targets-ci.db stats
 
       - name: Build wheel
         run: |
@@ -51,23 +51,23 @@ jobs:
       - name: Test wheel install
         run: |
           wheel_path="$(find dist -name '*.whl' -print -quit)"
-          uv venv /tmp/ledger-wheel-smoke --python 3.14
-          uv pip install --python /tmp/ledger-wheel-smoke/bin/python "$wheel_path"
+          uv venv /tmp/chronicle-wheel-smoke --python 3.14
+          uv pip install --python /tmp/chronicle-wheel-smoke/bin/python "$wheel_path"
           cd /tmp
-          /tmp/ledger-wheel-smoke/bin/python - <<'PY'
-          import policyengine_ledger
-          import policyengine_ledger.normalization
-          import policyengine_ledger.sources
-          import policyengine_ledger.target_profiles
-          import policyengine_ledger.targets
-          from policyengine_ledger.schema import (
+          /tmp/chronicle-wheel-smoke/bin/python - <<'PY'
+          import policyengine_chronicle
+          import policyengine_chronicle.normalization
+          import policyengine_chronicle.sources
+          import policyengine_chronicle.target_profiles
+          import policyengine_chronicle.targets
+          from policyengine_chronicle.schema import (
               CONSUMER_FACT_SCHEMA_SHA256,
               consumer_fact_schema,
           )
 
-          assert policyengine_ledger.__name__ == "policyengine_ledger"
+          assert policyengine_chronicle.__name__ == "policyengine_chronicle"
           # The pinned consumer-fact schema must ship inside the wheel.
           assert consumer_fact_schema()["title"] == "Ledger consumer fact contract row"
           assert len(CONSUMER_FACT_SCHEMA_SHA256) == 64
           PY
-          /tmp/ledger-wheel-smoke/bin/ledger --help >/dev/null
+          /tmp/chronicle-wheel-smoke/bin/chronicle --help >/dev/null

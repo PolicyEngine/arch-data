@@ -7,7 +7,7 @@ notes: >-
   Curated Ledger extract of CBO federal individual income tax receipts from the
   February 2026 Historical Budget Data workbook. Values mirror the CBO receipts
   series used by PolicyEngine-US calibration parameters and are stored as a
-  source-backed Ledger package for Populace fiscal targeting.
+  source-backed Ledger package for Microcosm fiscal targeting.
 files:
   2026:
     filename: cbo_individual_income_tax_receipts_2026_02.csv

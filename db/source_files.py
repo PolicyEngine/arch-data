@@ -1,4 +1,4 @@
-"""Generic source-file ingestion for Ledger source artifacts."""
+"""Generic source-file ingestion for Chronicle source artifacts."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ SUPPORTED_SUFFIXES = {
 
 @dataclass(frozen=True)
 class SourceArtifactSpec:
-    """A source artifact to parse into the Ledger source-file tables."""
+    """A source artifact to parse into the Chronicle source-file tables."""
 
     slug: str
     origin_project: str
@@ -94,7 +94,7 @@ def _fetch_url(url: str) -> tuple[bytes, str | None, str]:
     request = Request(
         url,
         headers={
-            "User-Agent": "policyengine-ledger/0.1",
+            "User-Agent": "policyengine-chronicle/0.1",
             "Accept": "*/*",
         },
     )

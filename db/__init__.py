@@ -1,5 +1,5 @@
 """
-Database layer for Ledger source facts and target inputs.
+Database layer for Chronicle source facts and target inputs.
 
 Supports two backends:
 - SQLite (local development via SQLModel)

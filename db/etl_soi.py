@@ -179,7 +179,7 @@ def _table_content(year: int, file_spec_fn, package_dir: str) -> bytes:
     else:
         request = Request(
             spec["source_url"],
-            headers={"User-Agent": "policyengine-ledger/0.1", "Accept": "*/*"},
+            headers={"User-Agent": "policyengine-chronicle/0.1", "Accept": "*/*"},
         )
         with urlopen(request, timeout=120) as response:
             content = response.read()

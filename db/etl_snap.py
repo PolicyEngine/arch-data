@@ -7,8 +7,8 @@ Values are sourced from the trustworthy USDA FNS source package at
 (``SNAP Monthly State Participation and Benefit Summary``) cell-by-cell with
 guard cells and checksum-locked provenance. This ETL previously hardcoded a
 ``SNAP_DATA`` dict of suspiciously round per-state values with no per-value
-citation (see PolicyEngine/ledger#77); those fabricated numbers have been
-removed in favor of the parsed source facts, so ``ledger load snap`` now emits
+citation (see PolicyEngine/chronicle#77); those fabricated numbers have been
+removed in favor of the parsed source facts, so ``chronicle load snap`` now emits
 only source-backed values.
 
 Data source page:
@@ -21,9 +21,9 @@ from collections import defaultdict
 
 from sqlmodel import Session, select
 
-from ledger.core import AggregateFact
-from ledger.normalization import SourceFact, as_target, convert_units, target_kwargs
-from ledger.source_package import load_source_package
+from chronicle.core import AggregateFact
+from chronicle.normalization import SourceFact, as_target, convert_units, target_kwargs
+from chronicle.source_package import load_source_package
 
 from .schema import (
     DataSource,

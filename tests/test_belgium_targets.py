@@ -1,4 +1,4 @@
-"""Tests for Belgium Ledger target source packages."""
+"""Tests for Belgium Chronicle target source packages."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import csv
 from functools import lru_cache
 from pathlib import Path
 
-from ledger.core import validate_facts
-from ledger.source_package import SOURCE_PACKAGE_ALIASES, load_source_package
+from chronicle.core import validate_facts
+from chronicle.source_package import SOURCE_PACKAGE_ALIASES, load_source_package
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -93,7 +93,7 @@ def test_belgium_target_packages_have_expected_fact_count():
     assert validate_facts(facts).valid
 
 
-def test_belgium_populace_selectors_match_one_package_stream():
+def test_belgium_microcosm_selectors_match_one_package_stream():
     facts_by_alias = {
         alias: _facts(alias, year) for alias, year, *_rest in BELGIUM_TARGET_STREAMS
     }
