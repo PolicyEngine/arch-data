@@ -2035,7 +2035,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: female_105 - 109
+  - value_id: female_105_109
     label: Females aged 105 - 109
     ordinal: 105
     row_number: 107
@@ -2049,7 +2049,7 @@ record_sets:
       label: age label
     filters:
       sex: female
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -2057,7 +2057,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: female_110_plus
     label: Females aged 110 and over
@@ -4078,7 +4078,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: male_105 - 109
+  - value_id: male_105_109
     label: Males aged 105 - 109
     ordinal: 212
     row_number: 214
@@ -4092,7 +4092,7 @@ record_sets:
       label: age label
     filters:
       sex: male
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -4100,7 +4100,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: male_110_plus
     label: Males aged 110 and over
@@ -6148,7 +6148,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: female_105 - 109
+  - value_id: female_105_109
     label: Females aged 105 - 109
     ordinal: 105
     row_number: 107
@@ -6162,7 +6162,7 @@ record_sets:
       label: age label
     filters:
       sex: female
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -6170,7 +6170,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: female_110_plus
     label: Females aged 110 and over
@@ -8191,7 +8191,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: male_105 - 109
+  - value_id: male_105_109
     label: Males aged 105 - 109
     ordinal: 212
     row_number: 214
@@ -8205,7 +8205,7 @@ record_sets:
       label: age label
     filters:
       sex: male
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -8213,7 +8213,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: male_110_plus
     label: Males aged 110 and over
@@ -10261,7 +10261,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: female_105 - 109
+  - value_id: female_105_109
     label: Females aged 105 - 109
     ordinal: 105
     row_number: 107
@@ -10275,7 +10275,7 @@ record_sets:
       label: age label
     filters:
       sex: female
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -10283,7 +10283,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: female_110_plus
     label: Females aged 110 and over
@@ -12304,7 +12304,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: male_105 - 109
+  - value_id: male_105_109
     label: Males aged 105 - 109
     ordinal: 212
     row_number: 214
@@ -12318,7 +12318,7 @@ record_sets:
       label: age label
     filters:
       sex: male
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -12326,7 +12326,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: male_110_plus
     label: Males aged 110 and over
@@ -14374,7 +14374,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: female_105 - 109
+  - value_id: female_105_109
     label: Females aged 105 - 109
     ordinal: 105
     row_number: 107
@@ -14388,7 +14388,7 @@ record_sets:
       label: age label
     filters:
       sex: female
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -14396,7 +14396,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: female_110_plus
     label: Females aged 110 and over
@@ -16417,7 +16417,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: male_105 - 109
+  - value_id: male_105_109
     label: Males aged 105 - 109
     ordinal: 212
     row_number: 214
@@ -16431,7 +16431,7 @@ record_sets:
       label: age label
     filters:
       sex: male
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -16439,7 +16439,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: male_110_plus
     label: Males aged 110 and over
@@ -18487,7 +18487,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: female_105 - 109
+  - value_id: female_105_109
     label: Females aged 105 - 109
     ordinal: 105
     row_number: 107
@@ -18501,7 +18501,7 @@ record_sets:
       label: age label
     filters:
       sex: female
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -18509,7 +18509,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: female_110_plus
     label: Females aged 110 and over
@@ -20530,7 +20530,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: male_105 - 109
+  - value_id: male_105_109
     label: Males aged 105 - 109
     ordinal: 212
     row_number: 214
@@ -20544,7 +20544,7 @@ record_sets:
       label: age label
     filters:
       sex: male
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -20552,7 +20552,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: male_110_plus
     label: Males aged 110 and over
@@ -22600,7 +22600,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: female_105 - 109
+  - value_id: female_105_109
     label: Females aged 105 - 109
     ordinal: 105
     row_number: 107
@@ -22614,7 +22614,7 @@ record_sets:
       label: age label
     filters:
       sex: female
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -22622,7 +22622,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: female_110_plus
     label: Females aged 110 and over
@@ -24643,7 +24643,7 @@ record_sets:
       operator: ==
       value: 104
       label: age
-  - value_id: male_105 - 109
+  - value_id: male_105_109
     label: Males aged 105 - 109
     ordinal: 212
     row_number: 214
@@ -24657,7 +24657,7 @@ record_sets:
       label: age label
     filters:
       sex: male
-      age: 105 - 109
+      age: '105_109'
     constraints:
     - variable: sex
       operator: ==
@@ -24665,7 +24665,7 @@ record_sets:
       label: sex
     - variable: age
       operator: ==
-      value: 105 - 109
+      value: '105_109'
       label: age
   - value_id: male_110_plus
     label: Males aged 110 and over

@@ -141,7 +141,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: total
     guard_cells:
@@ -189,7 +189,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: total
     guard_cells:
@@ -419,7 +419,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -488,7 +488,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -744,7 +744,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -813,7 +813,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -1069,7 +1069,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -1138,7 +1138,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -1394,7 +1394,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -1463,7 +1463,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -1719,7 +1719,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -1788,7 +1788,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -2044,7 +2044,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -2113,7 +2113,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -2369,7 +2369,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -2438,7 +2438,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -2694,7 +2694,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -2763,7 +2763,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3019,7 +3019,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3088,7 +3088,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3344,7 +3344,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3413,7 +3413,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3669,7 +3669,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3738,7 +3738,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -3994,7 +3994,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -4063,7 +4063,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -4319,7 +4319,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -4388,7 +4388,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -4644,7 +4644,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -4713,7 +4713,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -4969,7 +4969,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -5038,7 +5038,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -5294,7 +5294,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -5363,7 +5363,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -5619,7 +5619,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -5688,7 +5688,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -5944,7 +5944,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6013,7 +6013,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6269,7 +6269,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6338,7 +6338,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6594,7 +6594,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6663,7 +6663,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6919,7 +6919,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -6988,7 +6988,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -7244,7 +7244,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -7313,7 +7313,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -7569,7 +7569,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -7638,7 +7638,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -7894,7 +7894,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -7963,7 +7963,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -8219,7 +8219,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -8288,7 +8288,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -8544,7 +8544,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -8613,7 +8613,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -8869,7 +8869,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -8938,7 +8938,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -9194,7 +9194,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -9263,7 +9263,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -9519,7 +9519,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -9588,7 +9588,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -9844,7 +9844,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -9913,7 +9913,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -10169,7 +10169,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -10238,7 +10238,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -10494,7 +10494,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -10563,7 +10563,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -10819,7 +10819,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -10888,7 +10888,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -11144,7 +11144,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -11213,7 +11213,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -11469,7 +11469,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -11538,7 +11538,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -11794,7 +11794,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -11863,7 +11863,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -12119,7 +12119,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -12188,7 +12188,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -12444,7 +12444,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -12513,7 +12513,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -12769,7 +12769,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -12838,7 +12838,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -13094,7 +13094,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -13163,7 +13163,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -13419,7 +13419,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -13488,7 +13488,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -13744,7 +13744,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -13813,7 +13813,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -14069,7 +14069,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -14138,7 +14138,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -14394,7 +14394,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -14463,7 +14463,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -14719,7 +14719,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -14788,7 +14788,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -15044,7 +15044,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -15113,7 +15113,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -15369,7 +15369,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -15438,7 +15438,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -15694,7 +15694,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -15763,7 +15763,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16019,7 +16019,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16088,7 +16088,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16344,7 +16344,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16413,7 +16413,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16669,7 +16669,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16738,7 +16738,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -16994,7 +16994,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -17063,7 +17063,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -17319,7 +17319,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -17388,7 +17388,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -17644,7 +17644,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -17713,7 +17713,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -17969,7 +17969,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -18038,7 +18038,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -18294,7 +18294,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -18363,7 +18363,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -18619,7 +18619,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -18688,7 +18688,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -18944,7 +18944,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19013,7 +19013,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19269,7 +19269,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19338,7 +19338,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19594,7 +19594,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19663,7 +19663,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19919,7 +19919,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -19988,7 +19988,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -20244,7 +20244,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -20313,7 +20313,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -20569,7 +20569,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -20638,7 +20638,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -20894,7 +20894,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -20963,7 +20963,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -21219,7 +21219,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -21288,7 +21288,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -21544,7 +21544,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -21613,7 +21613,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -21869,7 +21869,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -21938,7 +21938,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -22194,7 +22194,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -22263,7 +22263,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -22519,7 +22519,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -22588,7 +22588,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -22844,7 +22844,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -22913,7 +22913,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -23169,7 +23169,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -23238,7 +23238,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -23494,7 +23494,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -23563,7 +23563,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -23819,7 +23819,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -23888,7 +23888,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -24144,7 +24144,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -24213,7 +24213,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -24469,7 +24469,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -24538,7 +24538,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -24794,7 +24794,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -24863,7 +24863,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -25119,7 +25119,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -25188,7 +25188,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -25444,7 +25444,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -25513,7 +25513,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -25769,7 +25769,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -25838,7 +25838,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -26094,7 +26094,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -26163,7 +26163,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -26419,7 +26419,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -26488,7 +26488,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -26744,7 +26744,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -26813,7 +26813,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -27069,7 +27069,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -27138,7 +27138,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -27394,7 +27394,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -27463,7 +27463,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -27719,7 +27719,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -27788,7 +27788,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -28044,7 +28044,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -28113,7 +28113,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -28369,7 +28369,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -28438,7 +28438,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -28694,7 +28694,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -28763,7 +28763,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -29019,7 +29019,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -29088,7 +29088,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -29344,7 +29344,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -29413,7 +29413,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -29669,7 +29669,7 @@ record_sets:
     expected_row_header: E12000003
     geography_id: E12000003
     geography_level: region
-    geography_name: Yorkshire And The Humber
+    geography_name: Yorkshire and the Humber
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
@@ -29738,7 +29738,7 @@ record_sets:
     expected_row_header: E12000006
     geography_id: E12000006
     geography_level: region
-    geography_name: East
+    geography_name: East of England
     geography_vintage: gss_2024
     table_record_kind: detail
     guard_cells:
