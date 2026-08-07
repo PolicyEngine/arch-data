@@ -357,6 +357,18 @@ uv run chronicle build-suite scotgov-scottish-budget-social-security-assistance-
   --out /tmp/chronicle-scotgov-scottish-budget-social-security-assistance-2026 \
   --replace
 
+uv run chronicle validate-package dft-nts-vehicle-ownership-2024 --year 2024
+uv run chronicle build-suite dft-nts-vehicle-ownership-2024 \
+  --year 2024 \
+  --out /tmp/chronicle-dft-nts-2024 \
+  --replace
+
+uv run chronicle validate-package ons-public-sector-employment-2026 --year 2026
+uv run chronicle build-suite ons-public-sector-employment-2026 \
+  --year 2026 \
+  --out /tmp/chronicle-ons-pse-2026 \
+  --replace
+
 uv run chronicle validate-package slc-student-loan-borrower-forecasts-england-2025 --year 2025
 uv run chronicle build-suite slc-student-loan-borrower-forecasts-england-2025 \
   --year 2025 \

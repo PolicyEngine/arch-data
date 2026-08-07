@@ -1,0 +1,115 @@
+# PE UK source checklist: uk-data targets → Ledger packages
+
+Tracker for the migration of every calibration-target family in
+`policyengine-uk-data` (pinned ref for the migration:
+[`ebf733c`](https://github.com/PolicyEngine/policyengine-uk-data/tree/ebf733c6ee7c0cea0afa7098bf4fbbe9922814bb),
+2026-07-26) onto Ledger source packages. Scope issues:
+[#132](https://github.com/PolicyEngine/ledger/issues/132) (wave 1, production
+149-target surface), [#133](https://github.com/PolicyEngine/ledger/issues/133)
+(wave 2, remaining national registry + `uk_national` profile),
+[#134](https://github.com/PolicyEngine/ledger/issues/134) (wave 3, local
+geography).
+
+Status vocabulary:
+
+- **ported** — facts live in an open or merged Ledger PR.
+- **gated** — blocked on a named dependency.
+- **parked** — needs credentials or access only a human holds.
+- **wave 3** — local-geography scope, tracked in #134.
+- **excluded (computed)** — the uk-data value is PolicyEngine-computed
+  (uprating, flat-fill, share-split, rate×count product); the facts-only ADR
+  (`docs/adr-ledger-facts-only.md`) keeps it out of Ledger. The publisher base
+  facts are ported (or listed under remaining); the computation becomes a
+  populace-side declaration.
+
+"Source reuse" says whether the Ledger package ingests the byte-for-byte
+artifact uk-data used, or had to re-pin because uk-data's source was
+runtime-downloaded, link-rotted, or transcribed from a page.
+
+## Ported
+
+| uk-data family (module) | targets | Ledger package(s) | PR | source reuse |
+|---|---|---|---|---|
+| Region×age population ([`ons_demographics.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/ons_demographics.py)) | 142 `ons/{region}_age_{band}` | `ons-mye-2023-uk-countries`, `ons-mye-2023-england-regions`, `ons-mye-2024-uk`, `ons-uk-population-projections-2024` | [#137](https://github.com/PolicyEngine/ledger/pull/137) | **Replaced.** uk-data reads a committed `demographics.csv` with no artifact lineage (the SNPP has no stable machine-readable URL). Ledger packages the publisher MYE workbooks ([mid-2023 UK](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland), [mid-2023 E&W regions](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/estimatesofthepopulationforenglandandwales), mid-2024 UK) and the [2024-based NPP principal](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/z1zippedpopulationprojectionsdatafilesuk) at single year of age; the fixture's 10-year bands (proven exhaustive, `_age_80_89` = 80+) are a populace-side mapping. |
+| OBR EFO receipts + expenditure ([`obr.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/obr.py)) | ~28 realized `obr/*` | `obr-efo-receipts-march-2026`, `obr-efo-expenditure-march-2026` (196 facts, FY2024–30) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Same bytes.** uk-data commits the March-2026 EFO workbooks under `storage/obr_efo/` (obr.uk 403s CI); the Ledger artifacts are sha256-identical to them (`f65b6cb7…`, `700bfd70…`), double-fetched from [obr.uk](https://obr.uk/efo/economic-and-fiscal-outlook-march-2026/) on a residential connection. |
+| ONS savings interest ([`ons_savings.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/ons_savings.py)) | 1 `ons/savings_interest_income` | `ons-savings-interest-income` (8 facts, 2018–2025) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Same series, pinned snapshot.** Both read the [HAXV/UKEA series](https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea); uk-data downloads at runtime and flat-fills the last actual through 2029 (**excluded, computed**); Ledger pins the 2026-06-30 CSV release bytes. |
+| Household types ([`ons_households.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/ons_households.py)) | household-type counts | `ons-families-households-2025` (80 facts, Table 7, 2018–2025) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Same artifact.** Same `familiesandhouseholdsuk2025.xlsx` "current" edition of [Families and households](https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds); Ledger pins the bytes (LFS-derived → `survey_aggregate`). |
+| Salary-sacrifice relief ([`hmrc_salary_sacrifice.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/hmrc_salary_sacrifice.py)) | 3 `hmrc/salary_sacrifice_*` | `hmrc-salary-sacrifice-relief-2024` (6 facts, TY2024-25) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Updated — uk-data's asset is dead.** uk-data pins `media/687a294e…/Tables_6_1_and_6_2.csv`, which now returns `{"status":"gone"}` (its runtime download silently drops the targets). Ledger packages the current asset from [Private pension statistics](https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics) (updated 2026-07-30). uk-data's ×1.03 growth uprating off a 2023-24 base is **excluded (computed)**. |
+| CGT ([`hmrc_cgt.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/hmrc_cgt.py)) | 4 `hmrc/cgt_*` | `hmrc-cgt-statistics-2025` (333 facts, 37 disposal years × 9 measures) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Same publication, full table.** Both cite [CGT statistics](https://www.gov.uk/government/statistics/capital-gains-tax-statistics) (2025 release); uk-data hand-transcribes 4 headline values (its 378k/£65.9bn are the publisher Total columns), Ledger ingests the Table 1 ODS bytes end to end. Also single-homes populace's native `UK_CGT_TARGET_SPECS` (retirement in [populace#622](https://github.com/PolicyEngine/populace/issues/622)). |
+| SPI income bands ([`hmrc_spi.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/hmrc_spi.py)) | 4 `hmrc/spi_*` | `hmrc-spi-income-bands-2023` (182 facts, Tables 3.6/3.7, TY2023-24) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Re-pinned.** uk-data's docstring cites the summarised-accounts page; Ledger pins the [SPI collated tables ODS](https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024) that actually carries the 13 bands × 7 income types — the same artifact populace's national HMRC stage parses (single-homing candidate). The ×1.9 property-income scale and uprated projections are **excluded (computed)**. |
+| Benefit cap ([`dwp.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/dwp.py)) | `dwp/benefit_capped_households` | `dwp-benefit-cap-november-2025` (15 facts, Table 4, Nov-2025) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Same publication, from bytes.** uk-data hand-transcribes 110,637 from the [Nov-2025 publication](https://www.gov.uk/government/statistics/benefit-cap-number-of-households-capped-to-november-2025) HTML; Ledger parses the ODS (110,637 is the GB Total row) plus the 13 amount-capped bands. uk-data's £320.9m annualized reduction is **excluded (computed)** — a midpoint-by-band annualization populace can re-declare over the ported band distribution. |
+| Two-child limit ([`dwp.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/dwp.py)) | 11 `dwp/uc/two_child_limit/*` | `dwp-uc-two-child-limit-2025` (92 facts, tables 01/03A/03B/04A/04B, Apr-2025) | [#139](https://github.com/PolicyEngine/ledger/pull/139) | **Same publication, from bytes.** uk-data hand-transcribes from the [April-2025 publication](https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025) HTML; Ledger parses the ODS data tables, adding the exception-granted rows uk-data skips. uk-data's `{2026: …}` timing on Apr-2025 values is a populace-side declaration. |
+
+## In continuation branch (this PR — wave 2 remainder)
+
+| uk-data family (module) | targets | Ledger package | source reuse |
+|---|---|---|---|
+| ESA/JSA claimants ([`dwp.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/dwp.py)) | `dwp/esa_claimants`, `dwp/esa_contrib_claimants`, `dwp/esa_income_claimants`, `dwp/jsa_claimants` | `dwp-benefit-statistics-february-2026` | **Same publication, archived HTML.** The [Feb-2026 statistical summary](https://www.gov.uk/government/statistics/dwp-benefit-statistics-february-2026/dwp-benefit-statistics-february-2026) is HTML-only (data otherwise via Stat-Xplore); the summary quotes 620,000 / 180,000 / 71,000 exactly at Aug-2025. uk-data's ESA total 999,000 is Stat-Xplore precision — the publisher emits "1 million"; the ported fact follows the publisher, the delta is enumerated in the PR. |
+| VOA council tax stock ([`voa_council_tax.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/voa_council_tax.py)) | 99 `voa/council_tax/{region}/{band,total}` (E&W) | `voa-council-tax-bands-2025` | **Same artifact, pinned.** uk-data regex-discovers the Summary Tables workbook URL from the [VOA stock of properties 2025 page](https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025) at runtime (no committed fallback); Ledger pins the workbook bytes (sheet CTSOP2.0). |
+| Scotland council tax bands ([`voa_council_tax.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/voa_council_tax.py)) | 9 `voa/council_tax/SCOTLAND/*` | `scotgov-council-tax-bands-2025` | **Same artifact, pinned.** uk-data downloads the [CTAXBASE 2025 chargeable-dwellings workbook](https://www.gov.scot/publications/council-tax-datasets/) with a hardcoded band-share fallback (total 2,623,149 × 2024-25 shares) when gov.scot blocks it — the fallback is **excluded (computed)**; Ledger pins the September-2025 workbook bytes. |
+| Scottish child payment budget ([`scottish_government.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/scottish_government.py)) | `sss/scottish_child_payment` | `scotgov-scottish-budget-social-security-assistance-2026` | **Same publication, published years only.** [Scottish Budget 2026-27](https://www.gov.scot/publications/scottish-budget-2026-2027/pages/6/) Table 5.08 values for 2024–2026 (£455.8m / £471.0m / £484.8m). uk-data's 2027–2029 series (`471.0e6 × 1.03^(y−2025)`) is **excluded (computed)**. |
+| NTS vehicle availability ([`nts_vehicles.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/nts_vehicles.py)) | 3 `nts/households_*_vehicle*` | `dft-nts-vehicle-ownership-2024` (81 facts, NTS0205a, 27 single-year rows 1951–2024) | **Re-pinned to publication table.** uk-data hand-transcribes rounded 22%/44%/34% from [NTS 2024](https://www.gov.uk/government/statistics/national-travel-survey-2024) and multiplies by a hand-transcribed 29.6m UK households — the products are **excluded (computed)**; Ledger ports the publisher shares at full precision (2024: 21.78/44.25/33.97). NTS covers England-resident households; applying its shares UK-wide is a populace-side declaration. The five combined-period rows (1985-86 … 1998-2000) are a named exclusion (no calendar-year period representation). |
+| Public sector employment ([`ons_public_sector_employment.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/ons_public_sector_employment.py)) | 1 `ons/public_sector_employment` (5.90m 2023 / 5.94m 2024) | `ons-public-sector-employment-2026` (12 facts, Table 1 headcount by sector, Dec-2023 + Dec-2024) | **Re-pinned to dataset — vintage revised by ONS.** uk-data hand-transcribes headline headcounts from the [PSE bulletin `/latest`](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/bulletins/publicsectoremployment/latest) (no fixed vintage); Ledger pins the March-2026 [reference table](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/datasets/publicsectoremploymentreferencetable), where reclassifications have revised the series to 6,089k (Dec 2023) / 6,146k (Dec 2024) total public sector. The pre-revision vintage stays portable via the backfill lane. |
+
+## Gated
+
+| family | targets | gate | notes |
+|---|---|---|---|
+| SLC student support ([`slc.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/slc.py)) | 10 `slc/*` (borrower forecasts Table 6a; maintenance loans Table 3A; PLA/ADG Table 4C(i)) | [#131](https://github.com/PolicyEngine/ledger/issues/131) / [PR #136](https://github.com/PolicyEngine/ledger/pull/136) (`academic_year`) | Sources: [EES permalink](https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d) (runtime scrape; `ees_permalink_table_html` parser lane exists) + [`slcsp052025.xlsx`](https://assets.publishing.service.gov.uk/media/691d9e662c6b98ecdbc5003f/slcsp052025.xlsx). Wave-1 scope (#132). |
+| SLC loan repayments ([`slc_repayments.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/slc_repayments.py)) | 8 `slc/student_loan_repayment/*` (FY2024-25) | landing with the SLC family post-#136 | England values hand-transcribed from Table 1A of the **corrected** workbook [`slcsp012025_Corrected.xlsx`](https://assets.publishing.service.gov.uk/media/6943ee619273c48f554cf5c5/slcsp012025_Corrected.xlsx); Scotland/Wales/NI from the [Scotland](https://www.gov.uk/government/statistics/student-loans-in-scotland-2024-to-2025/student-loans-for-higher-education-in-scotland-financial-year-2024-25) / [Wales](https://www.gov.uk/government/statistics/student-loans-in-wales-2024-to-2025/student-loans-for-higher-education-in-wales-financial-year-2024-25) / [NI](https://www.gov.uk/government/statistics/student-loans-in-northern-ireland-2024-to-2025/student-loans-for-higher-education-in-northern-ireland-financial-year-2024-25) HTML statistics. Periods are fiscal years, but the family lands together with `slc.py`. |
+
+## Parked — needs a human download
+
+| family | targets | notes |
+|---|---|---|
+| PIP daily-living awards ([`dwp.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/dwp.py)) | `dwp/pip_dl_{standard,enhanced}_claimants` (1,283,000 / 1,608,000 at 2025) | **Scoping correction (2026-08-07):** uk-data cites [PIP statistics to January 2026](https://www.gov.uk/government/statistics/personal-independence-payment-statistics-to-january-2026), but that publication's tables carry clearance/journey statistics only — the DL standard/enhanced caseload split is not in it. The values match DWP FOI response **FOI2025/24990** (PIP caseload at end-January 2025), published via [WhatDoTheyKnow](https://www.whatdotheyknow.com/request/personal_independence_payment_pi_7), which blocks automated fetches — needs a manual browser download of the response PDF (then the `pdf_text_numbers` lane), or the Stat-Xplore "PIP cases with entitlement" series once a key is available. |
+
+## Parked — needs a DWP Stat-Xplore API key
+
+All four follow the existing `api_response` artifact pattern once someone with a
+free [Stat-Xplore](https://stat-xplore.dwp.gov.uk/) key runs the extracts.
+
+| family | targets | notes |
+|---|---|---|
+| UC payment distribution ([`dwp.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/dwp.py) → `utils/uc_data.py`) | 104 `dwp/uc_payment_dist/*` (May-2025 pivot) | uk-data parses a committed Stat-Xplore export (`storage/uc_national_payment_dist.xlsx`) with no API provenance. Known uk-data bug: the open `£2500.01 or over` band parses to NaN, emitting 4 impossible `nan_to_nan` targets. |
+| UC claimants by children | 5 `dwp/uc/claimants_with_{n}_children` | Hand-transcribed Stat-Xplore counts (1,222,944 / 1,058,967 / 473,500 / 166,790 / 75,910). |
+| UC claimants by family type | 4 `dwp/uc/claimants_{family_type}` | Stat-Xplore base counts inflated by a computed `undercount_relative` — the inflation is **excluded (computed)** and stays populace-side; only the raw counts are portable. |
+| Scotland UC households, child under 1 | 1 `dwp/scotland_uc_households_child_under_1` (14,000) | Stat-Xplore. |
+
+## Wave 3 — local geography (#134)
+
+| family | notes |
+|---|---|
+| England tenure ([`ons_tenure.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/ons_tenure.py)) | Runtime-downloads the [subnational dwellings-by-tenure workbook](https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/subnationaldwellingstockbytenureestimates) and code-sums LA rows to an England total — an LA-grain workbook, so the England totals are not portable as national facts (ruling recorded on #133). Lands as the wave-3 tenure package. |
+| LA council tax ([`la_council_tax.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/la_council_tax.py)) | LOCAL_AUTHORITY level (never enters the national matrix). Its committed `la_council_tax.csv` mixes publisher values (band counts, Band D) with uk-data-computed England net CT (MHCLG taxbase × Band D — **excluded (computed)**). Portable publisher tables for wave 3: [CT levels England 2026-27](https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2026-to-2027), [Council Taxbase 2025 Table 1.35](https://www.gov.uk/government/statistics/council-taxbase-2025-in-england), [Welsh CT levels Table 3](https://www.gov.wales/council-tax-levels-april-2026-march-2027-html), VOA CTSOP1.1 per-LA stock. |
+| Local age / income / UC / LA extras (`local_age.py`, `local_income.py`, `local_uc.py`, `local_la_extras.py`) | Emit no registry `Target()`s (loss-matrix inputs); full inventory in [#134](https://github.com/PolicyEngine/ledger/issues/134). |
+
+## Remaining in wave 2 — not yet started
+
+| family | targets | plan |
+|---|---|---|
+| Land values ([`_land.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/_land.py), [`ons_land_values.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/ons_land_values.py), [`mhclg_regional_land.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/mhclg_regional_land.py)) | `ons/{household,corporate,}_land_value` + 11 regional | `ons-national-balance-sheet-land-2025` from the [ONS National Balance Sheet 2025](https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/bulletins/nationalbalancesheet/2025) dataset — verify which NBS table carries land by sector before packaging. Portable: the published aggregates (2020 household £4,309,138m / corporate £1,757,818m; totals 2021–2024). **Excluded (computed):** 2025/26 flat-fills, the fixed 2020 share split, and the regional split (fixed shares from an unattributed committed CSV of house prices × dwellings). |
+| Housing rent/mortgage ([`housing.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/housing.py)) | `housing/total_mortgage`, `housing/rent_private`, `housing/rent_social` | All three are rate×count products (**excluded (computed)**). Portable base facts need their own scoping: [ONS PRHI average rent](https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026) (£1,374/month), [EHS 2023-24 rented sectors](https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors) (£118/week social rent), and the 7.5m/5.4m/5.0m household counts (EHS + devolved stats; exact tables unpinned in uk-data). |
+| SPP Review base values ([`obr.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/obr.py)) | salary-sacrifice contribution/NI-relief bases | Small package from the [2025 SPP Review PDF](https://assets.publishing.service.gov.uk/media/67ce0e7c08e764d17a5d3c21/2025_SPP_Review.pdf) (`pdf_text_numbers` lane). The growth-uprated series remain **excluded (computed)**. |
+| ISC private-school census ([`obr.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/obr.py)) | `obr/private_school_students` (557,000 at 2023) | Wave-1 remainder (#132): true publisher is the [ISC annual census](https://www.isc.co.uk/research/annual-census/), relabeled from uk-data's `obr` tag. |
+| `uk_national` target profile | — | Own `ledger-target-profile-author`-lane PR once the packages it selects exist (#133). |
+
+## Legacy ETL cleanup
+
+The pre-package `db/etl_obr.py` / `db/etl_ons.py` dicts are superseded by these
+packages; cleanup tracked in
+[#135](https://github.com/PolicyEngine/ledger/issues/135).
+
+## Link-rot found during the migration
+
+- uk-data's pinned salary-sacrifice asset returns `{"status":"gone"}` — its
+  runtime download silently drops 3 targets today.
+- The NRS statistics-by-theme URLs in `ons_demographics.py` have moved; the
+  current publication is the mid-2025 estimates (which also revise mid-23/24).
+- gov.scot binaries intermittently block non-browser fetches (uk-data ships a
+  hardcoded Scottish band-share fallback for exactly this).
+- uk-data's Scottish-budget citation `scottish-budget-2026-2027/pages/6/` now
+  serves Chapter 4 — the chapter pagination drifted; Table 5.08 lives at
+  `pages/7/` (Chapter 5 Social Justice).
+- The PIP daily-living split's cited publication never carried the values
+  (see the parked PIP row above — the true source is FOI2025/24990).
