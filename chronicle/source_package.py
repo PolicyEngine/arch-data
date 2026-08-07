@@ -50,6 +50,7 @@ from chronicle.sources.rows import (
     source_rows_from_census_b01001_female_age_json,
     source_rows_from_cdc_vsrr_live_births_json,
     source_rows_from_json_table,
+    source_rows_from_statxplore_table,
     source_rows_from_ees_permalink_table_html,
     source_rows_from_kff_state_indicator_gdocs_html,
     source_rows_from_ons_timeseries_json,
@@ -110,6 +111,16 @@ SOURCE_PACKAGE_ALIASES = {
         "dwp/benefit_statistics_february_2026"
     ),
     "dwp-pip-daily-living-foi-2025": Path("dwp/pip_daily_living_foi_2025"),
+    "dwp-uc-households-children-may-2025": Path("dwp/uc_households_children_may_2025"),
+    "dwp-uc-households-family-type-may-2025": Path(
+        "dwp/uc_households_family_type_may_2025"
+    ),
+    "dwp-uc-payment-distribution-may-2025": Path(
+        "dwp/uc_payment_distribution_may_2025"
+    ),
+    "dwp-uc-scotland-youngest-child-may-2025": Path(
+        "dwp/uc_scotland_youngest_child_may_2025"
+    ),
     "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
         "cbo/revenue_projections_income_by_source_2026_02"
@@ -273,6 +284,12 @@ class SourceArtifactSpec:
             )
         if self.parser == "json_table_full_rows":
             return source_rows_from_json_table(
+                content,
+                artifact,
+                sheet_name=self._sheet_name(filename, year=year),
+            )
+        if self.parser == "statxplore_table_json_rows":
+            return source_rows_from_statxplore_table(
                 content,
                 artifact,
                 sheet_name=self._sheet_name(filename, year=year),
@@ -568,6 +585,26 @@ class SourceArtifactSpec:
                     content,
                     artifact,
                     sheet_name=self.sheet_name or "indicator",
+                )
+            )
+            return source_cells_from_source_rows(
+                rows,
+                selected_rows=tuple(
+                    {
+                        key: str(_render_value(value, year=year))
+                        for key, value in row.items()
+                    }
+                    for row in self.selected_rows
+                ),
+            )
+        if self.parser == "statxplore_table_json_rows":
+            rows = (
+                source_rows
+                if source_rows is not None
+                else source_rows_from_statxplore_table(
+                    content,
+                    artifact,
+                    sheet_name=self.sheet_name or "api_response",
                 )
             )
             return source_cells_from_source_rows(

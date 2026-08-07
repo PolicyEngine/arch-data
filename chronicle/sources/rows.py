@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import itertools
 import json
 import re
 from collections import Counter
@@ -1008,3 +1009,71 @@ def _excel_column_name(column_number: int) -> str:
 
 def _counter_dict(values: Any) -> dict[str, int]:
     return dict(sorted(Counter(values).items()))
+
+
+def _statxplore_column_key(label: str) -> str:
+    """Build a stable snake_case column key from a Stat-Xplore field label."""
+    key = re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
+    return key or "field"
+
+
+def source_rows_from_statxplore_table(
+    content: bytes,
+    artifact: SourceArtifactMetadata,
+    *,
+    sheet_name: str,
+) -> list[SourceRow]:
+    """Unpivot a Stat-Xplore Open Data API /table response into source rows.
+
+    The response is self-describing: it echoes the submitted query, names the
+    measure, and lists each dimension field with its items (labels plus value
+    URIs, whose trailing segments carry publisher codes such as GSS geography
+    identifiers). One source row is emitted per cube cell, columns are the
+    measure label, the cell value, and a label/URI pair per dimension field
+    in response order.
+    """
+    data = json.loads(content.decode("utf-8"))
+    fields = data.get("fields") or []
+    cubes = data.get("cubes") or {}
+    if not fields or not cubes:
+        return []
+    measure_uri, cube = next(iter(cubes.items()))
+    measure_label = measure_uri
+    for measure in data.get("measures") or []:
+        if measure.get("uri") == measure_uri:
+            measure_label = str(measure.get("label") or measure_uri)
+            break
+    field_keys: list[str] = []
+    for field in fields:
+        key = _statxplore_column_key(str(field.get("label") or field.get("uri")))
+        while key in field_keys:
+            key = f"{key}_"
+        field_keys.append(key)
+    item_axes = [field.get("items") or [] for field in fields]
+    values = cube.get("values") if isinstance(cube, dict) else None
+    if values is None or any(not axis for axis in item_axes):
+        return []
+    rows: list[SourceRow] = []
+    for indices in itertools.product(*(range(len(axis)) for axis in item_axes)):
+        node: Any = values
+        for index in indices:
+            node = node[index]
+        row_values: dict[str, Scalar] = {
+            "measure": measure_label,
+            "value": _json_scalar(node),
+        }
+        for key, axis, index in zip(field_keys, item_axes, indices):
+            item = axis[index]
+            labels = item.get("labels") or []
+            uris = item.get("uris") or []
+            row_values[key] = str(labels[0]) if labels else None
+            row_values[f"{key}_uri"] = str(uris[0]) if uris else None
+        rows.append(
+            SourceRow(
+                artifact=artifact,
+                sheet_name=sheet_name,
+                row_number=len(rows) + 1,
+                values=row_values,
+            )
+        )
+    return rows

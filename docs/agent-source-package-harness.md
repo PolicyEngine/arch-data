@@ -285,10 +285,28 @@ uv run chronicle build-suite dwp-pip-daily-living-foi-2025 \
   --out /tmp/chronicle-dwp-pip-daily-living-foi-2025 \
   --replace
 
-uv run chronicle validate-package dwp-uc-national-payment-dist-2025 --year 2025
-uv run chronicle build-suite dwp-uc-national-payment-dist-2025 \
+uv run chronicle validate-package dwp-uc-payment-distribution-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-payment-distribution-may-2025 \
   --year 2025 \
-  --out /tmp/chronicle-dwp-uc-national-payment-dist-2025 \
+  --out /tmp/chronicle-dwp-uc-payment-distribution-may-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-children-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-children-may-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-households-children-may-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-family-type-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-family-type-may-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-households-family-type-may-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-scotland-youngest-child-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-scotland-youngest-child-may-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-scotland-youngest-child-may-2025 \
   --replace
 
 uv run chronicle validate-package hmrc-salary-sacrifice-relief-2024-25 --year 2024
