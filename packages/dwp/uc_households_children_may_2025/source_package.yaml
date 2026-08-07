@@ -5,6 +5,14 @@
 # 1,269,512) - deltas enumerated in the PR. Digit categories are guarded
 # via publisher value URIs (digit-text row headers int-coerce in the guard
 # contract, the mye precedent).
+# Cross-cube reconciliation note (adversarial review): the same May-2025
+# universe queried through different dimensions returns totals that differ
+# by a handful of households (family-type cube total 6,584,241 vs
+# number-of-children cube total 6,584,239; summing the band x family cube's
+# non-overlapping bands differs from the family-type marginals by 4-20 per
+# family type). DWP applies cell-level adjustment at source, so cross-cube
+# marginals are not expected to reconcile exactly; each package carries its
+# own cube's publisher-emitted values.
 schema_version: ledger.source_package.v1
 package_id: dwp-uc-households-children-may-2025
 label: 'DWP Stat-Xplore: households on Universal Credit by number of children, Great Britain,

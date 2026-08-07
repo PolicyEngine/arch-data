@@ -1,15 +1,19 @@
 # DfT National Travel Survey 2024, table NTS0205a: percentage of households
-# with no / one / two-or-more cars or vans, England, from the published
+# with no / one / two-or-more cars or vans, from the published
 # nts-2024-excel-tables.zip (member nts0205.xlsx). Publisher precision is
 # ported (2024: 21.784588632006 / 44.2490898162473 / 33.9663215517466);
 # policyengine-uk-data hand-transcribes the rounded 22/44/34 and multiplies
 # by a hand-transcribed 29.6m UK household total - the products are excluded
 # per the facts-only ADR, and applying England-resident NTS shares UK-wide is
-# a populace-side declaration. Single-year rows only (1951-1981 decennial,
-# 2002-2024 annual); the five combined-period rows (1985 to 1986 through
-# 1998 to 2000) are excluded because a multi-year span has no calendar_year
-# period representation - a named exclusion, not a data gap. The E-column
-# guard pins each selected row to the table's all-households 100% check.
+# a populace-side declaration. Geography follows the workbook's note 3:
+# rows prior to 1989 (1951/1961/1971/1981) are Great Britain; 1989 onwards
+# are England - so the four decennial record sets carry K03000001 and, per
+# note 2, name the pre-NTS household surveys as their instrument. Single-year
+# rows only (1951-1981 decennial, 2002-2024 annual); the five combined-period
+# rows (1985 to 1986 through 1998 to 2000) are excluded because a multi-year
+# span has no calendar_year period representation - a named exclusion, not a
+# data gap. The E-column guard pins each selected row to the table's
+# all-households 100% check.
 schema_version: ledger.source_package.v1
 package_id: dft-nts-vehicle-ownership-2024
 label: 'DfT National Travel Survey 2024, NTS0205a: household car availability shares, England'
@@ -28,15 +32,15 @@ artifact:
 record_sets:
 - record_set_id: dft.nts2024.nts0205a.car_availability.cy1951
   provenance_class: survey_aggregate
-  survey_instrument: National Travel Survey
+  survey_instrument: Household travel surveys preceding the National Travel Survey
   record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1951.v1
   source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1951
   sheet_name: NTS0205a_car_availability
   period_type: calendar_year
   period: 1951
-  geography_id: E92000001
+  geography_id: K03000001
   geography_level: country
-  geography_name: England
+  geography_name: Great Britain
   geography_vintage: current
   entity: household
   entity_role: resident_household
@@ -109,15 +113,15 @@ record_sets:
     expected_cell_type: number
 - record_set_id: dft.nts2024.nts0205a.car_availability.cy1961
   provenance_class: survey_aggregate
-  survey_instrument: National Travel Survey
+  survey_instrument: Household travel surveys preceding the National Travel Survey
   record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1961.v1
   source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1961
   sheet_name: NTS0205a_car_availability
   period_type: calendar_year
   period: 1961
-  geography_id: E92000001
+  geography_id: K03000001
   geography_level: country
-  geography_name: England
+  geography_name: Great Britain
   geography_vintage: current
   entity: household
   entity_role: resident_household
@@ -190,15 +194,15 @@ record_sets:
     expected_cell_type: number
 - record_set_id: dft.nts2024.nts0205a.car_availability.cy1971
   provenance_class: survey_aggregate
-  survey_instrument: National Travel Survey
+  survey_instrument: Household travel surveys preceding the National Travel Survey
   record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1971.v1
   source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1971
   sheet_name: NTS0205a_car_availability
   period_type: calendar_year
   period: 1971
-  geography_id: E92000001
+  geography_id: K03000001
   geography_level: country
-  geography_name: England
+  geography_name: Great Britain
   geography_vintage: current
   entity: household
   entity_role: resident_household
@@ -271,15 +275,15 @@ record_sets:
     expected_cell_type: number
 - record_set_id: dft.nts2024.nts0205a.car_availability.cy1981
   provenance_class: survey_aggregate
-  survey_instrument: National Travel Survey
+  survey_instrument: Household travel surveys preceding the National Travel Survey
   record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1981.v1
   source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1981
   sheet_name: NTS0205a_car_availability
   period_type: calendar_year
   period: 1981
-  geography_id: E92000001
+  geography_id: K03000001
   geography_level: country
-  geography_name: England
+  geography_name: Great Britain
   geography_vintage: current
   entity: household
   entity_role: resident_household

@@ -8,7 +8,10 @@
 # uk-data's 999,000 is Stat-Xplore precision for the same series - the
 # publisher-emitted value is what lands here, and the delta is enumerated in
 # the PR. The publisher text notes the total exceeds contributions-based +
-# income-related because some claim both or receive credits only. gov.uk
+# income-related because some claim both or receive credits only. The JSA
+# count sits exactly at a publisher-flagged methodology break: from August
+# 2025 data onwards DWP removed a subset of inactive JSA claims, so 71,000
+# is not comparable with earlier vintages. gov.uk
 # serves per-request nonces in unrelated page chrome, so the archived HTML is
 # not byte-reproducible across fetches; the parsed statistical content is
 # stable and the manifest sha pins the archived bytes.
@@ -23,7 +26,8 @@ artifact:
   manifest: manifest.yaml
   vintage: benefit_statistics_february_2026
   extracted_at: '2026-08-07'
-  extraction_method: HTML table and document-text number parse of the archived statistical summary
+  extraction_method: HTML table and document-text number parse of the archived statistical
+    summary
   parser: html_tables_and_text
   artifact_year: 2025
 record_sets:
@@ -48,8 +52,8 @@ record_sets:
     ordinal: 0
     row_number: 158
     expected_row_header_column: C
-    expected_row_header: There were 1 million people on Employment and Support Allowance
-      at August 2025, a decrease of 500,000 since August 2024.
+    expected_row_header: There were 1 million people on Employment and Support Allowance at
+      August 2025, a decrease of 500,000 since August 2024.
     table_record_kind: total
     filters:
       esa_claim_type: all
@@ -92,14 +96,13 @@ record_sets:
       label: HTML element index
     - column: C
       row: 172
-      expected_value: Over recent years, the number of ESA claims has been decreasing
-        because UC has replaced ESA for new income-related claims on the grounds of
-        incapacity. Since August 2024, the number of people claiming ESA has decreased
-        by 33.1% (500,000). The number of people claiming contributions-based ESA
-        at August 2025 was 620,000, an increase of 180,000 against August 2024. The
-        number of people claiming income-related ESA at August 2025 was 180,000, a
-        decrease of 470,000 on August 2024. Remaining claimants either claim both
-        contributions-based and income-related ESA, or receive credits only.
+      expected_value: Over recent years, the number of ESA claims has been decreasing because
+        UC has replaced ESA for new income-related claims on the grounds of incapacity. Since
+        August 2024, the number of people claiming ESA has decreased by 33.1% (500,000). The
+        number of people claiming contributions-based ESA at August 2025 was 620,000, an increase
+        of 180,000 against August 2024. The number of people claiming income-related ESA at
+        August 2025 was 180,000, a decrease of 470,000 on August 2024. Remaining claimants
+        either claim both contributions-based and income-related ESA, or receive credits only.
       label: paragraph text
     - column: D
       row: 173
@@ -130,14 +133,13 @@ record_sets:
       label: HTML element index
     - column: C
       row: 175
-      expected_value: Over recent years, the number of ESA claims has been decreasing
-        because UC has replaced ESA for new income-related claims on the grounds of
-        incapacity. Since August 2024, the number of people claiming ESA has decreased
-        by 33.1% (500,000). The number of people claiming contributions-based ESA
-        at August 2025 was 620,000, an increase of 180,000 against August 2024. The
-        number of people claiming income-related ESA at August 2025 was 180,000, a
-        decrease of 470,000 on August 2024. Remaining claimants either claim both
-        contributions-based and income-related ESA, or receive credits only.
+      expected_value: Over recent years, the number of ESA claims has been decreasing because
+        UC has replaced ESA for new income-related claims on the grounds of incapacity. Since
+        August 2024, the number of people claiming ESA has decreased by 33.1% (500,000). The
+        number of people claiming contributions-based ESA at August 2025 was 620,000, an increase
+        of 180,000 against August 2024. The number of people claiming income-related ESA at
+        August 2025 was 180,000, a decrease of 470,000 on August 2024. Remaining claimants
+        either claim both contributions-based and income-related ESA, or receive credits only.
       label: paragraph text
     - column: D
       row: 172
@@ -160,10 +162,12 @@ record_sets:
     concept_relation: source_label
     concept_authority: dwp
     concept_evidence_url: https://www.gov.uk/government/statistics/dwp-benefit-statistics-february-2026/dwp-benefit-statistics-february-2026
-    concept_evidence_notes: 'DWP benefit statistics February 2026 statistical summary,
-      Employment and Support Allowance section: total people on ESA at August 2025
-      (published as 1 million), contributions-based ESA (620,000) and income-related
-      ESA (180,000).'
+    concept_evidence_notes: 'DWP benefit statistics February 2026 statistical summary, Employment
+      and Support Allowance section: total people on ESA at August 2025 (published as 1 million),
+      contributions-based ESA (620,000) and income-related ESA (180,000). The categories do
+      not partition the total: per the publication, remaining claimants either claim both
+      contributions-based and income-related ESA, or receive credits only - so contributions_based
+      and income_related are single-type counts, not model contributory/income-related caseloads.'
     unit: count
     aggregation: sum
     expected_cell_type: number
@@ -188,9 +192,9 @@ record_sets:
     ordinal: 0
     row_number: 238
     expected_row_header_column: C
-    expected_row_header: During the coronavirus (COVID-19) pandemic, claims for JSA
-      went up substantially, but have since fallen below pre-pandemic levels. There
-      were 71,000 JSA claimants at August 2025.
+    expected_row_header: During the coronavirus (COVID-19) pandemic, claims for JSA went up
+      substantially, but have since fallen below pre-pandemic levels. There were 71,000 JSA
+      claimants at August 2025.
     table_record_kind: total
     filters:
       benefit_line: jobseekers_allowance
@@ -225,10 +229,13 @@ record_sets:
     concept_relation: source_label
     concept_authority: dwp
     concept_evidence_url: https://www.gov.uk/government/statistics/dwp-benefit-statistics-february-2026/dwp-benefit-statistics-february-2026
-    concept_evidence_notes: 'DWP benefit statistics February 2026 statistical summary,
-      Jobseeker''s Allowance section: 71,000 JSA claimants at August 2025. The JSA
-      scheme is effectively New Style (contributory) only; the mapping of this count
-      to a contributory-JSA model variable is a populace-side declaration.'
+    concept_evidence_notes: 'DWP benefit statistics February 2026 statistical summary, Jobseeker''s
+      Allowance section: 71,000 JSA claimants at August 2025. The JSA scheme is effectively
+      New Style (contributory) only; the mapping of this count to a contributory-JSA model
+      variable is a populace-side declaration. The count is post-methodology-break: the publication
+      states a methodological improvement applied from August 2025 data onwards removed a
+      subset of inactive JSA claims from the caseload, so this figure is not directly comparable
+      with pre-August-2025 vintages.'
     unit: count
     aggregation: sum
     expected_cell_type: number

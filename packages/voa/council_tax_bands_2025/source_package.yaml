@@ -1,14 +1,23 @@
 # VOA Council Tax: stock of properties, 2025 (snapshot at 31 March 2025,
 # month period 2025-03). Sheet CTSOP2.0 of the summary-tables workbook -
-# publisher-emitted national and regional rows only (England and Wales,
-# England, Wales, nine English regions). Band I exists only in Wales; the
-# England and regional Band I cells are '[z]' suppressed, so the workbook
-# splits into two record sets: bands A-I + all-properties for the rows that
-# carry Band I (England and Wales, Wales) and bands A-H + all-properties for
-# England and the regions. PCON constituency rows (the bulk of the sheet) and
-# the per-LA CTSOP1.1 zips are wave-3 scope (#134). policyengine-uk-data
-# regex-discovers this workbook's URL at runtime with no committed fallback
-# and keys the values to calendar 2025 - a populace-side timing declaration.
+# publisher-emitted national and regional rows (England and Wales, England,
+# Wales, nine English regions) plus the UNMD 'Unmatched' residual row
+# (properties whose postcode could not be matched to a Westminster
+# constituency, note 15; carried with a geography_match == unmatched
+# identity on the England-and-Wales footprint). Additivity: England + Wales
+# + Unmatched equals the England and Wales row within the publisher's
+# nearest-10 cell rounding (every cell is independently rounded, so exact
+# reconciliation is not expected; band I reconciles exactly). Band I exists
+# only in Wales; the England and regional Band I cells are '[z]' (the
+# accessible-tables shorthand for not applicable - England's 1993 valuation
+# list has no Band I),
+# so the workbook splits into two record sets: bands A-I + all-properties
+# for the rows that carry Band I (England and Wales, Wales, Unmatched) and
+# bands A-H + all-properties for England and the regions. PCON constituency
+# rows (the bulk of the sheet) and the per-LA CTSOP1.1 zips are wave-3 scope
+# (#134). policyengine-uk-data regex-discovers this workbook's URL at
+# runtime with no committed fallback and keys the values to calendar 2025 -
+# a populace-side timing declaration.
 schema_version: ledger.source_package.v1
 package_id: voa-council-tax-bands-2025
 label: 'VOA Council Tax stock of properties 2025: properties by band, national and regional
@@ -81,6 +90,34 @@ record_sets:
     - column: D
       row: 560
       expected_value: Wales
+      label: area name
+  - value_id: unmatched
+    label: Unmatched (properties not matched to a constituency)
+    ordinal: 2
+    row_number: 593
+    expected_row_header_column: C
+    expected_row_header: Unmatched [note 15]
+    geography_id: K04000001
+    geography_level: country
+    geography_name: England and Wales
+    geography_vintage: gss_2024
+    table_record_kind: detail
+    filters:
+      geography_match: unmatched
+    constraints:
+    - variable: geography_match
+      operator: ==
+      value: unmatched
+      label: Properties whose postcode could not be matched to a Westminster constituency
+        (note 15)
+    guard_cells:
+    - column: A
+      row: 593
+      expected_value: UNMD
+      label: geography kind
+    - column: D
+      row: 593
+      expected_value: Unmatched [note 15]
       label: area name
   measures:
   - measure_id: band_a

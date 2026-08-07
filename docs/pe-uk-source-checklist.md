@@ -57,21 +57,7 @@ runtime-downloaded, link-rotted, or transcribed from a page.
 | family | targets | gate | notes |
 |---|---|---|---|
 | SLC student support ([`slc.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/slc.py)) | 10 `slc/*` (borrower forecasts Table 6a; maintenance loans Table 3A; PLA/ADG Table 4C(i)) | [#131](https://github.com/PolicyEngine/ledger/issues/131) / [PR #136](https://github.com/PolicyEngine/ledger/pull/136) (`academic_year`) | Sources: [EES permalink](https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d) (runtime scrape; `ees_permalink_table_html` parser lane exists) + [`slcsp052025.xlsx`](https://assets.publishing.service.gov.uk/media/691d9e662c6b98ecdbc5003f/slcsp052025.xlsx). Wave-1 scope (#132). |
-| SLC loan repayments ([`slc_repayments.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/slc_repayments.py)) | 8 `slc/student_loan_repayment/*` (FY2024-25) | landing with the SLC family post-#136 | England values hand-transcribed from Table 1A of the **corrected** workbook [`slcsp012025_Corrected.xlsx`](https://assets.publishing.service.gov.uk/media/6943ee619273c48f554cf5c5/slcsp012025_Corrected.xlsx); Scotland/Wales/NI from the [Scotland](https://www.gov.uk/government/statistics/student-loans-in-scotland-2024-to-2025/student-loans-for-higher-education-in-scotland-financial-year-2024-25) / [Wales](https://www.gov.uk/government/statistics/student-loans-in-wales-2024-to-2025/student-loans-for-higher-education-in-wales-financial-year-2024-25) / [NI](https://www.gov.uk/government/statistics/student-loans-in-northern-ireland-2024-to-2025/student-loans-for-higher-education-in-northern-ireland-financial-year-2024-25) HTML statistics. Periods are fiscal years, but the family lands together with `slc.py`. |
-
-## Stat-Xplore families — ported via the Open Data API
-
-All four were extracted from the [Stat-Xplore](https://stat-xplore.dwp.gov.uk/)
-"Households on Universal Credit" dataset with a registered API key
-(2026-08-07, Month = May 2025), on the new `statxplore_table_json_rows`
-parser lane; each artifact is the raw API response with its query echoed
-inside it. **Vintage note common to all four:** uk-data's transcriptions are
-the *provisional* May 2025 (p) extract; DWP has since revised the month, so
-the ported facts are the current revised series and uk-data's values differ
-by roughly 3–5% — an enumerated intentional difference, the same genus as the
-salary-sacrifice and PSE vintage notes.
-
-| family | targets | Ledger package | notes |
+| SLC loan repayments ([`slc_repayments.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/slc_repayments.py)) | 8 `slc/student_loan_repayment/*` (FY2024-25) | landing with the SLC family post-#136 | England values hand-transcribed from Table 1A of the **corrected** workbook [`slcsp012025_Corrected.xlsx`](https://assets.publishing.service.gov.uk/media/6943ee619273c48f554cf5c5/slcsp012025_Corrected.xlsx); Scotland/Wales/NI from the [Scotland](https://www.gov.uk/government/statistics/student-loans-in-scotland-2024-to-2025/student-loans-for-higher-education-in-scotland-financial-year-2024-25) / [Wales](https://www.gov.uk/government/statistics/student-loans-in-wales-2024-to-2025/student-loans-for-higher-education-in-wales-financial-year-2024-25) / [NI](https://www.gov.uk/government/statistics/student-loans-in-northern-ireland-2024-to-2025/student-loans-for-higher-education-in-northern-ireland-financial-year-2024-25) HTML statistics. Periods are fiscal years, but the family lands together with `slc.py`. | uk-data's transcriptions are an earlier provisional vintage of the same cubes; measured deltas vs the revised May-2025 series run +2.6% to +15.0% (family type) and +2.6% to +5.6% (children) — enumerated on the PR | family | targets | Ledger package | notes |
 |---|---|---|---|
 | UC payment distribution ([`dwp.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/dwp.py) → `utils/uc_data.py`) | 104 `dwp/uc_payment_dist/*` | `dwp-uc-payment-distribution-may-2025` (140 facts, 28 bands × 5 family types) | uk-data parses a committed provisional export with no API provenance; its open `£2500.01 or over` band parses to NaN (4 impossible `nan_to_nan` targets) — here it is an ordinary category. Band identities are exact publisher labels; the ×12 annualization is populace-side. |
 | UC claimants by children | 5 `dwp/uc/claimants_with_{n}_children` | `dwp-uc-households-children-may-2025` (8 facts) | Digit categories carry integer `number_of_children` constraints; `5 or more` and the unknown tail stay categorical (uk-data merged the tail into its `5+`). |
@@ -125,4 +111,4 @@ packages; cleanup tracked in
   serves Chapter 4 — the chapter pagination drifted; Table 5.08 lives at
   `pages/7/` (Chapter 5 Social Justice).
 - The PIP daily-living split's cited publication never carried the values
-  (see the parked PIP row above — the true source is FOI2025/24990).
+  (see the PIP row in the continuation table above — the true source is FOI2025/24990).

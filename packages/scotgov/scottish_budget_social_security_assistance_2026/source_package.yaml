@@ -1,15 +1,22 @@
 # Scottish Budget 2026-27, Table 5.08 Social Security Assistance (Level 3),
 # from the archived Chapter 5 Social Justice HTML page (the budget's Stage-2
-# supporting workbook carries only amended chapters, not Chapter 5). Full
-# published table: 18 assistance lines + total, three fiscal-year columns.
-# FY2024-25 is outturn (assertion observation); FY2025-26 ABR and FY2026-27
-# are budget allocations (assertion source_projection). Publisher '-' cells
-# (Scottish Welfare Fund FY2025-26; Two Child Limit Payment FY2024-25 and
-# FY2026-27) are skipped, not zero-filled. policyengine-uk-data transcribes
-# only the Scottish Child Payment line (455.8 / 471.0 / 484.8) and extends
-# 2027-2029 by 3% growth - that uprating is excluded per the facts-only ADR.
-# uk-data's pinned URL pages/6 now serves Chapter 4; the chapter pagination
-# drifted and this package pins pages/7 (link-rot note for the tracker).
+# supporting workbook carries only amended chapters, not Chapter 5).
+# Ported: the assistance lines + the Total Social Security Assistance row,
+# three fiscal-year columns. FY2024-25 is outturn (assertion observation);
+# FY2025-26 ABR and FY2026-27 are budget allocations (source_projection).
+# Named exclusions: publisher '-' cells (Scottish Welfare Fund FY2025-26;
+# Two Child Limit Payment FY2024-25 and FY2026-27) are skipped, not
+# zero-filled; the Two Child Limit Payment FY2025-26 GBP 11.3m allocation is
+# NOT ported because the publisher's own same-table footnote withdraws it
+# ("funding ... is no longer required. The GBP 11.3 million allocated in
+# 2025-26 will be removed at Spring Budget Revision"); and the table's
+# trailing 'of which' presentational block (Fiscal Resource, Non-cash,
+# Capital, FTs, UK Funded AME) is out of scope - the package ports
+# assistance lines, not funding-classification splits. policyengine-uk-data
+# transcribes only the Scottish Child Payment line (455.8 / 471.0 / 484.8)
+# and extends 2027-2029 by 3% growth - that uprating is excluded per the
+# facts-only ADR. uk-data's pinned URL pages/6 now serves Chapter 4; the
+# chapter pagination drifted and this package pins pages/7.
 schema_version: ledger.source_package.v1
 package_id: scotgov-scottish-budget-social-security-assistance-2026
 label: 'Scottish Budget 2026-27 Table 5.08: social security assistance spending by line, FY2024-25
@@ -542,23 +549,9 @@ record_sets:
       operator: ==
       value: pension_age_winter_heating_payment
       label: Social security assistance line
-  - value_id: two_child_limit_payment
-    label: Two Child Limit Payment*
-    ordinal: 15
-    row_number: 18
-    expected_row_header_column: A
-    expected_row_header: Two Child Limit Payment*
-    table_record_kind: detail
-    filters:
-      social_security_line: two_child_limit_payment
-    constraints:
-    - variable: social_security_line
-      operator: ==
-      value: two_child_limit_payment
-      label: Social security assistance line
   - value_id: winter_heating_payment
     label: Winter Heating Payment
-    ordinal: 16
+    ordinal: 15
     row_number: 19
     expected_row_header_column: A
     expected_row_header: Winter Heating Payment
@@ -572,7 +565,7 @@ record_sets:
       label: Social security assistance line
   - value_id: total_social_security_assistance
     label: 'Total Social Security Assistance of which:'
-    ordinal: 17
+    ordinal: 16
     row_number: 20
     expected_row_header_column: A
     expected_row_header: 'Total Social Security Assistance of which:'

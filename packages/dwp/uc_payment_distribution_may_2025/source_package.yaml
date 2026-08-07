@@ -5,12 +5,22 @@
 # list includes 'No payment' and an overlapping '£1500.01 or over' summary
 # band alongside its £100 sub-bands - every band lands with its exact
 # publisher label as the categorical identity, so no fact duplicates
-# another; mapping labels to numeric monthly bounds (and the x12
+# another, and the five '£1500.01 or over' rows carry table_record_kind
+# 'total' (they are subtotals over the £100 sub-bands above £1,500 - summing
+# the 'detail' rows alone yields disjoint coverage); mapping labels to numeric monthly bounds (and the x12
 # annualization policyengine-uk-data applies) is populace-side. Vintage
 # note: uk-data's committed pivot is the provisional May 2025 (p) extract;
 # DWP has since revised the month, so values here are the current revised
 # series. uk-data's parse also drops the open top band to NaN (its
 # nan_to_nan targets) - here '£2500.01 or over' is an ordinary category.
+# Cross-cube reconciliation note (adversarial review): the same May-2025
+# universe queried through different dimensions returns totals that differ
+# by a handful of households (family-type cube total 6,584,241 vs
+# number-of-children cube total 6,584,239; summing the band x family cube's
+# non-overlapping bands differs from the family-type marginals by 4-20 per
+# family type). DWP applies cell-level adjustment at source, so cross-cube
+# marginals are not expected to reconcile exactly; each package carries its
+# own cube's publisher-emitted values.
 schema_version: ledger.source_package.v1
 package_id: dwp-uc-payment-distribution-may-2025
 label: 'DWP Stat-Xplore: households on Universal Credit by monthly award amount band and family
@@ -1976,7 +1986,7 @@ record_sets:
     row_number: 82
     expected_row_header_column: E
     expected_row_header: £1500.01 or over
-    table_record_kind: detail
+    table_record_kind: total
     filters:
       monthly_award_amount_bands: £1500.01 or over
       family_type: Single, no children
@@ -2000,7 +2010,7 @@ record_sets:
     row_number: 83
     expected_row_header_column: E
     expected_row_header: £1500.01 or over
-    table_record_kind: detail
+    table_record_kind: total
     filters:
       monthly_award_amount_bands: £1500.01 or over
       family_type: Single, with children
@@ -2024,7 +2034,7 @@ record_sets:
     row_number: 84
     expected_row_header_column: E
     expected_row_header: £1500.01 or over
-    table_record_kind: detail
+    table_record_kind: total
     filters:
       monthly_award_amount_bands: £1500.01 or over
       family_type: Couple, no children
@@ -2048,7 +2058,7 @@ record_sets:
     row_number: 85
     expected_row_header_column: E
     expected_row_header: £1500.01 or over
-    table_record_kind: detail
+    table_record_kind: total
     filters:
       monthly_award_amount_bands: £1500.01 or over
       family_type: Couple, with children
@@ -2072,7 +2082,7 @@ record_sets:
     row_number: 86
     expected_row_header_column: E
     expected_row_header: £1500.01 or over
-    table_record_kind: detail
+    table_record_kind: total
     filters:
       monthly_award_amount_bands: £1500.01 or over
       family_type: Unknown or missing family type

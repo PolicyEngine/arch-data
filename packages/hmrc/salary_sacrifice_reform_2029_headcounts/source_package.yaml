@@ -4,8 +4,10 @@
 # estimates: 7.7 million employees using salary sacrifice for pension
 # contributions, of whom 3.3 million sacrifice more than GBP 2,000 and 4.3
 # million are within the GBP 2,000 threshold. The paper says 'the latest
-# available data' without pinning a reference period; the period here is the
-# publication year (2025), and policyengine-uk-data's {2024: ...} keying plus
+# available data' without pinning a reference period and names no
+# administrative source, so the counts carry provenance_class model_output
+# (policy-costing estimates) and the period here is the publication year
+# (2025) with UK geography inferred from the NICs scope; policyengine-uk-data's {2024: ...} keying plus
 # its 2.4%-per-year growth extension are populace-side declarations excluded
 # per the facts-only ADR. uk-data tags these targets 'obr'; the publisher is
 # HMRC (relabel recorded in docs/pe-uk-source-checklist.md). The paper's
@@ -30,7 +32,7 @@ artifact:
   artifact_year: 2025
 record_sets:
 - record_set_id: hmrc.ss_reform_2029.salary_sacrifice_users
-  provenance_class: administrative
+  provenance_class: model_output
   record_set_spec_id: hmrc.ss_reform_2029.salary_sacrifice_users.v1
   source_record_id_prefix: hmrc.ss_reform_2029.salary_sacrifice_users
   sheet_name: document_numbers
