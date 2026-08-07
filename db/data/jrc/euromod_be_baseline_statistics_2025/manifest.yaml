@@ -1,4 +1,5 @@
-source_id: jrc-euromod-be-baseline-statistics-2025
+source_id: belgium
+package_id: jrc-euromod-be-baseline-statistics-2025
 source_name: JRC EUROMOD-BE baseline statistics 2025
 publisher: European Commission Joint Research Centre
 source_page: https://euromod-web.jrc.ec.europa.eu/resources/country-reports
@@ -18,5 +19,5 @@ files:
     source_urls:
     - https://euromod-web.jrc.ec.europa.eu/resources/country-reports
     - https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
-    notes: Curated comparator rows from Annex 3 validation tables in the 2025 EUROMOD Country
-      Report for Belgium. Each row carries the report PDF URL.
+    notes: Curated comparator rows from Annex 3 validation tables in the 2025 EUROMOD
+      Country Report for Belgium. Each row carries the report PDF URL.

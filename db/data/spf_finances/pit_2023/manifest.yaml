@@ -1,4 +1,5 @@
-source_id: spf-finances-pit-2023
+source_id: belgium
+package_id: spf-finances-pit-2023
 source_name: SPF Finances personal income tax 2023
 publisher: SPF Finances / Statbel
 source_page: https://statbel.fgov.be/en/themes/households/taxable-income
@@ -18,5 +19,5 @@ files:
     source_urls:
     - https://statbel.fgov.be/en/themes/households/taxable-income
     - https://statbel.fgov.be/sites/default/files/files/opendata/arbeid/TF_PSNL_INC_TAX_MUNTY.zip
-    notes: Curated national total taxes from Statbel personal income tax statistics for income
-      year 2023, assessment year 2024.
+    notes: Curated national total taxes from Statbel personal income tax statistics
+      for income year 2023, assessment year 2024.

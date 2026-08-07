@@ -1,4 +1,5 @@
-source_id: ssa-ssi-table-7b1-2024
+source_id: ssa
+package_id: ssa-ssi-table-7b1-2024
 source_name: SSA Annual Statistical Supplement, 2025
 publisher: Social Security Administration
 source_page: https://www.ssa.gov/policy/docs/statcomps/supplement/2025/7b.html
@@ -12,8 +13,8 @@ files:
       r2:
         provider: r2
         bucket: ledger-raw
-        key: raw/ssa/ssa-annual-statistical-supplement-2025/2024/4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401/ssi_table_7b1_2024.csv
-        uri: r2://ledger-raw/raw/ssa/ssa-annual-statistical-supplement-2025/2024/4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401/ssi_table_7b1_2024.csv
+        key: raw/ssa/ssa-ssi-table-7b1-2024/2024/4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401/ssi_table_7b1_2024.csv
+        uri: r2://ledger-raw/raw/ssa/ssa-ssi-table-7b1-2024/2024/4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401/ssi_table_7b1_2024.csv
     source_urls:
     - https://www.ssa.gov/policy/docs/statcomps/supplement/2025/7b.html
     notes: Extracted selected 2024 All areas, state, and DC rows from SSA Annual Statistical
@@ -24,3 +25,11 @@ files:
     - https://www.ssa.gov/policy/docs/statcomps/supplement/2025/7b.html
     notes: Extracted selected 2024 SSI recipient and payment rows from SSA Annual
       Statistical Supplement 2025 Table 7.B1.
+    sha256: 4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401
+    size_bytes: 13990
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ssa/ssa-ssi-table-7b1-2024/extracted_targets/4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401/ssi_table_7b1_2024.csv
+        uri: r2://ledger-raw/raw/ssa/ssa-ssi-table-7b1-2024/extracted_targets/4935f2b90d5abedc869e660f8a68df33b6f935630ebab2b159c09de7e4bf2401/ssi_table_7b1_2024.csv

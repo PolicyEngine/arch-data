@@ -1,4 +1,5 @@
-source_id: ons-uk-business-firm-sector-targets-2025
+source_id: ons
+package_id: ons-uk-business-firm-sector-targets-2025
 source_name: ONS UK Business, Activity, Size and Location 2025
 publisher: Office for National Statistics
 source_page: https://www.ons.gov.uk/businessindustryandtrade/business/activitysizeandlocation/datasets/ukbusinessactivitysizeandlocation
@@ -6,8 +7,8 @@ files:
   2025:
     filename: ons_uk_business_firm_sector_targets_2025.csv
     source_url: https://www.ons.gov.uk/businessindustryandtrade/business/activitysizeandlocation/datasets/ukbusinessactivitysizeandlocation
-    source_table: UK Business, Activity, Size and Location 2025 enterprise counts by SIC division,
-      turnover band, and employment size band
+    source_table: UK Business, Activity, Size and Location 2025 enterprise counts
+      by SIC division, turnover band, and employment size band
     sha256: 7bd5266da7cbeecf0d23f5b7bc98f14ad588ef399decaa2469a83b1f846b4962
     size_bytes: 188745
     storage:
@@ -18,5 +19,5 @@ files:
         uri: r2://ledger-raw/raw/ons/ons-uk-business-firm-sector-targets-2025/2025/7bd5266da7cbeecf0d23f5b7bc98f14ad588ef399decaa2469a83b1f846b4962/ons_uk_business_firm_sector_targets_2025.csv
     source_urls:
     - https://www.ons.gov.uk/businessindustryandtrade/business/activitysizeandlocation/datasets/ukbusinessactivitysizeandlocation
-    notes: Curated sector-by-band extract from the ONS UK Business 2025 workbook used by firm-microsim-paper
-      processed/2024-25.
+    notes: Curated sector-by-band extract from the ONS UK Business 2025 workbook used
+      by firm-microsim-paper processed/2024-25.
