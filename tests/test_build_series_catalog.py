@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 209
+    assert len(committed["series"]) == 206
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1134,9 +1134,9 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     """The registry's introduction commit cannot be continuity-checked by
     the append-only gate (there is no prior registry to extend), so the
     identity->uuid map verified by the adversarial review of PR #128 is
-    pinned here. Changing ANY of the 201 bindings — or adding/retiring
-    one — must edit this constant in the same diff, making wholesale
-    remints impossible to slip through as regeneration noise.
+    pinned here. Changing any live binding — or adding or retiring one —
+    must edit this constant in the same diff, making wholesale remints
+    impossible to slip through as regeneration noise.
 
     Update the constant only alongside registry events that justify it.
     """
@@ -1164,11 +1164,14 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # Updated 2026-08-06 alongside one registry mint: the Thesis docket
     # registered census.spm.child_poverty_rate; its placeholder joins the
     # seed snapshot. All 205 prior bindings unchanged.
+    # Updated 2026-08-07: +6 docket-only mints for thesis#138 wave-1
+    # admission (bea fixed-investment x2, usaspending dhs title-vi, irs soi
+    # 30D claims+amount, irs actc amount) — see that commit's seed diff.
+    # Updated 2026-08-07: three same-dimension concept-spelling duplicates
+    # retired and folded into surviving lineages; 209 live bindings became
+    # 206 without changing any surviving UUID.
     assert digest == (
-        # 2026-08-07: +6 docket-only mints for thesis#138 wave-1 admission
-            # (bea fixed-investment x2, usaspending dhs title-vi, irs soi 30D
-            # claims+amount, irs actc amount) — see the seed diff in this commit.
-            "396e27996b2494c1defe94d834db4977c36e5b1ec179f71c198a0e20955cbd1e"
+        "c82492abf083f35f0b9427e7eb9b91a2dceba0ab71fa24bc24ef24a053526056"
     )
 
 
