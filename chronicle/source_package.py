@@ -109,6 +109,7 @@ SOURCE_PACKAGE_ALIASES = {
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"
     ),
+    "dwp-pip-daily-living-foi-2025": Path("dwp/pip_daily_living_foi_2025"),
     "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
         "cbo/revenue_projections_income_by_source_2026_02"

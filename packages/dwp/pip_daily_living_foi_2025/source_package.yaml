@@ -1,0 +1,141 @@
+# DWP FOI response FOI2025/24990 (2025-04-15): PIP daily living component
+# claimants by award rate, caseload at end January 2025 (month 2025-01).
+# This is the true publisher of policyengine-uk-data's pip_dl_standard/
+# enhanced targets - uk-data cites the Jan-2026 PIP statistics publication,
+# but those tables carry clearance/journey statistics only (scoping
+# correction recorded on #133 and in docs/pe-uk-source-checklist.md).
+# Publisher scope notes carried as constraints: DWP policy ownership
+# (England, Wales and Abroad - hence geography K04000001 as the nearest GSS
+# footprint, with the abroad tail disclosed here), working-age claimants,
+# normal rules only (SREL excluded), rounded to the nearest 1,000. The FOI's
+# less-than-4-points percentages (13% / 87%) belong to the withdrawn UC/PIP
+# Bill analysis and are not ported - a named exclusion. Artifact provenance:
+# WhatDoTheyKnow blocks automated fetches, so the response PDF was downloaded
+# manually in a browser (2026-08-07) and registered from the local file; the
+# manifest source_url is the canonical public attachment URL and the sha256
+# pins the exact bytes.
+schema_version: ledger.source_package.v1
+package_id: dwp-pip-daily-living-foi-2025
+label: 'DWP FOI2025/24990: PIP daily living component claimants by award rate, January 2025'
+artifact:
+  source_name: dwp
+  source_table: 'DWP FOI2025/24990: PIP daily living component claimants by award rate, January
+    2025'
+  resource_package: db
+  resource_directory: data/dwp/pip_daily_living_foi_2025
+  manifest: manifest.yaml
+  vintage: foi2025_24990
+  extracted_at: '2026-08-07'
+  extraction_method: pypdf text-line number extraction from the full FOI response PDF
+  parser: pdf_text_numbers
+  artifact_year: 2025
+record_sets:
+- record_set_id: dwp.pip_foi2025_24990.jan2025.daily_living_claimants
+  provenance_class: administrative
+  record_set_spec_id: dwp.pip_foi2025_24990.jan2025.daily_living_claimants.v1
+  source_record_id_prefix: dwp.pip_foi2025_24990.jan2025.daily_living_claimants
+  sheet_name: document_numbers
+  period_type: month
+  period: 2025-01
+  geography_id: K04000001
+  geography_level: country
+  geography_name: England and Wales
+  geography_vintage: current
+  entity: person
+  entity_role: pip_claimant
+  domain: personal_independence_payment
+  groupby_dimension: dwp.pip_daily_living_award_rate
+  shared_filters:
+    pip_policy_ownership: dwp
+    pip_claimant_age_group: working_age
+    pip_claim_rules: normal_rules
+  shared_constraints:
+  - variable: pip_policy_ownership
+    operator: ==
+    value: dwp
+    label: DWP policy ownership (England, Wales and Abroad)
+  - variable: pip_claimant_age_group
+    operator: ==
+    value: working_age
+    label: Working-age claimants
+  - variable: pip_claim_rules
+    operator: ==
+    value: normal_rules
+    label: Normal rules only (special rules for end of life excluded)
+  rows:
+  - value_id: enhanced_daily_living
+    label: Claimants in Receipt of Enhanced Daily Living
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: D
+    expected_row_header: 1,608,000
+    table_record_kind: detail
+    filters:
+      pip_daily_living_award_rate: enhanced
+    constraints:
+    - variable: pip_daily_living_award_rate
+      operator: ==
+      value: enhanced
+      label: PIP daily living award rate
+    guard_cells:
+    - column: A
+      row: 14
+      expected_value: 1
+      label: PDF page number
+    - column: C
+      row: 14
+      expected_value: Enhanced Daily Living 1,608,000 13%
+      label: PDF table line text
+    - column: F
+      row: 14
+      expected_value: living activities Claimants in Receipt of Enhanced Daily Living
+        1,608,000 13% Claimants in Receipt of Standard Daily Living 1,283,000 87%
+      label: nearby PDF text context
+  - value_id: standard_daily_living
+    label: Claimants in Receipt of Standard Daily Living
+    ordinal: 1
+    row_number: 16
+    expected_row_header_column: D
+    expected_row_header: 1,283,000
+    table_record_kind: detail
+    filters:
+      pip_daily_living_award_rate: standard
+    constraints:
+    - variable: pip_daily_living_award_rate
+      operator: ==
+      value: standard
+      label: PIP daily living award rate
+    guard_cells:
+    - column: A
+      row: 16
+      expected_value: 1
+      label: PDF page number
+    - column: C
+      row: 16
+      expected_value: Standard Daily Living 1,283,000 87%
+      label: PDF table line text
+    - column: F
+      row: 16
+      expected_value: 'Enhanced Daily Living 1,608,000 13% Claimants in Receipt of
+        Standard Daily Living 1,283,000 87% Source: PIP Administrative Data Notes:'
+      label: nearby PDF text context
+  measures:
+  - measure_id: claimants
+    label: PIP claimants in receipt of the daily living component
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: dwp.pip_daily_living_claimants
+    source_concept: dwp.pip_daily_living_claimants
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.whatdotheyknow.com/request/personal_independence_payment_pi_7
+    concept_evidence_notes: 'DWP FOI response FOI2025/24990 (15 April 2025), table
+      of PIP daily living component claimants at the standard and enhanced rate,
+      caseload at end January 2025, source PIP Administrative Data. Volumes rounded
+      to the nearest 1,000 by the publisher.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
