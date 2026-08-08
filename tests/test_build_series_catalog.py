@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 206
+    assert len(committed["series"]) == 209
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1170,8 +1170,13 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # Updated 2026-08-07: three same-dimension concept-spelling duplicates
     # retired and folded into surviving lineages; 209 live bindings became
     # 206 without changing any surviving UUID.
+    # Updated 2026-08-08: +3 docket-only mints for the thesis SBA
+    # custody-family admission (sba.disaster.loan_program charge-off
+    # amount, charge-off rate on UPB, post-charge-off recovery —
+    # thesis#145); builder reported minted=3, superseded=0, suspects=0,
+    # so all 206 prior bindings are unchanged.
     assert digest == (
-        "c82492abf083f35f0b9427e7eb9b91a2dceba0ab71fa24bc24ef24a053526056"
+        "b0940b8e1b100b6ecbc99722b338252d23bb52e9f822e2a932f7ddafdafea21b"
     )
 
 

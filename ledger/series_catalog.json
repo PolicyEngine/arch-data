@@ -4,8 +4,8 @@
   "observations_sha256": "b0c29d7cb2aee323a5d30f8196eb59f62aa396066070131c5048740659d5e241",
   "observation_rows": 171,
   "current_assertion_rows": 171,
-  "docket_seed_sha256": "08266fc9db0b0a3ccadf6095902f8e1b67dd1a5a199cd3841b58b1681434fa13",
-  "uuid_registry_sha256": "0c4af1f59dd7d65a4335144917075b208124dd8cb3b0f7543372e47653bc94de",
+  "docket_seed_sha256": "235ee5742faa3ad1f5048b91402b93b3526dd405da2b52557ffbb306579a6033",
+  "uuid_registry_sha256": "4fc6f98b339a5932448cc546fef455514b449999a2f01343b701910dc89387d0",
   "suspect_segments": [],
   "stripped_segments": {
     "2026-05": [
@@ -5566,6 +5566,75 @@
       "first_observed_period": "2026-06",
       "last_observed_period": "2026-06",
       "observation_count": 1
+    },
+    {
+      "uuid": "c0b2e780-847d-4780-8671-c8b38f0ad3d6",
+      "concept": "sba.disaster.loan_program.charge_off_amount",
+      "family_patterns": [
+        "sba.disaster.loan_program.charge_off_amount"
+      ],
+      "status": "docket-only",
+      "unit": "usd",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
+    },
+    {
+      "uuid": "0b925fe8-b841-4d0e-84f7-65bef6fc611c",
+      "concept": "sba.disaster.loan_program.charge_off_rate_upb",
+      "family_patterns": [
+        "sba.disaster.loan_program.charge_off_rate_upb"
+      ],
+      "status": "docket-only",
+      "unit": "percent",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
+    },
+    {
+      "uuid": "282e0e7a-6290-4114-aaf8-caaf96b99418",
+      "concept": "sba.disaster.loan_program.post_charge_off_recovery",
+      "family_patterns": [
+        "sba.disaster.loan_program.post_charge_off_recovery"
+      ],
+      "status": "docket-only",
+      "unit": "usd",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
     },
     {
       "uuid": "b908460f-bc4c-4416-a7d6-75b43244b752",
