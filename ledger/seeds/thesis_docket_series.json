@@ -1605,6 +1605,33 @@
     "targetUnit": "usd_millions",
     "country": "US"
    }
+  },
+  {
+   "series": "sba.disaster.loan_program.charge_off_amount",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-08 for thesis wave-2 SBA custody-family admission (containment gate; thesis#145); observations arrive with the witnessed-capture resolver.",
+   "extras": {
+    "targetUnit": "usd",
+    "country": "US"
+   }
+  },
+  {
+   "series": "sba.disaster.loan_program.charge_off_rate_upb",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-08 for thesis wave-2 SBA custody-family admission (containment gate; thesis#145); observations arrive with the witnessed-capture resolver.",
+   "extras": {
+    "targetUnit": "percent",
+    "country": "US"
+   }
+  },
+  {
+   "series": "sba.disaster.loan_program.post_charge_off_recovery",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-08 for thesis wave-2 SBA custody-family admission (containment gate; thesis#145); observations arrive with the witnessed-capture resolver.",
+   "extras": {
+    "targetUnit": "usd",
+    "country": "US"
+   }
   }
  ]
 }
