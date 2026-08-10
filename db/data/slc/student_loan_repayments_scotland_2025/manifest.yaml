@@ -1,0 +1,12 @@
+source_id: slc
+package_id: slc-student-loan-repayments-scotland-2025
+dataset: slc_slc-student-loan-repayments-scotland-2025
+source_page: https://www.gov.uk/government/statistics/student-loans-in-scotland-2024-to-2025
+table: Student loans for higher education in Scotland, financial year 2024-25
+files:
+  2025:
+    filename: slc-scotland-fy2024-25.html
+    source_url: https://www.gov.uk/government/statistics/student-loans-in-scotland-2024-to-2025/student-loans-for-higher-education-in-scotland-financial-year-2024-25
+    sha256: 5b0f6bab93b10af5d1ec3eb8eaa951ca27baf4c9caaf77c5256c5560227c00d5
+    size_bytes: 190948
+    fetched_at: '2026-08-10T09:31:51+00:00'

@@ -1,0 +1,79 @@
+# SLC 'Student loans for higher education in Scotland', financial year
+# 2024-25 - the publication is HTML-only, so the archived statistics page is
+# the artifact and the headline repayment figure lands from its prose via
+# the html_tables_and_text document-numbers lane (£203.3 million at
+# fiscal_year 2024, opening-year convention). The number text already
+# carries the million scaling, so the parsed numeric value is in pounds.
+# policyengine-uk-data transcribes the same figure. gov.uk serves
+# per-request nonces in unrelated page chrome, so the archived HTML is not
+# byte-reproducible across fetches; the parsed statistical content is
+# stable and the manifest sha pins the archived bytes.
+schema_version: ledger.source_package.v1
+package_id: slc-student-loan-repayments-scotland-2025
+label: 'SLC student loans in Scotland FY2024-25: higher education borrower repayments'
+artifact:
+  source_name: slc
+  source_table: Student loans for higher education in Scotland, financial year 2024-25
+  resource_package: db
+  resource_directory: data/slc/student_loan_repayments_scotland_2025
+  manifest: manifest.yaml
+  vintage: fy2024_25
+  extracted_at: '2026-08-08'
+  extraction_method: HTML table and document-text number parse of the archived statistics
+    page
+  parser: html_tables_and_text
+  artifact_year: 2025
+record_sets:
+- record_set_id: slc.repayments_2025.scotland.fy2024
+  provenance_class: administrative
+  record_set_spec_id: slc.repayments_2025.scotland.fy2024.v1
+  source_record_id_prefix: slc.repayments_2025.scotland.fy2024
+  sheet_name: document_numbers
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.repayment_line
+  rows:
+  - value_id: he_repayments
+    label: Higher education borrower repayments, Scotland, FY2024-25
+    ordinal: 0
+    row_number: 306
+    expected_row_header_column: D
+    expected_row_header: £203.3 million
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 306
+      expected_value: 175
+      label: HTML element index
+    - column: C
+      row: 306
+      expected_value: 9.0% decrease in higher education loan borrower repayments in financial
+        year 2024-25, to £203.3 million - likely attributed to continued rise in repayment
+        threshold
+      label: sentence text
+  measures:
+  - measure_id: repayments
+    label: HE student loan repayments, Scotland, FY2024-25
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: slc.student_loan_net_repayments_total
+    source_concept: slc.student_loan_net_repayments_total
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-loans-in-scotland-2024-to-2025
+    concept_evidence_notes: 'Student loans for higher education in Scotland, financial year
+      2024-25 statistics page: total higher education borrower repayments £203.3 million in
+      financial year 2024-25.'
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
