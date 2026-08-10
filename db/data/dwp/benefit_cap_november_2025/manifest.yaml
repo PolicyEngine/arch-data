@@ -10,3 +10,9 @@ files:
     sha256: a4ddddf1156446d2234605145bf04b3c3a427e3f38ec8ad15ec5e35ab65895ac
     size_bytes: 173996
     fetched_at: '2026-08-06T14:34:10+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/dwp/dwp-benefit-cap-november-2025/2025/a4ddddf1156446d2234605145bf04b3c3a427e3f38ec8ad15ec5e35ab65895ac/benefit-cap-ods-tables-data-to-nov25.ods
+        uri: r2://ledger-raw/raw/dwp/dwp-benefit-cap-november-2025/2025/a4ddddf1156446d2234605145bf04b3c3a427e3f38ec8ad15ec5e35ab65895ac/benefit-cap-ods-tables-data-to-nov25.ods

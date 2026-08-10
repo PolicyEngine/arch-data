@@ -2,8 +2,8 @@ source_id: hmrc
 package_id: hmrc-salary-sacrifice-relief-2024-25
 dataset: hmrc_hmrc-salary-sacrifice-relief-2024-25
 source_page: https://www.gov.uk/government/statistics/personal-and-stakeholder-pensions-statistics
-table: 'Private pension statistics Tables 6.1 and 6.2: salary sacrifice pension contributions, income
-  tax and NICs relief, tax year 2024 to 2025'
+table: 'Private pension statistics Tables 6.1 and 6.2: salary sacrifice pension contributions,
+  income tax and NICs relief, tax year 2024 to 2025'
 files:
   2025:
     filename: Tables_6_1_and_6_2.csv
@@ -11,3 +11,9 @@ files:
     sha256: 04e0dab6354b01c96d04f9e379f237ea2083476bd9e920c882a236cdcf88101d
     size_bytes: 12742
     fetched_at: '2026-08-06T13:52:22+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/hmrc/hmrc-salary-sacrifice-relief-2024-25/2025/04e0dab6354b01c96d04f9e379f237ea2083476bd9e920c882a236cdcf88101d/Tables_6_1_and_6_2.csv
+        uri: r2://ledger-raw/raw/hmrc/hmrc-salary-sacrifice-relief-2024-25/2025/04e0dab6354b01c96d04f9e379f237ea2083476bd9e920c882a236cdcf88101d/Tables_6_1_and_6_2.csv
