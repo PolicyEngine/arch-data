@@ -27,16 +27,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 9,
         "error_count": 0,
-        "fact_count": 145222,
-        "geography_count": 9390,
-        "period_count": 144,
+        "fact_count": 155288,
+        "geography_count": 12534,
+        "period_count": 147,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
         "source_count": 40,
-        "source_package_count": 120,
+        "source_package_count": 123,
         "warning_count": 1,
     }
-    assert len(rows) == 145222
+    assert len(rows) == 155288
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -54,7 +54,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 120
+    assert source_packages["source_package_count"] == 123
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -68,13 +68,13 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 145222
+    assert coverage["fact_count"] == 155288
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
         "cbo": 7,
         "census_acs": 468,
-        "census_pep": 988,
+        "census_pep": 4132,
         "census_population_projections": 86,
         "census_stc": 46,
         "cms_medicaid": 515,
@@ -87,7 +87,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "hhs_acf_tanf": 110,
         "hmrc": 20533,
         "ici": 12,
-        "irs_soi": 33777,
+        "irs_soi": 40063,
         "isc": 2,
         "jrc_euromod_be": 18,
         "kff": 52,
@@ -107,13 +107,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "ssa": 426,
         "statbel_fiscal_income": 565,
         "statbel_population_structure": 18,
-        "usda_snap": 216,
+        "usda_snap": 852,
         "voa": 3001,
         "welshgov": 198,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 115
+    assert len(table_counts) == 118
+    assert table_counts["usda_snap:SNAP FY2025 Monthly State Participation"] == 636
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
+    assert table_counts["irs_soi:IRS SOI County Data 2022"] == 6286
+    assert table_counts["census_pep:Vintage 2024 County Population Totals"] == 3144
     assert (
         table_counts[
             "cms_nhe:Employer-Sponsored Private Health Insurance: "
@@ -282,7 +285,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2021": 3990,
         "calendar_year:2022": 1911,
         "calendar_year:2023": 6161,
-        "calendar_year:2024": 30578,
+        "calendar_year:2024": 33722,
         "calendar_year:2025": 4438,
         "calendar_year:2026": 235,
         "calendar_year:2027": 214,
@@ -327,9 +330,12 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2023-01": 1,
         "month:2023-12": 6,
         "month:2024-01": 1,
-        "month:2024-12": 270,
-        "month:2025-01": 2,
-        "month:2025-03": 120,
+        "month:2024-10": 106,
+        "month:2024-11": 106,
+        "month:2024-12": 376,
+        "month:2025-01": 108,
+        "month:2025-02": 106,
+        "month:2025-03": 226,
         "month:2025-04": 92,
         "month:2025-05": 6214,
         "month:2025-08": 4,
@@ -373,7 +379,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2019": 9,
         "tax_year:2020": 9,
         "tax_year:2021": 9,
-        "tax_year:2022": 34951,
+        "tax_year:2022": 41237,
         "tax_year:2023": 48436,
         "tax_year:2024": 40,
     }
@@ -383,23 +389,23 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert coverage["counts"]["by_geography"]["nuts1:BE3"] == 6
     assert coverage["counts"]["by_geography"]["commune:11002"] == 1
     assert coverage["counts"]["by_geography"]["country:0100000US"] == 2109
-    assert coverage["counts"]["by_geography"]["state:0400000US06"] == 217
+    assert coverage["counts"]["by_geography"]["state:0400000US06"] == 229
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
     assert coverage["counts"]["by_geography"]["country:K02000001"] == 4189
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 277
-    assert len(coverage["counts"]["by_geography"]) == 9390
+    assert len(coverage["counts"]["by_geography"]) == 12534
     assert coverage["counts"]["by_entity"] == {
         "dwelling": 12708,
         "family": 107,
         "firm": 1439,
         "government": 213,
-        "household": 40114,
+        "household": 40432,
         "institutional_sector": 103,
         "pension_plan": 2,
-        "person": 56753,
-        "tax_unit": 33783,
+        "person": 60215,
+        "tax_unit": 40069,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
     assert len(coverage["duplicates"]["semantic_fact_keys"]) == 12
@@ -457,6 +463,12 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     ).exists()
     assert (
         output_dir / "sources" / "usda-snap-fy69-to-current" / "consumer_facts.jsonl"
+    ).exists()
+    assert (
+        output_dir
+        / "sources"
+        / "usda-snap-fy2025-monthly-state-caseloads"
+        / "consumer_facts.jsonl"
     ).exists()
     assert (
         output_dir / "sources" / "soi-historic-table-2" / "consumer_facts.jsonl"
@@ -693,16 +705,16 @@ def test_build_bundle_cli_supports_jct_obbba_source(tmp_path, capsys):
         "jct.obbba_title_vii.fy2026.no_tax_on_tips.revenue_effect",
         "jct.obbba_title_vii.fy2026.no_tax_on_overtime.revenue_effect",
     }
-    values = {
-        row["lineage"]["source_record_id"]: row["value"] for row in rows
-    }
+    values = {row["lineage"]["source_record_id"]: row["value"] for row in rows}
     # JCX-35-25 FY2026: tips -$10,121M, overtime -$32,806M.
-    assert values[
-        "jct.obbba_title_vii.fy2026.no_tax_on_tips.revenue_effect"
-    ] == -10_121_000_000
-    assert values[
-        "jct.obbba_title_vii.fy2026.no_tax_on_overtime.revenue_effect"
-    ] == -32_806_000_000
+    assert (
+        values["jct.obbba_title_vii.fy2026.no_tax_on_tips.revenue_effect"]
+        == -10_121_000_000
+    )
+    assert (
+        values["jct.obbba_title_vii.fy2026.no_tax_on_overtime.revenue_effect"]
+        == -32_806_000_000
+    )
 
 
 def test_build_bundle_coverage_reports_duplicate_keys():

@@ -16,7 +16,11 @@ from typing import Any
 
 import openpyxl
 
-from chronicle.sources.cells import SourceArtifactMetadata, SourceCell
+from chronicle.sources.cells import (
+    SourceArtifactMetadata,
+    SourceCell,
+    decode_delimited_text,
+)
 
 Scalar = str | int | float | bool | None
 SOURCE_ROW_KEY_PREFIX = "ledger.source_row.v1"
@@ -154,7 +158,7 @@ def source_rows_from_delimited_text(
         raise ValueError(
             f"header_row is a 1-based physical line number, got {header_row}"
         )
-    text = content.decode("utf-8-sig")
+    text = decode_delimited_text(content)
     reader = csv.reader(StringIO(text), delimiter=delimiter)
     header: list[str] | None = None
     rows: list[SourceRow] = []

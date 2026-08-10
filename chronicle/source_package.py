@@ -159,6 +159,7 @@ SOURCE_PACKAGE_ALIASES = {
         "census/acs_s2201_district_2024"
     ),
     "census-b01001-female-age-2023": Path("census/b01001_female_15_44_2023"),
+    "census-pep-county-population-2024": Path("census/pep_county_2024"),
     "census-pep-2024-national-age-sex": Path("census/pep_2024_national_age_sex"),
     "census-pep-2024-state-age-sex": Path("census/pep_2024_state_age_sex"),
     "census-population-projections-2023": Path("census/population_projections_2023"),
@@ -221,6 +222,7 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "soi-table-4-3": Path("irs_soi/table_4_3"),
     "soi-state-2022": Path("irs_soi/state_2022"),
+    "soi-county-2022": Path("irs_soi/county_2022"),
     "soi-congressional-district-2022": Path("irs_soi/congressional_district_2022"),
     "soi-historic-table-2": Path("irs_soi/historic_table_2"),
     "soi-historic-table-2-state-agi-2022": Path(
@@ -315,6 +317,9 @@ SOURCE_PACKAGE_ALIASES = {
         "ons/uk_business_firm_sector_targets_2025"
     ),
     "usda-snap-fy69-to-current": Path("usda_snap/fy69_to_current"),
+    "usda-snap-fy2025-monthly-state-caseloads": Path(
+        "usda_snap/fy2025_monthly_state_caseloads"
+    ),
 }
 SOURCE_ARTIFACT_CACHE_ENV = "LEDGER_SOURCE_ARTIFACT_CACHE_DIR"
 SOURCE_ARTIFACT_FETCH_ENV = "LEDGER_SOURCE_ARTIFACT_FETCH"
