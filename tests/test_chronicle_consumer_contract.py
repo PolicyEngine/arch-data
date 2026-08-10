@@ -23,6 +23,8 @@ from chronicle.consumer_contract import (
 )
 from chronicle.core import (
     AggregateConstraint,
+    EntityDimension,
+    GeographyDimension,
     Measure,
     PeriodDimension,
     build_aggregate_constraints,
@@ -439,26 +441,61 @@ def test_write_consumer_facts_jsonl(tmp_path):
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
 
 
-def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
+def _slc_student_support_fact(academic_year, value):
+    """A fact shaped like the SLC/EES student-support rows this vocabulary
+    exists for: recipients of maintenance loans in England, published per
+    academic year (AY 2023/24 -> academic_year 2023, the opening year)."""
     base = _soi_agi_fact()
+    return replace(
+        base,
+        value=value,
+        period=PeriodDimension(type="academic_year", value=academic_year),
+        geography=GeographyDimension(
+            level="country", id="E92000001", vintage="current", name="England"
+        ),
+        entity=EntityDimension(name="person", role="student_support_recipient"),
+        measure=replace(
+            base.measure,
+            concept="slc.maintenance_loan_recipients",
+            unit="count",
+            source_concept="slc.maintenance_loan_recipients",
+            concept_relation="source_label",
+            concept_authority="slc",
+            concept_evidence_url=(
+                "https://explore-education-statistics.service.gov.uk/"
+                "data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d"
+            ),
+            concept_evidence_notes=(
+                "Synthetic test fixture shaped like the EES student-support "
+                "rows: maintenance-loan recipients per academic year."
+            ),
+            legal_vintage=None,
+        ),
+        source=replace(
+            base.source,
+            source_name="slc",
+            source_table="Student support for higher education in England",
+        ),
+        provenance_class="administrative",
+        filters={},
+        constraints=(),
+        domain="student_support",
+        label=f"Maintenance loan recipients, AY {academic_year}/"
+        f"{(academic_year + 1) % 100:02d}",
+    )
+
+
+def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
     facts = [
         replace(
-            base,
-            period=PeriodDimension(type="academic_year", value=2023),
-            source_record_id=(
-                "irs_soi.ay2023.table_1_1.all.adjusted_gross_income"
-            ),
-            source_cell_keys=("ledger.source_cell.v1:ay2023agi",),
-            value=90.0,
+            _slc_student_support_fact(2023, 90.0),
+            source_record_id="slc.ay2023.student_support.maintenance_loan_recipients",
+            source_cell_keys=("ledger.source_cell.v1:ay2023slc",),
         ),
         replace(
-            base,
-            period=PeriodDimension(type="academic_year", value=2024),
-            source_record_id=(
-                "irs_soi.ay2024.table_1_1.all.adjusted_gross_income"
-            ),
-            source_cell_keys=("ledger.source_cell.v1:ay2024agi",),
-            value=100.0,
+            _slc_student_support_fact(2024, 100.0),
+            source_record_id="slc.ay2024.student_support.maintenance_loan_recipients",
+            source_cell_keys=("ledger.source_cell.v1:ay2024slc",),
         ),
     ]
     assert validate_facts(facts).valid  # the vocabulary gate itself
@@ -473,7 +510,7 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
     profile_mapping = {
         "schema_version": "policyengine_ledger.target_profile.v1",
         "profile_id": "academic_year_round_trip",
-        "country": "us",
+        "country": "uk",
         "label": "Academic-year period round trip",
         "defaults": {
             "base_period_policy": "latest_not_after_build_base_period",
@@ -481,8 +518,8 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
         },
         "targets": [
             {
-                "target_id": "soi.agi.academic_year_probe",
-                "family": "irs_soi",
+                "target_id": "slc.maintenance_loan_recipients",
+                "family": "slc",
                 "geography_levels": ["country"],
                 "chronicle_selector": {
                     "source_name": rows[0]["source"]["source_name"],
@@ -491,12 +528,12 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
                     ],
                 },
                 "measurement": {
-                    "entity": "tax_unit",
-                    "concept": "us.agi",
+                    "entity": "person",
+                    "concept": "uk.education.maintenance_loan_recipients",
                 },
                 "bindings": {
                     "policyengine": {
-                        "metric_name": "soi/agi/academic_year_probe",
+                        "metric_name": "slc/maintenance_loan/recipients",
                     }
                 },
             }
