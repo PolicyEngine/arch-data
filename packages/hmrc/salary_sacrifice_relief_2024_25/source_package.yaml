@@ -8,7 +8,7 @@
 # Unit: GBP million per the Private pension statistics publication page
 # (tables described in GBP million; the tidy CSV itself carries no unit text).
 schema_version: ledger.source_package.v1
-package_id: hmrc-salary-sacrifice-relief-2024
+package_id: hmrc-salary-sacrifice-relief-2024-25
 label: 'HMRC salary sacrifice pension contributions: income tax and NICs relief, tax year
   2024-25'
 artifact:

@@ -9,7 +9,7 @@
 # (columns K/L) and both sheets' total-count column N - named exclusions,
 # backfill candidates, not derivable from the ported columns.
 schema_version: ledger.source_package.v1
-package_id: hmrc-spi-income-bands-2023
+package_id: hmrc-spi-income-bands-2023-24
 label: 'HMRC Survey of Personal Incomes 2023-24: income counts and amounts by range of total
   income (Tables 3.6 and 3.7)'
 artifact:
