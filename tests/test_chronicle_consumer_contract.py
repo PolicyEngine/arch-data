@@ -23,12 +23,23 @@ from chronicle.consumer_contract import (
 )
 from chronicle.core import (
     AggregateConstraint,
+    EntityDimension,
+    GeographyDimension,
     Measure,
+    PeriodDimension,
     build_aggregate_constraints,
+    validate_facts,
 )
 from chronicle.harness import main
 from chronicle.jurisdictions.us.soi import build_soi_table_1_1_facts
 from chronicle.store import save_facts_jsonl
+from policyengine_chronicle.consumer import (
+    PeriodContractError,
+    build_consumer_artifact,
+    load_consumer_artifact,
+    resolve_profile_targets,
+)
+from policyengine_chronicle.target_profiles import target_profile_from_mapping
 
 CONSUMER_FACT_SCHEMA_PATH = (
     Path(__file__).parents[1] / "docs" / "schemas" / "consumer_fact.v1.schema.json"
@@ -428,6 +439,135 @@ def test_write_consumer_facts_jsonl(tmp_path):
     }
     assert len(rows) == 1
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
+
+
+def _slc_student_support_fact(academic_year, value):
+    """A fact shaped like the SLC/EES student-support rows this vocabulary
+    exists for: recipients of maintenance loans in England, published per
+    academic year (AY 2023/24 -> academic_year 2023, the opening year)."""
+    base = _soi_agi_fact()
+    return replace(
+        base,
+        value=value,
+        period=PeriodDimension(type="academic_year", value=academic_year),
+        geography=GeographyDimension(
+            level="country", id="E92000001", vintage="current", name="England"
+        ),
+        entity=EntityDimension(name="person", role="student_support_recipient"),
+        measure=replace(
+            base.measure,
+            concept="slc.maintenance_loan_recipients",
+            unit="count",
+            source_concept="slc.maintenance_loan_recipients",
+            concept_relation="source_label",
+            concept_authority="slc",
+            concept_evidence_url=(
+                "https://explore-education-statistics.service.gov.uk/"
+                "data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d"
+            ),
+            concept_evidence_notes=(
+                "Synthetic test fixture shaped like the EES student-support "
+                "rows: maintenance-loan recipients per academic year."
+            ),
+            legal_vintage=None,
+        ),
+        source=replace(
+            base.source,
+            source_name="slc",
+            source_table="Student support for higher education in England",
+        ),
+        provenance_class="administrative",
+        filters={},
+        constraints=(),
+        domain="student_support",
+        label=f"Maintenance loan recipients, AY {academic_year}/"
+        f"{(academic_year + 1) % 100:02d}",
+    )
+
+
+def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
+    facts = [
+        replace(
+            _slc_student_support_fact(2023, 90.0),
+            source_record_id="slc.ay2023.student_support.maintenance_loan_recipients",
+            source_cell_keys=("ledger.source_cell.v1:ay2023slc",),
+        ),
+        replace(
+            _slc_student_support_fact(2024, 100.0),
+            source_record_id="slc.ay2024.student_support.maintenance_loan_recipients",
+            source_cell_keys=("ledger.source_cell.v1:ay2024slc",),
+        ),
+    ]
+    assert validate_facts(facts).valid  # the vocabulary gate itself
+    facts_path = tmp_path / "consumer_facts.jsonl"
+    write_consumer_facts_jsonl(facts, facts_path)
+    rows = _load_jsonl(facts_path)
+    assert [row["period"] for row in rows] == [
+        {"type": "academic_year", "value": 2023},
+        {"type": "academic_year", "value": 2024},
+    ]
+
+    profile_mapping = {
+        "schema_version": "policyengine_ledger.target_profile.v1",
+        "profile_id": "academic_year_round_trip",
+        "country": "uk",
+        "label": "Academic-year period round trip",
+        "defaults": {
+            "base_period_policy": "latest_not_after_build_base_period",
+            "operation": "sum",
+        },
+        "targets": [
+            {
+                "target_id": "slc.maintenance_loan_recipients",
+                "family": "slc",
+                "geography_levels": ["country"],
+                "chronicle_selector": {
+                    "source_name": rows[0]["source"]["source_name"],
+                    "source_measure_id": rows[0]["observed_measure"][
+                        "source_measure_id"
+                    ],
+                },
+                "measurement": {
+                    "entity": "person",
+                    "concept": "uk.education.maintenance_loan_recipients",
+                },
+                "bindings": {
+                    "policyengine": {
+                        "metric_name": "slc/maintenance_loan/recipients",
+                    }
+                },
+            }
+        ],
+    }
+    target_profile_from_mapping(profile_mapping)
+    profile_path = tmp_path / "academic_year_round_trip.json"
+    profile_path.write_text(json.dumps(profile_mapping, indent=2) + "\n")
+
+    artifact_dir = tmp_path / "artifact"
+    build_consumer_artifact(
+        artifact_dir,
+        facts_path=facts_path,
+        profile_paths=[profile_path],
+    )
+    artifact = load_consumer_artifact(artifact_dir)
+
+    report = resolve_profile_targets(
+        artifact.profiles["academic_year_round_trip"],
+        artifact.rows,
+        {"type": "academic_year", "value": 2024},
+    )
+    assert report.valid
+    (resolved,) = report.resolved
+    assert resolved.basis == "fact"
+    assert resolved.value == 100.0
+    assert resolved.fact_period == {"type": "academic_year", "value": 2024}
+
+    with pytest.raises(PeriodContractError):
+        resolve_profile_targets(
+            artifact.profiles["academic_year_round_trip"],
+            artifact.rows,
+            {"type": "fiscal_year", "value": 2024},
+        )
 
 
 def test_consumer_fact_row_marks_decimal_values_as_decimal_strings():
