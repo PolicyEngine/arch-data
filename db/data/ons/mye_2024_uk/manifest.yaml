@@ -2,7 +2,8 @@ source_id: ons
 package_id: ons-mye-2024-uk
 dataset: ons_ons-mye-2024-uk
 source_page: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
-table: 'Mid-2024 population estimates, UK: countries and regions by single year of age and sex (MYE2)'
+table: 'Mid-2024 population estimates, UK: countries and regions by single year of
+  age and sex (MYE2)'
 files:
   2024:
     filename: mye24tablesuk.xlsx
@@ -10,3 +11,9 @@ files:
     sha256: f78d50e8d77fe5ed9d04667d6875aefcf62b56380af7aceb2e90dce067981526
     size_bytes: 1062342
     fetched_at: '2026-08-06T09:26:35+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-mye-2024-uk/2024/f78d50e8d77fe5ed9d04667d6875aefcf62b56380af7aceb2e90dce067981526/mye24tablesuk.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-mye-2024-uk/2024/f78d50e8d77fe5ed9d04667d6875aefcf62b56380af7aceb2e90dce067981526/mye24tablesuk.xlsx
