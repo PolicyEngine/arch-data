@@ -35,3 +35,21 @@ on `person/ui_claimant` under UUID
 `1ad67747-d9d8-4ff9-9ebc-58206e658518`. Correct the two upstream rows'
 period and entity metadata before folding these lineages; an alias cannot
 bridge either mismatch safely.
+
+## Builder polish
+
+The two LOW residuals accepted in the chronicle#145 merge disposition
+were closed on 2026-08-09 by chronicle#153:
+
+- `_plan_enrichment` now verifies the live binding owns the catalog
+  row's UUID (`registry.binding(prior_own_key) == row_uuid`) instead of
+  inferring ownership from the historical first-owner map plus key
+  liveness. A stale catalog row carrying a UUID its key superseded away
+  from fails at plan time with the UUID-reuse ceremony diagnostic;
+  previously the invalid retire + succeeds plan was only rejected later,
+  by staging replay. Builder output for valid states is byte-unchanged.
+- The previously untested state — a stale catalog UUID after the same
+  placeholder key was superseded — is pinned by two regressions: staging
+  replay rejects the hand-forged plan before any write reaches disk, and
+  the builder end-to-end refuses the stale catalog, leaving both
+  artifacts untouched.

@@ -1641,10 +1641,16 @@ def build_catalog(
                 )
             )
         )
+        # uuid_owner records FIRST ownership and never moves, so alone it
+        # would accept a stale catalog row still carrying a UUID its key
+        # has since superseded away from. The contract is about the LIVE
+        # binding: demand it be row_uuid itself. Staging replay would
+        # reject such a plan anyway; this fails at plan time instead.
         if not (
             enrichment_shaped
             and owner_key == prior_own_key
             and registry.is_live(prior_own_key)
+            and registry.binding(prior_own_key) == row_uuid
         ):
             return False
         # Docket-placeholder enrichment: the binding MOVES to the observed
