@@ -801,3 +801,152 @@ def test_load_rejects_a_false_manifest_row_count(tmp_path):
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="fact_row_count"):
         load_consumer_artifact(out_dir)
+
+
+def _mixed_assertion_rows():
+    """Observed 2021/2022 plus a 2023 projection of the same soi series."""
+    return consumer_fact_rows(
+        [
+            _fact(value=100, period_value=2021),
+            _fact(value=110, period_value=2022),
+            _fact(value=120, period_value=2023, assertion="source_projection"),
+        ]
+    )
+
+
+def _policy_profile(
+    *,
+    defaults_policy=None,
+    target_policy=None,
+    selector=None,
+    target_id="soi.agi.total",
+):
+    mapping = {
+        "schema_version": "policyengine_ledger.target_profile.v1",
+        "profile_id": "test_profile",
+        "country": "us",
+        "label": "Test profile",
+        "defaults": {
+            "base_period_policy": "latest_not_after_build_base_period",
+            "operation": "sum",
+        },
+        "targets": [
+            {
+                "target_id": target_id,
+                "family": "irs_soi",
+                "geography_levels": ["country"],
+                "chronicle_selector": selector
+                or {"source_name": "irs_soi", "source_measure_id": "agi"},
+                "measurement": {"entity": "tax_unit", "concept": "us.agi"},
+                "bindings": {
+                    "microcosm": {"metric_name": "irs_soi/agi/total"},
+                },
+            }
+        ],
+    }
+    if defaults_policy is not None:
+        mapping["defaults"]["assertion_policy"] = defaults_policy
+    if target_policy is not None:
+        mapping["targets"][0]["assertion_policy"] = target_policy
+    return target_profile_from_mapping(mapping)
+
+
+def test_observed_only_default_never_resolves_a_projection():
+    # The 2023 projection is invisible; the newest observed fact is 2022, and
+    # taking it at a requested 2023 base period correctly demands an explicit
+    # alignment instead of resolving anything silently.
+    report = resolve_profile_targets(
+        _policy_profile(),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+        strict=False,
+    )
+    assert not report.resolved
+    (violation,) = report.violations
+    assert violation.fact_period == {"type": "tax_year", "value": 2022}
+    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_observed_only_fails_loudly_on_projection_only_families():
+    report = resolve_profile_targets(
+        _policy_profile(
+            selector={"source_name": "cbo", "source_measure_id": "receipts"},
+            target_id="cbo.receipts",
+        ),
+        _rows(),
+        {"type": "calendar_year", "value": 2027},
+        strict=False,
+    )
+    assert not report.resolved
+    (issue,) = [i for i in report.issues if i.code == "only_projection_facts"]
+    assert issue.severity == "error"
+    assert not report.valid
+
+
+def test_prefer_observed_takes_the_observation_over_a_newer_projection():
+    # Observations win even when a projection sits exactly at the requested
+    # period; the observed 2022 fact is chosen and the period contract then
+    # asks for an alignment rather than silently substituting the projection.
+    report = resolve_profile_targets(
+        _policy_profile(defaults_policy="prefer_observed"),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+        strict=False,
+    )
+    assert not report.resolved
+    (violation,) = report.violations
+    assert violation.fact_period == {"type": "tax_year", "value": 2022}
+
+
+def test_prefer_observed_falls_back_to_projections_with_a_warning():
+    report = resolve_profile_targets(
+        _policy_profile(
+            defaults_policy="prefer_observed",
+            selector={"source_name": "cbo", "source_measure_id": "receipts"},
+            target_id="cbo.receipts",
+        ),
+        _rows(),
+        {"type": "calendar_year", "value": 2027},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "source_projection"
+    assert row.value == 250
+    (issue,) = [i for i in report.issues if i.code == "resolved_from_projection"]
+    assert issue.severity == "warning"
+
+
+def test_allow_source_projection_resolves_the_latest_projection():
+    report = resolve_profile_targets(
+        _policy_profile(target_policy="allow_source_projection"),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "source_projection"
+    assert row.value == 120
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_target_assertion_policy_overrides_the_profile_default():
+    report = resolve_profile_targets(
+        _policy_profile(
+            defaults_policy="allow_source_projection",
+            target_policy="observed_only",
+        ),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2022},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "observation"
+    assert row.value == 110
+    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_invalid_assertion_policy_values_are_rejected():
+    with pytest.raises(ValueError, match="assertion_policy"):
+        _policy_profile(defaults_policy="projections_welcome")
+    with pytest.raises(ValueError, match="assertion_policy"):
+        _policy_profile(target_policy="observed")

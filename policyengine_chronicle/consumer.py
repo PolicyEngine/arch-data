@@ -296,6 +296,39 @@ def resolve_profile_targets(
             )
             continue
 
+        assertion_policy = (
+            target.assertion_policy or profile.default_assertion_policy
+        )
+        if "assertion" in target.chronicle_selector:
+            # An explicit assertion selector is maximal author intent; the
+            # policy governs only targets that do not select on assertion.
+            assertion_policy = "allow_source_projection"
+        observed = [
+            row
+            for row in candidates
+            if row.get("assertion", "observation") == "observation"
+        ]
+        if assertion_policy == "observed_only":
+            if not observed:
+                issues.append(
+                    ResolutionIssue(
+                        code="only_projection_facts",
+                        message=(
+                            f"Target {target.target_id!r} matched only "
+                            "source_projection facts and its assertion_policy "
+                            "is 'observed_only'; declare 'prefer_observed' or "
+                            "'allow_source_projection' to resolve projections "
+                            "deliberately."
+                        ),
+                        profile_id=profile.profile_id,
+                        target_id=target.target_id,
+                    )
+                )
+                continue
+            candidates = observed
+        elif assertion_policy == "prefer_observed" and observed:
+            candidates = observed
+
         chosen_period, period_issue = _choose_period(
             profile.profile_id,
             target,
@@ -341,9 +374,12 @@ def resolve_profile_targets(
         else:
             basis = "declared_alignment"
 
+        projection_resolved = False
         for row in candidates:
             if dict(row["period"]) != chosen_period:
                 continue
+            if row.get("assertion", "observation") == "source_projection":
+                projection_resolved = True
             resolved.append(
                 _resolved_target(
                     profile.profile_id,
@@ -352,6 +388,21 @@ def resolve_profile_targets(
                     basis=basis,
                     requested_period=requested,
                     alignment=alignment,
+                )
+            )
+        if projection_resolved:
+            issues.append(
+                ResolutionIssue(
+                    code="resolved_from_projection",
+                    message=(
+                        f"Target {target.target_id!r} resolved from a "
+                        "source_projection fact at "
+                        f"{chosen_period['type']}:{chosen_period['value']} "
+                        f"under assertion_policy {assertion_policy!r}."
+                    ),
+                    profile_id=profile.profile_id,
+                    target_id=target.target_id,
+                    severity="warning",
                 )
             )
 

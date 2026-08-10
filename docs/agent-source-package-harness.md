@@ -495,6 +495,26 @@ A `survey_aggregate` record set must also name its source survey in a non-empty
 class. Missing, unknown, wrongly typed, and misplaced values fail package load
 and build validation.
 
+Orthogonal to `provenance_class`, every fact carries an `assertion`:
+`observation` (a realized value, the default) or `source_projection` (the
+publisher's forward statement — OBR forecast years, NPP projection years,
+budget-allocation years). `provenance_class` says how the publisher measured;
+`assertion` says whether the period had happened. The two cross freely: a
+national-balance-sheet estimate is `model_output` + `observation`, an NPP
+projection year is `model_output` + `source_projection`.
+
+Consumer profiles resolve this axis explicitly rather than by convention.
+Each profile (or individual target) declares an `assertion_policy`:
+`observed_only` (the default — projections are invisible and a
+projection-only family fails loudly with `only_projection_facts`),
+`prefer_observed` (observed facts win; projections fill only periods with no
+observation), or `allow_source_projection` (both compete under the period
+policy). A target whose `chronicle_selector` names `assertion` explicitly
+bypasses the policy — the selector is already maximal intent. Whenever a
+projection is resolved, the report carries a `resolved_from_projection`
+warning and the resolved row exposes its `assertion`, so downstream builds
+never discover the estimate/projection boundary by accident.
+
 ```yaml
 record_sets:
   - record_set_id: census_acs.acs1_{year}.s0101.national_age
