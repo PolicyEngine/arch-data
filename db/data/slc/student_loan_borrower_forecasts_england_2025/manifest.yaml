@@ -11,3 +11,9 @@ files:
     sha256: b6de727ec0f8b1771c9a2d2c781b405830872634ed7283bf23e46a3898873922
     size_bytes: 55511
     fetched_at: '2026-08-10T09:31:49+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-borrower-forecasts-england-2025/2025/b6de727ec0f8b1771c9a2d2c781b405830872634ed7283bf23e46a3898873922/ees-table-6a-permalink.html
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-borrower-forecasts-england-2025/2025/b6de727ec0f8b1771c9a2d2c781b405830872634ed7283bf23e46a3898873922/ees-table-6a-permalink.html

@@ -10,3 +10,9 @@ files:
     sha256: 1774899f189e9d2e006459e5a4bd0d01313488c196b571ff157c2970c79074b6
     size_bytes: 223577
     fetched_at: '2026-08-10T09:31:52+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-repayments-wales-2025/2025/1774899f189e9d2e006459e5a4bd0d01313488c196b571ff157c2970c79074b6/slc-wales-fy2024-25.html
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-repayments-wales-2025/2025/1774899f189e9d2e006459e5a4bd0d01313488c196b571ff157c2970c79074b6/slc-wales-fy2024-25.html

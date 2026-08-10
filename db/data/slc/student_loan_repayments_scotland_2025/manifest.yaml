@@ -10,3 +10,9 @@ files:
     sha256: 5b0f6bab93b10af5d1ec3eb8eaa951ca27baf4c9caaf77c5256c5560227c00d5
     size_bytes: 190948
     fetched_at: '2026-08-10T09:31:51+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-repayments-scotland-2025/2025/5b0f6bab93b10af5d1ec3eb8eaa951ca27baf4c9caaf77c5256c5560227c00d5/slc-scotland-fy2024-25.html
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-repayments-scotland-2025/2025/5b0f6bab93b10af5d1ec3eb8eaa951ca27baf4c9caaf77c5256c5560227c00d5/slc-scotland-fy2024-25.html
