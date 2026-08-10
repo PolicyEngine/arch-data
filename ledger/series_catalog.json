@@ -1,11 +1,11 @@
 {
   "comment": "Canonical series catalog. One row per (concept, geography level/id/vintage, entity) identity. UUID authority is the append-only ledger/series_uuid_registry.jsonl (digest below): a uuid is minted once, inherited from the registry on every regeneration, and changes only through explicit, chained supersede/retire/revive/succeeds events recorded there (live bindings and rows stay in bijection). Consumers reference series by uuid or concept only. Regenerate with scripts/build_series_catalog.py; verify with --check. Aliases are curated identity statements (plus observed spellings of the same identity) and inherit only within one (geography, entity) slice; aliases listed in ambiguous_aliases match multiple rows and never drive inheritance. source_concepts are publisher labels — provenance, never identity. Cross-spelling and cross-vintage merges are manual curation: delete the absorbed row, alias its concept on the survivor, regenerate with --allow-remint.",
   "generator_version": 3,
-  "observations_sha256": "b0c29d7cb2aee323a5d30f8196eb59f62aa396066070131c5048740659d5e241",
-  "observation_rows": 171,
-  "current_assertion_rows": 171,
+  "observations_sha256": "92a1f4f40c98bdd91edafd5e15faa78b641f94f016a526b783ab2fe74974074d",
+  "observation_rows": 179,
+  "current_assertion_rows": 179,
   "docket_seed_sha256": "235ee5742faa3ad1f5048b91402b93b3526dd405da2b52557ffbb306579a6033",
-  "uuid_registry_sha256": "4fc6f98b339a5932448cc546fef455514b449999a2f01343b701910dc89387d0",
+  "uuid_registry_sha256": "b2c933a238b92bae48dc565e14a65ea29a40b1c28ec2dab5141ffc4153b172b9",
   "suspect_segments": [],
   "stripped_segments": {
     "2026-05": [
@@ -47,14 +47,21 @@
       "census.construction_spending.total_mom",
       "census.m3.durable_goods_new_orders_mom",
       "census.m3.durable_goods_shipments_mom",
+      "fed.g19.consumer_credit_nonrevolving_annual_rate",
+      "fed.g19.consumer_credit_revolving_annual_rate",
+      "fed.g19.consumer_credit_total_annual_rate",
       "us.fed.fomc.target_range_upper"
     ],
     "2026_06_18": [
       "boe.bank_rate"
     ],
+    "2026_07": [
+      "bls.cps.u6_underemployment_rate"
+    ],
     "2026_q2": [
       "bls.eci.private_wages_salaries_qoq",
-      "bls.eci.total_compensation_private_industry_qoq"
+      "bls.eci.total_compensation_private_industry_qoq",
+      "bls.productivity.nonfarm_unit_labor_costs_qoq_prelim"
     ],
     "after_june_2026": [
       "bank_of_canada.overnight_rate",
@@ -93,6 +100,9 @@
     "fy2025": [
       "fns.snap.share_jurisdictions_at_or_above_6pct",
       "fns.snap.total_payment_error_rate"
+    ],
+    "july_2026": [
+      "bls.cps.unemployment_rate"
     ],
     "june_2026": [
       "abs.labour.employment_change.australia",
@@ -179,6 +189,10 @@
       "us.dol.initial_claims.sa"
     ],
     "week_2026-07-25": [
+      "dol.eta.continued_claims.sa",
+      "us.dol.initial_claims.sa"
+    ],
+    "week_2026-08-01": [
       "us.dol.initial_claims.sa"
     ],
     "week_2026_06_13": [
@@ -1478,20 +1492,36 @@
       "uuid": "e0be267e-d74c-4ad2-a5cd-5ac9f821e018",
       "concept": "bls.cps.u6_underemployment_rate",
       "family_patterns": [
-        "bls.cps.u6_underemployment_rate"
+        "bls.cps.u6_underemployment_rate.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "percent",
       "cadence": "month",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "bls_cps"
+      ],
+      "aliases": [
+        "bls.cps.u6_underemployment_rate.2026_07"
+      ],
+      "source_concepts": [
+        "U6RATE"
+      ],
+      "rid_patterns": [
+        "bls.cps.u6_underemployment_rate.{P}.first_print"
+      ],
+      "first_observed_period": "2026-07",
+      "last_observed_period": "2026-07",
+      "observation_count": 1
     },
     {
       "uuid": "db2f3857-e0fa-48f8-9ab1-6c8989307fd2",
@@ -1516,6 +1546,7 @@
         "bls_cps"
       ],
       "aliases": [
+        "bls.cps.unemployment_rate.july_2026",
         "bls.cps.unemployment_rate.june_2026"
       ],
       "source_concepts": [
@@ -1525,8 +1556,8 @@
         "bls.cps.unemployment_rate.{P}.first_print"
       ],
       "first_observed_period": "2026-06",
-      "last_observed_period": "2026-06",
-      "observation_count": 1
+      "last_observed_period": "2026-07",
+      "observation_count": 2
     },
     {
       "uuid": "8dbbd54f-4bfd-4735-ad0d-5b55b8bb4ec5",
@@ -1922,20 +1953,36 @@
       "uuid": "205885c4-de46-47df-a916-253ae2a0299a",
       "concept": "bls.productivity.nonfarm_unit_labor_costs_qoq_prelim",
       "family_patterns": [
-        "bls.productivity.nonfarm_unit_labor_costs_qoq_prelim"
+        "bls.productivity.nonfarm_unit_labor_costs_qoq_prelim.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "percent_growth",
       "cadence": "quarter",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "bls_productivity"
+      ],
+      "aliases": [
+        "bls.productivity.nonfarm_unit_labor_costs_qoq_prelim.2026_q2"
+      ],
+      "source_concepts": [
+        "PRS85006112"
+      ],
+      "rid_patterns": [
+        "bls.productivity.nonfarm_unit_labor_costs_qoq_prelim.{P}.first_print"
+      ],
+      "first_observed_period": "2026-04",
+      "last_observed_period": "2026-04",
+      "observation_count": 1
     },
     {
       "uuid": "2e3a7126-41fd-4d88-99b6-cf4f2057c277",
@@ -2589,8 +2636,8 @@
         "dol.eta.continued_claims.sa.{P}.first_print"
       ],
       "first_observed_period": "2026-06-27",
-      "last_observed_period": "2026-07-18",
-      "observation_count": 4
+      "last_observed_period": "2026-07-25",
+      "observation_count": 5
     },
     {
       "uuid": "32b335ea-b2dd-4fba-8321-e9751df19318",
@@ -3120,58 +3167,106 @@
       "uuid": "bd0643c4-6716-41ae-988d-c985272e38ae",
       "concept": "fed.g19.consumer_credit_nonrevolving_annual_rate",
       "family_patterns": [
-        "fed.g19.consumer_credit_nonrevolving_annual_rate"
+        "fed.g19.consumer_credit_nonrevolving_annual_rate.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "percent_growth",
       "cadence": "month",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "federal_reserve_g19"
+      ],
+      "aliases": [
+        "fed.g19.consumer_credit_nonrevolving_annual_rate.2026_06"
+      ],
+      "source_concepts": [
+        "NONREVSLAR"
+      ],
+      "rid_patterns": [
+        "fed.g19.consumer_credit_nonrevolving_annual_rate.{P}.first_print"
+      ],
+      "first_observed_period": "2026-06",
+      "last_observed_period": "2026-06",
+      "observation_count": 1
     },
     {
       "uuid": "8a82c6a5-7c83-4ac8-ab5b-7dd6eaf97e8f",
       "concept": "fed.g19.consumer_credit_revolving_annual_rate",
       "family_patterns": [
-        "fed.g19.consumer_credit_revolving_annual_rate"
+        "fed.g19.consumer_credit_revolving_annual_rate.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "percent_growth",
       "cadence": "month",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "federal_reserve_g19"
+      ],
+      "aliases": [
+        "fed.g19.consumer_credit_revolving_annual_rate.2026_06"
+      ],
+      "source_concepts": [
+        "REVOLSLAR"
+      ],
+      "rid_patterns": [
+        "fed.g19.consumer_credit_revolving_annual_rate.{P}.first_print"
+      ],
+      "first_observed_period": "2026-06",
+      "last_observed_period": "2026-06",
+      "observation_count": 1
     },
     {
       "uuid": "dac76c03-0630-4859-898d-b4849383d147",
       "concept": "fed.g19.consumer_credit_total_annual_rate",
       "family_patterns": [
-        "fed.g19.consumer_credit_total_annual_rate"
+        "fed.g19.consumer_credit_total_annual_rate.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "percent_growth",
       "cadence": "month",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "federal_reserve_g19"
+      ],
+      "aliases": [
+        "fed.g19.consumer_credit_total_annual_rate.2026_06"
+      ],
+      "source_concepts": [
+        "TOTALSLAR"
+      ],
+      "rid_patterns": [
+        "fed.g19.consumer_credit_total_annual_rate.{P}.first_print"
+      ],
+      "first_observed_period": "2026-06",
+      "last_observed_period": "2026-06",
+      "observation_count": 1
     },
     {
       "uuid": "3b195edb-1b2d-4380-8267-43084fe3cbeb",
@@ -6341,8 +6436,8 @@
         "us.dol.initial_claims.sa.{P}"
       ],
       "first_observed_period": "2026-06-20",
-      "last_observed_period": "2026-07-25",
-      "observation_count": 5
+      "last_observed_period": "2026-08-01",
+      "observation_count": 6
     },
     {
       "uuid": "830e68bb-9ed6-493c-a8a4-440ba8e53f76",
