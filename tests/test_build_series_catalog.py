@@ -2320,3 +2320,85 @@ def test_malformed_succeeds_geography_is_a_schema_finding(
     )
     with pytest.raises(SystemExit, match="must be an object or null"):
         bsc.UuidRegistry.load(path)
+
+
+def test_stage_rejects_stale_uuid_retire_after_supersede(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Fifteenth-review follow-up: a stale catalog row can retain U1 after
+    # its own placeholder key superseded to U2. The enrichment plan the
+    # old guard built from that row — retire(A/U1) + succeeds(B/U1) —
+    # must die in staging replay before anything reaches disk.
+    entries = [
+        _mint("census.m3.new_orders", U1),
+        dict(_mint("census.m3.new_orders", U2), supersedes=U1,
+             note="curated remint of the placeholder"),
+    ]
+    registry = _registry(tmp_path, entries)
+    raw_before = (tmp_path / "registry.jsonl").read_bytes()
+    b_geo = {"level": "country", "id": "0100000US", "vintage": "current"}
+    b_ent = {"name": "economy", "role": "aggregate"}
+    invalid = [
+        dict(_mint("census.m3.new_orders", U1), retired=True,
+             note="docket placeholder enriched by first observed identity"),
+        dict(_mint("census.m3.new_orders", U1, geography=b_geo,
+                   entity=b_ent),
+             succeeds={"concept": "census.m3.new_orders",
+                       "geography": None, "entity": None}),
+    ]
+    with pytest.raises(SystemExit, match="must keep uuid"):
+        registry.stage(invalid)
+    assert (tmp_path / "registry.jsonl").read_bytes() == raw_before
+
+
+def test_stale_catalog_uuid_after_supersede_fails_before_write(
+    tmp_path: pathlib.Path,
+) -> None:
+    # Fifteenth-review follow-up: the builder itself must refuse the
+    # stale row at plan time — the LIVE binding, not historical UUID
+    # ownership, decides enrichment — and leave both artifacts untouched.
+    seed = {
+        "series": [
+            {
+                "series": "census.m3.new_orders",
+                "cadence": "monthly",
+                "extras": {"country": "US", "targetUnit": "percent"},
+            }
+        ]
+    }
+    argv = _repo(tmp_path, [_row("bls.cps.unemployment_rate")], seed=seed)
+    assert bsc.main(argv) == 0
+    catalog = json.loads((tmp_path / "catalog.json").read_text())
+    row = next(r for r in catalog["series"] if r["status"] == "docket-only")
+    stale_uuid = row["uuid"]
+    row["uuid"] = "55555555-5555-4555-8555-555555555555"
+    (tmp_path / "catalog.json").write_text(
+        json.dumps(catalog, indent=2) + "\n", encoding="utf-8"
+    )
+    assert (
+        bsc.main(argv + ["--allow-remint", "--remint-note", "curated remint"])
+        == 0
+    )
+    # Regress the row to its pre-supersede UUID: a stale catalog.
+    catalog = json.loads((tmp_path / "catalog.json").read_text())
+    row = next(r for r in catalog["series"] if r["status"] == "docket-only")
+    row["uuid"] = stale_uuid
+    (tmp_path / "catalog.json").write_text(
+        json.dumps(catalog, indent=2) + "\n", encoding="utf-8"
+    )
+    catalog_before = (tmp_path / "catalog.json").read_bytes()
+    registry_before = (tmp_path / "registry.jsonl").read_bytes()
+    (tmp_path / "obs.jsonl").write_text(
+        "".join(
+            json.dumps(r) + "\n"
+            for r in [
+                _row("bls.cps.unemployment_rate"),
+                _row("census.m3.new_orders"),
+            ]
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="explicit ceremony"):
+        bsc.main(argv)
+    assert (tmp_path / "catalog.json").read_bytes() == catalog_before
+    assert (tmp_path / "registry.jsonl").read_bytes() == registry_before
