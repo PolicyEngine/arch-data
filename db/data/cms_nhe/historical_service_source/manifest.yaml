@@ -1,4 +1,5 @@
 source_id: cms-nhe
+package_id: cms-nhe-historical-service-source
 source_name: CMS National Health Expenditure Accounts
 publisher: Centers for Medicare & Medicaid Services
 source_page: https://www.cms.gov/data-research/statistics-trends-and-reports/national-health-expenditure-data/historical
@@ -9,5 +10,12 @@ files:
     csv_member: NHE2024.csv
     sha256: b6a9e26774ca36931d42add46204947d6335fc4898011780563196898f964746
     size_bytes: 123721
-    source_table: National Health Expenditures by type of service and source of funds, CY 1960-2024
+    source_table: National Health Expenditures by type of service and source of funds,
+      CY 1960-2024
     notes: Full CMS ZIP source preserved; values are reported in millions of dollars.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/cms-nhe/cms-nhe-historical-service-source/historical_service_source/b6a9e26774ca36931d42add46204947d6335fc4898011780563196898f964746/national-health-expenditures-type-service-source-funds-cy-1960-2024.zip
+        uri: r2://ledger-raw/raw/cms-nhe/cms-nhe-historical-service-source/historical_service_source/b6a9e26774ca36931d42add46204947d6335fc4898011780563196898f964746/national-health-expenditures-type-service-source-funds-cy-1960-2024.zip

@@ -1,4 +1,5 @@
-source_id: hmrc-vat-firm-targets-2024-25
+source_id: hmrc
+package_id: hmrc-vat-firm-targets-2024-25
 source_name: HMRC Annual UK VAT Statistics 2024 to 2025
 publisher: HM Revenue and Customs
 source_page: https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
@@ -6,7 +7,8 @@ files:
   2024:
     filename: hmrc_vat_firm_targets_2024_25.csv
     source_url: https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
-    source_table: Annual UK VAT Statistics 2024 to 2025 VAT trader population and net VAT liability by turnover band
+    source_table: Annual UK VAT Statistics 2024 to 2025 VAT trader population and
+      net VAT liability by turnover band
     sha256: c37f8d7980f9c3154ff6fdf39fcb8d4b9f2d0ddd0e9acae492bfe427f5318a52
     size_bytes: 2462
     storage:
@@ -16,8 +18,7 @@ files:
         key: raw/hmrc/hmrc-vat-firm-targets-2024-25/2024/c37f8d7980f9c3154ff6fdf39fcb8d4b9f2d0ddd0e9acae492bfe427f5318a52/hmrc_vat_firm_targets_2024_25.csv
         uri: r2://ledger-raw/raw/hmrc/hmrc-vat-firm-targets-2024-25/2024/c37f8d7980f9c3154ff6fdf39fcb8d4b9f2d0ddd0e9acae492bfe427f5318a52/hmrc_vat_firm_targets_2024_25.csv
     source_urls:
-      - https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
-    notes: >-
-      Curated national extract from HMRC Annual UK VAT Statistics 2024 to 2025.
-      Net VAT liability rows retain source values in GBP millions and are scaled
-      to GBP by the Ledger source package.
+    - https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
+    notes: Curated national extract from HMRC Annual UK VAT Statistics 2024 to 2025.
+      Net VAT liability rows retain source values in GBP millions and are scaled to
+      GBP by the Ledger source package.

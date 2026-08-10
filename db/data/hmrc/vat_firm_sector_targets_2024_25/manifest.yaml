@@ -1,4 +1,5 @@
-source_id: hmrc-vat-firm-sector-targets-2024-25
+source_id: hmrc
+package_id: hmrc-vat-firm-sector-targets-2024-25
 source_name: HMRC Annual UK VAT Statistics 2024 to 2025
 publisher: HM Revenue and Customs
 source_page: https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
@@ -6,8 +7,8 @@ files:
   2024:
     filename: hmrc_vat_firm_sector_targets_2024_25.csv
     source_url: https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
-    source_table: Annual UK VAT Statistics 2024 to 2025 VAT trader population and net VAT
-      liability by trade sector
+    source_table: Annual UK VAT Statistics 2024 to 2025 VAT trader population and
+      net VAT liability by trade sector
     sha256: 1ad4ad25fde9eeae3ddb57957921c03c3a3167aa924cbe8d5d99df73a63a95f8
     size_bytes: 17440
     storage:
@@ -18,5 +19,5 @@ files:
         uri: r2://ledger-raw/raw/hmrc/hmrc-vat-firm-sector-targets-2024-25/2024/1ad4ad25fde9eeae3ddb57957921c03c3a3167aa924cbe8d5d99df73a63a95f8/hmrc_vat_firm_sector_targets_2024_25.csv
     source_urls:
     - https://www.gov.uk/government/statistics/value-added-tax-vat-annual-statistics
-    notes: Curated trade-sector extract from HMRC Annual UK VAT Statistics 2024 to 2025 used
-      by firm-microsim-paper processed/2024-25.
+    notes: Curated trade-sector extract from HMRC Annual UK VAT Statistics 2024 to
+      2025 used by firm-microsim-paper processed/2024-25.
