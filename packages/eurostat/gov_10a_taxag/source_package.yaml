@@ -1,0 +1,567 @@
+schema_version: ledger.source_package.v1
+package_id: eurostat-gov-10a-taxag
+label: Eurostat gov_10a_taxag tax revenue for Belgium, Germany, and France
+artifact:
+  source_name: eurostat
+  source_table: Eurostat gov_10a_taxag Main national accounts tax aggregates for Belgium, Germany, and France
+  resource_package: db
+  resource_directory: data/eurostat/gov_10a_taxag
+  manifest: manifest.yaml
+  vintage: eurostat_gov_10a_taxag_2024
+  extracted_at: '2026-07-22'
+  extraction_method: >-
+    Eurostat dissemination API v1.0 JSON-stat 2.0 full-cube row parse of
+    the filtered request recorded in the manifest source_url
+  parser: json_stat_2_full_rows
+  artifact_year: 2024
+  sheet_name: gov_10a_taxag
+  selected_rows:
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: BE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: DE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: FR, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: BE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: DE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: FR, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: BE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: DE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: FR, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: BE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: DE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: FR, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: BE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: DE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: FR, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: BE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: DE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: FR, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: BE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: DE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: FR, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: BE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: DE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: FR, time: '2024'}
+record_sets:
+  - record_set_id: eurostat.gov_10a_taxag.cy2023.tax_revenue.country
+    provenance_class: administrative
+    record_set_spec_id: eurostat.gov_10a_taxag.tax_revenue.country.v1
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2023.tax_revenue.country
+    sheet_name: gov_10a_taxag
+    period_type: calendar_year
+    period: 2023
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: government
+    entity_role: general_government
+    domain: taxes_and_social_contributions
+    groupby_dimension: na_item
+    shared_filters:
+      freq: A
+      unit: MIO_EUR
+      sector: S13
+      time: '2023'
+    shared_constraints:
+      - {variable: freq, operator: '==', value: A, label: Eurostat frequency}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: Eurostat source unit}
+      - {variable: sector, operator: '==', value: S13, label: Eurostat institutional sector}
+      - {variable: time, operator: '==', value: '2023', label: Eurostat time}
+    rows:
+      - value_id: d2_be
+        label: Belgium taxes on production and imports
+        ordinal: 0
+        row_number: 2
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D2, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D2, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d2_de
+        label: Germany taxes on production and imports
+        ordinal: 1
+        row_number: 3
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D2, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D2, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d2_fr
+        label: France taxes on production and imports
+        ordinal: 2
+        row_number: 4
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D2, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D2, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+      - value_id: d5_be
+        label: Belgium current taxes on income and wealth
+        ordinal: 3
+        row_number: 5
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D5, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D5, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d5_de
+        label: Germany current taxes on income and wealth
+        ordinal: 4
+        row_number: 6
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D5, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D5, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d5_fr
+        label: France current taxes on income and wealth
+        ordinal: 5
+        row_number: 7
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D5, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D5, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+      - value_id: d51_be
+        label: Belgium taxes on income
+        ordinal: 6
+        row_number: 8
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D51, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D51, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d51_de
+        label: Germany taxes on income
+        ordinal: 7
+        row_number: 9
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D51, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D51, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d51_fr
+        label: France taxes on income
+        ordinal: 8
+        row_number: 10
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D51, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D51, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+      - value_id: d61_be
+        label: Belgium net social contributions
+        ordinal: 9
+        row_number: 11
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D61, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D61, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d61_de
+        label: Germany net social contributions
+        ordinal: 10
+        row_number: 12
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D61, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D61, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d61_fr
+        label: France net social contributions
+        ordinal: 11
+        row_number: 13
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D61, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D61, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+    measures:
+      - measure_id: revenue
+        label: Tax or net social contribution revenue
+        ordinal: 0
+        column: G
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: eurostat.gov_10a_taxag.revenue
+        source_concept: eurostat.gov_10a_taxag.value
+        concept_relation: source_label
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=en
+        concept_evidence_notes: >-
+          Source na_item codes identify the published tax and net
+          social contribution categories.
+        unit: eur
+        aggregation: sum
+        value_scale: 1000000
+        expected_cell_type: number
+  - record_set_id: eurostat.gov_10a_taxag.cy2024.tax_revenue.country
+    provenance_class: administrative
+    record_set_spec_id: eurostat.gov_10a_taxag.tax_revenue.country.v1
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2024.tax_revenue.country
+    sheet_name: gov_10a_taxag
+    period_type: calendar_year
+    period: 2024
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: government
+    entity_role: general_government
+    domain: taxes_and_social_contributions
+    groupby_dimension: na_item
+    shared_filters:
+      freq: A
+      unit: MIO_EUR
+      sector: S13
+      time: '2024'
+    shared_constraints:
+      - {variable: freq, operator: '==', value: A, label: Eurostat frequency}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: Eurostat source unit}
+      - {variable: sector, operator: '==', value: S13, label: Eurostat institutional sector}
+      - {variable: time, operator: '==', value: '2024', label: Eurostat time}
+    rows:
+      - value_id: d2_be
+        label: Belgium taxes on production and imports
+        ordinal: 0
+        row_number: 14
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D2, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D2, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d2_de
+        label: Germany taxes on production and imports
+        ordinal: 1
+        row_number: 15
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D2, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D2, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d2_fr
+        label: France taxes on production and imports
+        ordinal: 2
+        row_number: 16
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D2, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D2, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+      - value_id: d5_be
+        label: Belgium current taxes on income and wealth
+        ordinal: 3
+        row_number: 17
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D5, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D5, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d5_de
+        label: Germany current taxes on income and wealth
+        ordinal: 4
+        row_number: 18
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D5, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D5, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d5_fr
+        label: France current taxes on income and wealth
+        ordinal: 5
+        row_number: 19
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D5, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D5, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+      - value_id: d51_be
+        label: Belgium taxes on income
+        ordinal: 6
+        row_number: 20
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D51, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D51, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d51_de
+        label: Germany taxes on income
+        ordinal: 7
+        row_number: 21
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D51, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D51, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d51_fr
+        label: France taxes on income
+        ordinal: 8
+        row_number: 22
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D51, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D51, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+      - value_id: d61_be
+        label: Belgium net social contributions
+        ordinal: 9
+        row_number: 23
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D61, label: Eurostat na_item dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D61, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d61_de
+        label: Germany net social contributions
+        ordinal: 10
+        row_number: 24
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D61, label: Eurostat na_item dimension}
+          - {column: E, expected_value: DE, label: Eurostat geo dimension}
+        filters: {na_item: D61, geo: DE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: DE, label: Eurostat geography}
+      - value_id: d61_fr
+        label: France net social contributions
+        ordinal: 11
+        row_number: 25
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: D, expected_value: D61, label: Eurostat na_item dimension}
+          - {column: E, expected_value: FR, label: Eurostat geo dimension}
+        filters: {na_item: D61, geo: FR}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: FR, label: Eurostat geography}
+    measures:
+      - measure_id: revenue
+        label: Tax or net social contribution revenue
+        ordinal: 0
+        column: G
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: eurostat.gov_10a_taxag.revenue
+        source_concept: eurostat.gov_10a_taxag.value
+        concept_relation: source_label
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=en
+        concept_evidence_notes: >-
+          Source na_item codes identify the published tax and net
+          social contribution categories.
+        unit: eur
+        aggregation: sum
+        value_scale: 1000000
+        expected_cell_type: number

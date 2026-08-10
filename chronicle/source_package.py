@@ -52,6 +52,7 @@ from chronicle.sources.rows import (
     source_rows_from_json_table,
     source_rows_from_statxplore_table,
     source_rows_from_ees_permalink_table_html,
+    source_rows_from_json_stat_2,
     source_rows_from_kff_state_indicator_gdocs_html,
     source_rows_from_ons_timeseries_json,
     source_rows_from_delimited_text,
@@ -250,6 +251,10 @@ SOURCE_PACKAGE_ALIASES = {
     "hmrc-vat-firm-sector-targets-2024-25": Path(
         "hmrc/vat_firm_sector_targets_2024_25"
     ),
+    "eurostat-gov-10a-taxag": Path("eurostat/gov_10a_taxag"),
+    "eurostat-spr-exp-func": Path("eurostat/spr_exp_func"),
+    "eurostat-ilc-li02": Path("eurostat/ilc_li02"),
+    "eurostat-ilc-di01": Path("eurostat/ilc_di01"),
     "kff-marketplace-effectuated-enrollment": Path(
         "kff/marketplace_effectuated_enrollment"
     ),
@@ -388,6 +393,12 @@ class SourceArtifactSpec:
             )
         if self.parser == "statxplore_table_json_rows":
             return source_rows_from_statxplore_table(
+                content,
+                artifact,
+                sheet_name=self._sheet_name(filename, year=year),
+            )
+        if self.parser == "json_stat_2_full_rows":
+            return source_rows_from_json_stat_2(
                 content,
                 artifact,
                 sheet_name=self._sheet_name(filename, year=year),
@@ -562,6 +573,26 @@ class SourceArtifactSpec:
                 source_rows
                 if source_rows is not None
                 else source_rows_from_json_table(
+                    content,
+                    artifact,
+                    sheet_name=self._sheet_name(filename, year=year),
+                )
+            )
+            return source_cells_from_source_rows(
+                rows,
+                selected_rows=tuple(
+                    {
+                        key: str(_render_value(value, year=year))
+                        for key, value in row.items()
+                    }
+                    for row in self.selected_rows
+                ),
+            )
+        if self.parser == "json_stat_2_full_rows":
+            rows = (
+                source_rows
+                if source_rows is not None
+                else source_rows_from_json_stat_2(
                     content,
                     artifact,
                     sheet_name=self._sheet_name(filename, year=year),

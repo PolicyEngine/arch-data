@@ -1,0 +1,23 @@
+source_id: eurostat-gov-10a-taxag
+source_name: Eurostat gov_10a_taxag
+publisher: Eurostat
+source_page: https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=en
+files:
+  2024:
+    filename: gov_10a_taxag.json
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag?format=JSON&lang=en&freq=A&unit=MIO_EUR&sector=S13&na_item=D2&na_item=D5&na_item=D51&na_item=D61&geo=BE&geo=DE&geo=FR&time=2023&time=2024
+    source_table: Eurostat gov_10a_taxag Main national accounts tax aggregates for Belgium, Germany, and France
+    sha256: 5b4e4b99f0778855e164481a52eb16306ef4ac99afef874a91f22315bd0c472a
+    size_bytes: 3346
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/eurostat/eurostat-gov-10a-taxag/2024/5b4e4b99f0778855e164481a52eb16306ef4ac99afef874a91f22315bd0c472a/gov_10a_taxag.json
+        uri: r2://ledger-raw/raw/eurostat/eurostat-gov-10a-taxag/2024/5b4e4b99f0778855e164481a52eb16306ef4ac99afef874a91f22315bd0c472a/gov_10a_taxag.json
+    source_urls:
+      - https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag?format=JSON&lang=en&freq=A&unit=MIO_EUR&sector=S13&na_item=D2&na_item=D5&na_item=D51&na_item=D61&geo=BE&geo=DE&geo=FR&time=2023&time=2024
+    notes: >-
+      Real Eurostat dissemination API bytes for the filtered request in
+      source_url; hash-pinned and content-addressed. Different bytes at
+      the mutable API endpoint are a new vintage, never a pin update.

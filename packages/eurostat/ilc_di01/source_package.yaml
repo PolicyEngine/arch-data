@@ -1,0 +1,488 @@
+schema_version: ledger.source_package.v1
+package_id: eurostat-ilc-di01
+label: Eurostat EU-SILC income distribution by decile for BE, DE, and FR
+artifact:
+  source_name: eurostat
+  source_table: Eurostat ilc_di01 Distribution of income by quantiles for Belgium, Germany, and France
+  resource_package: db
+  resource_directory: data/eurostat/ilc_di01
+  manifest: manifest.yaml
+  vintage: eurostat_ilc_di01_2024
+  extracted_at: "2026-08-09"
+  extraction_method: >-
+    Eurostat dissemination API v1.0 JSON-stat 2.0 full-cube row parse of
+    the filtered request recorded in the manifest source_url
+  parser: json_stat_2_full_rows
+  artifact_year: 2024
+  sheet_name: ilc_di01
+  # statinfo determines measure semantics in the live cube. SHARE is a
+  # percentage share even though its raw unit/currency context is EUR; TC is a
+  # top cut-off point measured in EUR. Chronicle preserves both source fields.
+  selected_rows:
+    - {freq: A, quant_inc: D1, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D2, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D3, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D4, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D5, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D6, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D7, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D8, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D9, statinfo: SHARE, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D1, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D2, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D3, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D4, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D5, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D6, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D7, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D8, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D9, statinfo: SHARE, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D1, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D2, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D3, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D4, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D5, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D6, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D7, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D8, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D9, statinfo: SHARE, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D1, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D2, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D3, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D4, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D5, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D6, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D7, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D8, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D9, statinfo: TC, unit: EUR, geo: BE, time: "2024"}
+    - {freq: A, quant_inc: D1, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D2, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D3, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D4, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D5, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D6, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D7, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D8, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D9, statinfo: TC, unit: EUR, geo: DE, time: "2024"}
+    - {freq: A, quant_inc: D1, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D2, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D3, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D4, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D5, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D6, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D7, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D8, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+    - {freq: A, quant_inc: D9, statinfo: TC, unit: EUR, geo: FR, time: "2024"}
+
+# EVALUATION-ONLY by class: Ledger ingests everything; the Populace gate decides use.
+record_sets:
+  - &share_be_record_set
+    record_set_id: eurostat.ilc_di01.cy2024.income_share.be
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    record_set_spec_id: eurostat.ilc_di01.income_share.by_decile.v1
+    source_record_id_prefix: eurostat.ilc_di01.cy2024.income_share.be
+    sheet_name: ilc_di01
+    period_type: calendar_year
+    period: 2024
+    period_coverage: &period_coverage
+      basis: survey_reference
+      source_period_label: "2024"
+      start_date: "2023-01-01"
+      end_date: "2023-12-31"
+      notes: >-
+        The fact period preserves Eurostat TIME_PERIOD 2024 (survey year).
+        For BE, DE, and FR the EU-SILC income reference period is the
+        previous calendar year, 2023; start_date and end_date record that
+        income reference span.
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: person
+    entity_role: eu_silc_equivalised_disposable_income_recipient
+    domain: income_distribution
+    groupby_dimension: quant_inc
+    shared_filters:
+      freq: A
+      statinfo: SHARE
+      unit: EUR
+      geo: BE
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency code}
+      - {variable: statinfo, operator: "==", value: SHARE, label: Share of national equivalised income}
+      - {variable: unit, operator: "==", value: EUR, label: Eurostat unit code}
+      - {variable: geo, operator: "==", value: BE, label: Eurostat geography code}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time code}
+    rows:
+      - &share_d1
+        value_id: d1
+        label: First income decile share
+        ordinal: 0
+        row_number: 2
+        expected_row_header_column: B
+        expected_row_header: D1
+        guard_cells: &share_be_guards
+          - {column: A, expected_value: A, label: Eurostat frequency code}
+          - {column: C, expected_value: SHARE, label: Eurostat statistical information}
+          - {column: D, expected_value: EUR, label: Eurostat unit code}
+          - {column: E, expected_value: BE, label: Eurostat geography code}
+        filters: {quant_inc: D1}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D1, label: Eurostat income quantile code}
+      - &share_d2
+        value_id: d2
+        label: Second income decile share
+        ordinal: 1
+        row_number: 3
+        expected_row_header_column: B
+        expected_row_header: D2
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D2}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D2, label: Eurostat income quantile code}
+      - &share_d3
+        value_id: d3
+        label: Third income decile share
+        ordinal: 2
+        row_number: 4
+        expected_row_header_column: B
+        expected_row_header: D3
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D3}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D3, label: Eurostat income quantile code}
+      - &share_d4
+        value_id: d4
+        label: Fourth income decile share
+        ordinal: 3
+        row_number: 5
+        expected_row_header_column: B
+        expected_row_header: D4
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D4}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D4, label: Eurostat income quantile code}
+      - &share_d5
+        value_id: d5
+        label: Fifth income decile share
+        ordinal: 4
+        row_number: 6
+        expected_row_header_column: B
+        expected_row_header: D5
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D5}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D5, label: Eurostat income quantile code}
+      - &share_d6
+        value_id: d6
+        label: Sixth income decile share
+        ordinal: 5
+        row_number: 7
+        expected_row_header_column: B
+        expected_row_header: D6
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D6}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D6, label: Eurostat income quantile code}
+      - &share_d7
+        value_id: d7
+        label: Seventh income decile share
+        ordinal: 6
+        row_number: 8
+        expected_row_header_column: B
+        expected_row_header: D7
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D7}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D7, label: Eurostat income quantile code}
+      - &share_d8
+        value_id: d8
+        label: Eighth income decile share
+        ordinal: 7
+        row_number: 9
+        expected_row_header_column: B
+        expected_row_header: D8
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D8}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D8, label: Eurostat income quantile code}
+      - &share_d9
+        value_id: d9
+        label: Ninth income decile share
+        ordinal: 8
+        row_number: 10
+        expected_row_header_column: B
+        expected_row_header: D9
+        guard_cells: *share_be_guards
+        filters: {quant_inc: D9}
+        constraints:
+          - {variable: quant_inc, operator: "==", value: D9, label: Eurostat income quantile code}
+    measures: &share_measure
+      - measure_id: income_share
+        label: Income share of decile
+        ordinal: 0
+        column: G
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: eurostat.ilc_di01.income_share
+        source_concept: eurostat.ilc_di01.SHARE
+        concept_relation: source_label
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/ilc_di01/default/table?lang=en
+        concept_evidence_notes: >-
+          statinfo SHARE is "Share of national equivalised income" and is a
+          percentage share. The live cube carries raw unit EUR as currency
+          context, so statinfo—not unit—controls this Ledger measure mapping.
+          EU-SILC universe: private households and their current members;
+          persons in collective households and institutions are generally
+          excluded, and France is covered excluding Mayotte, per the
+          Eurostat ilc_sieusilc reference metadata.
+        unit: percent
+        aggregation: share
+        expected_cell_type: number
+  - <<: *share_be_record_set
+    record_set_id: eurostat.ilc_di01.cy2024.income_share.de
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    source_record_id_prefix: eurostat.ilc_di01.cy2024.income_share.de
+    geography_id: DE
+    geography_name: Germany
+    shared_filters:
+      freq: A
+      statinfo: SHARE
+      unit: EUR
+      geo: DE
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency code}
+      - {variable: statinfo, operator: "==", value: SHARE, label: Share of national equivalised income}
+      - {variable: unit, operator: "==", value: EUR, label: Eurostat unit code}
+      - {variable: geo, operator: "==", value: DE, label: Eurostat geography code}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time code}
+    rows:
+      - <<: *share_d1
+        row_number: 11
+        guard_cells: &share_de_guards
+          - {column: A, expected_value: A, label: Eurostat frequency code}
+          - {column: C, expected_value: SHARE, label: Eurostat statistical information}
+          - {column: D, expected_value: EUR, label: Eurostat unit code}
+          - {column: E, expected_value: DE, label: Eurostat geography code}
+      - {<<: *share_d2, row_number: 12, guard_cells: *share_de_guards}
+      - {<<: *share_d3, row_number: 13, guard_cells: *share_de_guards}
+      - {<<: *share_d4, row_number: 14, guard_cells: *share_de_guards}
+      - {<<: *share_d5, row_number: 15, guard_cells: *share_de_guards}
+      - {<<: *share_d6, row_number: 16, guard_cells: *share_de_guards}
+      - {<<: *share_d7, row_number: 17, guard_cells: *share_de_guards}
+      - {<<: *share_d8, row_number: 18, guard_cells: *share_de_guards}
+      - {<<: *share_d9, row_number: 19, guard_cells: *share_de_guards}
+  - <<: *share_be_record_set
+    record_set_id: eurostat.ilc_di01.cy2024.income_share.fr
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    source_record_id_prefix: eurostat.ilc_di01.cy2024.income_share.fr
+    geography_id: FR
+    geography_name: France
+    shared_filters:
+      freq: A
+      statinfo: SHARE
+      unit: EUR
+      geo: FR
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency code}
+      - {variable: statinfo, operator: "==", value: SHARE, label: Share of national equivalised income}
+      - {variable: unit, operator: "==", value: EUR, label: Eurostat unit code}
+      - {variable: geo, operator: "==", value: FR, label: Eurostat geography code}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time code}
+    rows:
+      - <<: *share_d1
+        row_number: 20
+        guard_cells: &share_fr_guards
+          - {column: A, expected_value: A, label: Eurostat frequency code}
+          - {column: C, expected_value: SHARE, label: Eurostat statistical information}
+          - {column: D, expected_value: EUR, label: Eurostat unit code}
+          - {column: E, expected_value: FR, label: Eurostat geography code}
+      - {<<: *share_d2, row_number: 21, guard_cells: *share_fr_guards}
+      - {<<: *share_d3, row_number: 22, guard_cells: *share_fr_guards}
+      - {<<: *share_d4, row_number: 23, guard_cells: *share_fr_guards}
+      - {<<: *share_d5, row_number: 24, guard_cells: *share_fr_guards}
+      - {<<: *share_d6, row_number: 25, guard_cells: *share_fr_guards}
+      - {<<: *share_d7, row_number: 26, guard_cells: *share_fr_guards}
+      - {<<: *share_d8, row_number: 27, guard_cells: *share_fr_guards}
+      - {<<: *share_d9, row_number: 28, guard_cells: *share_fr_guards}
+  - &cut_point_be_record_set
+    record_set_id: eurostat.ilc_di01.cy2024.income_cut_point.be
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    record_set_spec_id: eurostat.ilc_di01.income_cut_point.by_decile.v1
+    source_record_id_prefix: eurostat.ilc_di01.cy2024.income_cut_point.be
+    sheet_name: ilc_di01
+    period_type: calendar_year
+    period: 2024
+    period_coverage: *period_coverage
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: person
+    entity_role: eu_silc_equivalised_disposable_income_recipient
+    domain: income_distribution
+    groupby_dimension: quant_inc
+    shared_filters:
+      freq: A
+      statinfo: TC
+      unit: EUR
+      geo: BE
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency code}
+      - {variable: statinfo, operator: "==", value: TC, label: Top cut-off point}
+      - {variable: unit, operator: "==", value: EUR, label: Eurostat unit code}
+      - {variable: geo, operator: "==", value: BE, label: Eurostat geography code}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time code}
+    rows:
+      - &cut_d1
+        <<: *share_d1
+        label: First income decile cut-point
+        row_number: 29
+        guard_cells: &cut_be_guards
+          - {column: A, expected_value: A, label: Eurostat frequency code}
+          - {column: C, expected_value: TC, label: Eurostat statistical information}
+          - {column: D, expected_value: EUR, label: Eurostat unit code}
+          - {column: E, expected_value: BE, label: Eurostat geography code}
+      - &cut_d2
+        <<: *share_d2
+        label: Second income decile cut-point
+        row_number: 30
+        guard_cells: *cut_be_guards
+      - &cut_d3
+        <<: *share_d3
+        label: Third income decile cut-point
+        row_number: 31
+        guard_cells: *cut_be_guards
+      - &cut_d4
+        <<: *share_d4
+        label: Fourth income decile cut-point
+        row_number: 32
+        guard_cells: *cut_be_guards
+      - &cut_d5
+        <<: *share_d5
+        label: Fifth income decile cut-point
+        row_number: 33
+        guard_cells: *cut_be_guards
+      - &cut_d6
+        <<: *share_d6
+        label: Sixth income decile cut-point
+        row_number: 34
+        guard_cells: *cut_be_guards
+      - &cut_d7
+        <<: *share_d7
+        label: Seventh income decile cut-point
+        row_number: 35
+        guard_cells: *cut_be_guards
+      - &cut_d8
+        <<: *share_d8
+        label: Eighth income decile cut-point
+        row_number: 36
+        guard_cells: *cut_be_guards
+      - &cut_d9
+        <<: *share_d9
+        label: Ninth income decile cut-point
+        row_number: 37
+        guard_cells: *cut_be_guards
+    measures: &cut_point_measure
+      - measure_id: income_cut_point
+        label: Income decile top cut-off point
+        ordinal: 0
+        column: G
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: eurostat.ilc_di01.income_cut_point
+        source_concept: eurostat.ilc_di01.TC
+        concept_relation: source_label
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/ilc_di01/default/table?lang=en
+        concept_evidence_notes: >-
+          statinfo TC is "Top cut-off point". For D1-D9 with raw unit EUR,
+          Eurostat publishes the euro-denominated income decile cut-points.
+          EU-SILC universe: private households and their current members;
+          persons in collective households and institutions are generally
+          excluded, and France is covered excluding Mayotte, per the
+          Eurostat ilc_sieusilc reference metadata.
+        unit: eur
+        aggregation: quantile
+        expected_cell_type: number
+  - <<: *cut_point_be_record_set
+    record_set_id: eurostat.ilc_di01.cy2024.income_cut_point.de
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    source_record_id_prefix: eurostat.ilc_di01.cy2024.income_cut_point.de
+    geography_id: DE
+    geography_name: Germany
+    shared_filters:
+      freq: A
+      statinfo: TC
+      unit: EUR
+      geo: DE
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency code}
+      - {variable: statinfo, operator: "==", value: TC, label: Top cut-off point}
+      - {variable: unit, operator: "==", value: EUR, label: Eurostat unit code}
+      - {variable: geo, operator: "==", value: DE, label: Eurostat geography code}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time code}
+    rows:
+      - <<: *cut_d1
+        row_number: 38
+        guard_cells: &cut_de_guards
+          - {column: A, expected_value: A, label: Eurostat frequency code}
+          - {column: C, expected_value: TC, label: Eurostat statistical information}
+          - {column: D, expected_value: EUR, label: Eurostat unit code}
+          - {column: E, expected_value: DE, label: Eurostat geography code}
+      - {<<: *cut_d2, row_number: 39, guard_cells: *cut_de_guards}
+      - {<<: *cut_d3, row_number: 40, guard_cells: *cut_de_guards}
+      - {<<: *cut_d4, row_number: 41, guard_cells: *cut_de_guards}
+      - {<<: *cut_d5, row_number: 42, guard_cells: *cut_de_guards}
+      - {<<: *cut_d6, row_number: 43, guard_cells: *cut_de_guards}
+      - {<<: *cut_d7, row_number: 44, guard_cells: *cut_de_guards}
+      - {<<: *cut_d8, row_number: 45, guard_cells: *cut_de_guards}
+      - {<<: *cut_d9, row_number: 46, guard_cells: *cut_de_guards}
+  - <<: *cut_point_be_record_set
+    record_set_id: eurostat.ilc_di01.cy2024.income_cut_point.fr
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    source_record_id_prefix: eurostat.ilc_di01.cy2024.income_cut_point.fr
+    geography_id: FR
+    geography_name: France
+    shared_filters:
+      freq: A
+      statinfo: TC
+      unit: EUR
+      geo: FR
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency code}
+      - {variable: statinfo, operator: "==", value: TC, label: Top cut-off point}
+      - {variable: unit, operator: "==", value: EUR, label: Eurostat unit code}
+      - {variable: geo, operator: "==", value: FR, label: Eurostat geography code}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time code}
+    rows:
+      - <<: *cut_d1
+        row_number: 47
+        guard_cells: &cut_fr_guards
+          - {column: A, expected_value: A, label: Eurostat frequency code}
+          - {column: C, expected_value: TC, label: Eurostat statistical information}
+          - {column: D, expected_value: EUR, label: Eurostat unit code}
+          - {column: E, expected_value: FR, label: Eurostat geography code}
+      - {<<: *cut_d2, row_number: 48, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d3, row_number: 49, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d4, row_number: 50, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d5, row_number: 51, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d6, row_number: 52, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d7, row_number: 53, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d8, row_number: 54, guard_cells: *cut_fr_guards}
+      - {<<: *cut_d9, row_number: 55, guard_cells: *cut_fr_guards}
