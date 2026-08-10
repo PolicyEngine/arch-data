@@ -120,6 +120,46 @@ def test_publish_source_artifacts_uploads_manifest_entries(tmp_path):
     assert "ledger-raw/raw/irs_soi/soi-table-1-2/2023/" in log.read_text()
 
 
+def test_publish_source_artifacts_handles_label_year_entries(tmp_path):
+    output_dir = tmp_path / "data" / "ssa" / "ssi_monthly_statistics_2024_12"
+    source = tmp_path / "table01.csv"
+    source.write_bytes(b"csv artifact")
+    fetch_source_artifact(
+        str(source),
+        source_id="ssa",
+        package_id="ssa-ssi-monthly-statistics-2024-12",
+        year=2024,
+        output_dir=output_dir,
+    )
+    capture = output_dir / "table01.html"
+    capture_bytes = b"<html>capture</html>"
+    capture.write_bytes(capture_bytes)
+    manifest_path = output_dir / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    manifest["files"]["source_capture"] = {
+        "filename": capture.name,
+        "sha256": hashlib.sha256(capture_bytes).hexdigest(),
+        "size_bytes": len(capture_bytes),
+    }
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
+    wrangler.chmod(0o755)
+
+    report = publish_source_artifacts(output_dir, wrangler_command=str(wrangler))
+    manifest = yaml.safe_load(manifest_path.read_text())
+    storage = manifest["files"]["source_capture"]["storage"]["r2"]
+
+    assert report.valid
+    assert report.counts["uploaded_count"] == 2
+    assert report.counts["failed_count"] == 0
+    assert storage["key"] == (
+        "raw/ssa/ssa-ssi-monthly-statistics-2024-12/source_capture/"
+        f"{hashlib.sha256(capture_bytes).hexdigest()}/table01.html"
+    )
+
+
 def test_inventory_source_artifacts_catches_checksum_mismatch(tmp_path):
     source = tmp_path / "source.xls"
     source.write_bytes(b"original")

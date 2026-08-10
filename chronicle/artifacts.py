@@ -768,12 +768,16 @@ def build_r2_key(
     *,
     source_id: str,
     package_id: str,
-    year: int,
+    year: int | str,
     sha256: str,
     filename: str,
     prefix: str = DEFAULT_R2_PREFIX,
 ) -> str:
-    """Build the canonical immutable R2 key for a raw source artifact."""
+    """Build the canonical immutable R2 key for a raw source artifact.
+
+    ``year`` is usually a calendar year but may be a label such as
+    ``source_capture`` for non-year manifest file entries.
+    """
     return posixpath.join(
         _clean_key_part(prefix),
         _clean_key_part(source_id),
@@ -931,7 +935,6 @@ def _upload_r2_object(
         "--file",
         str(local_path),
         "--remote",
-        "--force",
     ]
     if content_type:
         command.extend(["--content-type", content_type])
@@ -993,7 +996,7 @@ def _publish_raw_manifest_entry(
         key=build_r2_key(
             source_id=source_id,
             package_id=package_id,
-            year=int(year),
+            year=year,
             sha256=sha256_actual or "",
             filename=filename,
             prefix=r2_prefix,
