@@ -774,13 +774,13 @@ def test_committed_catalog_is_current_and_valid() -> None:
     # period spelling can only be caught here.
     assert sorted(committed["stripped_segments"]) == [
         "2026-05", "2026-06", "2026-06-18", "2026-07", "2026_05",
-        "2026_06", "2026_06_18", "2026_q2", "after_june_2026",
+        "2026_06", "2026_06_18", "2026_07", "2026_q2", "after_june_2026",
         "after_mpc_june_2026", "april_2026", "feb_2026",
-        "february_to_april_2026", "fy2024", "fy2025", "june_2026",
-        "may_2026", "q1_2026", "week_2026-06-13", "week_2026-06-20",
-        "week_2026-06-27", "week_2026-07-04", "week_2026-07-11",
-        "week_2026-07-18", "week_2026-07-25", "week_2026_06_13",
-        "week_ending_2026_06_06",
+        "february_to_april_2026", "fy2024", "fy2025", "july_2026",
+        "june_2026", "may_2026", "q1_2026", "week_2026-06-13",
+        "week_2026-06-20", "week_2026-06-27", "week_2026-07-04",
+        "week_2026-07-11", "week_2026-07-18", "week_2026-07-25",
+        "week_2026-08-01", "week_2026_06_13", "week_ending_2026_06_06",
     ]
     assert committed["stripped_segments"]["after_mpc_june_2026"] == [
         "boe.bank_rate"
@@ -1175,8 +1175,17 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # amount, charge-off rate on UPB, post-charge-off recovery —
     # thesis#145); builder reported minted=3, superseded=0, suspects=0,
     # so all 206 prior bindings are unchanged.
+    # Updated 2026-08-09 alongside ten registry events: five docket
+    # placeholders enriched by their first recorded observations
+    # (retire+succeeds pairs, UUIDs preserved:
+    # bls.cps.u6_underemployment_rate,
+    # bls.productivity.nonfarm_unit_labor_costs_qoq_prelim, and the three
+    # fed.g19 consumer-credit annual rates). No fresh UUIDs, no
+    # supersedes; builder reported minted=5 (all succeeds), superseded=0,
+    # suspects=0. The other 204 bindings are byte-unchanged; row count
+    # stays 209.
     assert digest == (
-        "b0940b8e1b100b6ecbc99722b338252d23bb52e9f822e2a932f7ddafdafea21b"
+        "96cfd574d8749179f92bf469665b0facb7739aefc06d6f04b23d901b2c1cf3c3"
     )
 
 
