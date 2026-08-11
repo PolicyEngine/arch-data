@@ -507,13 +507,15 @@ Consumer profiles resolve this axis explicitly rather than by convention.
 Each profile (or individual target) declares an `assertion_policy`:
 `observed_only` (the default — projections are invisible and a
 projection-only family fails loudly with `only_projection_facts`),
-`prefer_observed` (family-level: a family with any observed fact resolves
-only from observations; projections are reachable only when the family has
-none, so one series never mixes bases across periods), or
+`prefer_observed` (per series — one geography/entity/dimension tuple: a
+series with any observed fact resolves only from observations, and a series
+with none may fall back to projections, so no single series ever mixes
+bases across periods and a projection-only series is never starved by a
+neighbouring series' observation), or
 `allow_source_projection` (both compete under the period policy; an
-observation and a projection colliding at the chosen period resolve to the
-observation with an `ambiguous_assertion_at_period` warning rather than
-double-counting). A target whose `chronicle_selector` names `assertion`
+observation and a projection colliding within one series at the chosen
+period resolve to the observation with an `ambiguous_assertion_at_period`
+warning naming the series rather than double-counting it). A target whose `chronicle_selector` names `assertion`
 explicitly bypasses the policy — the selector is already maximal intent —
 and declaring both on one target is rejected at profile load as a
 contradiction. Whenever a

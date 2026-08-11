@@ -52,13 +52,14 @@ def _fact(
     assertion="observation",
     provenance_class="administrative",
     survey_instrument=None,
+    geography_id="0100000US",
 ):
     return AggregateFact(
         value=value,
         period=PeriodDimension(type=period_type, value=period_value),
         geography=GeographyDimension(
             level="country",
-            id="0100000US",
+            id=geography_id,
             vintage="2020_census",
         ),
         entity=EntityDimension(name="tax_unit", role="filing_unit"),
@@ -981,6 +982,86 @@ def test_explicit_assertion_selector_reaches_the_projection_despite_a_tie():
     assert not [
         i for i in report.issues if i.code == "ambiguous_assertion_at_period"
     ]
+
+
+def test_assertion_tie_break_is_scoped_to_the_series():
+    # Geography A carries a genuine tie (observation + projection at the
+    # chosen period); geography B has only a projection. The tie-break must
+    # drop A's projection, keep A's observation — and leave B's projection
+    # alone: B was never in a tie with anything.
+    rows = consumer_fact_rows(
+        [
+            _fact(value=130, period_value=2023),
+            _fact(value=120, period_value=2023, assertion="source_projection"),
+            _fact(
+                value=99,
+                period_value=2023,
+                assertion="source_projection",
+                geography_id="0100000GB",
+            ),
+        ]
+    )
+    report = resolve_profile_targets(
+        _policy_profile(target_policy="allow_source_projection"),
+        rows,
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    resolved = {row.geography["id"]: row for row in report.resolved}
+    assert set(resolved) == {"0100000US", "0100000GB"}
+    assert resolved["0100000US"].assertion == "observation"
+    assert resolved["0100000US"].value == 130
+    assert resolved["0100000GB"].assertion == "source_projection"
+    assert resolved["0100000GB"].value == 99
+    (ambiguous,) = [
+        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
+    ]
+    assert "0100000US" in ambiguous.message
+    assert "0100000GB" not in ambiguous.message
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_prefer_observed_lets_a_projection_only_series_resolve():
+    # The Northern-Ireland shape: one geography observed, another carrying
+    # only a projection at the same period. Per-series preference resolves
+    # both instead of starving the projection-only series.
+    rows = consumer_fact_rows(
+        [
+            _fact(value=130, period_value=2023),
+            _fact(
+                value=99,
+                period_value=2023,
+                assertion="source_projection",
+                geography_id="0100000GB",
+            ),
+        ]
+    )
+    report = resolve_profile_targets(
+        _policy_profile(defaults_policy="prefer_observed"),
+        rows,
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    resolved = {row.geography["id"]: row for row in report.resolved}
+    assert resolved["0100000US"].assertion == "observation"
+    assert resolved["0100000GB"].assertion == "source_projection"
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_prefer_observed_still_never_mixes_bases_within_one_series():
+    # Within a single series the family rule survives the per-series change:
+    # an observed 2022 fact still beats a projection sitting at the
+    # requested 2023 period, ending in a period-contract violation rather
+    # than a silent base mix.
+    report = resolve_profile_targets(
+        _policy_profile(defaults_policy="prefer_observed"),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+        strict=False,
+    )
+    assert not report.resolved
+    (violation,) = report.violations
+    assert violation.fact_period == {"type": "tax_year", "value": 2022}
 
 
 def test_target_assertion_policy_overrides_the_profile_default():

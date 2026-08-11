@@ -327,7 +327,17 @@ def resolve_profile_targets(
                 continue
             candidates = observed
         elif assertion_policy == "prefer_observed" and observed:
-            candidates = observed
+            # Per series, not per family: a series with any observed fact
+            # resolves only from observations, while a projection-only
+            # series keeps its projections instead of being starved by a
+            # neighbouring series' observation.
+            observed_series = {_series_key(row) for row in observed}
+            candidates = [
+                row
+                for row in candidates
+                if row["assertion"] == "observation"
+                or _series_key(row) not in observed_series
+            ]
 
         chosen_period, period_issue = _choose_period(
             profile.profile_id,
@@ -377,21 +387,36 @@ def resolve_profile_targets(
         rows_at_period = [
             row for row in candidates if dict(row["period"]) == chosen_period
         ]
-        if len({row["assertion"] for row in rows_at_period}) > 1:
-            # An observation and a publisher projection collide at the chosen
-            # period; emitting both would double-count the series. The
-            # realized value wins the tie, loudly.
-            rows_at_period = [
-                row
-                for row in rows_at_period
-                if row["assertion"] == "observation"
-            ]
+        series_at_period: dict[str, list[Mapping[str, Any]]] = {}
+        for row in rows_at_period:
+            series_at_period.setdefault(_series_key(row), []).append(row)
+        drop_keys: set[str] = set()
+        for series_rows in series_at_period.values():
+            if len({row["assertion"] for row in series_rows}) < 2:
+                continue
+            # An observation and a publisher projection collide within one
+            # series at the chosen period; emitting both would double-count
+            # it. The realized value wins the tie, loudly. Series that were
+            # never in a tie — a geography whose only fact is a projection —
+            # are untouched.
+            drop_keys.update(
+                row["aggregate_fact_key"]
+                for row in series_rows
+                if row["assertion"] != "observation"
+            )
+            sample = series_rows[0]
+            geography = sample.get("geography", {})
+            dimensions = sample.get("dimensions") or {}
+            where = f"geography {geography.get('level')}:{geography.get('id')}"
+            if dimensions:
+                where += f", dimensions {json.dumps(dimensions, sort_keys=True)}"
             issues.append(
                 ResolutionIssue(
                     code="ambiguous_assertion_at_period",
                     message=(
                         f"Target {target.target_id!r} matched both an "
-                        "observation and a source_projection at "
+                        f"observation and a source_projection for one series "
+                        f"({where}) at "
                         f"{chosen_period['type']}:{chosen_period['value']}; "
                         "resolved the observation. Select on assertion or "
                         "tighten dimensions/record_set_id to address the "
@@ -402,6 +427,12 @@ def resolve_profile_targets(
                     severity="warning",
                 )
             )
+        if drop_keys:
+            rows_at_period = [
+                row
+                for row in rows_at_period
+                if row["aggregate_fact_key"] not in drop_keys
+            ]
 
         # The flag is set inside the row loop deliberately: one
         # resolved_from_projection warning per target, however many of its
@@ -618,6 +649,32 @@ def _latest(values) -> Any:
     if all(isinstance(value, int) for value in values):
         return max(values)
     return max(values, key=str)
+
+
+def _series_key(row: Mapping[str, Any]) -> str:
+    """Identity of a co-resolving series, blind to source, period, assertion.
+
+    Groups the rows a target resolves together so the per-series rules (the
+    prefer_observed filter, the assertion tie-break) never let one series'
+    observation starve a different series that only has a projection.
+    Source identity is deliberately excluded so one publisher's estimate and
+    another table's projection of the same series still collide. The
+    canonical concept is not carried on the row, so two different concepts
+    sharing every axis below within one selector match are a selector-hygiene
+    problem this key does not adjudicate.
+    """
+    observed_measure = row.get("observed_measure", {})
+    return json.dumps(
+        {
+            "geography": row.get("geography"),
+            "entity": row.get("entity"),
+            "aggregation": row.get("aggregation"),
+            "dimension_set_key": row.get("dimension_set_key"),
+            "universe_constraint_set_key": row.get("universe_constraint_set_key"),
+            "unit": observed_measure.get("unit"),
+        },
+        sort_keys=True,
+    )
 
 
 def _normalize_assertion_rows(

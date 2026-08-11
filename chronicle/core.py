@@ -81,11 +81,13 @@ ALLOWED_ASSERTIONS = {"observation", "source_projection"}
 DEFAULT_ASSERTION = "observation"
 # How profile resolution treats the assertion axis. observed_only is the safe
 # default: projections are invisible and a projection-only family fails loudly.
-# prefer_observed applies family-level: a family with any observed fact
-# resolves only from observations; projections are reachable only when the
-# family has none, so one series never mixes bases across periods.
-# allow_source_projection treats both equally (for forecast families such as
-# the OBR EFO lines), with observation winning an exact-period tie.
+# prefer_observed applies per series (one geography/entity/dimension tuple):
+# a series with any observed fact resolves only from observations, and a
+# series with none may fall back to projections — no single series ever
+# mixes bases across periods, and a projection-only series is never starved
+# by a neighbouring series' observation. allow_source_projection treats both
+# equally (for forecast families such as the OBR EFO lines), with the
+# observation winning an exact-period tie within a series.
 ASSERTION_POLICIES = {
     "observed_only",
     "prefer_observed",
