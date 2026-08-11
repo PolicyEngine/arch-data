@@ -1,0 +1,2219 @@
+# DfT National Travel Survey 2024, table NTS0205a: percentage of households
+# with no / one / two-or-more cars or vans, from the published
+# nts-2024-excel-tables.zip (member nts0205.xlsx). Publisher precision is
+# ported (2024: 21.784588632006 / 44.2490898162473 / 33.9663215517466);
+# policyengine-uk-data hand-transcribes the rounded 22/44/34 and multiplies
+# by a hand-transcribed 29.6m UK household total - the products are excluded
+# per the facts-only ADR, and applying England-resident NTS shares UK-wide is
+# a populace-side declaration. Geography follows the workbook's note 3:
+# rows prior to 1989 (1951/1961/1971/1981) are Great Britain; 1989 onwards
+# are England - so the four decennial record sets carry K03000001 and, per
+# note 2, name the pre-NTS household surveys as their instrument. Single-year
+# rows only (1951-1981 decennial, 2002-2024 annual); the five combined-period
+# rows (1985 to 1986 through 1998 to 2000) are excluded because a multi-year
+# span has no calendar_year period representation - a named exclusion, not a
+# data gap. The E-column guard pins each selected row to the table's
+# all-households 100% check.
+schema_version: ledger.source_package.v1
+package_id: dft-nts-vehicle-ownership-2024
+label: 'DfT National Travel Survey 2024, NTS0205a: household car availability shares, England'
+artifact:
+  source_name: dft
+  source_table: National Travel Survey 2024, table NTS0205 household car availability
+  resource_package: db
+  resource_directory: data/dft/nts_vehicle_ownership_2024
+  manifest: manifest.yaml
+  vintage: nts_2024
+  extracted_at: '2026-08-07'
+  extraction_method: ZIP archive XLSX member whole-workbook used-range cell parse
+  parser: zip_xlsx_used_range
+  archive_member: nts0205.xlsx
+  artifact_year: 2024
+record_sets:
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy1951
+  provenance_class: survey_aggregate
+  survey_instrument: Household travel surveys preceding the National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1951.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1951
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 1951
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy1951
+    label: '1951'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: 1951
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 7
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 1951
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1951, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 1951
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1951, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 1951
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1951, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy1961
+  provenance_class: survey_aggregate
+  survey_instrument: Household travel surveys preceding the National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1961.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1961
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 1961
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy1961
+    label: '1961'
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: 1961
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 8
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 1961
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1961, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 1961
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1961, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 1961
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1961, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy1971
+  provenance_class: survey_aggregate
+  survey_instrument: Household travel surveys preceding the National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1971.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1971
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 1971
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy1971
+    label: '1971'
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: 1971
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 9
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 1971
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1971, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 1971
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1971, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 1971
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1971, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy1981
+  provenance_class: survey_aggregate
+  survey_instrument: Household travel surveys preceding the National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy1981.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy1981
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 1981
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy1981
+    label: '1981'
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: 1981
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 10
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 1981
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1981, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 1981
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1981, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 1981
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 1981, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2002
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2002.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2002
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2002
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2002
+    label: '2002'
+    ordinal: 0
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: 2002
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 16
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2002
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2002, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2002
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2002, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2002
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2002, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2003
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2003.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2003
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2003
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2003
+    label: '2003'
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: 2003
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 17
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2003
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2003, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2003
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2003, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2003
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2003, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2004
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2004.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2004
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2004
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2004
+    label: '2004'
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: 2004
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 18
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2004
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2004, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2004
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2004, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2004
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2004, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2005
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2005.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2005
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2005
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2005
+    label: '2005'
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: 2005
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 19
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2005
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2005, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2005
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2005, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2005
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2005, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2006
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2006.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2006
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2006
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2006
+    label: '2006'
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 2006
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 20
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2006
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2006, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2006
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2006, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2006
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2006, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2007
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2007.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2007
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2007
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2007
+    label: '2007'
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: 2007
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 21
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2007
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2007, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2007
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2007, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2007
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2007, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2008
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2008.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2008
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2008
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2008
+    label: '2008'
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: 2008
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 22
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2008
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2008, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2008
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2008, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2008
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2008, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2009
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2009.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2009
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2009
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2009
+    label: '2009'
+    ordinal: 0
+    row_number: 23
+    expected_row_header_column: A
+    expected_row_header: 2009
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 23
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2009
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2009, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2009
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2009, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2009
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2009, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2010
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2010.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2010
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2010
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2010
+    label: '2010'
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: 2010
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 24
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2010
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2010, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2010
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2010, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2010
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2010, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2011
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2011.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2011
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2011
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2011
+    label: '2011'
+    ordinal: 0
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: 2011
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 25
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2011
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2011, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2011
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2011, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2011
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2011, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2012
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2012.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2012
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2012
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2012
+    label: '2012'
+    ordinal: 0
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: 2012
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 26
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2012
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2012, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2012
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2012, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2012
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2012, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2013
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2013.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2013
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2013
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2013
+    label: '2013'
+    ordinal: 0
+    row_number: 27
+    expected_row_header_column: A
+    expected_row_header: 2013
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 27
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2013
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2013, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2013
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2013, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2013
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2013, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2014
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2014.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2014
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2014
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2014
+    label: '2014'
+    ordinal: 0
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: 2014
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 28
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2014
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2014, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2014
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2014, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2014
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2014, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2015
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2015.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2015
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2015
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2015
+    label: '2015'
+    ordinal: 0
+    row_number: 29
+    expected_row_header_column: A
+    expected_row_header: 2015
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 29
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2015
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2015, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2015
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2015, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2015
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2015, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2016
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2016.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2016
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2016
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2016
+    label: '2016'
+    ordinal: 0
+    row_number: 30
+    expected_row_header_column: A
+    expected_row_header: 2016
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 30
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2016
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2016, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2016
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2016, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2016
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2016, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2017
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2017.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2017
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2017
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2017
+    label: '2017'
+    ordinal: 0
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: 2017
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 31
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2017
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2017, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2017
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2017, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2017
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2017, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2018
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2018.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2018
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2018
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2018
+    label: '2018'
+    ordinal: 0
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: 2018
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 32
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2018
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2018, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2018
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2018, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2018
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2018, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2019
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2019.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2019
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2019
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2019
+    label: '2019'
+    ordinal: 0
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: 2019
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 33
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2019
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2019, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2019
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2019, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2019
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2019, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2020
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2020.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2020
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2020
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2020
+    label: '2020'
+    ordinal: 0
+    row_number: 34
+    expected_row_header_column: A
+    expected_row_header: 2020
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 34
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2020
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2020, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2020
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2020, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2020
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2020, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2021
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2021.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2021
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2021
+    label: '2021'
+    ordinal: 0
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: 2021
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 35
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2021
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2021, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2021
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2021, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2021
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2021, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2022
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2022.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2022
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2022
+    label: '2022'
+    ordinal: 0
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: 2022
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 36
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2022
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2022, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2022
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2022, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2022
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2022, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2023
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2023.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2023
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2023
+    label: '2023'
+    ordinal: 0
+    row_number: 37
+    expected_row_header_column: A
+    expected_row_header: 2023
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 37
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2023
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2023, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2023
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2023, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2023
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2023, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: dft.nts2024.nts0205a.car_availability.cy2024
+  provenance_class: survey_aggregate
+  survey_instrument: National Travel Survey
+  record_set_spec_id: dft.nts2024.nts0205a.car_availability.cy2024.v1
+  source_record_id_prefix: dft.nts2024.nts0205a.car_availability.cy2024
+  sheet_name: NTS0205a_car_availability
+  period_type: calendar_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_vehicle_availability
+  groupby_dimension: dft.car_availability_band
+  rows:
+  - value_id: cy2024
+    label: '2024'
+    ordinal: 0
+    row_number: 38
+    expected_row_header_column: A
+    expected_row_header: 2024
+    table_record_kind: total
+    guard_cells:
+    - column: E
+      row: 38
+      expected_value: 100
+      label: all households row sums to 100 percent
+  measures:
+  - measure_id: no_car
+    label: Households, No car or van, 2024
+    ordinal: 0
+    column: B
+    source_column_id: no_car
+    expected_column_header_row: 6
+    expected_column_header: No car or van (%)
+    concept: dft.households_no_car_share
+    source_concept: dft.households_no_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2024, column: No car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: one_car
+    label: Households, One car or van, 2024
+    ordinal: 1
+    column: C
+    source_column_id: one_car
+    expected_column_header_row: 6
+    expected_column_header: One car or van (%)
+    concept: dft.households_one_car_share
+    source_concept: dft.households_one_car_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2024, column: One car or van (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number
+  - measure_id: two_plus_cars
+    label: Households, Two or more cars or vans, 2024
+    ordinal: 2
+    column: D
+    source_column_id: two_plus_cars
+    expected_column_header_row: 6
+    expected_column_header: Two or more cars or vans (%)
+    concept: dft.households_two_plus_cars_share
+    source_concept: dft.households_two_plus_cars_share
+    concept_relation: source_label
+    concept_authority: dft
+    concept_evidence_url: https://www.gov.uk/government/statistics/national-travel-survey-2024
+    concept_evidence_notes: 'National Travel Survey 2024, table NTS0205a (household car availability,
+      England), year row 2024, column: Two or more cars or vans (%).'
+    unit: percent
+    aggregation: share
+    expected_cell_type: number

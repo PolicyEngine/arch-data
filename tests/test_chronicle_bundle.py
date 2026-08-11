@@ -25,18 +25,18 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert summary["valid"]
     assert summary["counts"] == {
         "aggregate_duplicate_key_count": 0,
-        "entity_count": 8,
+        "entity_count": 9,
         "error_count": 0,
-        "fact_count": 43807,
-        "geography_count": 1066,
-        "period_count": 64,
+        "fact_count": 44359,
+        "geography_count": 1068,
+        "period_count": 98,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
-        "source_count": 31,
-        "source_package_count": 73,
+        "source_count": 35,
+        "source_package_count": 88,
         "warning_count": 1,
     }
-    assert len(rows) == 43807
+    assert len(rows) == 44359
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -54,7 +54,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 73
+    assert source_packages["source_package_count"] == 88
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -68,7 +68,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 43807
+    assert coverage["fact_count"] == 44359
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -80,30 +80,34 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "cms_medicaid": 515,
         "cms_medicare": 1,
         "cms_nhe": 3,
-        "dwp": 107,
+        "dft": 81,
+        "dwp": 289,
         "federal_reserve": 1,
         "hhs_acf_liheap": 2,
         "hhs_acf_tanf": 110,
+        "hmrc": 717,
         "ici": 12,
-        "hmrc": 714,
         "irs_soi": 33777,
+        "isc": 2,
         "jrc_euromod_be": 18,
         "kff": 52,
         "nbb_national_accounts": 1,
         "obr": 196,
-        "ons": 5010,
         "onem_rva_unemployment": 1,
+        "ons": 5112,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
+        "scotgov": 62,
         "sfpd_pensions": 4,
         "spf_finances_pit": 1,
         "ssa": 426,
         "statbel_fiscal_income": 565,
         "statbel_population_structure": 18,
         "usda_snap": 216,
+        "voa": 120,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 68
+    assert len(table_counts) == 83
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert (
         table_counts[
@@ -223,30 +227,64 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         == 18
     )
     assert coverage["counts"]["by_period"] == {
-        "calendar_year:2015": 2,
-        "calendar_year:2018": 12,
-        "calendar_year:2019": 11,
-        "calendar_year:2020": 11,
-        "calendar_year:2021": 13,
-        "calendar_year:2022": 19,
-        "calendar_year:2023": 2222,
-        "calendar_year:2024": 2890,
-        "calendar_year:2025": 1488,
+        "calendar_year:1951": 3,
+        "calendar_year:1961": 3,
+        "calendar_year:1971": 3,
+        "calendar_year:1981": 3,
+        "calendar_year:1995": 3,
+        "calendar_year:1996": 3,
+        "calendar_year:1997": 3,
+        "calendar_year:1998": 3,
+        "calendar_year:1999": 3,
+        "calendar_year:2000": 3,
+        "calendar_year:2001": 3,
+        "calendar_year:2002": 6,
+        "calendar_year:2003": 6,
+        "calendar_year:2004": 6,
+        "calendar_year:2005": 6,
+        "calendar_year:2006": 6,
+        "calendar_year:2007": 6,
+        "calendar_year:2008": 6,
+        "calendar_year:2009": 6,
+        "calendar_year:2010": 6,
+        "calendar_year:2011": 6,
+        "calendar_year:2012": 6,
+        "calendar_year:2013": 6,
+        "calendar_year:2014": 6,
+        "calendar_year:2015": 8,
+        "calendar_year:2016": 6,
+        "calendar_year:2017": 6,
+        "calendar_year:2018": 18,
+        "calendar_year:2019": 17,
+        "calendar_year:2020": 17,
+        "calendar_year:2021": 19,
+        "calendar_year:2022": 25,
+        "calendar_year:2023": 2228,
+        "calendar_year:2024": 2896,
+        "calendar_year:2025": 1491,
         "calendar_year:2026": 235,
         "calendar_year:2027": 214,
         "calendar_year:2028": 214,
         "calendar_year:2029": 214,
         "calendar_year:2031": 2,
         "fiscal_year:2023": 48,
-        "fiscal_year:2024": 548,
-        "fiscal_year:2025": 28,
-        "fiscal_year:2026": 28,
+        "fiscal_year:2024": 566,
+        "fiscal_year:2025": 45,
+        "fiscal_year:2026": 46,
         "fiscal_year:2027": 28,
         "fiscal_year:2028": 28,
         "fiscal_year:2029": 28,
         "fiscal_year:2030": 28,
-        "month:2024-12": 264,
+        "month:2023-01": 1,
+        "month:2023-12": 6,
+        "month:2024-01": 1,
+        "month:2024-12": 270,
+        "month:2025-01": 2,
+        "month:2025-03": 120,
         "month:2025-04": 92,
+        "month:2025-05": 176,
+        "month:2025-08": 4,
+        "month:2025-09": 9,
         "month:2025-11": 15,
         "month:2025-12": 255,
         "tax_year:1987": 9,
@@ -298,17 +336,18 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 3712
-    assert coverage["counts"]["by_geography"]["country:K03000001"] == 107
-    assert len(coverage["counts"]["by_geography"]) == 1066
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 3819
+    assert coverage["counts"]["by_geography"]["country:K03000001"] == 276
+    assert len(coverage["counts"]["by_geography"]) == 1068
     assert coverage["counts"]["by_entity"] == {
+        "dwelling": 129,
         "family": 107,
         "firm": 1439,
         "government": 125,
-        "household": 209,
-        "institutional_sector": 13,
+        "household": 466,
+        "institutional_sector": 103,
         "pension_plan": 2,
-        "person": 8129,
+        "person": 8205,
         "tax_unit": 33783,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]

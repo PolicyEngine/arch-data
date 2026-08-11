@@ -1,0 +1,18 @@
+source_id: ons
+package_id: ons-national-balance-sheet-land-2025
+dataset: ons_ons-national-balance-sheet-land-2025
+source_page: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+table: The UK national balance sheet estimates, 2025 edition (reference tables)
+files:
+  2024:
+    filename: nbsreferencetables2025.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates/current/nbsreferencetables2025.xlsx
+    sha256: 8bec0fbbaf474c76daf721100f1cbda6bda57957ff370f85d36fca4e310d3a79
+    size_bytes: 532615
+    fetched_at: '2026-08-07T12:51:56+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-national-balance-sheet-land-2025/2024/8bec0fbbaf474c76daf721100f1cbda6bda57957ff370f85d36fca4e310d3a79/nbsreferencetables2025.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-national-balance-sheet-land-2025/2024/8bec0fbbaf474c76daf721100f1cbda6bda57957ff370f85d36fca4e310d3a79/nbsreferencetables2025.xlsx

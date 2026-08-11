@@ -1,0 +1,18 @@
+source_id: isc
+package_id: isc-annual-census-2023
+dataset: isc_isc-annual-census-2023
+source_page: https://www.isc.co.uk/research/annual-census/isc-annual-census-2023/
+table: ISC annual Census 2023
+files:
+  2023:
+    filename: isc_census_2023_final.pdf
+    source_url: https://www.isc.co.uk/media/9316/isc_census_2023_final.pdf
+    sha256: 67ae15ec91c626522b964fabe7c1624de9b83fcae356ebf2a240bf8c9adf35d8
+    size_bytes: 6061790
+    fetched_at: '2026-08-07T12:47:45+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/isc/isc-annual-census-2023/2023/67ae15ec91c626522b964fabe7c1624de9b83fcae356ebf2a240bf8c9adf35d8/isc_census_2023_final.pdf
+        uri: r2://ledger-raw/raw/isc/isc-annual-census-2023/2023/67ae15ec91c626522b964fabe7c1624de9b83fcae356ebf2a240bf8c9adf35d8/isc_census_2023_final.pdf

@@ -1,0 +1,19 @@
+source_id: dwp
+package_id: dwp-pip-daily-living-foi-2025
+dataset: dwp_dwp-pip-daily-living-foi-2025
+source_page: https://www.whatdotheyknow.com/request/personal_independence_payment_pi_7
+table: 'DWP FOI2025/24990: PIP daily living component claimants by award rate, January
+  2025'
+files:
+  2025:
+    filename: Response_FOI2025_24990.pdf
+    source_url: https://www.whatdotheyknow.com/request/personal_independence_payment_pi_7/response/2989270/attach/3/Response%20FOI2025%2024990.pdf
+    sha256: d9c06412797711a1b09e730aa403682d2a9ef88386f6a8cf5e80412bc3a58aa8
+    size_bytes: 67645
+    fetched_at: '2026-08-07T11:23:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/dwp/dwp-pip-daily-living-foi-2025/2025/d9c06412797711a1b09e730aa403682d2a9ef88386f6a8cf5e80412bc3a58aa8/Response_FOI2025_24990.pdf
+        uri: r2://ledger-raw/raw/dwp/dwp-pip-daily-living-foi-2025/2025/d9c06412797711a1b09e730aa403682d2a9ef88386f6a8cf5e80412bc3a58aa8/Response_FOI2025_24990.pdf

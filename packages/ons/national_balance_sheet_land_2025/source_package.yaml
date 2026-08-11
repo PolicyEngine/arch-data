@@ -1,0 +1,3810 @@
+# ONS national balance sheet estimates, 2025 edition (released 2025-12-18):
+# Land (AN.211) at current prices, GBP million (value_scale 1e6), end-of-year
+# positions 1995-2024, for the whole economy (Table 2, series E44R), the
+# households sector (Table 11, E44N) and non-financial corporations (Table 3,
+# E43B). Rows 1987-1994 are blank in the workbook for these series - a named
+# exclusion, not a data gap. Column guards pin the published CDIDs.
+# Fidelity vs policyengine-uk-data (_land.py): its hand-transcribed totals
+# match this edition exactly for 2021-2023 (7,106,785 / 7,138,696 /
+# 6,756,315); its 2024 total (7,100,000) was an approximation of the
+# published 7,117,771; and its 2020 household/corporate split (4,309,138 /
+# 1,757,818) matches no series in this edition - an earlier, since-revised
+# vintage. The fixed 2020 share split, the 2025/26 flat-fills, and the
+# regional split over an unattributed prices-x-dwellings CSV are all
+# uk-data-computed and excluded per the facts-only ADR; populace re-derives
+# them over these raw sector series.
+schema_version: ledger.source_package.v1
+package_id: ons-national-balance-sheet-land-2025
+label: 'ONS national balance sheet 2025: land (AN.211) by institutional sector, 1995-2024'
+artifact:
+  source_name: ons
+  source_table: The UK national balance sheet estimates, 2025 edition (reference tables)
+  resource_package: db
+  resource_directory: data/ons/national_balance_sheet_land_2025
+  manifest: manifest.yaml
+  vintage: nbs_2025
+  extracted_at: '2026-08-07'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2024
+record_sets:
+- record_set_id: ons.nbs2025.land.total_economy.cy1995
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy1995.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy1995
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 1995
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1995
+    label: '1995'
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: 1995
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 1995
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy1996
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy1996.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy1996
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 1996
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1996
+    label: '1996'
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: 1996
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 1996
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy1997
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy1997.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy1997
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 1997
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1997
+    label: '1997'
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: 1997
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 1997
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy1998
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy1998.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy1998
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 1998
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1998
+    label: '1998'
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 1998
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 1998
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy1999
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy1999.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy1999
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 1999
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1999
+    label: '1999'
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: 1999
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 1999
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2000
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2000.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2000
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2000
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2000
+    label: '2000'
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: 2000
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2000
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2001
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2001.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2001
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2001
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2001
+    label: '2001'
+    ordinal: 0
+    row_number: 23
+    expected_row_header_column: A
+    expected_row_header: 2001
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2001
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2002
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2002.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2002
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2002
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2002
+    label: '2002'
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: 2002
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2002
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2003
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2003.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2003
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2003
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2003
+    label: '2003'
+    ordinal: 0
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: 2003
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2003
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2004
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2004.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2004
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2004
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2004
+    label: '2004'
+    ordinal: 0
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: 2004
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2004
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2005
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2005.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2005
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2005
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2005
+    label: '2005'
+    ordinal: 0
+    row_number: 27
+    expected_row_header_column: A
+    expected_row_header: 2005
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2005
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2006
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2006.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2006
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2006
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2006
+    label: '2006'
+    ordinal: 0
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: 2006
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2006
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2007
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2007.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2007
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2007
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2007
+    label: '2007'
+    ordinal: 0
+    row_number: 29
+    expected_row_header_column: A
+    expected_row_header: 2007
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2007
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2008
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2008.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2008
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2008
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2008
+    label: '2008'
+    ordinal: 0
+    row_number: 30
+    expected_row_header_column: A
+    expected_row_header: 2008
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2008
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2009
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2009.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2009
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2009
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2009
+    label: '2009'
+    ordinal: 0
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: 2009
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2009
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2010
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2010.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2010
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2010
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2010
+    label: '2010'
+    ordinal: 0
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: 2010
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2010
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2011
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2011.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2011
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2011
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2011
+    label: '2011'
+    ordinal: 0
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: 2011
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2011
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2012
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2012.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2012
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2012
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2012
+    label: '2012'
+    ordinal: 0
+    row_number: 34
+    expected_row_header_column: A
+    expected_row_header: 2012
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2012
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2013
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2013.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2013
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2013
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2013
+    label: '2013'
+    ordinal: 0
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: 2013
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2013
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2014
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2014.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2014
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2014
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2014
+    label: '2014'
+    ordinal: 0
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: 2014
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2014
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2015
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2015.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2015
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2015
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2015
+    label: '2015'
+    ordinal: 0
+    row_number: 37
+    expected_row_header_column: A
+    expected_row_header: 2015
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2015
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2016
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2016.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2016
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2016
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2016
+    label: '2016'
+    ordinal: 0
+    row_number: 38
+    expected_row_header_column: A
+    expected_row_header: 2016
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2016
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2017
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2017.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2017
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2017
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2017
+    label: '2017'
+    ordinal: 0
+    row_number: 39
+    expected_row_header_column: A
+    expected_row_header: 2017
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2017
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2018
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2018.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2018
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2018
+    label: '2018'
+    ordinal: 0
+    row_number: 40
+    expected_row_header_column: A
+    expected_row_header: 2018
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2018
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2019
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2019.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2019
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2019
+    label: '2019'
+    ordinal: 0
+    row_number: 41
+    expected_row_header_column: A
+    expected_row_header: 2019
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2019
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2020
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2020.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2020
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2020
+    label: '2020'
+    ordinal: 0
+    row_number: 42
+    expected_row_header_column: A
+    expected_row_header: 2020
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2020
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2021
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2021.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2021
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2021
+    label: '2021'
+    ordinal: 0
+    row_number: 43
+    expected_row_header_column: A
+    expected_row_header: 2021
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2021
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2022
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2022.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2022
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2022
+    label: '2022'
+    ordinal: 0
+    row_number: 44
+    expected_row_header_column: A
+    expected_row_header: 2022
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2022
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2023
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2023.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2023
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2023
+    label: '2023'
+    ordinal: 0
+    row_number: 45
+    expected_row_header_column: A
+    expected_row_header: 2023
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2023
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.total_economy.cy2024
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.total_economy.cy2024.v1
+  source_record_id_prefix: ons.nbs2025.land.total_economy.cy2024
+  sheet_name: Table 2
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: total_economy
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2024
+    label: '2024'
+    ordinal: 0
+    row_number: 46
+    expected_row_header_column: A
+    expected_row_header: 2024
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: United Kingdom total land, end of 2024
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44R
+    concept: ons.nbs_land_value_total
+    source_concept: ons.e44r
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 2,
+      Land (AN.211) series E44R, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy1995
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy1995.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy1995
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 1995
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1995
+    label: '1995'
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: 1995
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 1995
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy1996
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy1996.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy1996
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 1996
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1996
+    label: '1996'
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: 1996
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 1996
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy1997
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy1997.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy1997
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 1997
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1997
+    label: '1997'
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: 1997
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 1997
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy1998
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy1998.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy1998
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 1998
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1998
+    label: '1998'
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 1998
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 1998
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy1999
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy1999.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy1999
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 1999
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1999
+    label: '1999'
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: 1999
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 1999
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2000
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2000.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2000
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2000
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2000
+    label: '2000'
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: 2000
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2000
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2001
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2001.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2001
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2001
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2001
+    label: '2001'
+    ordinal: 0
+    row_number: 23
+    expected_row_header_column: A
+    expected_row_header: 2001
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2001
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2002
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2002.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2002
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2002
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2002
+    label: '2002'
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: 2002
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2002
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2003
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2003.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2003
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2003
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2003
+    label: '2003'
+    ordinal: 0
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: 2003
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2003
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2004
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2004.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2004
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2004
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2004
+    label: '2004'
+    ordinal: 0
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: 2004
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2004
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2005
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2005.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2005
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2005
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2005
+    label: '2005'
+    ordinal: 0
+    row_number: 27
+    expected_row_header_column: A
+    expected_row_header: 2005
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2005
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2006
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2006.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2006
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2006
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2006
+    label: '2006'
+    ordinal: 0
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: 2006
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2006
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2007
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2007.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2007
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2007
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2007
+    label: '2007'
+    ordinal: 0
+    row_number: 29
+    expected_row_header_column: A
+    expected_row_header: 2007
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2007
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2008
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2008.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2008
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2008
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2008
+    label: '2008'
+    ordinal: 0
+    row_number: 30
+    expected_row_header_column: A
+    expected_row_header: 2008
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2008
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2009
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2009.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2009
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2009
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2009
+    label: '2009'
+    ordinal: 0
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: 2009
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2009
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2010
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2010.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2010
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2010
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2010
+    label: '2010'
+    ordinal: 0
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: 2010
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2010
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2011
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2011.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2011
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2011
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2011
+    label: '2011'
+    ordinal: 0
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: 2011
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2011
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2012
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2012.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2012
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2012
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2012
+    label: '2012'
+    ordinal: 0
+    row_number: 34
+    expected_row_header_column: A
+    expected_row_header: 2012
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2012
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2013
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2013.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2013
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2013
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2013
+    label: '2013'
+    ordinal: 0
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: 2013
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2013
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2014
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2014.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2014
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2014
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2014
+    label: '2014'
+    ordinal: 0
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: 2014
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2014
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2015
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2015.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2015
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2015
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2015
+    label: '2015'
+    ordinal: 0
+    row_number: 37
+    expected_row_header_column: A
+    expected_row_header: 2015
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2015
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2016
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2016.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2016
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2016
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2016
+    label: '2016'
+    ordinal: 0
+    row_number: 38
+    expected_row_header_column: A
+    expected_row_header: 2016
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2016
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2017
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2017.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2017
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2017
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2017
+    label: '2017'
+    ordinal: 0
+    row_number: 39
+    expected_row_header_column: A
+    expected_row_header: 2017
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2017
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2018
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2018.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2018
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2018
+    label: '2018'
+    ordinal: 0
+    row_number: 40
+    expected_row_header_column: A
+    expected_row_header: 2018
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2018
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2019
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2019.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2019
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2019
+    label: '2019'
+    ordinal: 0
+    row_number: 41
+    expected_row_header_column: A
+    expected_row_header: 2019
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2019
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2020
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2020.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2020
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2020
+    label: '2020'
+    ordinal: 0
+    row_number: 42
+    expected_row_header_column: A
+    expected_row_header: 2020
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2020
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2021
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2021.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2021
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2021
+    label: '2021'
+    ordinal: 0
+    row_number: 43
+    expected_row_header_column: A
+    expected_row_header: 2021
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2021
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2022
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2022.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2022
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2022
+    label: '2022'
+    ordinal: 0
+    row_number: 44
+    expected_row_header_column: A
+    expected_row_header: 2022
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2022
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2023
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2023.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2023
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2023
+    label: '2023'
+    ordinal: 0
+    row_number: 45
+    expected_row_header_column: A
+    expected_row_header: 2023
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2023
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.households.cy2024
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.households.cy2024.v1
+  source_record_id_prefix: ons.nbs2025.land.households.cy2024
+  sheet_name: Table 11
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: households
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2024
+    label: '2024'
+    ordinal: 0
+    row_number: 46
+    expected_row_header_column: A
+    expected_row_header: 2024
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Households sector land, end of 2024
+    ordinal: 0
+    column: S
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E44N
+    concept: ons.nbs_land_value_households
+    source_concept: ons.e44n
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 11,
+      Land (AN.211) series E44N, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy1995
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy1995.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy1995
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 1995
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1995
+    label: '1995'
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: 1995
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 1995
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy1996
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy1996.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy1996
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 1996
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1996
+    label: '1996'
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: 1996
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 1996
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy1997
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy1997.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy1997
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 1997
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1997
+    label: '1997'
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: 1997
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 1997
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy1998
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy1998.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy1998
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 1998
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1998
+    label: '1998'
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: 1998
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 1998
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy1999
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy1999.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy1999
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 1999
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy1999
+    label: '1999'
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: 1999
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 1999
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2000
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2000.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2000
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2000
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2000
+    label: '2000'
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: 2000
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2000
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2001
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2001.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2001
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2001
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2001
+    label: '2001'
+    ordinal: 0
+    row_number: 23
+    expected_row_header_column: A
+    expected_row_header: 2001
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2001
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2002
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2002.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2002
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2002
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2002
+    label: '2002'
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: 2002
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2002
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2003
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2003.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2003
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2003
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2003
+    label: '2003'
+    ordinal: 0
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: 2003
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2003
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2004
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2004.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2004
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2004
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2004
+    label: '2004'
+    ordinal: 0
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: 2004
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2004
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2005
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2005.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2005
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2005
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2005
+    label: '2005'
+    ordinal: 0
+    row_number: 27
+    expected_row_header_column: A
+    expected_row_header: 2005
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2005
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2006
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2006.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2006
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2006
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2006
+    label: '2006'
+    ordinal: 0
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: 2006
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2006
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2007
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2007.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2007
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2007
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2007
+    label: '2007'
+    ordinal: 0
+    row_number: 29
+    expected_row_header_column: A
+    expected_row_header: 2007
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2007
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2008
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2008.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2008
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2008
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2008
+    label: '2008'
+    ordinal: 0
+    row_number: 30
+    expected_row_header_column: A
+    expected_row_header: 2008
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2008
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2009
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2009.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2009
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2009
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2009
+    label: '2009'
+    ordinal: 0
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: 2009
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2009
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2010
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2010.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2010
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2010
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2010
+    label: '2010'
+    ordinal: 0
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: 2010
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2010
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2011
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2011.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2011
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2011
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2011
+    label: '2011'
+    ordinal: 0
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: 2011
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2011
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2012
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2012.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2012
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2012
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2012
+    label: '2012'
+    ordinal: 0
+    row_number: 34
+    expected_row_header_column: A
+    expected_row_header: 2012
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2012
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2013
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2013.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2013
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2013
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2013
+    label: '2013'
+    ordinal: 0
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: 2013
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2013
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2014
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2014.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2014
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2014
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2014
+    label: '2014'
+    ordinal: 0
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: 2014
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2014
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2015
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2015.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2015
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2015
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2015
+    label: '2015'
+    ordinal: 0
+    row_number: 37
+    expected_row_header_column: A
+    expected_row_header: 2015
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2015
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2016
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2016.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2016
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2016
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2016
+    label: '2016'
+    ordinal: 0
+    row_number: 38
+    expected_row_header_column: A
+    expected_row_header: 2016
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2016
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2017
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2017.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2017
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2017
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2017
+    label: '2017'
+    ordinal: 0
+    row_number: 39
+    expected_row_header_column: A
+    expected_row_header: 2017
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2017
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2018
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2018.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2018
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2018
+    label: '2018'
+    ordinal: 0
+    row_number: 40
+    expected_row_header_column: A
+    expected_row_header: 2018
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2018
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2019
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2019.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2019
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2019
+    label: '2019'
+    ordinal: 0
+    row_number: 41
+    expected_row_header_column: A
+    expected_row_header: 2019
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2019
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2020
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2020.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2020
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2020
+    label: '2020'
+    ordinal: 0
+    row_number: 42
+    expected_row_header_column: A
+    expected_row_header: 2020
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2020
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2021
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2021.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2021
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2021
+    label: '2021'
+    ordinal: 0
+    row_number: 43
+    expected_row_header_column: A
+    expected_row_header: 2021
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2021
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2022
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2022.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2022
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2022
+    label: '2022'
+    ordinal: 0
+    row_number: 44
+    expected_row_header_column: A
+    expected_row_header: 2022
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2022
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2023
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2023.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2023
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2023
+    label: '2023'
+    ordinal: 0
+    row_number: 45
+    expected_row_header_column: A
+    expected_row_header: 2023
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2023
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.nbs2025.land.non_financial_corporations.cy2024
+  provenance_class: model_output
+  record_set_spec_id: ons.nbs2025.land.non_financial_corporations.cy2024.v1
+  source_record_id_prefix: ons.nbs2025.land.non_financial_corporations.cy2024
+  sheet_name: Table 3
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: institutional_sector
+  entity_role: non_financial_corporations
+  domain: national_balance_sheet
+  groupby_dimension: ons.nbs_asset_category
+  rows:
+  - value_id: cy2024
+    label: '2024'
+    ordinal: 0
+    row_number: 46
+    expected_row_header_column: A
+    expected_row_header: 2024
+    table_record_kind: total
+  measures:
+  - measure_id: land_value
+    label: Non-financial corporations land, end of 2024
+    ordinal: 0
+    column: V
+    source_column_id: land_value
+    expected_column_header_row: 8
+    expected_column_header: E43B
+    concept: ons.nbs_land_value_nfc
+    source_concept: ons.e43b
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/nationalaccounts/uksectoraccounts/datasets/thenationalbalancesheetestimates
+    concept_evidence_notes: The UK national balance sheet estimates, 2025 edition, Table 3,
+      Land (AN.211) series E43B, GBP million at current prices, end-of-year position.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number

@@ -1,0 +1,152 @@
+# HMRC policy paper 'Salary sacrifice reform for pension contributions'
+# (published 2025-12-04, measure effective 6 April 2029), archived HTML on
+# the html_tables_and_text document-numbers lane. Three published headcount
+# estimates: 7.7 million employees using salary sacrifice for pension
+# contributions, of whom 3.3 million sacrifice more than GBP 2,000 and 4.3
+# million are within the GBP 2,000 threshold. The paper says 'the latest
+# available data' without pinning a reference period and names no
+# administrative source, so the counts carry provenance_class model_output
+# (policy-costing estimates) and the period here is the publication year
+# (2025) with UK geography inferred from the NICs scope; policyengine-uk-data's {2024: ...} keying plus
+# its 2.4%-per-year growth extension are populace-side declarations excluded
+# per the facts-only ADR. uk-data tags these targets 'obr'; the publisher is
+# HMRC (relabel recorded in docs/pe-uk-source-checklist.md). The paper's
+# NI-relief companions (GBP 1.2bn employee / 2.9bn employer) come from the
+# separate 2025 SPP Review PDF, whose uk-data asset link is dead with no
+# Wayback copy - tracked as blocked in the checklist.
+schema_version: ledger.source_package.v1
+package_id: hmrc-salary-sacrifice-reform-2029-headcounts
+label: 'HMRC salary sacrifice reform policy paper: employees using salary sacrifice for
+  pension contributions, by GBP 2,000 threshold position'
+artifact:
+  source_name: hmrc
+  source_table: Salary sacrifice reform for pension contributions (effective 6 April 2029),
+    policy paper
+  resource_package: db
+  resource_directory: data/hmrc/salary_sacrifice_reform_2029_headcounts
+  manifest: manifest.yaml
+  vintage: policy_paper_2025_12
+  extracted_at: '2026-08-07'
+  extraction_method: HTML table and document-text number parse of the archived policy paper
+  parser: html_tables_and_text
+  artifact_year: 2025
+record_sets:
+- record_set_id: hmrc.ss_reform_2029.salary_sacrifice_users
+  provenance_class: model_output
+  record_set_spec_id: hmrc.ss_reform_2029.salary_sacrifice_users.v1
+  source_record_id_prefix: hmrc.ss_reform_2029.salary_sacrifice_users
+  sheet_name: document_numbers
+  period_type: calendar_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: salary_sacrifice_pension_contributor
+  domain: pension_contributions
+  groupby_dimension: hmrc.salary_sacrifice_threshold_position
+  rows:
+  - value_id: total_users
+    label: Employees using salary sacrifice to make pension contributions
+    ordinal: 0
+    row_number: 40
+    expected_row_header_column: D
+    expected_row_header: 7.7 million
+    table_record_kind: total
+    filters:
+      salary_sacrifice_threshold_position: all
+    constraints:
+    - variable: salary_sacrifice_threshold_position
+      operator: ==
+      value: all
+      label: Threshold position
+    guard_cells:
+    - column: A
+      row: 40
+      expected_value: 83
+      label: HTML element index
+    - column: C
+      row: 40
+      expected_value: Using the latest available data, an estimated 7.7 million employees
+        currently use salary sacrifice to make pension contributions. Of these, 3.3
+        million sacrifice more than £2,000 of salary or bonuses. This means 44% of
+        employees using salary sacrifice for pensions would be impacted by this measure,
+        while 56% around 4.3 million people are fully protected by the £2,000 threshold.
+      label: paragraph text
+  - value_id: above_2000
+    label: Employees sacrificing more than GBP 2,000 of salary or bonuses
+    ordinal: 1
+    row_number: 41
+    expected_row_header_column: D
+    expected_row_header: 3.3 million
+    table_record_kind: detail
+    filters:
+      salary_sacrifice_threshold_position: above_2000
+    constraints:
+    - variable: salary_sacrifice_threshold_position
+      operator: ==
+      value: above_2000
+      label: Threshold position
+    - variable: annual_salary_sacrificed
+      operator: '>'
+      value: 2000
+      unit: gbp
+      label: Annual salary or bonus sacrificed lower bound
+    guard_cells:
+    - column: A
+      row: 41
+      expected_value: 83
+      label: HTML element index
+    - column: D
+      row: 40
+      expected_value: 7.7 million
+      label: preceding number is the total
+  - value_id: below_2000
+    label: Employees fully protected by the GBP 2,000 threshold
+    ordinal: 2
+    row_number: 45
+    expected_row_header_column: D
+    expected_row_header: 4.3 million
+    table_record_kind: detail
+    filters:
+      salary_sacrifice_threshold_position: within_2000
+    constraints:
+    - variable: salary_sacrifice_threshold_position
+      operator: ==
+      value: within_2000
+      label: Threshold position
+    - variable: annual_salary_sacrificed
+      operator: <=
+      value: 2000
+      unit: gbp
+      label: Annual salary or bonus sacrificed upper bound
+    guard_cells:
+    - column: A
+      row: 45
+      expected_value: 83
+      label: HTML element index
+    - column: D
+      row: 41
+      expected_value: 3.3 million
+      label: above-threshold count earlier in the sequence
+  measures:
+  - measure_id: employees
+    label: Employees using salary sacrifice for pension contributions
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: hmrc.salary_sacrifice_pension_users
+    source_concept: hmrc.salary_sacrifice_pension_users
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/publications/salary-sacrifice-reform-for-pension-contributions-effective-from-6-april-2029/salary-sacrifice-reform-for-pension-contributions
+    concept_evidence_notes: 'HMRC policy paper, impact on individuals section: an estimated
+      7.7 million employees currently use salary sacrifice to make pension contributions;
+      3.3 million sacrifice more than GBP 2,000; around 4.3 million are within the
+      GBP 2,000 threshold.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

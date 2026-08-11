@@ -1,0 +1,19 @@
+source_id: scotgov
+package_id: scotgov-scottish-budget-social-security-assistance-2026
+dataset: scotgov_scotgov-scottish-budget-social-security-assistance-2026
+source_page: https://www.gov.scot/publications/scottish-budget-2026-2027/
+table: Scottish Budget 2026-27, Chapter 5 Social Justice, Table 5.08 Social Security
+  Assistance
+files:
+  2026:
+    filename: scottish-budget-2026-27-chapter-5-social-justice.html
+    source_url: https://www.gov.scot/publications/scottish-budget-2026-2027/pages/7/
+    sha256: fca63d11dc1b82fb4a6863b499b0eb561e6cc91262000e233ea2f9e61179e130
+    size_bytes: 58387
+    fetched_at: '2026-08-07T10:40:07+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/scotgov/scotgov-scottish-budget-social-security-assistance-2026/2026/fca63d11dc1b82fb4a6863b499b0eb561e6cc91262000e233ea2f9e61179e130/scottish-budget-2026-27-chapter-5-social-justice.html
+        uri: r2://ledger-raw/raw/scotgov/scotgov-scottish-budget-social-security-assistance-2026/2026/fca63d11dc1b82fb4a6863b499b0eb561e6cc91262000e233ea2f9e61179e130/scottish-budget-2026-27-chapter-5-social-justice.html

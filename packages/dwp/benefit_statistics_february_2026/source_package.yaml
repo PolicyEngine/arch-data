@@ -1,0 +1,241 @@
+# DWP benefit statistics: February 2026 - the biannual statistical summary is
+# HTML-only (detailed data live on Stat-Xplore), so the archived summary page
+# is the publisher artifact and facts come from its prose via the
+# html_tables_and_text document_numbers lane (hhs_acf_liheap precedent).
+# All four figures are at the August 2025 reference point (month 2025-08);
+# policyengine-uk-data declares them at calendar 2025, a populace-side timing
+# call. The ESA total is published as '1 million' (parsed 1,000,000);
+# uk-data's 999,000 is Stat-Xplore precision for the same series - the
+# publisher-emitted value is what lands here, and the delta is enumerated in
+# the PR. The publisher text notes the total exceeds contributions-based +
+# income-related because some claim both or receive credits only. The JSA
+# count sits exactly at a publisher-flagged methodology break: from August
+# 2025 data onwards DWP removed a subset of inactive JSA claims, so 71,000
+# is not comparable with earlier vintages. gov.uk
+# serves per-request nonces in unrelated page chrome, so the archived HTML is
+# not byte-reproducible across fetches; the parsed statistical content is
+# stable and the manifest sha pins the archived bytes.
+schema_version: ledger.source_package.v1
+package_id: dwp-benefit-statistics-february-2026
+label: 'DWP benefit statistics February 2026: ESA and JSA claimants at August 2025'
+artifact:
+  source_name: dwp
+  source_table: 'DWP benefit statistics: February 2026'
+  resource_package: db
+  resource_directory: data/dwp/benefit_statistics_february_2026
+  manifest: manifest.yaml
+  vintage: benefit_statistics_february_2026
+  extracted_at: '2026-08-07'
+  extraction_method: HTML table and document-text number parse of the archived statistical
+    summary
+  parser: html_tables_and_text
+  artifact_year: 2025
+record_sets:
+- record_set_id: dwp.benefit_stats.feb2026.esa_claimants
+  provenance_class: administrative
+  record_set_spec_id: dwp.benefit_stats.feb2026.esa_claimants.v1
+  source_record_id_prefix: dwp.benefit_stats.feb2026.esa_claimants
+  sheet_name: document_numbers
+  period_type: month
+  period: 2025-08
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: person
+  entity_role: esa_claimant
+  domain: employment_support_allowance
+  groupby_dimension: dwp.esa_claim_type
+  rows:
+  - value_id: esa_total
+    label: People on Employment and Support Allowance at August 2025
+    ordinal: 0
+    row_number: 158
+    expected_row_header_column: C
+    expected_row_header: There were 1 million people on Employment and Support Allowance at
+      August 2025, a decrease of 500,000 since August 2024.
+    table_record_kind: total
+    filters:
+      esa_claim_type: all
+    constraints:
+    - variable: esa_claim_type
+      operator: ==
+      value: all
+      label: ESA claim type
+    guard_cells:
+    - column: A
+      row: 158
+      expected_value: 153
+      label: HTML element index
+    - column: B
+      row: 158
+      expected_value: p
+      label: HTML element type
+    - column: D
+      row: 158
+      expected_value: 1 million
+      label: source number text
+  - value_id: esa_contributions_based
+    label: People claiming contributions-based ESA at August 2025
+    ordinal: 1
+    row_number: 172
+    expected_row_header_column: D
+    expected_row_header: 620,000
+    table_record_kind: detail
+    filters:
+      esa_claim_type: contributions_based
+    constraints:
+    - variable: esa_claim_type
+      operator: ==
+      value: contributions_based
+      label: ESA claim type
+    guard_cells:
+    - column: A
+      row: 172
+      expected_value: 161
+      label: HTML element index
+    - column: C
+      row: 172
+      expected_value: Over recent years, the number of ESA claims has been decreasing because
+        UC has replaced ESA for new income-related claims on the grounds of incapacity. Since
+        August 2024, the number of people claiming ESA has decreased by 33.1% (500,000). The
+        number of people claiming contributions-based ESA at August 2025 was 620,000, an increase
+        of 180,000 against August 2024. The number of people claiming income-related ESA at
+        August 2025 was 180,000, a decrease of 470,000 on August 2024. Remaining claimants
+        either claim both contributions-based and income-related ESA, or receive credits only.
+      label: paragraph text
+    - column: D
+      row: 173
+      expected_value: 180,000
+      label: next number in sequence (year-on-year increase)
+    - column: D
+      row: 176
+      expected_value: 470,000
+      label: final number in the paragraph sequence
+  - value_id: esa_income_related
+    label: People claiming income-related ESA at August 2025
+    ordinal: 2
+    row_number: 175
+    expected_row_header_column: D
+    expected_row_header: 180,000
+    table_record_kind: detail
+    filters:
+      esa_claim_type: income_related
+    constraints:
+    - variable: esa_claim_type
+      operator: ==
+      value: income_related
+      label: ESA claim type
+    guard_cells:
+    - column: A
+      row: 175
+      expected_value: 161
+      label: HTML element index
+    - column: C
+      row: 175
+      expected_value: Over recent years, the number of ESA claims has been decreasing because
+        UC has replaced ESA for new income-related claims on the grounds of incapacity. Since
+        August 2024, the number of people claiming ESA has decreased by 33.1% (500,000). The
+        number of people claiming contributions-based ESA at August 2025 was 620,000, an increase
+        of 180,000 against August 2024. The number of people claiming income-related ESA at
+        August 2025 was 180,000, a decrease of 470,000 on August 2024. Remaining claimants
+        either claim both contributions-based and income-related ESA, or receive credits only.
+      label: paragraph text
+    - column: D
+      row: 172
+      expected_value: 620,000
+      label: contributions-based level two numbers earlier
+    - column: D
+      row: 176
+      expected_value: 470,000
+      label: following number is the income-related year-on-year decrease
+  measures:
+  - measure_id: claimants
+    label: ESA claimants
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: dwp.esa_claimants
+    source_concept: dwp.esa_claimants
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/dwp-benefit-statistics-february-2026/dwp-benefit-statistics-february-2026
+    concept_evidence_notes: 'DWP benefit statistics February 2026 statistical summary, Employment
+      and Support Allowance section: total people on ESA at August 2025 (published as 1 million),
+      contributions-based ESA (620,000) and income-related ESA (180,000). The categories do
+      not partition the total: per the publication, remaining claimants either claim both
+      contributions-based and income-related ESA, or receive credits only - so contributions_based
+      and income_related are single-type counts, not model contributory/income-related caseloads.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: dwp.benefit_stats.feb2026.jsa_claimants
+  provenance_class: administrative
+  record_set_spec_id: dwp.benefit_stats.feb2026.jsa_claimants.v1
+  source_record_id_prefix: dwp.benefit_stats.feb2026.jsa_claimants
+  sheet_name: document_numbers
+  period_type: month
+  period: 2025-08
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: person
+  entity_role: jsa_claimant
+  domain: jobseekers_allowance
+  groupby_dimension: dwp.benefit_line
+  rows:
+  - value_id: jsa_total
+    label: JSA claimants at August 2025
+    ordinal: 0
+    row_number: 238
+    expected_row_header_column: C
+    expected_row_header: During the coronavirus (COVID-19) pandemic, claims for JSA went up
+      substantially, but have since fallen below pre-pandemic levels. There were 71,000 JSA
+      claimants at August 2025.
+    table_record_kind: total
+    filters:
+      benefit_line: jobseekers_allowance
+    constraints:
+    - variable: benefit_line
+      operator: ==
+      value: jobseekers_allowance
+      label: benefit line
+    guard_cells:
+    - column: A
+      row: 238
+      expected_value: 194
+      label: HTML element index
+    - column: B
+      row: 238
+      expected_value: p
+      label: HTML element type
+    - column: D
+      row: 238
+      expected_value: 71,000
+      label: source number text
+  measures:
+  - measure_id: claimants
+    label: JSA claimants
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: dwp.jsa_claimants
+    source_concept: dwp.jsa_claimants
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/dwp-benefit-statistics-february-2026/dwp-benefit-statistics-february-2026
+    concept_evidence_notes: 'DWP benefit statistics February 2026 statistical summary, Jobseeker''s
+      Allowance section: 71,000 JSA claimants at August 2025. The JSA scheme is effectively
+      New Style (contributory) only; the mapping of this count to a contributory-JSA model
+      variable is a populace-side declaration. The count is post-methodology-break: the publication
+      states a methodological improvement applied from August 2025 data onwards removed a
+      subset of inactive JSA claims from the caseload, so this figure is not directly comparable
+      with pre-August-2025 vintages.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

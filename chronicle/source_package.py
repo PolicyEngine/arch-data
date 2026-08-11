@@ -50,6 +50,7 @@ from chronicle.sources.rows import (
     source_rows_from_census_b01001_female_age_json,
     source_rows_from_cdc_vsrr_live_births_json,
     source_rows_from_json_table,
+    source_rows_from_statxplore_table,
     source_rows_from_ees_permalink_table_html,
     source_rows_from_kff_state_indicator_gdocs_html,
     source_rows_from_ons_timeseries_json,
@@ -83,7 +84,12 @@ SOURCE_PACKAGE_ALIASES = {
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-salary-sacrifice-relief-2024-25": Path("hmrc/salary_sacrifice_relief_2024_25"),
+    "hmrc-salary-sacrifice-reform-2029-headcounts": Path(
+        "hmrc/salary_sacrifice_reform_2029_headcounts"
+    ),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
+    "isc-annual-census-2023": Path("isc/annual_census_2023"),
+    "isc-annual-census-2024": Path("isc/annual_census_2024"),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
     "statbel-fiscal-income-2023-nis-2025": Path(
         "statbel/fiscal_income_2023_nis_2025"
@@ -104,7 +110,22 @@ SOURCE_PACKAGE_ALIASES = {
         "opgroeien/groeipakket_caseload_2025"
     ),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
+    "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
+    "dwp-benefit-statistics-february-2026": Path(
+        "dwp/benefit_statistics_february_2026"
+    ),
+    "dwp-pip-daily-living-foi-2025": Path("dwp/pip_daily_living_foi_2025"),
+    "dwp-uc-households-children-may-2025": Path("dwp/uc_households_children_may_2025"),
+    "dwp-uc-households-family-type-may-2025": Path(
+        "dwp/uc_households_family_type_may_2025"
+    ),
+    "dwp-uc-payment-distribution-may-2025": Path(
+        "dwp/uc_payment_distribution_may_2025"
+    ),
+    "dwp-uc-scotland-youngest-child-may-2025": Path(
+        "dwp/uc_scotland_youngest_child_may_2025"
+    ),
     "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
         "cbo/revenue_projections_income_by_source_2026_02"
@@ -201,8 +222,17 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
+    "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
+    "scotgov-scottish-budget-social-security-assistance-2026": Path(
+        "scotgov/scottish_budget_social_security_assistance_2026"
+    ),
+    "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
+    "ons-national-balance-sheet-land-2025": Path(
+        "ons/national_balance_sheet_land_2025"
+    ),
+    "ons-public-sector-employment-2026": Path("ons/public_sector_employment_2026"),
     "ons-savings-interest-income": Path("ons/savings_interest_income"),
     "ons-families-households-2025": Path("ons/families_households_2025"),
     "ons-uk-business-firm-targets-2025": Path("ons/uk_business_firm_targets_2025"),
@@ -262,6 +292,12 @@ class SourceArtifactSpec:
             )
         if self.parser == "json_table_full_rows":
             return source_rows_from_json_table(
+                content,
+                artifact,
+                sheet_name=self._sheet_name(filename, year=year),
+            )
+        if self.parser == "statxplore_table_json_rows":
+            return source_rows_from_statxplore_table(
                 content,
                 artifact,
                 sheet_name=self._sheet_name(filename, year=year),
@@ -557,6 +593,26 @@ class SourceArtifactSpec:
                     content,
                     artifact,
                     sheet_name=self.sheet_name or "indicator",
+                )
+            )
+            return source_cells_from_source_rows(
+                rows,
+                selected_rows=tuple(
+                    {
+                        key: str(_render_value(value, year=year))
+                        for key, value in row.items()
+                    }
+                    for row in self.selected_rows
+                ),
+            )
+        if self.parser == "statxplore_table_json_rows":
+            rows = (
+                source_rows
+                if source_rows is not None
+                else source_rows_from_statxplore_table(
+                    content,
+                    artifact,
+                    sheet_name=self.sheet_name or "api_response",
                 )
             )
             return source_cells_from_source_rows(

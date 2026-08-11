@@ -285,10 +285,28 @@ uv run chronicle build-suite dwp-pip-daily-living-foi-2025 \
   --out /tmp/chronicle-dwp-pip-daily-living-foi-2025 \
   --replace
 
-uv run chronicle validate-package dwp-uc-national-payment-dist-2025 --year 2025
-uv run chronicle build-suite dwp-uc-national-payment-dist-2025 \
+uv run chronicle validate-package dwp-uc-payment-distribution-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-payment-distribution-may-2025 \
   --year 2025 \
-  --out /tmp/chronicle-dwp-uc-national-payment-dist-2025 \
+  --out /tmp/chronicle-dwp-uc-payment-distribution-may-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-children-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-children-may-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-households-children-may-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-family-type-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-family-type-may-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-households-family-type-may-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-scotland-youngest-child-may-2025 --year 2025
+uv run chronicle build-suite dwp-uc-scotland-youngest-child-may-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-scotland-youngest-child-may-2025 \
   --replace
 
 uv run chronicle validate-package hmrc-salary-sacrifice-relief-2024-25 --year 2024
@@ -333,6 +351,23 @@ uv run chronicle build-suite ons-subnational-dwellings-by-tenure-2024 \
   --out /tmp/chronicle-ons-subnational-dwellings-by-tenure-2024 \
   --replace
 
+uv run chronicle validate-package hmrc-salary-sacrifice-reform-2029-headcounts --year 2025
+uv run chronicle build-suite hmrc-salary-sacrifice-reform-2029-headcounts \
+  --year 2025 \
+  --out /tmp/chronicle-hmrc-ss-headcounts \
+  --replace
+
+uv run chronicle validate-package isc-annual-census-2023 --year 2023
+uv run chronicle build-suite isc-annual-census-2023 \
+  --year 2023 \
+  --out /tmp/chronicle-isc-2023 \
+  --replace
+uv run chronicle validate-package isc-annual-census-2024 --year 2024
+uv run chronicle build-suite isc-annual-census-2024 \
+  --year 2024 \
+  --out /tmp/chronicle-isc-2024 \
+  --replace
+
 uv run chronicle validate-package ons-national-balance-sheet-land-2025 --year 2024
 uv run chronicle build-suite ons-national-balance-sheet-land-2025 \
   --year 2024 \
@@ -355,6 +390,18 @@ uv run chronicle validate-package scotgov-scottish-budget-social-security-assist
 uv run chronicle build-suite scotgov-scottish-budget-social-security-assistance-2026 \
   --year 2026 \
   --out /tmp/chronicle-scotgov-scottish-budget-social-security-assistance-2026 \
+  --replace
+
+uv run chronicle validate-package dft-nts-vehicle-ownership-2024 --year 2024
+uv run chronicle build-suite dft-nts-vehicle-ownership-2024 \
+  --year 2024 \
+  --out /tmp/chronicle-dft-nts-2024 \
+  --replace
+
+uv run chronicle validate-package ons-public-sector-employment-2026 --year 2026
+uv run chronicle build-suite ons-public-sector-employment-2026 \
+  --year 2026 \
+  --out /tmp/chronicle-ons-pse-2026 \
   --replace
 
 uv run chronicle validate-package slc-student-loan-borrower-forecasts-england-2025 --year 2025
