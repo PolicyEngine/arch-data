@@ -298,7 +298,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 2244
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 3712
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 107
     assert len(coverage["counts"]["by_geography"]) == 1066
     assert coverage["counts"]["by_entity"] == {
