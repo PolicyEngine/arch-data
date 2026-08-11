@@ -929,6 +929,60 @@ def test_allow_source_projection_resolves_the_latest_projection():
     assert [i for i in report.issues if i.code == "resolved_from_projection"]
 
 
+def _tied_assertion_rows():
+    """An observation and a projection colliding at the same 2023 period."""
+    return consumer_fact_rows(
+        [
+            _fact(value=110, period_value=2022),
+            _fact(value=130, period_value=2023),
+            _fact(value=120, period_value=2023, assertion="source_projection"),
+        ]
+    )
+
+
+def test_allow_source_projection_resolves_the_observation_on_a_period_tie():
+    # Emitting both rows would double-count the series; the realized value
+    # wins the tie and the overlap is flagged instead of passing silently.
+    report = resolve_profile_targets(
+        _policy_profile(target_policy="allow_source_projection"),
+        _tied_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "observation"
+    assert row.value == 130
+    (issue,) = [
+        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
+    ]
+    assert issue.severity == "warning"
+    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_explicit_assertion_selector_reaches_the_projection_despite_a_tie():
+    # Selecting on assertion is maximal intent: the selector filters the tie
+    # away before resolution, so the projection resolves without ambiguity.
+    report = resolve_profile_targets(
+        _policy_profile(
+            selector={
+                "source_name": "irs_soi",
+                "source_measure_id": "agi",
+                "assertion": "source_projection",
+            }
+        ),
+        _tied_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "source_projection"
+    assert row.value == 120
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+    assert not [
+        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
+    ]
+
+
 def test_target_assertion_policy_overrides_the_profile_default():
     report = resolve_profile_targets(
         _policy_profile(

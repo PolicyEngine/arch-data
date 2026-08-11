@@ -304,9 +304,7 @@ def resolve_profile_targets(
             # policy governs only targets that do not select on assertion.
             assertion_policy = "allow_source_projection"
         observed = [
-            row
-            for row in candidates
-            if row.get("assertion", "observation") == "observation"
+            row for row in candidates if row["assertion"] == "observation"
         ]
         if assertion_policy == "observed_only":
             if not observed:
@@ -374,11 +372,38 @@ def resolve_profile_targets(
         else:
             basis = "declared_alignment"
 
+        rows_at_period = [
+            row for row in candidates if dict(row["period"]) == chosen_period
+        ]
+        if len({row["assertion"] for row in rows_at_period}) > 1:
+            # An observation and a publisher projection collide at the chosen
+            # period; emitting both would double-count the series. The
+            # realized value wins the tie, loudly.
+            rows_at_period = [
+                row
+                for row in rows_at_period
+                if row["assertion"] == "observation"
+            ]
+            issues.append(
+                ResolutionIssue(
+                    code="ambiguous_assertion_at_period",
+                    message=(
+                        f"Target {target.target_id!r} matched both an "
+                        "observation and a source_projection at "
+                        f"{chosen_period['type']}:{chosen_period['value']}; "
+                        "resolved the observation. Select on assertion or "
+                        "tighten dimensions/record_set_id to address the "
+                        "overlap explicitly."
+                    ),
+                    profile_id=profile.profile_id,
+                    target_id=target.target_id,
+                    severity="warning",
+                )
+            )
+
         projection_resolved = False
-        for row in candidates:
-            if dict(row["period"]) != chosen_period:
-                continue
-            if row.get("assertion", "observation") == "source_projection":
+        for row in rows_at_period:
+            if row["assertion"] == "source_projection":
                 projection_resolved = True
             resolved.append(
                 _resolved_target(

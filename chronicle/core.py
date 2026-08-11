@@ -79,6 +79,19 @@ ALLOWED_CONCEPT_RELATIONS = {
 }
 ALLOWED_ASSERTIONS = {"observation", "source_projection"}
 DEFAULT_ASSERTION = "observation"
+# How profile resolution treats the assertion axis. observed_only is the safe
+# default: projections are invisible and a projection-only family fails loudly.
+# prefer_observed applies family-level: a family with any observed fact
+# resolves only from observations; projections are reachable only when the
+# family has none, so one series never mixes bases across periods.
+# allow_source_projection treats both equally (for forecast families such as
+# the OBR EFO lines), with observation winning an exact-period tie.
+ASSERTION_POLICIES = {
+    "observed_only",
+    "prefer_observed",
+    "allow_source_projection",
+}
+DEFAULT_ASSERTION_POLICY = "observed_only"
 ALLOWED_PROVENANCE_CLASSES = {
     "administrative",
     "census",

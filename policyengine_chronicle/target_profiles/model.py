@@ -14,19 +14,10 @@ from dataclasses import dataclass
 from importlib.resources import files
 from typing import Any
 
+from chronicle.core import ASSERTION_POLICIES, DEFAULT_ASSERTION_POLICY
+
 TARGET_PROFILE_SCHEMA_VERSION = "policyengine_ledger.target_profile.v1"
 FORBIDDEN_VALUE_KEYS = {"aggregation", "operation", "registry", "target_value", "value"}
-# How profile resolution treats the fact-level assertion axis (observation vs
-# source_projection). observed_only is the safe default: projections are
-# invisible and a projection-only family fails loudly. prefer_observed lets
-# projections fill periods that have no observed fact. allow_source_projection
-# treats both equally (for forecast families such as the OBR EFO lines).
-ASSERTION_POLICIES = {
-    "observed_only",
-    "prefer_observed",
-    "allow_source_projection",
-}
-DEFAULT_ASSERTION_POLICY = "observed_only"
 FORBIDDEN_RUNTIME_KEYS = {
     "callable",
     "command",
