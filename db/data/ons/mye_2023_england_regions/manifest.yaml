@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-mye-2023-england-regions
+dataset: ons_ons-mye-2023-england-regions
+source_page: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/estimatesofthepopulationforenglandandwales
+table: Mid-2023 population estimates, England and Wales, by single year of age and
+  sex (MYE2), 2023 local authority boundaries
+files:
+  2023:
+    filename: mye23tablesew.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/estimatesofthepopulationforenglandandwales/mid20232023localauthorityboundarieseditionofthisdataset/mye23tablesew.xlsx
+    sha256: 96dcbb73d01c2965a0e8173bdf736f04a16d91dc189c4a52220919792e5e2c94
+    size_bytes: 832569
+    fetched_at: '2026-08-05T15:16:18+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-mye-2023-england-regions/2023/96dcbb73d01c2965a0e8173bdf736f04a16d91dc189c4a52220919792e5e2c94/mye23tablesew.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-mye-2023-england-regions/2023/96dcbb73d01c2965a0e8173bdf736f04a16d91dc189c4a52220919792e5e2c94/mye23tablesew.xlsx

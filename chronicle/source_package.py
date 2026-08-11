@@ -192,6 +192,10 @@ SOURCE_PACKAGE_ALIASES = {
     "kff-marketplace-effectuated-enrollment": Path(
         "kff/marketplace_effectuated_enrollment"
     ),
+    "ons-mye-2023-uk-countries": Path("ons/mye_2023_uk_countries"),
+    "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
+    "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
+    "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "ons-uk-business-firm-targets-2025": Path("ons/uk_business_firm_targets_2025"),
     "ons-uk-business-firm-sector-targets-2025": Path(
         "ons/uk_business_firm_sector_targets_2025"
