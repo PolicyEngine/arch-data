@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from importlib.resources import files
 from typing import Any
 
+from chronicle.core import ASSERTION_POLICIES, DEFAULT_ASSERTION_POLICY
+
 TARGET_PROFILE_SCHEMA_VERSION = "policyengine_ledger.target_profile.v1"
 FORBIDDEN_VALUE_KEYS = {"aggregation", "operation", "registry", "target_value", "value"}
 FORBIDDEN_RUNTIME_KEYS = {
@@ -52,6 +54,7 @@ class TargetProfileTarget:
     measurement: Mapping[str, Any]
     bindings: Mapping[str, TargetProfileBinding]
     tolerance: float | None = None
+    assertion_policy: str | None = None
 
     def binding(self, backend: str) -> TargetProfileBinding:
         """Return the binding for ``backend`` or raise a useful error."""
@@ -72,6 +75,7 @@ class TargetProfile:
     label: str
     base_period_policy: str
     default_operation: str
+    default_assertion_policy: str
     targets: tuple[TargetProfileTarget, ...]
 
     def targets_for_geography(
@@ -118,6 +122,15 @@ def target_profile_from_mapping(raw: Mapping[str, Any]) -> TargetProfile:
             f"target profile {profile_id!r} must use operation 'sum', "
             f"got {default_operation!r}."
         )
+    default_assertion_policy = defaults.get(
+        "assertion_policy", DEFAULT_ASSERTION_POLICY
+    )
+    if default_assertion_policy not in ASSERTION_POLICIES:
+        raise ValueError(
+            f"target profile {profile_id!r} defaults.assertion_policy must be "
+            f"one of {sorted(ASSERTION_POLICIES)}, got "
+            f"{default_assertion_policy!r}."
+        )
     targets = tuple(
         _target_from_mapping(target)
         for target in _required_mapping_sequence(raw, "targets")
@@ -140,6 +153,7 @@ def target_profile_from_mapping(raw: Mapping[str, Any]) -> TargetProfile:
         label=label,
         base_period_policy=base_period_policy,
         default_operation=default_operation,
+        default_assertion_policy=default_assertion_policy,
         targets=targets,
     )
 
@@ -177,6 +191,18 @@ def _target_from_mapping(raw: Mapping[str, Any]) -> TargetProfileTarget:
         if not isinstance(tolerance, int | float) or isinstance(tolerance, bool):
             raise ValueError(f"target profile row {target_id!r}: invalid tolerance.")
         tolerance = float(tolerance)
+    assertion_policy = raw.get("assertion_policy")
+    if assertion_policy is not None and assertion_policy not in ASSERTION_POLICIES:
+        raise ValueError(
+            f"target profile row {target_id!r} assertion_policy must be one of "
+            f"{sorted(ASSERTION_POLICIES)}, got {assertion_policy!r}."
+        )
+    if assertion_policy is not None and "assertion" in chronicle_selector:
+        raise ValueError(
+            f"target profile row {target_id!r} declares both assertion_policy "
+            f"{assertion_policy!r} and a chronicle_selector on 'assertion'; "
+            "the selector already pins the axis — declare one or the other."
+        )
     return TargetProfileTarget(
         target_id=target_id,
         family=family,
@@ -185,6 +211,7 @@ def _target_from_mapping(raw: Mapping[str, Any]) -> TargetProfileTarget:
         measurement=measurement,
         bindings=bindings,
         tolerance=tolerance,
+        assertion_policy=assertion_policy,
     )
 
 

@@ -52,13 +52,14 @@ def _fact(
     assertion="observation",
     provenance_class="administrative",
     survey_instrument=None,
+    geography_id="0100000US",
 ):
     return AggregateFact(
         value=value,
         period=PeriodDimension(type=period_type, value=period_value),
         geography=GeographyDimension(
             level="country",
-            id="0100000US",
+            id=geography_id,
             vintage="2020_census",
         ),
         entity=EntityDimension(name="tax_unit", role="filing_unit"),
@@ -801,3 +802,332 @@ def test_load_rejects_a_false_manifest_row_count(tmp_path):
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="fact_row_count"):
         load_consumer_artifact(out_dir)
+
+
+def _mixed_assertion_rows():
+    """Observed 2021/2022 plus a 2023 projection of the same soi series."""
+    return consumer_fact_rows(
+        [
+            _fact(value=100, period_value=2021),
+            _fact(value=110, period_value=2022),
+            _fact(value=120, period_value=2023, assertion="source_projection"),
+        ]
+    )
+
+
+def _policy_profile(
+    *,
+    defaults_policy=None,
+    target_policy=None,
+    selector=None,
+    target_id="soi.agi.total",
+):
+    mapping = {
+        "schema_version": "policyengine_ledger.target_profile.v1",
+        "profile_id": "test_profile",
+        "country": "us",
+        "label": "Test profile",
+        "defaults": {
+            "base_period_policy": "latest_not_after_build_base_period",
+            "operation": "sum",
+        },
+        "targets": [
+            {
+                "target_id": target_id,
+                "family": "irs_soi",
+                "geography_levels": ["country"],
+                "chronicle_selector": selector
+                or {"source_name": "irs_soi", "source_measure_id": "agi"},
+                "measurement": {"entity": "tax_unit", "concept": "us.agi"},
+                "bindings": {
+                    "microcosm": {"metric_name": "irs_soi/agi/total"},
+                },
+            }
+        ],
+    }
+    if defaults_policy is not None:
+        mapping["defaults"]["assertion_policy"] = defaults_policy
+    if target_policy is not None:
+        mapping["targets"][0]["assertion_policy"] = target_policy
+    return target_profile_from_mapping(mapping)
+
+
+def test_observed_only_default_never_resolves_a_projection():
+    # The 2023 projection is invisible; the newest observed fact is 2022, and
+    # taking it at a requested 2023 base period correctly demands an explicit
+    # alignment instead of resolving anything silently.
+    report = resolve_profile_targets(
+        _policy_profile(),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+        strict=False,
+    )
+    assert not report.resolved
+    (violation,) = report.violations
+    assert violation.fact_period == {"type": "tax_year", "value": 2022}
+    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_observed_only_fails_loudly_on_projection_only_families():
+    report = resolve_profile_targets(
+        _policy_profile(
+            selector={"source_name": "cbo", "source_measure_id": "receipts"},
+            target_id="cbo.receipts",
+        ),
+        _rows(),
+        {"type": "calendar_year", "value": 2027},
+        strict=False,
+    )
+    assert not report.resolved
+    (issue,) = [i for i in report.issues if i.code == "only_projection_facts"]
+    assert issue.severity == "error"
+    assert not report.valid
+
+
+def test_prefer_observed_takes_the_observation_over_a_newer_projection():
+    # Observations win even when a projection sits exactly at the requested
+    # period; the observed 2022 fact is chosen and the period contract then
+    # asks for an alignment rather than silently substituting the projection.
+    report = resolve_profile_targets(
+        _policy_profile(defaults_policy="prefer_observed"),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+        strict=False,
+    )
+    assert not report.resolved
+    (violation,) = report.violations
+    assert violation.fact_period == {"type": "tax_year", "value": 2022}
+
+
+def test_prefer_observed_falls_back_to_projections_with_a_warning():
+    report = resolve_profile_targets(
+        _policy_profile(
+            defaults_policy="prefer_observed",
+            selector={"source_name": "cbo", "source_measure_id": "receipts"},
+            target_id="cbo.receipts",
+        ),
+        _rows(),
+        {"type": "calendar_year", "value": 2027},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "source_projection"
+    assert row.value == 250
+    (issue,) = [i for i in report.issues if i.code == "resolved_from_projection"]
+    assert issue.severity == "warning"
+
+
+def test_allow_source_projection_resolves_the_latest_projection():
+    report = resolve_profile_targets(
+        _policy_profile(target_policy="allow_source_projection"),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "source_projection"
+    assert row.value == 120
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def _tied_assertion_rows():
+    """An observation and a projection colliding at the same 2023 period."""
+    return consumer_fact_rows(
+        [
+            _fact(value=110, period_value=2022),
+            _fact(value=130, period_value=2023),
+            _fact(value=120, period_value=2023, assertion="source_projection"),
+        ]
+    )
+
+
+def test_allow_source_projection_resolves_the_observation_on_a_period_tie():
+    # Emitting both rows would double-count the series; the realized value
+    # wins the tie and the overlap is flagged instead of passing silently.
+    report = resolve_profile_targets(
+        _policy_profile(target_policy="allow_source_projection"),
+        _tied_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "observation"
+    assert row.value == 130
+    (issue,) = [
+        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
+    ]
+    assert issue.severity == "warning"
+    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_explicit_assertion_selector_reaches_the_projection_despite_a_tie():
+    # Selecting on assertion is maximal intent: the selector filters the tie
+    # away before resolution, so the projection resolves without ambiguity.
+    report = resolve_profile_targets(
+        _policy_profile(
+            selector={
+                "source_name": "irs_soi",
+                "source_measure_id": "agi",
+                "assertion": "source_projection",
+            }
+        ),
+        _tied_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "source_projection"
+    assert row.value == 120
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+    assert not [
+        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
+    ]
+
+
+def test_assertion_tie_break_is_scoped_to_the_series():
+    # Geography A carries a genuine tie (observation + projection at the
+    # chosen period); geography B has only a projection. The tie-break must
+    # drop A's projection, keep A's observation — and leave B's projection
+    # alone: B was never in a tie with anything.
+    rows = consumer_fact_rows(
+        [
+            _fact(value=130, period_value=2023),
+            _fact(value=120, period_value=2023, assertion="source_projection"),
+            _fact(
+                value=99,
+                period_value=2023,
+                assertion="source_projection",
+                geography_id="0100000GB",
+            ),
+        ]
+    )
+    report = resolve_profile_targets(
+        _policy_profile(target_policy="allow_source_projection"),
+        rows,
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    resolved = {row.geography["id"]: row for row in report.resolved}
+    assert set(resolved) == {"0100000US", "0100000GB"}
+    assert resolved["0100000US"].assertion == "observation"
+    assert resolved["0100000US"].value == 130
+    assert resolved["0100000GB"].assertion == "source_projection"
+    assert resolved["0100000GB"].value == 99
+    (ambiguous,) = [
+        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
+    ]
+    assert "0100000US" in ambiguous.message
+    assert "0100000GB" not in ambiguous.message
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_prefer_observed_lets_a_projection_only_series_resolve():
+    # The Northern-Ireland shape: one geography observed, another carrying
+    # only a projection at the same period. Per-series preference resolves
+    # both instead of starving the projection-only series.
+    rows = consumer_fact_rows(
+        [
+            _fact(value=130, period_value=2023),
+            _fact(
+                value=99,
+                period_value=2023,
+                assertion="source_projection",
+                geography_id="0100000GB",
+            ),
+        ]
+    )
+    report = resolve_profile_targets(
+        _policy_profile(defaults_policy="prefer_observed"),
+        rows,
+        {"type": "tax_year", "value": 2023},
+    )
+    assert report.valid
+    resolved = {row.geography["id"]: row for row in report.resolved}
+    assert resolved["0100000US"].assertion == "observation"
+    assert resolved["0100000GB"].assertion == "source_projection"
+    assert [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_prefer_observed_still_never_mixes_bases_within_one_series():
+    # Within a single series the family rule survives the per-series change:
+    # an observed 2022 fact still beats a projection sitting at the
+    # requested 2023 period, ending in a period-contract violation rather
+    # than a silent base mix.
+    report = resolve_profile_targets(
+        _policy_profile(defaults_policy="prefer_observed"),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2023},
+        strict=False,
+    )
+    assert not report.resolved
+    (violation,) = report.violations
+    assert violation.fact_period == {"type": "tax_year", "value": 2022}
+
+
+def test_target_assertion_policy_overrides_the_profile_default():
+    report = resolve_profile_targets(
+        _policy_profile(
+            defaults_policy="allow_source_projection",
+            target_policy="observed_only",
+        ),
+        _mixed_assertion_rows(),
+        {"type": "tax_year", "value": 2022},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "observation"
+    assert row.value == 110
+    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
+
+
+def test_invalid_assertion_policy_values_are_rejected():
+    with pytest.raises(ValueError, match="assertion_policy"):
+        _policy_profile(defaults_policy="projections_welcome")
+    with pytest.raises(ValueError, match="assertion_policy"):
+        _policy_profile(target_policy="observed")
+
+
+def test_unknown_assertion_values_fail_resolution_loudly():
+    # A typo'd assertion must not quietly vanish from every policy's
+    # candidate set; the resolver polices the enum like the file loader does.
+    rows = _mixed_assertion_rows()
+    rows[-1] = dict(rows[-1], assertion="projection")
+    with pytest.raises(ValueError, match="unsupported assertion"):
+        resolve_profile_targets(
+            _policy_profile(),
+            rows,
+            {"type": "tax_year", "value": 2022},
+        )
+
+
+def test_missing_assertion_defaults_to_observation_at_resolve():
+    # Back-compat parity with the file loader: rows that predate the axis
+    # resolve as observations.
+    rows = _mixed_assertion_rows()
+    legacy = dict(rows[1])
+    del legacy["assertion"]
+    rows[1] = legacy
+    report = resolve_profile_targets(
+        _policy_profile(),
+        rows,
+        {"type": "tax_year", "value": 2022},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "observation"
+    assert row.value == 110
+
+
+def test_assertion_selector_and_target_policy_together_are_rejected():
+    # The selector already pins the axis; a per-target policy alongside it is
+    # a contradiction the author should hear about at load, not have
+    # silently resolved.
+    with pytest.raises(ValueError, match="declares both assertion_policy"):
+        _policy_profile(
+            target_policy="observed_only",
+            selector={
+                "source_name": "irs_soi",
+                "source_measure_id": "agi",
+                "assertion": "source_projection",
+            },
+        )

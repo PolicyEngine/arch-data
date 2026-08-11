@@ -495,6 +495,38 @@ A `survey_aggregate` record set must also name its source survey in a non-empty
 class. Missing, unknown, wrongly typed, and misplaced values fail package load
 and build validation.
 
+Orthogonal to `provenance_class`, every fact carries an `assertion`:
+`observation` (a realized value, the default) or `source_projection` (the
+publisher's forward statement — OBR forecast years, NPP projection years,
+budget-allocation years). `provenance_class` says how the publisher measured;
+`assertion` says whether the period had happened. The two cross freely: a
+national-balance-sheet estimate is `model_output` + `observation`, an NPP
+projection year is `model_output` + `source_projection`.
+
+Consumer profiles resolve this axis explicitly rather than by convention.
+Each profile (or individual target) declares an `assertion_policy`:
+`observed_only` (the default — projections are invisible and a
+projection-only family fails loudly with `only_projection_facts`),
+`prefer_observed` (per series — one geography/entity/dimension tuple: a
+series with any observed fact resolves only from observations, and a series
+with none may fall back to projections, so no single series ever mixes
+bases across periods and a projection-only series is never starved by a
+neighbouring series' observation), or
+`allow_source_projection` (both compete under the period policy; an
+observation and a projection colliding within one series at the chosen
+period resolve to the observation with an `ambiguous_assertion_at_period`
+warning naming the series rather than double-counting it). A target whose `chronicle_selector` names `assertion`
+explicitly bypasses the policy — the selector is already maximal intent —
+and declaring both on one target is rejected at profile load as a
+contradiction. Whenever a
+projection is resolved, the report carries a `resolved_from_projection`
+warning and the resolved row exposes its `assertion`, so downstream builds
+never discover the estimate/projection boundary by accident. A fact that
+predates the axis loads as `observation`: both the file loader and the
+resolver default a missing `assertion` and reject unknown values, so every
+pre-existing package keeps its meaning and a typo'd assertion fails loudly
+instead of vanishing from the candidate set.
+
 ```yaml
 record_sets:
   - record_set_id: census_acs.acs1_{year}.s0101.national_age
