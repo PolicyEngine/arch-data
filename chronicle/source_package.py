@@ -80,6 +80,9 @@ SOURCE_PACKAGE_ALIASES = {
     "bea-regional-state-personal-income-components-2024": Path(
         "bea/regional_personal_income_state"
     ),
+    "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
+    "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
+    "hmrc-salary-sacrifice-relief-2024-25": Path("hmrc/salary_sacrifice_relief_2024_25"),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
     "statbel-fiscal-income-2023-nis-2025": Path(
@@ -101,6 +104,8 @@ SOURCE_PACKAGE_ALIASES = {
         "opgroeien/groeipakket_caseload_2025"
     ),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
+    "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
+    "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
         "cbo/revenue_projections_income_by_source_2026_02"
     ),
@@ -196,6 +201,10 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
+    "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
+    "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
+    "ons-savings-interest-income": Path("ons/savings_interest_income"),
+    "ons-families-households-2025": Path("ons/families_households_2025"),
     "ons-uk-business-firm-targets-2025": Path("ons/uk_business_firm_targets_2025"),
     "ons-uk-business-firm-sector-targets-2025": Path(
         "ons/uk_business_firm_sector_targets_2025"

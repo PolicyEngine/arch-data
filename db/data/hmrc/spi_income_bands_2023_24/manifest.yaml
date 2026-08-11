@@ -1,0 +1,19 @@
+source_id: hmrc
+package_id: hmrc-spi-income-bands-2023-24
+dataset: hmrc_hmrc-spi-income-bands-2023-24
+source_page: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+table: 'SPI collated Tables 3.1 to 3.11, tax year 2023-24: income by range of total
+  income'
+files:
+  2024:
+    filename: Collated_Tables_3_1_to_3_11_2324.ods
+    source_url: https://assets.publishing.service.gov.uk/media/69f1f12d2fae53a03709682f/Collated_Tables_3_1_to_3_11_2324.ods
+    sha256: ad063b06b2bdeef8600dbbb09d48153337a4966f8c7eea50df7a2e0304ebd73e
+    size_bytes: 166693
+    fetched_at: '2026-08-06T14:33:23+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/hmrc/hmrc-spi-income-bands-2023-24/2024/ad063b06b2bdeef8600dbbb09d48153337a4966f8c7eea50df7a2e0304ebd73e/Collated_Tables_3_1_to_3_11_2324.ods
+        uri: r2://ledger-raw/raw/hmrc/hmrc-spi-income-bands-2023-24/2024/ad063b06b2bdeef8600dbbb09d48153337a4966f8c7eea50df7a2e0304ebd73e/Collated_Tables_3_1_to_3_11_2324.ods

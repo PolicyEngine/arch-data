@@ -291,16 +291,16 @@ uv run chronicle build-suite dwp-uc-national-payment-dist-2025 \
   --out /tmp/chronicle-dwp-uc-national-payment-dist-2025 \
   --replace
 
-uv run chronicle validate-package hmrc-salary-sacrifice-relief-2024 --year 2024
-uv run chronicle build-suite hmrc-salary-sacrifice-relief-2024 \
+uv run chronicle validate-package hmrc-salary-sacrifice-relief-2024-25 --year 2024
+uv run chronicle build-suite hmrc-salary-sacrifice-relief-2024-25 \
   --year 2024 \
-  --out /tmp/chronicle-hmrc-salary-sacrifice-relief-2024 \
+  --out /tmp/chronicle-hmrc-salary-sacrifice-relief-2024-25 \
   --replace
 
-uv run chronicle validate-package hmrc-spi-income-bands-2023 --year 2023
-uv run chronicle build-suite hmrc-spi-income-bands-2023 \
+uv run chronicle validate-package hmrc-spi-income-bands-2023-24 --year 2023
+uv run chronicle build-suite hmrc-spi-income-bands-2023-24 \
   --year 2023 \
-  --out /tmp/chronicle-hmrc-spi-income-bands-2023 \
+  --out /tmp/chronicle-hmrc-spi-income-bands-2023-24 \
   --replace
 
 uv run chronicle validate-package ons-savings-interest-income --year 2023

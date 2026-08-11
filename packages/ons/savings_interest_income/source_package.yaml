@@ -1,0 +1,340 @@
+# ONS UKEA HAXV annual observations only (2018-2025). policyengine-uk-data
+# additionally holds the last actual flat through 2029 - a computed extension
+# the facts-only ADR excludes; any forward fill is a populace-side declaration.
+# Quarterly rows in the same CSV are not ported in this tranche.
+schema_version: ledger.source_package.v1
+package_id: ons-savings-interest-income
+label: 'ONS UKEA HAXV: household interest resources (savings interest income), annual 2018-2025'
+artifact:
+  source_name: ons
+  source_table: 'UKEA time series HAXV: Households (S.14) interest (D.41) resources, current
+    price GBP million NSA'
+  resource_package: db
+  resource_directory: data/ons/savings_interest_income
+  manifest: manifest.yaml
+  vintage: ukea_2026_06_30
+  extracted_at: '2026-08-06'
+  extraction_method: delimited text full-row parse with selected source-row cells
+  parser: delimited_text_full_rows
+  artifact_year: 2025
+record_sets:
+- record_set_id: ons.ukea_haxv.savings_interest.cy2018
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2018.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2018
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2018
+    ordinal: 0
+    row_number: 40
+    expected_row_header_column: A
+    expected_row_header: 2018
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2018; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2019
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2019.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2019
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2019
+    ordinal: 0
+    row_number: 41
+    expected_row_header_column: A
+    expected_row_header: 2019
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2019; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2020
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2020.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2020
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2020
+    ordinal: 0
+    row_number: 42
+    expected_row_header_column: A
+    expected_row_header: 2020
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2020; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2021
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2021.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2021
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2021
+    ordinal: 0
+    row_number: 43
+    expected_row_header_column: A
+    expected_row_header: 2021
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2021; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2022
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2022.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2022
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2022
+    ordinal: 0
+    row_number: 44
+    expected_row_header_column: A
+    expected_row_header: 2022
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2022; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2023
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2023.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2023
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2023
+    ordinal: 0
+    row_number: 45
+    expected_row_header_column: A
+    expected_row_header: 2023
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2023; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2024
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2024.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2024
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2024
+    ordinal: 0
+    row_number: 46
+    expected_row_header_column: A
+    expected_row_header: 2024
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2024; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: ons.ukea_haxv.savings_interest.cy2025
+  provenance_class: model_output
+  record_set_spec_id: ons.ukea_haxv.savings_interest.cy2025.v1
+  source_record_id_prefix: ons.ukea_haxv.savings_interest.cy2025
+  sheet_name: haxv
+  period_type: calendar_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: national_accounts
+  groupby_dimension: ons.ukea_series
+  rows:
+  - value_id: haxv
+    label: Households interest resources (D.41), 2025
+    ordinal: 0
+    row_number: 47
+    expected_row_header_column: A
+    expected_row_header: 2025
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Interest resources, current price
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    concept: ons.household_interest_resources
+    source_concept: ons.ukea_haxv
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/haxv/ukea
+    concept_evidence_notes: UKEA series HAXV, households (S.14) interest (D.41) resources,
+      current price GBP million NSA; annual observation for 2025; 30 June 2026 release.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number

@@ -1,0 +1,686 @@
+# SPI 2023-24 Tables 3.6/3.7: 13 total-income bands x 7 income types,
+# counts (thousands, 1e3) + amounts (GBP million, 1e6); means are derivable
+# and not ported. tax_year period 2023 (opening year; uk-data maps to 2024).
+# Band lower bounds are numeric ODS cells, so numeric row-header guards
+# work here. uk-data's 1.9x property-income scale (SPI-vs-ITSA coverage)
+# and its uprated projections are populace-side adjustments, not facts.
+# Same artifact populace's national HMRC stage parses (hmrc_income.py).
+# Also not ported from Table 3.7: the 'Other income' Number/Amount pair
+# (columns K/L) and both sheets' total-count column N - named exclusions,
+# backfill candidates, not derivable from the ported columns.
+schema_version: ledger.source_package.v1
+package_id: hmrc-spi-income-bands-2023-24
+label: 'HMRC Survey of Personal Incomes 2023-24: income counts and amounts by range of total
+  income (Tables 3.6 and 3.7)'
+artifact:
+  source_name: hmrc
+  source_table: 'SPI collated Tables 3.1 to 3.11, tax year 2023-24: income by range of total
+    income'
+  resource_package: db
+  resource_directory: data/hmrc/spi_income_bands_2023_24
+  manifest: manifest.yaml
+  vintage: spi_2023_24
+  extracted_at: '2026-08-06'
+  extraction_method: ODS whole-workbook used-range cell parse
+  parser: ods_used_range
+  artifact_year: 2024
+record_sets:
+- record_set_id: hmrc.spi_2324.table_3_6
+  provenance_class: survey_aggregate
+  survey_instrument: Survey of Personal Incomes
+  record_set_spec_id: hmrc.spi_2324.table_3_6.v1
+  source_record_id_prefix: hmrc.spi_2324.table_3_6
+  sheet_name: Table_3_6
+  period_type: tax_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: personal_incomes
+  groupby_dimension: hmrc.total_income_band
+  rows:
+  - value_id: band_12570
+    label: Total income from GBP 12 570
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: 12570
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 12570
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 12570
+      label: total_income_lower_bound
+  - value_id: band_15000
+    label: Total income from GBP 15 000
+    ordinal: 1
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: 15000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 15000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 15000
+      label: total_income_lower_bound
+  - value_id: band_20000
+    label: Total income from GBP 20 000
+    ordinal: 2
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: 20000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 20000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 20000
+      label: total_income_lower_bound
+  - value_id: band_30000
+    label: Total income from GBP 30 000
+    ordinal: 3
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: 30000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 30000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 30000
+      label: total_income_lower_bound
+  - value_id: band_40000
+    label: Total income from GBP 40 000
+    ordinal: 4
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: 40000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 40000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 40000
+      label: total_income_lower_bound
+  - value_id: band_50000
+    label: Total income from GBP 50 000
+    ordinal: 5
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: 50000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 50000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 50000
+      label: total_income_lower_bound
+  - value_id: band_70000
+    label: Total income from GBP 70 000
+    ordinal: 6
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: 70000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 70000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 70000
+      label: total_income_lower_bound
+  - value_id: band_100000
+    label: Total income from GBP 100 000
+    ordinal: 7
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: 100000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 100000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 100000
+      label: total_income_lower_bound
+  - value_id: band_150000
+    label: Total income from GBP 150 000
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: 150000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 150000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 150000
+      label: total_income_lower_bound
+  - value_id: band_200000
+    label: Total income from GBP 200 000
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: 200000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 200000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 200000
+      label: total_income_lower_bound
+  - value_id: band_300000
+    label: Total income from GBP 300 000
+    ordinal: 10
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: 300000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 300000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 300000
+      label: total_income_lower_bound
+  - value_id: band_500000
+    label: Total income from GBP 500 000
+    ordinal: 11
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: 500000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 500000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 500000
+      label: total_income_lower_bound
+  - value_id: band_1000000
+    label: Total income from GBP 1 000 000
+    ordinal: 12
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: 1000000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 1000000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 1000000
+      label: total_income_lower_bound
+  measures:
+  - measure_id: self_employment_count
+    label: Self Employment (count)
+    ordinal: 0
+    column: B
+    source_column_id: self_employment_count
+    expected_column_header_row: 5
+    expected_column_header: Self-employment income (Number of individuals) [Note 1]
+    concept: hmrc.spi_self_employment_income_count
+    source_concept: hmrc.spi_self_employment_income_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Self-employment
+      income (Number of individuals) [Note 1]; taxpayers in thousands, amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: self_employment_amount
+    label: Self Employment (amount)
+    ordinal: 1
+    column: C
+    source_column_id: self_employment_amount
+    expected_column_header_row: 5
+    expected_column_header: Self-employment income (Amount) [Note 1]
+    concept: hmrc.spi_self_employment_income_amount
+    source_concept: hmrc.spi_self_employment_income_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Self-employment
+      income (Amount) [Note 1]; taxpayers in thousands, amounts GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+  - measure_id: employment_count
+    label: Employment (count)
+    ordinal: 2
+    column: E
+    source_column_id: employment_count
+    expected_column_header_row: 5
+    expected_column_header: Employment income (Number of individuals)
+    concept: hmrc.spi_employment_income_count
+    source_concept: hmrc.spi_employment_income_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Employment income
+      (Number of individuals); taxpayers in thousands, amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: employment_amount
+    label: Employment (amount)
+    ordinal: 3
+    column: F
+    source_column_id: employment_amount
+    expected_column_header_row: 5
+    expected_column_header: Employment income (Amount)
+    concept: hmrc.spi_employment_income_amount
+    source_concept: hmrc.spi_employment_income_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Employment income
+      (Amount); taxpayers in thousands, amounts GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+  - measure_id: state_pension_count
+    label: State Pension (count)
+    ordinal: 4
+    column: H
+    source_column_id: state_pension_count
+    expected_column_header_row: 5
+    expected_column_header: Pension Income from National Insurance contributions (Number of
+      individuals) [Note 2]
+    concept: hmrc.spi_state_pension_count
+    source_concept: hmrc.spi_state_pension_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension Income
+      from National Insurance contributions (Number of individuals) [Note 2]; taxpayers in
+      thousands, amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: state_pension_amount
+    label: State Pension (amount)
+    ordinal: 5
+    column: I
+    source_column_id: state_pension_amount
+    expected_column_header_row: 5
+    expected_column_header: Pension Income from National Insurance contributions (Amount)
+      [Note 2]
+    concept: hmrc.spi_state_pension_amount
+    source_concept: hmrc.spi_state_pension_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension Income
+      from National Insurance contributions (Amount) [Note 2]; taxpayers in thousands, amounts
+      GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+  - measure_id: private_pension_count
+    label: Private Pension (count)
+    ordinal: 6
+    column: K
+    source_column_id: private_pension_count
+    expected_column_header_row: 5
+    expected_column_header: Pension income from other pensions (Number of individuals)
+    concept: hmrc.spi_private_pension_income_count
+    source_concept: hmrc.spi_private_pension_income_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension income
+      from other pensions (Number of individuals); taxpayers in thousands, amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: private_pension_amount
+    label: Private Pension (amount)
+    ordinal: 7
+    column: L
+    source_column_id: private_pension_amount
+    expected_column_header_row: 5
+    expected_column_header: Pension income from other pensions (Amount)
+    concept: hmrc.spi_private_pension_income_amount
+    source_concept: hmrc.spi_private_pension_income_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_6, column: Pension income
+      from other pensions (Amount); taxpayers in thousands, amounts GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: hmrc.spi_2324.table_3_7
+  provenance_class: survey_aggregate
+  survey_instrument: Survey of Personal Incomes
+  record_set_spec_id: hmrc.spi_2324.table_3_7.v1
+  source_record_id_prefix: hmrc.spi_2324.table_3_7
+  sheet_name: Table_3_7
+  period_type: tax_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: person
+  entity_role: taxpayer
+  domain: personal_incomes
+  groupby_dimension: hmrc.total_income_band
+  rows:
+  - value_id: band_12570
+    label: Total income from GBP 12 570
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: 12570
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 12570
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 12570
+      label: total_income_lower_bound
+  - value_id: band_15000
+    label: Total income from GBP 15 000
+    ordinal: 1
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: 15000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 15000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 15000
+      label: total_income_lower_bound
+  - value_id: band_20000
+    label: Total income from GBP 20 000
+    ordinal: 2
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: 20000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 20000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 20000
+      label: total_income_lower_bound
+  - value_id: band_30000
+    label: Total income from GBP 30 000
+    ordinal: 3
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: 30000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 30000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 30000
+      label: total_income_lower_bound
+  - value_id: band_40000
+    label: Total income from GBP 40 000
+    ordinal: 4
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: 40000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 40000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 40000
+      label: total_income_lower_bound
+  - value_id: band_50000
+    label: Total income from GBP 50 000
+    ordinal: 5
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: 50000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 50000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 50000
+      label: total_income_lower_bound
+  - value_id: band_70000
+    label: Total income from GBP 70 000
+    ordinal: 6
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: 70000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 70000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 70000
+      label: total_income_lower_bound
+  - value_id: band_100000
+    label: Total income from GBP 100 000
+    ordinal: 7
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: 100000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 100000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 100000
+      label: total_income_lower_bound
+  - value_id: band_150000
+    label: Total income from GBP 150 000
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: 150000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 150000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 150000
+      label: total_income_lower_bound
+  - value_id: band_200000
+    label: Total income from GBP 200 000
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: 200000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 200000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 200000
+      label: total_income_lower_bound
+  - value_id: band_300000
+    label: Total income from GBP 300 000
+    ordinal: 10
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: 300000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 300000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 300000
+      label: total_income_lower_bound
+  - value_id: band_500000
+    label: Total income from GBP 500 000
+    ordinal: 11
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: 500000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 500000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 500000
+      label: total_income_lower_bound
+  - value_id: band_1000000
+    label: Total income from GBP 1 000 000
+    ordinal: 12
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: 1000000
+    table_record_kind: detail
+    filters:
+      total_income_lower_bound: 1000000
+    constraints:
+    - variable: total_income_lower_bound
+      operator: ==
+      value: 1000000
+      label: total_income_lower_bound
+  measures:
+  - measure_id: property_count
+    label: Property (count)
+    ordinal: 0
+    column: B
+    source_column_id: property_count
+    expected_column_header_row: 5
+    expected_column_header: Net income from property (Number of individuals) [Note 2]
+    concept: hmrc.spi_property_income_count
+    source_concept: hmrc.spi_property_income_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Net income from
+      property (Number of individuals) [Note 2]; taxpayers in thousands, amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: property_amount
+    label: Property (amount)
+    ordinal: 1
+    column: C
+    source_column_id: property_amount
+    expected_column_header_row: 5
+    expected_column_header: Net income from property (Amount) [Note 2]
+    concept: hmrc.spi_property_income_amount
+    source_concept: hmrc.spi_property_income_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Net income from
+      property (Amount) [Note 2]; taxpayers in thousands, amounts GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+  - measure_id: savings_interest_count
+    label: Savings Interest (count)
+    ordinal: 2
+    column: E
+    source_column_id: savings_interest_count
+    expected_column_header_row: 5
+    expected_column_header: Interest from building societies and banks (Number of individuals)
+      [Note 3, 4]
+    concept: hmrc.spi_savings_interest_income_count
+    source_concept: hmrc.spi_savings_interest_income_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Interest from
+      building societies and banks (Number of individuals) [Note 3, 4]; taxpayers in thousands,
+      amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: savings_interest_amount
+    label: Savings Interest (amount)
+    ordinal: 3
+    column: F
+    source_column_id: savings_interest_amount
+    expected_column_header_row: 5
+    expected_column_header: Interest from building societies and banks (Amount) [Note 3, 4]
+    concept: hmrc.spi_savings_interest_income_amount
+    source_concept: hmrc.spi_savings_interest_income_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Interest from
+      building societies and banks (Amount) [Note 3, 4]; taxpayers in thousands, amounts GBP
+      million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+  - measure_id: dividends_count
+    label: Dividends (count)
+    ordinal: 4
+    column: H
+    source_column_id: dividends_count
+    expected_column_header_row: 5
+    expected_column_header: Dividends (Number of individuals) [Note 5]
+    concept: hmrc.spi_dividend_income_count
+    source_concept: hmrc.spi_dividend_income_count
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Dividends (Number
+      of individuals) [Note 5]; taxpayers in thousands, amounts GBP million.'
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+  - measure_id: dividends_amount
+    label: Dividends (amount)
+    ordinal: 5
+    column: I
+    source_column_id: dividends_amount
+    expected_column_header_row: 5
+    expected_column_header: Dividends (Amount) [Note 5]
+    concept: hmrc.spi_dividend_income_amount
+    source_concept: hmrc.spi_dividend_income_amount
+    concept_relation: source_label
+    concept_authority: hmrc
+    concept_evidence_url: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+    concept_evidence_notes: 'SPI collated tables 2023-24, Table_3_7, column: Dividends (Amount)
+      [Note 5]; taxpayers in thousands, amounts GBP million.'
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number

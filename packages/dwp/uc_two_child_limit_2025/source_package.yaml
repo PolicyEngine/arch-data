@@ -1,0 +1,868 @@
+# Tables 01, 03A/03B and 04A/04B: all four status rows ported (in receipt /
+# affected / not receiving a child element / exception granted). month period
+# 2025-04 (publisher reference point); policyengine-uk-data models these at
+# 2026, a populace-side timing declaration. Entity split per review: household
+# counts carry entity household; children counts (table 01 cols C-D, tables
+# 03B/04B) carry entity person (role child_in_uc_household) - DWP's captions
+# count children, and 03B values are exact child-multiples of 03A households.
+# Not ported (named exclusions, backfill candidates): 04A/04B columns H-J
+# (child with DLA / child with PIP / blind child), the exception-reason rows
+# 13-16, family-type and earnings rows 17-26, and the children-count rows
+# 27-30 on the 04x sheets; regional/time-series sheets 02x and 05x-14.
+schema_version: ledger.source_package.v1
+package_id: dwp-uc-two-child-limit-2025
+label: 'DWP Universal Credit two-child limit statistics, April 2025: households and children
+  by status, family size and disability'
+artifact:
+  source_name: dwp
+  source_table: 'Universal Credit claimants: statistics on the two-child limit policy, April
+    2025 data tables'
+  resource_package: db
+  resource_directory: data/dwp/uc_two_child_limit_2025
+  manifest: manifest.yaml
+  vintage: two_child_limit_april_2025
+  extracted_at: '2026-08-06'
+  extraction_method: ODS whole-workbook used-range cell parse
+  parser: ods_used_range
+  artifact_year: 2025
+record_sets:
+- domain: universal_credit_two_child_limit
+  entity: household
+  entity_role: uc_household
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  groupby_dimension: dwp.two_child_limit_status
+  measures:
+  - aggregation: sum
+    column: B
+    concept: dwp.uc_tcl_headline_households_affected
+    concept_authority: dwp
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 01, column: Universal
+      Credit households affected by the Two Child Limit policy.'
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_relation: source_label
+    expected_cell_type: number
+    expected_column_header: Universal Credit households affected by the Two Child Limit policy
+    expected_column_header_row: 8
+    label: Universal Credit households affected by the Two Child Limit policy
+    measure_id: universal_credit_households_affected_by_the_two_
+    ordinal: 0
+    source_column_id: universal_credit_households_affected_by_the_two_
+    source_concept: dwp.uc_tcl_headline_households_affected
+    unit: count
+  period: 2025-04
+  period_type: month
+  provenance_class: administrative
+  record_set_id: dwp.uc_tcl.apr2025.table01
+  record_set_spec_id: dwp.uc_tcl.apr2025.table01.v1
+  rows:
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: in_receipt_of_child_element_all
+      variable: two_child_limit_status
+    expected_row_header: Households in receipt of UC with three or more children
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: in_receipt_of_child_element_all
+    label: Households in receipt of UC with three or more children
+    ordinal: 0
+    row_number: 9
+    table_record_kind: total
+    value_id: in_receipt_of_child_element_all
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: affected_3plus_children
+      variable: two_child_limit_status
+    expected_row_header: Affected UC Household (has third or subsequent child on or after
+      6 April 2017)
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: affected_3plus_children
+    label: Affected UC Household (has third or subsequent child on or after 6 April 2017)
+    ordinal: 1
+    row_number: 10
+    table_record_kind: detail
+    value_id: affected_3plus_children
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: not_receiving_child_element
+      variable: two_child_limit_status
+    expected_row_header: Not receiving a child element
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: not_receiving_child_element
+    label: Not receiving a child element
+    ordinal: 2
+    row_number: 11
+    table_record_kind: detail
+    value_id: not_receiving_child_element
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: exception_granted
+      variable: two_child_limit_status
+    expected_row_header: In receipt of an exception
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: exception_granted
+    label: In receipt of an exception
+    ordinal: 3
+    row_number: 12
+    table_record_kind: detail
+    value_id: exception_granted
+  sheet_name: '01'
+  source_record_id_prefix: dwp.uc_tcl.apr2025.table01
+- domain: universal_credit_two_child_limit
+  entity: person
+  entity_role: child_in_uc_household
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  groupby_dimension: dwp.two_child_limit_status
+  measures:
+  - aggregation: sum
+    column: C
+    concept: dwp.uc_tcl_headline_children_within_affected_households
+    concept_authority: dwp
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 01, column: Children
+      within Universal Credit households affected by the Two Child Limit policy.'
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_relation: source_label
+    expected_cell_type: number
+    expected_column_header: Children within Universal Credit households affected by the Two
+      Child Limit policy
+    expected_column_header_row: 8
+    label: Children within Universal Credit households affected by the Two Child Limit policy
+    measure_id: children_within_universal_credit_households_affe
+    ordinal: 0
+    source_column_id: children_within_universal_credit_households_affe
+    source_concept: dwp.uc_tcl_headline_children_within_affected_households
+    unit: count
+  - aggregation: sum
+    column: D
+    concept: dwp.uc_tcl_headline_children_affected_by_policy
+    concept_authority: dwp
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 01, column: Children
+      affected by the Two Child Limit policy.'
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_relation: source_label
+    expected_cell_type: number
+    expected_column_header: Children affected by the Two Child Limit policy
+    expected_column_header_row: 8
+    label: Children affected by the Two Child Limit policy
+    measure_id: children_affected_by_the_two_child_limit_policy
+    ordinal: 1
+    source_column_id: children_affected_by_the_two_child_limit_policy
+    source_concept: dwp.uc_tcl_headline_children_affected_by_policy
+    unit: count
+  period: 2025-04
+  period_type: month
+  provenance_class: administrative
+  record_set_id: dwp.uc_tcl.apr2025.table01_children
+  record_set_spec_id: dwp.uc_tcl.apr2025.table01_children.v1
+  rows:
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: in_receipt_of_child_element_all
+      variable: two_child_limit_status
+    expected_row_header: Households in receipt of UC with three or more children
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: in_receipt_of_child_element_all
+    label: Households in receipt of UC with three or more children
+    ordinal: 0
+    row_number: 9
+    table_record_kind: total
+    value_id: in_receipt_of_child_element_all
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: affected_3plus_children
+      variable: two_child_limit_status
+    expected_row_header: Affected UC Household (has third or subsequent child on or after
+      6 April 2017)
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: affected_3plus_children
+    label: Affected UC Household (has third or subsequent child on or after 6 April 2017)
+    ordinal: 1
+    row_number: 10
+    table_record_kind: detail
+    value_id: affected_3plus_children
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: not_receiving_child_element
+      variable: two_child_limit_status
+    expected_row_header: Not receiving a child element
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: not_receiving_child_element
+    label: Not receiving a child element
+    ordinal: 2
+    row_number: 11
+    table_record_kind: detail
+    value_id: not_receiving_child_element
+  - constraints:
+    - label: two_child_limit_status
+      operator: ==
+      value: exception_granted
+      variable: two_child_limit_status
+    expected_row_header: In receipt of an exception
+    expected_row_header_column: A
+    filters:
+      two_child_limit_status: exception_granted
+    label: In receipt of an exception
+    ordinal: 3
+    row_number: 12
+    table_record_kind: detail
+    value_id: exception_granted
+  sheet_name: '01'
+  source_record_id_prefix: dwp.uc_tcl.apr2025.table01_children
+- record_set_id: dwp.uc_tcl.apr2025.table03a
+  provenance_class: administrative
+  record_set_spec_id: dwp.uc_tcl.apr2025.table03a.v1
+  source_record_id_prefix: dwp.uc_tcl.apr2025.table03a
+  sheet_name: 03A
+  period_type: month
+  period: 2025-04
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit_two_child_limit
+  groupby_dimension: dwp.two_child_limit_status
+  rows:
+  - value_id: in_receipt_of_child_element_all
+    label: Households in receipt of UC with three or more children
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Households in receipt of UC with three or more children
+    table_record_kind: total
+    filters:
+      two_child_limit_status: in_receipt_of_child_element_all
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: in_receipt_of_child_element_all
+      label: two_child_limit_status
+  - value_id: affected_3plus_children
+    label: Affected UC Household (has third or subsequent child on or after 6 April 2017)
+    ordinal: 1
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Affected UC Household (has third or subsequent child on or after
+      6 April 2017)
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: affected_3plus_children
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: affected_3plus_children
+      label: two_child_limit_status
+  - value_id: not_receiving_child_element
+    label: Not receiving a child element
+    ordinal: 2
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Not receiving a child element
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: not_receiving_child_element
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: not_receiving_child_element
+      label: two_child_limit_status
+  - value_id: exception_granted
+    label: In receipt of an exception
+    ordinal: 3
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: In receipt of an exception
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: exception_granted
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: exception_granted
+      label: two_child_limit_status
+  measures:
+  - measure_id: 3_children_in_household
+    label: 3 children in household
+    ordinal: 0
+    column: B
+    source_column_id: 3_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 3 children in household
+    concept: dwp.uc_tcl_households_by_children_3
+    source_concept: dwp.uc_tcl_households_by_children_3
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03A, column: 3
+      children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 4_children_in_household
+    label: 4 children in household
+    ordinal: 1
+    column: C
+    source_column_id: 4_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 4 children in household
+    concept: dwp.uc_tcl_households_by_children_4
+    source_concept: dwp.uc_tcl_households_by_children_4
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03A, column: 4
+      children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 5_children_in_household
+    label: 5 children in household
+    ordinal: 2
+    column: D
+    source_column_id: 5_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 5 children in household
+    concept: dwp.uc_tcl_households_by_children_5
+    source_concept: dwp.uc_tcl_households_by_children_5
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03A, column: 5
+      children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 6_or_more_children_in_household
+    label: 6 or more children in household
+    ordinal: 3
+    column: E
+    source_column_id: 6_or_more_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 6 or more children in household
+    concept: dwp.uc_tcl_households_by_children_6_plus
+    source_concept: dwp.uc_tcl_households_by_children_6_plus
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03A, column: 6
+      or more children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: dwp.uc_tcl.apr2025.table03b
+  provenance_class: administrative
+  record_set_spec_id: dwp.uc_tcl.apr2025.table03b.v1
+  source_record_id_prefix: dwp.uc_tcl.apr2025.table03b
+  sheet_name: 03B
+  period_type: month
+  period: 2025-04
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: person
+  entity_role: child_in_uc_household
+  domain: universal_credit_two_child_limit
+  groupby_dimension: dwp.two_child_limit_status
+  rows:
+  - value_id: in_receipt_of_child_element_all
+    label: Households in receipt of UC with three or more children
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Households in receipt of UC with three or more children
+    table_record_kind: total
+    filters:
+      two_child_limit_status: in_receipt_of_child_element_all
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: in_receipt_of_child_element_all
+      label: two_child_limit_status
+  - value_id: affected_3plus_children
+    label: Affected UC Household (has third or subsequent child on or after 6 April 2017)
+    ordinal: 1
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Affected UC Household (has third or subsequent child on or after
+      6 April 2017)
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: affected_3plus_children
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: affected_3plus_children
+      label: two_child_limit_status
+  - value_id: not_receiving_child_element
+    label: Not receiving a child element
+    ordinal: 2
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Not receiving a child element
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: not_receiving_child_element
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: not_receiving_child_element
+      label: two_child_limit_status
+  - value_id: exception_granted
+    label: In receipt of an exception
+    ordinal: 3
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: In receipt of an exception
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: exception_granted
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: exception_granted
+      label: two_child_limit_status
+  measures:
+  - measure_id: 3_children_in_household
+    label: 3 children in household
+    ordinal: 0
+    column: B
+    source_column_id: 3_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 3 children in household
+    concept: dwp.uc_tcl_children_by_children_3
+    source_concept: dwp.uc_tcl_children_by_children_3
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03B, column: 3
+      children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 4_children_in_household
+    label: 4 children in household
+    ordinal: 1
+    column: C
+    source_column_id: 4_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 4 children in household
+    concept: dwp.uc_tcl_children_by_children_4
+    source_concept: dwp.uc_tcl_children_by_children_4
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03B, column: 4
+      children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 5_children_in_household
+    label: 5 children in household
+    ordinal: 2
+    column: D
+    source_column_id: 5_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 5 children in household
+    concept: dwp.uc_tcl_children_by_children_5
+    source_concept: dwp.uc_tcl_children_by_children_5
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03B, column: 5
+      children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: 6_or_more_children_in_household
+    label: 6 or more children in household
+    ordinal: 3
+    column: E
+    source_column_id: 6_or_more_children_in_household
+    expected_column_header_row: 8
+    expected_column_header: 6 or more children in household
+    concept: dwp.uc_tcl_children_by_children_6_plus
+    source_concept: dwp.uc_tcl_children_by_children_6_plus
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 03B, column: 6
+      or more children in household.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: dwp.uc_tcl.apr2025.table04a
+  provenance_class: administrative
+  record_set_spec_id: dwp.uc_tcl.apr2025.table04a.v1
+  source_record_id_prefix: dwp.uc_tcl.apr2025.table04a
+  sheet_name: 04A
+  period_type: month
+  period: 2025-04
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit_two_child_limit
+  groupby_dimension: dwp.two_child_limit_status
+  rows:
+  - value_id: in_receipt_of_child_element_all
+    label: Households in receipt of UC with three or more children
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Households in receipt of UC with three or more children
+    table_record_kind: total
+    filters:
+      two_child_limit_status: in_receipt_of_child_element_all
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: in_receipt_of_child_element_all
+      label: two_child_limit_status
+  - value_id: affected_3plus_children
+    label: Affected UC Household (has third or subsequent child on or after 6 April 2017)
+    ordinal: 1
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Affected UC Household (has third or subsequent child on or after
+      6 April 2017)
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: affected_3plus_children
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: affected_3plus_children
+      label: two_child_limit_status
+  - value_id: not_receiving_child_element
+    label: Not receiving a child element
+    ordinal: 2
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Not receiving a child element
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: not_receiving_child_element
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: not_receiving_child_element
+      label: two_child_limit_status
+  - value_id: exception_granted
+    label: In receipt of an exception
+    ordinal: 3
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: In receipt of an exception
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: exception_granted
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: exception_granted
+      label: two_child_limit_status
+  measures:
+  - measure_id: household_recieves_any_of_the_following
+    label: 'Household recieves any of the following:'
+    ordinal: 0
+    column: B
+    source_column_id: household_recieves_any_of_the_following
+    expected_column_header_row: 8
+    expected_column_header: 'Household recieves any of the following:'
+    concept: dwp.uc_tcl_households_by_disability_any_element
+    source_concept: dwp.uc_tcl_households_by_disability_any_element
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04A, column: Household
+      recieves any of the following:.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: health_or_limited_capability_for_work_or_work_re
+    label: Health (or limited capability for work or work related activity LCWRA) element
+      of UC
+    ordinal: 1
+    column: C
+    source_column_id: health_or_limited_capability_for_work_or_work_re
+    expected_column_header_row: 8
+    expected_column_header: Health (or limited capability for work or work related activity
+      LCWRA) element of UC
+    concept: dwp.uc_tcl_households_by_disability_lcwra_element
+    source_concept: dwp.uc_tcl_households_by_disability_lcwra_element
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04A, column: Health
+      (or limited capability for work or work related activity LCWRA) element of UC.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: claimant_with_disability_living_allowance_dla
+    label: Claimant with Disability Living Allowance (DLA)
+    ordinal: 2
+    column: D
+    source_column_id: claimant_with_disability_living_allowance_dla
+    expected_column_header_row: 8
+    expected_column_header: Claimant with Disability Living Allowance (DLA)
+    concept: dwp.uc_tcl_households_by_disability_claimant_dla
+    source_concept: dwp.uc_tcl_households_by_disability_claimant_dla
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04A, column: Claimant
+      with Disability Living Allowance (DLA).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: claimant_with_personal_independence_payment_pip
+    label: Claimant with Personal Independence Payment (PIP)
+    ordinal: 3
+    column: E
+    source_column_id: claimant_with_personal_independence_payment_pip
+    expected_column_header_row: 8
+    expected_column_header: Claimant with Personal Independence Payment (PIP)
+    concept: dwp.uc_tcl_households_by_disability_claimant_pip
+    source_concept: dwp.uc_tcl_households_by_disability_claimant_pip
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04A, column: Claimant
+      with Personal Independence Payment (PIP).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: disabled_child_element_of_uc
+    label: Disabled Child Element of UC
+    ordinal: 4
+    column: F
+    source_column_id: disabled_child_element_of_uc
+    expected_column_header_row: 8
+    expected_column_header: Disabled Child Element of UC
+    concept: dwp.uc_tcl_households_by_disability_disabled_child_element
+    source_concept: dwp.uc_tcl_households_by_disability_disabled_child_element
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04A, column: Disabled
+      Child Element of UC.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: household_with_child_with_dla_with_pip_or_is_bli
+    label: Household with child with DLA, with PIP, or is blind
+    ordinal: 5
+    column: G
+    source_column_id: household_with_child_with_dla_with_pip_or_is_bli
+    expected_column_header_row: 8
+    expected_column_header: Household with child with DLA, with PIP, or is blind
+    concept: dwp.uc_tcl_households_by_disability_child_dla_pip_or_blind
+    source_concept: dwp.uc_tcl_households_by_disability_child_dla_pip_or_blind
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04A, column: Household
+      with child with DLA, with PIP, or is blind.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: dwp.uc_tcl.apr2025.table04b
+  provenance_class: administrative
+  record_set_spec_id: dwp.uc_tcl.apr2025.table04b.v1
+  source_record_id_prefix: dwp.uc_tcl.apr2025.table04b
+  sheet_name: 04B
+  period_type: month
+  period: 2025-04
+  geography_id: K03000001
+  geography_level: country
+  geography_name: Great Britain
+  geography_vintage: current
+  entity: person
+  entity_role: child_in_uc_household
+  domain: universal_credit_two_child_limit
+  groupby_dimension: dwp.two_child_limit_status
+  rows:
+  - value_id: in_receipt_of_child_element_all
+    label: Households in receipt of UC with three or more children
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Households in receipt of UC with three or more children
+    table_record_kind: total
+    filters:
+      two_child_limit_status: in_receipt_of_child_element_all
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: in_receipt_of_child_element_all
+      label: two_child_limit_status
+  - value_id: affected_3plus_children
+    label: Affected UC Household (has third or subsequent child on or after 6 April 2017)
+    ordinal: 1
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Affected UC Household (has third or subsequent child on or after
+      6 April 2017)
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: affected_3plus_children
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: affected_3plus_children
+      label: two_child_limit_status
+  - value_id: not_receiving_child_element
+    label: Not receiving a child element
+    ordinal: 2
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Not receiving a child element
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: not_receiving_child_element
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: not_receiving_child_element
+      label: two_child_limit_status
+  - value_id: exception_granted
+    label: In receipt of an exception
+    ordinal: 3
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: In receipt of an exception
+    table_record_kind: detail
+    filters:
+      two_child_limit_status: exception_granted
+    constraints:
+    - variable: two_child_limit_status
+      operator: ==
+      value: exception_granted
+      label: two_child_limit_status
+  measures:
+  - measure_id: household_recieves_any_of_the_following
+    label: 'Household recieves any of the following:'
+    ordinal: 0
+    column: B
+    source_column_id: household_recieves_any_of_the_following
+    expected_column_header_row: 8
+    expected_column_header: 'Household recieves any of the following:'
+    concept: dwp.uc_tcl_children_by_disability_any_element
+    source_concept: dwp.uc_tcl_children_by_disability_any_element
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04B, column: Household
+      recieves any of the following:.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: health_or_limited_capability_for_work_or_work_re
+    label: Health (or limited capability for work or work related activity LCWRA) element
+      of UC
+    ordinal: 1
+    column: C
+    source_column_id: health_or_limited_capability_for_work_or_work_re
+    expected_column_header_row: 8
+    expected_column_header: Health (or limited capability for work or work related activity
+      LCWRA) element of UC
+    concept: dwp.uc_tcl_children_by_disability_lcwra_element
+    source_concept: dwp.uc_tcl_children_by_disability_lcwra_element
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04B, column: Health
+      (or limited capability for work or work related activity LCWRA) element of UC.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: claimant_with_disability_living_allowance_dla
+    label: Claimant with Disability Living Allowance (DLA)
+    ordinal: 2
+    column: D
+    source_column_id: claimant_with_disability_living_allowance_dla
+    expected_column_header_row: 8
+    expected_column_header: Claimant with Disability Living Allowance (DLA)
+    concept: dwp.uc_tcl_children_by_disability_claimant_dla
+    source_concept: dwp.uc_tcl_children_by_disability_claimant_dla
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04B, column: Claimant
+      with Disability Living Allowance (DLA).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: claimant_with_personal_independence_payment_pip
+    label: Claimant with Personal Independence Payment (PIP)
+    ordinal: 3
+    column: E
+    source_column_id: claimant_with_personal_independence_payment_pip
+    expected_column_header_row: 8
+    expected_column_header: Claimant with Personal Independence Payment (PIP)
+    concept: dwp.uc_tcl_children_by_disability_claimant_pip
+    source_concept: dwp.uc_tcl_children_by_disability_claimant_pip
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04B, column: Claimant
+      with Personal Independence Payment (PIP).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: disabled_child_element_of_uc
+    label: Disabled Child Element of UC
+    ordinal: 4
+    column: F
+    source_column_id: disabled_child_element_of_uc
+    expected_column_header_row: 8
+    expected_column_header: Disabled Child Element of UC
+    concept: dwp.uc_tcl_children_by_disability_disabled_child_element
+    source_concept: dwp.uc_tcl_children_by_disability_disabled_child_element
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04B, column: Disabled
+      Child Element of UC.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: household_with_child_with_dla_with_pip_or_is_bli
+    label: Household with child with DLA, with PIP, or is blind
+    ordinal: 5
+    column: G
+    source_column_id: household_with_child_with_dla_with_pip_or_is_bli
+    expected_column_header_row: 8
+    expected_column_header: Household with child with DLA, with PIP, or is blind
+    concept: dwp.uc_tcl_children_by_disability_child_dla_pip_or_blind
+    source_concept: dwp.uc_tcl_children_by_disability_child_dla_pip_or_blind
+    concept_relation: source_label
+    concept_authority: dwp
+    concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-claimants-statistics-on-the-two-child-limit-policy-april-2025
+    concept_evidence_notes: 'Two-child limit data tables, April 2025, sheet 04B, column: Household
+      with child with DLA, with PIP, or is blind.'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

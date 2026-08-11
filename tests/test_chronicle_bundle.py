@@ -27,16 +27,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 8,
         "error_count": 0,
-        "fact_count": 42895,
-        "geography_count": 1065,
-        "period_count": 19,
+        "fact_count": 43807,
+        "geography_count": 1066,
+        "period_count": 64,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
-        "source_count": 29,
-        "source_package_count": 64,
+        "source_count": 31,
+        "source_package_count": 73,
         "warning_count": 1,
     }
-    assert len(rows) == 42895
+    assert len(rows) == 43807
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -54,7 +54,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 64
+    assert source_packages["source_package_count"] == 73
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -68,7 +68,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 42895
+    assert coverage["fact_count"] == 43807
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -80,16 +80,18 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "cms_medicaid": 515,
         "cms_medicare": 1,
         "cms_nhe": 3,
+        "dwp": 107,
         "federal_reserve": 1,
         "hhs_acf_liheap": 2,
         "hhs_acf_tanf": 110,
         "ici": 12,
-        "hmrc": 193,
+        "hmrc": 714,
         "irs_soi": 33777,
         "jrc_euromod_be": 18,
         "kff": 52,
         "nbb_national_accounts": 1,
-        "ons": 4922,
+        "obr": 196,
+        "ons": 5010,
         "onem_rva_unemployment": 1,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
@@ -101,7 +103,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "usda_snap": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 59
+    assert len(table_counts) == 68
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert (
         table_counts[
@@ -222,24 +224,69 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert coverage["counts"]["by_period"] == {
         "calendar_year:2015": 2,
-        "calendar_year:2018": 1,
-        "calendar_year:2021": 2,
-        "calendar_year:2022": 8,
-        "calendar_year:2023": 2211,
-        "calendar_year:2024": 2879,
-        "calendar_year:2025": 1477,
+        "calendar_year:2018": 12,
+        "calendar_year:2019": 11,
+        "calendar_year:2020": 11,
+        "calendar_year:2021": 13,
+        "calendar_year:2022": 19,
+        "calendar_year:2023": 2222,
+        "calendar_year:2024": 2890,
+        "calendar_year:2025": 1488,
         "calendar_year:2026": 235,
         "calendar_year:2027": 214,
         "calendar_year:2028": 214,
         "calendar_year:2029": 214,
         "calendar_year:2031": 2,
         "fiscal_year:2023": 48,
-        "fiscal_year:2024": 520,
+        "fiscal_year:2024": 548,
+        "fiscal_year:2025": 28,
+        "fiscal_year:2026": 28,
+        "fiscal_year:2027": 28,
+        "fiscal_year:2028": 28,
+        "fiscal_year:2029": 28,
+        "fiscal_year:2030": 28,
         "month:2024-12": 264,
+        "month:2025-04": 92,
+        "month:2025-11": 15,
         "month:2025-12": 255,
-        "tax_year:2022": 5886,
-        "tax_year:2023": 28429,
-        "tax_year:2024": 34,
+        "tax_year:1987": 9,
+        "tax_year:1988": 9,
+        "tax_year:1989": 9,
+        "tax_year:1990": 9,
+        "tax_year:1991": 9,
+        "tax_year:1992": 9,
+        "tax_year:1993": 9,
+        "tax_year:1994": 9,
+        "tax_year:1995": 9,
+        "tax_year:1996": 9,
+        "tax_year:1997": 9,
+        "tax_year:1998": 9,
+        "tax_year:1999": 9,
+        "tax_year:2000": 9,
+        "tax_year:2001": 9,
+        "tax_year:2002": 9,
+        "tax_year:2003": 9,
+        "tax_year:2004": 9,
+        "tax_year:2005": 9,
+        "tax_year:2006": 9,
+        "tax_year:2007": 9,
+        "tax_year:2008": 9,
+        "tax_year:2009": 9,
+        "tax_year:2010": 9,
+        "tax_year:2011": 9,
+        "tax_year:2012": 9,
+        "tax_year:2013": 9,
+        "tax_year:2014": 9,
+        "tax_year:2015": 9,
+        "tax_year:2016": 9,
+        "tax_year:2017": 9,
+        "tax_year:2018": 9,
+        "tax_year:2019": 9,
+        "tax_year:2020": 9,
+        "tax_year:2021": 9,
+        "tax_year:2022": 5895,
+        "tax_year:2023": 28620,
+        "tax_year:2024": 40,
     }
     assert coverage["counts"]["by_geography"]["country:BE"] == 31
     assert coverage["counts"]["by_geography"]["nuts1:BE1"] == 6
@@ -251,16 +298,17 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 2907
-    assert len(coverage["counts"]["by_geography"]) == 1065
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 3712
+    assert coverage["counts"]["by_geography"]["country:K03000001"] == 107
+    assert len(coverage["counts"]["by_geography"]) == 1066
     assert coverage["counts"]["by_entity"] == {
         "family": 107,
         "firm": 1439,
         "government": 125,
-        "household": 62,
+        "household": 209,
         "institutional_sector": 13,
         "pension_plan": 2,
-        "person": 7364,
+        "person": 8129,
         "tax_unit": 33783,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]

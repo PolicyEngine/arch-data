@@ -1,0 +1,1428 @@
+# LFS-derived survey aggregates (survey_instrument: Labour Force Survey).
+# Values are thousands (value_scale 1e3). Row headers are exact cell text
+# including leading indentation and ONS note markers. The 2025 edition
+# carries LFS-reweighted revisions of earlier years; deltas vs the June
+# production fixture are enumerated at the populace consumption gate.
+schema_version: ledger.source_package.v1
+package_id: ons-families-households-2025
+label: 'ONS families and households 2025, Table 7: UK households by household type, 2018-2025'
+artifact:
+  source_name: ons
+  source_table: 'Families and households in the UK 2025, Table 7: households by type'
+  resource_package: db
+  resource_directory: data/ons/families_households_2025
+  manifest: manifest.yaml
+  vintage: families_households_2025
+  extracted_at: '2026-08-06'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2025
+record_sets:
+- record_set_id: ons.families_households_2025.table7.cy2018
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2018.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2018
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2018 estimate
+    ordinal: 0
+    column: W
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2018 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2018 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2019
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2019.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2019
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2019 estimate
+    ordinal: 0
+    column: T
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2019 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2019 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2020
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2020.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2020
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2020 estimate
+    ordinal: 0
+    column: Q
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2020 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2020 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2021
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2021.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2021
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2021 estimate
+    ordinal: 0
+    column: N
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2021 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2021 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2022
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2022.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2022
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2022 estimate
+    ordinal: 0
+    column: K
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2022 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2022 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2023
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2023.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2023
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2023 estimate
+    ordinal: 0
+    column: H
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2023 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2023 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2024
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2024.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2024
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2024 estimate
+    ordinal: 0
+    column: E
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2024 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2024 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: ons.families_households_2025.table7.cy2025
+  provenance_class: survey_aggregate
+  survey_instrument: Labour Force Survey
+  record_set_spec_id: ons.families_households_2025.table7.cy2025.v1
+  source_record_id_prefix: ons.families_households_2025.table7.cy2025
+  sheet_name: '7'
+  period_type: calendar_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_type
+  rows:
+  - value_id: lone_households_under_65
+    label: Under 65
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: '   Under 65'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_under_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_under_65
+      label: household_type
+  - value_id: lone_households_over_65
+    label: 65 or over
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: '   65 or over'
+    table_record_kind: detail
+    filters:
+      household_type: lone_households_over_65
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_households_over_65
+      label: household_type
+  - value_id: unrelated_adult_households
+    label: Two or more unrelated adults [note 10]
+    ordinal: 2
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: Two or more unrelated adults [note 10]
+    table_record_kind: detail
+    filters:
+      household_type: unrelated_adult_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: unrelated_adult_households
+      label: household_type
+  - value_id: couple_no_children_households
+    label: No children [note 7]
+    ordinal: 3
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: '      No children [note 7]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_no_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_no_children_households
+      label: household_type
+  - value_id: couple_under_3_children_households
+    label: 1 to 2 dependent children [note 5]
+    ordinal: 4
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: '      1 to 2 dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_under_3_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_under_3_children_households
+      label: household_type
+  - value_id: couple_3_plus_children_households
+    label: 3 or more dependent children [note 5]
+    ordinal: 5
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: '      3 or more dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_3_plus_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_3_plus_children_households
+      label: household_type
+  - value_id: couple_non_dependent_children_only_households
+    label: Non-dependent children only [note 6]
+    ordinal: 6
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: couple_non_dependent_children_only_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: couple_non_dependent_children_only_households
+      label: household_type
+  - value_id: lone_parent_dependent_children_households
+    label: Dependent children [note 5]
+    ordinal: 7
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: '      Dependent children [note 5]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_dependent_children_households
+      label: household_type
+  - value_id: lone_parent_non_dependent_children_households
+    label: Non-dependent children only [note 6]
+    ordinal: 8
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: '      Non-dependent children only [note 6]'
+    table_record_kind: detail
+    filters:
+      household_type: lone_parent_non_dependent_children_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: lone_parent_non_dependent_children_households
+      label: household_type
+  - value_id: multi_family_households
+    label: Multi-family households [note 4] [note 11]
+    ordinal: 9
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: Multi-family households [note 4] [note 11]
+    table_record_kind: detail
+    filters:
+      household_type: multi_family_households
+    constraints:
+    - variable: household_type
+      operator: ==
+      value: multi_family_households
+      label: household_type
+  measures:
+  - measure_id: households
+    label: Households, 2025 estimate
+    ordinal: 0
+    column: B
+    source_column_id: households
+    expected_column_header_row: 12
+    expected_column_header: 2025 Estimate
+    concept: ons.households_by_type
+    source_concept: ons.families_households_table7
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 7 households
+      by type, 2025 estimate, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
