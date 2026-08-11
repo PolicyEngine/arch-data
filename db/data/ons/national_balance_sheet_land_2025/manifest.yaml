@@ -10,3 +10,9 @@ files:
     sha256: 8bec0fbbaf474c76daf721100f1cbda6bda57957ff370f85d36fca4e310d3a79
     size_bytes: 532615
     fetched_at: '2026-08-07T12:51:56+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-national-balance-sheet-land-2025/2024/8bec0fbbaf474c76daf721100f1cbda6bda57957ff370f85d36fca4e310d3a79/nbsreferencetables2025.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-national-balance-sheet-land-2025/2024/8bec0fbbaf474c76daf721100f1cbda6bda57957ff370f85d36fca4e310d3a79/nbsreferencetables2025.xlsx

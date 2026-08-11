@@ -10,3 +10,9 @@ files:
     sha256: 8e431837aa37ee298c9a2b9b010b8ecbc7e3a817573a3a84f6251e6db00a591f
     size_bytes: 18765
     fetched_at: '2026-08-07T10:36:57+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/scotgov/scotgov-council-tax-bands-2025/2025/8e431837aa37ee298c9a2b9b010b8ecbc7e3a817573a3a84f6251e6db00a591f/CTAXBASE_2025_Tables_Chargeable_Dwellings.xlsx
+        uri: r2://ledger-raw/raw/scotgov/scotgov-council-tax-bands-2025/2025/8e431837aa37ee298c9a2b9b010b8ecbc7e3a817573a3a84f6251e6db00a591f/CTAXBASE_2025_Tables_Chargeable_Dwellings.xlsx

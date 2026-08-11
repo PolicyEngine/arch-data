@@ -10,3 +10,9 @@ files:
     sha256: f36b277c3bbb243858d171a8dcd3ad086d76d8afdb53d63b9884df6597071938
     size_bytes: 18678676
     fetched_at: '2026-08-07T10:42:50+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/dft/dft-nts-vehicle-ownership-2024/2024/f36b277c3bbb243858d171a8dcd3ad086d76d8afdb53d63b9884df6597071938/nts-2024-excel-tables.zip
+        uri: r2://ledger-raw/raw/dft/dft-nts-vehicle-ownership-2024/2024/f36b277c3bbb243858d171a8dcd3ad086d76d8afdb53d63b9884df6597071938/nts-2024-excel-tables.zip

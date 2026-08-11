@@ -10,3 +10,9 @@ files:
     sha256: 29c49dd487b87ef6e3164243c9f16847839e9e28b37743c65c13fb560f5540fe
     size_bytes: 200834
     fetched_at: '2026-08-07T10:27:59+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/dwp/dwp-benefit-statistics-february-2026/2025/29c49dd487b87ef6e3164243c9f16847839e9e28b37743c65c13fb560f5540fe/dwp-benefit-statistics-february-2026.html
+        uri: r2://ledger-raw/raw/dwp/dwp-benefit-statistics-february-2026/2025/29c49dd487b87ef6e3164243c9f16847839e9e28b37743c65c13fb560f5540fe/dwp-benefit-statistics-february-2026.html

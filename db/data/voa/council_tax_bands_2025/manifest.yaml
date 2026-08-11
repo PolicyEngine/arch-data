@@ -11,3 +11,9 @@ files:
     sha256: dee4a50bebe96b0774eee4210f0293ba698a160d72de345d36f0c088bb46500b
     size_bytes: 122081
     fetched_at: '2026-08-07T10:33:40+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/voa/voa-council-tax-bands-2025/2025/dee4a50bebe96b0774eee4210f0293ba698a160d72de345d36f0c088bb46500b/2025_CT_SoP_Summary_Tables.xlsx
+        uri: r2://ledger-raw/raw/voa/voa-council-tax-bands-2025/2025/dee4a50bebe96b0774eee4210f0293ba698a160d72de345d36f0c088bb46500b/2025_CT_SoP_Summary_Tables.xlsx

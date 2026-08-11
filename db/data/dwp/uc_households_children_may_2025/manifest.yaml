@@ -10,3 +10,9 @@ files:
     sha256: 8772d7385bb35e6c5123852e53e0626ee474021f74fa46256f7cde7fe8f7dd75
     size_bytes: 5292
     fetched_at: '2026-08-07T12:05:54+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/dwp/dwp-uc-households-children-may-2025/2025/8772d7385bb35e6c5123852e53e0626ee474021f74fa46256f7cde7fe8f7dd75/uc_households_by_number_of_children_may2025.json
+        uri: r2://ledger-raw/raw/dwp/dwp-uc-households-children-may-2025/2025/8772d7385bb35e6c5123852e53e0626ee474021f74fa46256f7cde7fe8f7dd75/uc_households_by_number_of_children_may2025.json

@@ -10,3 +10,9 @@ files:
     sha256: aa04454e77ae1a45d26e7a89801a946721b9c8f00b7760cf72f4edaa2482509c
     size_bytes: 225893
     fetched_at: '2026-08-07T10:45:14+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-public-sector-employment-2026/2026/aa04454e77ae1a45d26e7a89801a946721b9c8f00b7760cf72f4edaa2482509c/pse-reference-table-march2026.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-public-sector-employment-2026/2026/aa04454e77ae1a45d26e7a89801a946721b9c8f00b7760cf72f4edaa2482509c/pse-reference-table-march2026.xlsx

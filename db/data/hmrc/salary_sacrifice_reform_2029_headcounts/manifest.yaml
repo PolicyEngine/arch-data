@@ -11,3 +11,9 @@ files:
     sha256: 0b966220ca665c4d08307080329e1f912bd5ebd78b60796d70a6ad52e3c68f7b
     size_bytes: 95269
     fetched_at: '2026-08-07T12:43:01+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/hmrc/hmrc-salary-sacrifice-reform-2029-headcounts/2025/0b966220ca665c4d08307080329e1f912bd5ebd78b60796d70a6ad52e3c68f7b/salary-sacrifice-reform-for-pension-contributions.html
+        uri: r2://ledger-raw/raw/hmrc/hmrc-salary-sacrifice-reform-2029-headcounts/2025/0b966220ca665c4d08307080329e1f912bd5ebd78b60796d70a6ad52e3c68f7b/salary-sacrifice-reform-for-pension-contributions.html
