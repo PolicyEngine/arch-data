@@ -1632,6 +1632,42 @@
     "targetUnit": "usd",
     "country": "US"
    }
+  },
+  {
+   "series": "usaspending.cdfi.assistance_transaction_obligations",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-11 for the thesis bills full-coverage wave (thesis#159 Wave A verified request; S. 2718 CDFI page): CDFI Fund awarding-subtier ASSISTANCE TRANSACTION obligations via USAspending spending_over_time — the filter is part of the concept identity, so a differently filtered CDFI series is a distinct identity, never an enrichment of this one. Context series only, not the assistance S. 2718 would authorize. Observations arrive when the thesis usaspending-api extension and its docket admission land (in review at mint time).",
+   "extras": {
+    "targetUnit": "usd_millions",
+    "country": "US"
+   }
+  },
+  {
+   "series": "usaspending.ondcp.hidta_al95001_obligations",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-11 for the thesis bills full-coverage wave (thesis#159 Wave A verified request; S. 767 HIDTA page): the whole Assistance Listing 95.001 award-transaction aggregate via USAspending spending_over_time — the listing number is part of the concept identity. Not a section 707(s) supplemental metric. Observations arrive when the thesis usaspending-api extension and its docket admission land (in review at mint time).",
+   "extras": {
+    "targetUnit": "usd_millions",
+    "country": "US"
+   }
+  },
+  {
+   "series": "usaspending.ntia.broadband_al11038_obligations",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-11 for the thesis bills full-coverage wave (thesis#159 Wave A verified request; H.R. 2449 FUTURE Networks page): the Assistance Listing 11.038 award-transaction aggregate via USAspending spending_over_time — the listing number is part of the concept identity. Advanced-wireless grant context, not a 6G Task Force metric. Observations arrive when the thesis usaspending-api extension and its docket admission land (in review at mint time).",
+   "extras": {
+    "targetUnit": "usd_millions",
+    "country": "US"
+   }
+  },
+  {
+   "series": "usaspending.usfs.minnesota_place_of_performance_obligations",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-11 for the thesis bills full-coverage wave (thesis#159 Wave A verified request; H.R. 978 Superior NF page): Forest Service award obligations with Minnesota place of performance via USAspending spending_over_time. Geography decision: the docket-seed schema is country-level by design, so this row's geography is US country and the Minnesota place-of-performance scope is part of the concept identity string — a future state-geography series would be a distinct identity, not an enrichment of this one. Minnesota-wide context: USAspending has no named-forest filter, so this is NOT Superior National Forest obligations. Observations arrive when the thesis usaspending-api extension and its docket admission land (in review at mint time).",
+   "extras": {
+    "targetUnit": "usd_millions",
+    "country": "US"
+   }
   }
  ]
 }

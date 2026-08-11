@@ -1,11 +1,11 @@
 {
   "comment": "Canonical series catalog. One row per (concept, geography level/id/vintage, entity) identity. UUID authority is the append-only ledger/series_uuid_registry.jsonl (digest below): a uuid is minted once, inherited from the registry on every regeneration, and changes only through explicit, chained supersede/retire/revive/succeeds events recorded there (live bindings and rows stay in bijection). Consumers reference series by uuid or concept only. Regenerate with scripts/build_series_catalog.py; verify with --check. Aliases are curated identity statements (plus observed spellings of the same identity) and inherit only within one (geography, entity) slice; aliases listed in ambiguous_aliases match multiple rows and never drive inheritance. source_concepts are publisher labels — provenance, never identity. Cross-spelling and cross-vintage merges are manual curation: delete the absorbed row, alias its concept on the survivor, regenerate with --allow-remint.",
   "generator_version": 3,
-  "observations_sha256": "92a1f4f40c98bdd91edafd5e15faa78b641f94f016a526b783ab2fe74974074d",
-  "observation_rows": 179,
-  "current_assertion_rows": 179,
-  "docket_seed_sha256": "235ee5742faa3ad1f5048b91402b93b3526dd405da2b52557ffbb306579a6033",
-  "uuid_registry_sha256": "b2c933a238b92bae48dc565e14a65ea29a40b1c28ec2dab5141ffc4153b172b9",
+  "observations_sha256": "893b06cf310d7075ed62ad1a964c3cfa025b1049415446f2c76428d77c2bbe5c",
+  "observation_rows": 182,
+  "current_assertion_rows": 182,
+  "docket_seed_sha256": "f86ca19d9b7ff1f44cdfa026ae506452f32033342691e0dda35dca0b353392cc",
+  "uuid_registry_sha256": "488aed798f7bcbb053e774e0e8192397d8fee7b367e6fb5fbdc00613f64f9c64",
   "suspect_segments": [],
   "stripped_segments": {
     "2026-05": [
@@ -107,6 +107,9 @@
     "june_2026": [
       "abs.labour.employment_change.australia",
       "abs.labour.unemployment_rate.australia",
+      "bls.ces.aerospace_product_and_parts_employment",
+      "bls.ces.federal_department_of_defense_employment",
+      "bls.ces.ship_and_boat_building_employment",
       "bls.ces.total_nonfarm_payroll_change",
       "bls.cpi.u.core_mom",
       "bls.cpi.u.headline_mom",
@@ -903,6 +906,41 @@
       "observation_count": 1
     },
     {
+      "uuid": "80a2c9d9-6a09-484b-9ecd-8cc7e8b6be22",
+      "concept": "bls.ces.aerospace_product_and_parts_employment",
+      "family_patterns": [
+        "bls.ces.aerospace_product_and_parts_employment.{P}"
+      ],
+      "status": "observed",
+      "unit": "thousands",
+      "cadence": "month",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "bls_ces"
+      ],
+      "aliases": [
+        "bls.ces.aerospace_product_and_parts_employment.june_2026"
+      ],
+      "source_concepts": [
+        "CES3133640001"
+      ],
+      "rid_patterns": [
+        "bls.ces.aerospace_product_and_parts_employment.{P}.first_print"
+      ],
+      "first_observed_period": "2026-06",
+      "last_observed_period": "2026-06",
+      "observation_count": 1
+    },
+    {
       "uuid": "0edb7ad9-0541-4bd2-9597-bffc9e73cd92",
       "concept": "bls.ces.average_hourly_earnings_private_monthly_change",
       "family_patterns": [
@@ -938,6 +976,41 @@
       "observation_count": 1
     },
     {
+      "uuid": "d1d4fc9b-d53a-4e04-a3c3-e4498801c88b",
+      "concept": "bls.ces.federal_department_of_defense_employment",
+      "family_patterns": [
+        "bls.ces.federal_department_of_defense_employment.{P}"
+      ],
+      "status": "observed",
+      "unit": "thousands",
+      "cadence": "month",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "bls_ces"
+      ],
+      "aliases": [
+        "bls.ces.federal_department_of_defense_employment.june_2026"
+      ],
+      "source_concepts": [
+        "CES9091911001"
+      ],
+      "rid_patterns": [
+        "bls.ces.federal_department_of_defense_employment.{P}.first_print"
+      ],
+      "first_observed_period": "2026-06",
+      "last_observed_period": "2026-06",
+      "observation_count": 1
+    },
+    {
       "uuid": "d8ab9f3a-aa0c-4b7f-89df-a0c9107cfdbb",
       "concept": "bls.ces.nonfarm_payrolls.change",
       "family_patterns": [
@@ -955,6 +1028,41 @@
       "first_observed_period": null,
       "last_observed_period": null,
       "observation_count": 0
+    },
+    {
+      "uuid": "13c723db-3ec7-4e28-b305-30050f832a71",
+      "concept": "bls.ces.ship_and_boat_building_employment",
+      "family_patterns": [
+        "bls.ces.ship_and_boat_building_employment.{P}"
+      ],
+      "status": "observed",
+      "unit": "thousands",
+      "cadence": "month",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "bls_ces"
+      ],
+      "aliases": [
+        "bls.ces.ship_and_boat_building_employment.june_2026"
+      ],
+      "source_concepts": [
+        "CES3133660001"
+      ],
+      "rid_patterns": [
+        "bls.ces.ship_and_boat_building_employment.{P}.first_print"
+      ],
+      "first_observed_period": "2026-06",
+      "last_observed_period": "2026-06",
+      "observation_count": 1
     },
     {
       "uuid": "c0515530-c56b-417d-9ead-aff423c87207",
@@ -6515,6 +6623,29 @@
       "observation_count": 1
     },
     {
+      "uuid": "69834e1f-1fbf-432c-9913-6b391321b3a8",
+      "concept": "usaspending.cdfi.assistance_transaction_obligations",
+      "family_patterns": [
+        "usaspending.cdfi.assistance_transaction_obligations"
+      ],
+      "status": "docket-only",
+      "unit": "usd_millions",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
+    },
+    {
       "uuid": "e64ea5db-b72a-4a46-8948-6142dbc59d91",
       "concept": "usaspending.dhs.title_vi.award_transaction_obligations",
       "family_patterns": [
@@ -6642,6 +6773,75 @@
       "unit": "thousands",
       "cadence": "year",
       "geography": null,
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
+    },
+    {
+      "uuid": "f37307e0-91c6-49ee-afc7-2021e33ea863",
+      "concept": "usaspending.ntia.broadband_al11038_obligations",
+      "family_patterns": [
+        "usaspending.ntia.broadband_al11038_obligations"
+      ],
+      "status": "docket-only",
+      "unit": "usd_millions",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
+    },
+    {
+      "uuid": "02662bfc-b77d-48f3-938b-7a5b2f9e5c73",
+      "concept": "usaspending.ondcp.hidta_al95001_obligations",
+      "family_patterns": [
+        "usaspending.ondcp.hidta_al95001_obligations"
+      ],
+      "status": "docket-only",
+      "unit": "usd_millions",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
+    },
+    {
+      "uuid": "720be189-a4a5-4b0c-a25c-49233ff388a4",
+      "concept": "usaspending.usfs.minnesota_place_of_performance_obligations",
+      "family_patterns": [
+        "usaspending.usfs.minnesota_place_of_performance_obligations"
+      ],
+      "status": "docket-only",
+      "unit": "usd_millions",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
       "entity": null,
       "sources": [],
       "aliases": [],
