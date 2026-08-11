@@ -514,10 +514,16 @@ none, so one series never mixes bases across periods), or
 observation and a projection colliding at the chosen period resolve to the
 observation with an `ambiguous_assertion_at_period` warning rather than
 double-counting). A target whose `chronicle_selector` names `assertion`
-explicitly bypasses the policy — the selector is already maximal intent. Whenever a
+explicitly bypasses the policy — the selector is already maximal intent —
+and declaring both on one target is rejected at profile load as a
+contradiction. Whenever a
 projection is resolved, the report carries a `resolved_from_projection`
 warning and the resolved row exposes its `assertion`, so downstream builds
-never discover the estimate/projection boundary by accident.
+never discover the estimate/projection boundary by accident. A fact that
+predates the axis loads as `observation`: both the file loader and the
+resolver default a missing `assertion` and reject unknown values, so every
+pre-existing package keeps its meaning and a typo'd assertion fails loudly
+instead of vanishing from the candidate set.
 
 ```yaml
 record_sets:

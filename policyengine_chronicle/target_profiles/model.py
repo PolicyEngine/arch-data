@@ -197,6 +197,12 @@ def _target_from_mapping(raw: Mapping[str, Any]) -> TargetProfileTarget:
             f"target profile row {target_id!r} assertion_policy must be one of "
             f"{sorted(ASSERTION_POLICIES)}, got {assertion_policy!r}."
         )
+    if assertion_policy is not None and "assertion" in chronicle_selector:
+        raise ValueError(
+            f"target profile row {target_id!r} declares both assertion_policy "
+            f"{assertion_policy!r} and a chronicle_selector on 'assertion'; "
+            "the selector already pins the axis — declare one or the other."
+        )
     return TargetProfileTarget(
         target_id=target_id,
         family=family,

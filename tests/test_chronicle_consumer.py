@@ -1004,3 +1004,49 @@ def test_invalid_assertion_policy_values_are_rejected():
         _policy_profile(defaults_policy="projections_welcome")
     with pytest.raises(ValueError, match="assertion_policy"):
         _policy_profile(target_policy="observed")
+
+
+def test_unknown_assertion_values_fail_resolution_loudly():
+    # A typo'd assertion must not quietly vanish from every policy's
+    # candidate set; the resolver polices the enum like the file loader does.
+    rows = _mixed_assertion_rows()
+    rows[-1] = dict(rows[-1], assertion="projection")
+    with pytest.raises(ValueError, match="unsupported assertion"):
+        resolve_profile_targets(
+            _policy_profile(),
+            rows,
+            {"type": "tax_year", "value": 2022},
+        )
+
+
+def test_missing_assertion_defaults_to_observation_at_resolve():
+    # Back-compat parity with the file loader: rows that predate the axis
+    # resolve as observations.
+    rows = _mixed_assertion_rows()
+    legacy = dict(rows[1])
+    del legacy["assertion"]
+    rows[1] = legacy
+    report = resolve_profile_targets(
+        _policy_profile(),
+        rows,
+        {"type": "tax_year", "value": 2022},
+    )
+    assert report.valid
+    (row,) = report.resolved
+    assert row.assertion == "observation"
+    assert row.value == 110
+
+
+def test_assertion_selector_and_target_policy_together_are_rejected():
+    # The selector already pins the axis; a per-target policy alongside it is
+    # a contradiction the author should hear about at load, not have
+    # silently resolved.
+    with pytest.raises(ValueError, match="declares both assertion_policy"):
+        _policy_profile(
+            target_policy="observed_only",
+            selector={
+                "source_name": "irs_soi",
+                "source_measure_id": "agi",
+                "assertion": "source_projection",
+            },
+        )

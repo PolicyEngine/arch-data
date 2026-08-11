@@ -263,6 +263,7 @@ def resolve_profile_targets(
     blocking coverage issues instead of returning an invalid report.
     """
     requested = _normalize_period(requested_period)
+    rows = _normalize_assertion_rows(rows)
     alignment_map = _normalize_alignments(alignments)
     if profile.base_period_policy not in SUPPORTED_BASE_PERIOD_POLICIES:
         raise ValueError(
@@ -320,6 +321,7 @@ def resolve_profile_targets(
                         ),
                         profile_id=profile.profile_id,
                         target_id=target.target_id,
+                        severity="error",
                     )
                 )
                 continue
@@ -401,6 +403,9 @@ def resolve_profile_targets(
                 )
             )
 
+        # The flag is set inside the row loop deliberately: one
+        # resolved_from_projection warning per target, however many of its
+        # rows resolve from projections.
         projection_resolved = False
         for row in rows_at_period:
             if row["assertion"] == "source_projection":
@@ -613,6 +618,29 @@ def _latest(values) -> Any:
     if all(isinstance(value, int) for value in values):
         return max(values)
     return max(values, key=str)
+
+
+def _normalize_assertion_rows(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Police the assertion axis for rows that bypassed the file loader.
+
+    ``_load_consumer_rows`` already defaults and validates ``assertion``;
+    rows handed to :func:`resolve_profile_targets` directly get the same
+    treatment here, so a typo such as ``assertion: projection`` fails loudly
+    instead of silently vanishing from every policy's candidate set.
+    """
+    normalized: list[dict[str, Any]] = []
+    for index, row in enumerate(rows):
+        mutable = dict(row)
+        assertion = mutable.setdefault("assertion", DEFAULT_ASSERTION)
+        if assertion not in ALLOWED_ASSERTIONS:
+            raise ValueError(
+                f"Consumer fact row {index} has unsupported assertion "
+                f"{assertion!r}; allowed: {sorted(ALLOWED_ASSERTIONS)}."
+            )
+        normalized.append(mutable)
+    return normalized
 
 
 def _normalize_period(period: Mapping[str, Any]) -> dict[str, Any]:
