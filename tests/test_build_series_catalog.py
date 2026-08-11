@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 209
+    assert len(committed["series"]) == 216
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1184,8 +1184,28 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # supersedes; builder reported minted=5 (all succeeds), superseded=0,
     # suspects=0. The other 204 bindings are byte-unchanged; row count
     # stays 209.
+    # Updated 2026-08-11: +7 mints, superseded=0, suspects=0, all 209
+    # prior bindings unchanged (209 -> 216). Four docket-only
+    # placeholders for the thesis bills full-coverage wave's in-review
+    # usaspending-api extensions (thesis#159 Wave A verified requests;
+    # implementation, tests, anchors, and docket admission were still
+    # outstanding at mint time),
+    # with the defining filter carried in each concept identity so a
+    # differently filtered series can never enrich these lineages:
+    # usaspending.cdfi.assistance_transaction_obligations,
+    # usaspending.ondcp.hidta_al95001_obligations,
+    # usaspending.ntia.broadband_al11038_obligations, and
+    # usaspending.usfs.minnesota_place_of_performance_obligations
+    # (country-level geography by seed-schema design; the Minnesota
+    # place-of-performance scope lives in the concept string, so a
+    # future state-geography series is a distinct identity). Plus the
+    # three observed BLS CES defense-employment identities whose first
+    # prints were recorded 2026-08-10 ahead of their catalog rows
+    # (aerospace_product_and_parts, federal_department_of_defense,
+    # ship_and_boat_building employment) — deterministic auto-mints any
+    # next build would produce.
     assert digest == (
-        "96cfd574d8749179f92bf469665b0facb7739aefc06d6f04b23d901b2c1cf3c3"
+        "bf17abbe438eddb9401cee0f5c38d4c2d25eed775c53b5a2106bd4ef1445d38d"
     )
 
 
