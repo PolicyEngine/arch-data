@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 217
+    assert len(committed["series"]) == 218
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1204,11 +1204,14 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # (aerospace_product_and_parts, federal_department_of_defense,
     # ship_and_boat_building employment) — deterministic auto-mints any
     # next build would produce.
-    # Updated 2026-08-12: +1 docket-only mint for the Thesis Wave B3
+    # Updated 2026-08-12: +2 docket-only mints for the Thesis Wave B3
     # BLS QCEW U.S.-private NAICS 624410 annual-average employment
-    # admission. All 216 prior live bindings are unchanged (216 -> 217).
+    # admission and the exact BEA ITA Table 5.1 line 18 QSA
+    # personal-transfer-payments identity. The BEA source-linked seed makes
+    # clear that only future release-day custody can enrich it; all 216 prior
+    # live bindings remain unchanged (216 -> 218).
     assert digest == (
-        "8335bba2be865639908ac47372f097919041b182074a8c5f68c2abc158f433c9"
+        "8e8ba1974997ce4714eab462f482bccb9292f1c4317e87809d68feac869a6a5c"
     )
 
 

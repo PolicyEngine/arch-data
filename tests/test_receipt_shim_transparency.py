@@ -31,9 +31,9 @@ ORIGINAL_HASHES = {
 }
 OPENSSL_QUEUE_ID = re.compile(rb"(?m)^[0-9A-Fa-f]{8,16}(?=:error:)")
 
-BASE_LINE_COUNT = 145
-CANDIDATE_LINE_COUNT = 147
-NEW_RELEASE_STEM = "0002-a69272175b73c83b"
+BASE_LINE_COUNT = 182
+CANDIDATE_LINE_COUNT = 189
+NEW_RELEASE_STEM = "0012-3a5ef7eeee484370"
 RELEASE_FILE_SUFFIXES = (
     ".json",
     ".producer.sig",
@@ -163,10 +163,10 @@ def test_live_full_release_chain_is_byte_identical(
     _assert_byte_identical(original, shim, expected_code=0)
     assert shim.stderr == b""
     assert shim.stdout == (
-        b"release chain OK: 3 releases, "
-        b"HEAD=0002-a69272175b73c83b.json, "
-        b"digicert=2026-07-18T16:39:11Z, "
-        b"freetsa=2026-07-18T16:39:11Z\n"
+        b"release chain OK: 13 releases, "
+        b"HEAD=0012-3a5ef7eeee484370.json, "
+        b"digicert=2026-08-12T14:43:16Z, "
+        b"freetsa=2026-08-12T14:43:16Z\n"
     )
 
 
@@ -212,7 +212,7 @@ def _corrupt_freetsa_receipt(root: pathlib.Path) -> None:
         (
             "unwitnessed-row",
             _append_unwitnessed_row,
-            b"HEAD release lineCount 147 does not match working-tree line count 148",
+            b"HEAD release lineCount 189 does not match working-tree line count 190",
         ),
         (
             "producer-signature",
@@ -270,8 +270,8 @@ def _release_file(root: pathlib.Path, suffix: str) -> pathlib.Path:
     return root / "releases" / "manifests" / f"{NEW_RELEASE_STEM}{suffix}"
 
 
-def _replay_release_two(destination: pathlib.Path) -> tuple[pathlib.Path, str]:
-    """Create the real release-1 base and restore the witnessed release-2 append."""
+def _replay_latest_release(destination: pathlib.Path) -> tuple[pathlib.Path, str]:
+    """Create the real prior-release base and restore the witnessed HEAD append."""
 
     root = _copy_custody_tree(destination)
     ledger = root / "ledger" / "official_observations.jsonl"
@@ -333,13 +333,13 @@ def test_valid_base_ref_append_is_byte_identical(
     original_oracle: pathlib.Path,
     tmp_path: pathlib.Path,
 ) -> None:
-    candidate, base = _replay_release_two(tmp_path)
+    candidate, base = _replay_latest_release(tmp_path)
     original, shim = _run_append_pair(original_oracle, candidate, base)
     _assert_byte_identical(original, shim, expected_code=0)
     assert shim.stderr == b""
     assert shim.stdout == (
-        b"thesis-facts append check OK: 147 rows, immutable prefix 128, "
-        b"+2 appended vs base, release 2\n"
+        b"thesis-facts append check OK: 189 rows, immutable prefix 128, "
+        b"+7 appended vs base, release 12\n"
     )
 
 
@@ -353,9 +353,9 @@ def _rewrite_historical_row(root: pathlib.Path) -> None:
 def _remove_appended_assertion_version(root: pathlib.Path) -> None:
     ledger = root / "ledger" / "official_observations.jsonl"
     rows = ledger.read_bytes().splitlines(keepends=True)
-    row = json.loads(rows[145])
+    row = json.loads(rows[BASE_LINE_COUNT])
     row.pop("assertionVersion")
-    rows[145] = (
+    rows[BASE_LINE_COUNT] = (
         json.dumps(row, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         + b"\n"
     )
@@ -377,12 +377,12 @@ def _remove_new_release_manifest(root: pathlib.Path) -> None:
         (
             "missing-assertion-version",
             _remove_appended_assertion_version,
-            b"appended line 146",
+            b"appended line 183",
         ),
         (
             "missing-release-manifest",
             _remove_new_release_manifest,
-            b"release proposal must add exactly one manifest for index 2",
+            b"release proposal must add exactly one manifest for index 12",
         ),
     ],
 )
@@ -393,7 +393,7 @@ def test_corrupt_base_ref_append_refusals_are_byte_identical(
     mutation: Mutation,
     marker: bytes,
 ) -> None:
-    candidate, base = _replay_release_two(tmp_path / case)
+    candidate, base = _replay_latest_release(tmp_path / case)
     mutation(candidate)
     original, shim = _run_append_pair(original_oracle, candidate, base)
     _assert_byte_identical(original, shim, expected_code=1)
