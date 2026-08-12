@@ -1,0 +1,18 @@
+source_id: hmrc
+package_id: hmrc-spi-income-by-area-2023-24
+dataset: hmrc_hmrc-spi-income-by-area-2023-24
+source_page: https://www.gov.uk/government/statistics/personal-incomes-statistics-for-the-tax-year-2023-to-2024
+table: Personal Incomes Statistics tables 3.12 to 3.15a, tax year 2023 to 2024
+files:
+  2023:
+    filename: Collated_Tables_3_12_to_3_15a_2324.ods
+    source_url: https://assets.publishing.service.gov.uk/media/69f1f17cc42061e837e3ac3b/Collated_Tables_3_12_to_3_15a_2324.ods
+    sha256: f70e210eb2931d9a6da5f8b6fa184b902b51ef9e2c9fb3588323907647d7672c
+    size_bytes: 926081
+    fetched_at: '2026-08-12T15:02:57+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/hmrc/hmrc-spi-income-by-area-2023-24/2023/f70e210eb2931d9a6da5f8b6fa184b902b51ef9e2c9fb3588323907647d7672c/Collated_Tables_3_12_to_3_15a_2324.ods
+        uri: r2://ledger-raw/raw/hmrc/hmrc-spi-income-by-area-2023-24/2023/f70e210eb2931d9a6da5f8b6fa184b902b51ef9e2c9fb3588323907647d7672c/Collated_Tables_3_12_to_3_15a_2324.ods

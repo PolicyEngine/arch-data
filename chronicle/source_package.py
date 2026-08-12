@@ -83,6 +83,7 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
+    "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
     "hmrc-salary-sacrifice-relief-2024-25": Path("hmrc/salary_sacrifice_relief_2024_25"),
     "hmrc-salary-sacrifice-reform-2029-headcounts": Path(
         "hmrc/salary_sacrifice_reform_2029_headcounts"
