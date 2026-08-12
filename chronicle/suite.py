@@ -1409,6 +1409,10 @@ def _source_row_age_range(row: SourceRow) -> tuple[int, int | None] | None:
         match = re.search(r"\bAged?\s+(\d+)\s*\+", label, re.I)
         if match:
             return int(match.group(1)), None
+        # ... and its open bottom band as "Aged under 1 year".
+        match = re.search(r"\bunder\s+(\d+)\s+years?\b", label, re.I)
+        if match:
+            return 0, int(match.group(1))
     return None
 
 

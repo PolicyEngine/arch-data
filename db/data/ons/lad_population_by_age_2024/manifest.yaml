@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-lad-population-by-age-2024
+dataset: ons_ons-lad-population-by-age-2024
+source_page: https://www.nomisweb.co.uk/datasets/pestsyoala
+table: Population estimates - local authority based by five year age band, United
+  Kingdom, mid-2024
+files:
+  2024:
+    filename: lad_population_by_five_year_age_mid2024.csv
+    source_url: https://www.nomisweb.co.uk/api/v01/dataset/NM_31_1.data.csv?geography=TYPE424&date=2024&sex=7&age=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&measures=20100&select=date_name,geography_name,geography_code,sex_name,age_name,measures_name,obs_value
+    sha256: af0f646ed8e5e7020cebed1971bc9a8ebd8e02698115d44049cbee33be65f706
+    size_bytes: 542028
+    fetched_at: '2026-08-12T14:44:09+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-lad-population-by-age-2024/2024/af0f646ed8e5e7020cebed1971bc9a8ebd8e02698115d44049cbee33be65f706/lad_population_by_five_year_age_mid2024.csv
+        uri: r2://ledger-raw/raw/ons/ons-lad-population-by-age-2024/2024/af0f646ed8e5e7020cebed1971bc9a8ebd8e02698115d44049cbee33be65f706/lad_population_by_five_year_age_mid2024.csv

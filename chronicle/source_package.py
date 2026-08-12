@@ -240,6 +240,7 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2023-uk-countries": Path("ons/mye_2023_uk_countries"),
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
+    "ons-lad-population-by-age-2024": Path("ons/lad_population_by_age_2024"),
     "ons-pcon24-population-by-age-2024": Path("ons/pcon24_population_by_age_2024"),
     "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
     "nisra-pcon24-population-by-age-2024": Path(
