@@ -1,0 +1,4078 @@
+# Student loan forecasts for England (DfE/SLC, Explore Education Statistics
+# permalink), Table 6a: forecast borrowers liable to repay and earning above
+# the repayment threshold, by product group and repayment plan, academic
+# years 2024/25 to 2029/30. First consumer of the academic_year period type
+# (#131/#136): fact periods store the OPENING year, while the EES value
+# columns are named by the END year (value_2025 = AY 2024/25) - the exact
+# leak the ALLOWED_PERIOD_TYPES caution warns about. All values are
+# forecasts (the table is titled 'Forecast number of...'), so every record
+# set carries model_output + assertion: source_projection; the uk_national
+# profile must opt in via assertion_policy (#154). Null publisher cells
+# (plan_3 rows for pre-masters products; Master's/Doctoral rows in years
+# with no forecast) are skipped per year, not zero-filled.
+# policyengine-uk-data keys these values to END-year calendars (its 2025 =
+# AY 2024/25) and uses only the Higher education total rows - both
+# populace-side declarations over these facts.
+schema_version: ledger.source_package.v1
+package_id: slc-student-loan-borrower-forecasts-england-2025
+label: 'SLC/DfE student loan forecasts for England, Table 6a: borrowers liable to repay and
+  earning above threshold, AY2024/25-2029/30'
+artifact:
+  source_name: slc
+  source_table: 'Student loan forecasts for England, Table 6a: forecast borrowers liable to
+    repay and earning above threshold, by product'
+  resource_package: db
+  resource_directory: data/slc/student_loan_borrower_forecasts_england_2025
+  manifest: manifest.yaml
+  vintage: forecasts_2025
+  extracted_at: '2026-08-08'
+  extraction_method: EES permalink __NEXT_DATA__ table parse into product x plan x status
+    rows
+  parser: ees_permalink_table_html
+  sheet_name: table
+  artifact_year: 2025
+record_sets:
+- record_set_id: slc.forecasts_2025.table_6a.ay2024
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: slc.forecasts_2025.table_6a.ay2024.v1
+  source_record_id_prefix: slc.forecasts_2025.table_6a.ay2024
+  sheet_name: table
+  period_type: academic_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.borrower_line
+  rows:
+  - value_id: higher_education_full_time__plan_2__liable_to_repay
+    label: Higher education full time, plan_2, liable_to_repay
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 2
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 2
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__liable_to_repay
+    label: Higher education full time, plan_5, liable_to_repay
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 3
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 3
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_2__above_repayment_threshold
+    label: Higher education full time, plan_2, above_repayment_threshold
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 5
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 5
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__above_repayment_threshold
+    label: Higher education full time, plan_5, above_repayment_threshold
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 6
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 6
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__liable_to_repay
+    label: Higher education part time, plan_2, liable_to_repay
+    ordinal: 4
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 8
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 8
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__liable_to_repay
+    label: Higher education part time, plan_5, liable_to_repay
+    ordinal: 5
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 9
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 9
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__above_repayment_threshold
+    label: Higher education part time, plan_2, above_repayment_threshold
+    ordinal: 6
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 11
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 11
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__above_repayment_threshold
+    label: Higher education part time, plan_5, above_repayment_threshold
+    ordinal: 7
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 12
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 12
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__liable_to_repay
+    label: Advanced Learner loans, plan_2, liable_to_repay
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 14
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__liable_to_repay
+    label: Advanced Learner loans, plan_5, liable_to_repay
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 15
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 15
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__above_repayment_threshold
+    label: Advanced Learner loans, plan_2, above_repayment_threshold
+    ordinal: 10
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 17
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 17
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__above_repayment_threshold
+    label: Advanced Learner loans, plan_5, above_repayment_threshold
+    ordinal: 11
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 18
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 18
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: master_s_loans__plan_3__liable_to_repay
+    label: Master's loans, plan_3, liable_to_repay
+    ordinal: 12
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 22
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 22
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: master_s_loans__plan_3__above_repayment_threshold
+    label: Master's loans, plan_3, above_repayment_threshold
+    ordinal: 13
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 25
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 25
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__liable_to_repay
+    label: Doctoral loans, plan_3, liable_to_repay
+    ordinal: 14
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 28
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 28
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__above_repayment_threshold
+    label: Doctoral loans, plan_3, above_repayment_threshold
+    ordinal: 15
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 31
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 31
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_2__liable_to_repay
+    label: Higher education total, plan_2, liable_to_repay
+    ordinal: 16
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 32
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 32
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_5__liable_to_repay
+    label: Higher education total, plan_5, liable_to_repay
+    ordinal: 17
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 33
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 33
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_2__above_repayment_threshold
+    label: Higher education total, plan_2, above_repayment_threshold
+    ordinal: 18
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 35
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 35
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_5__above_repayment_threshold
+    label: Higher education total, plan_5, above_repayment_threshold
+    ordinal: 19
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 36
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 36
+      expected_value: above_repayment_threshold
+      label: borrower status
+  measures:
+  - measure_id: borrowers
+    label: Student loan borrowers, AY 2024/25
+    ordinal: 0
+    column: K
+    source_column_id: value_2025
+    expected_column_header_row: 1
+    expected_column_header: value_2025
+    concept: slc.student_loan_borrowers
+    source_concept: slc.student_loan_borrowers
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    concept_evidence_notes: Student loan forecasts for England, Table 6a, academic year 2024/25
+      (EES value column value_2025 names the END year; the fact period stores the opening
+      year per the academic_year convention).
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: slc.forecasts_2025.table_6a.ay2025
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: slc.forecasts_2025.table_6a.ay2025.v1
+  source_record_id_prefix: slc.forecasts_2025.table_6a.ay2025
+  sheet_name: table
+  period_type: academic_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.borrower_line
+  rows:
+  - value_id: higher_education_full_time__plan_2__liable_to_repay
+    label: Higher education full time, plan_2, liable_to_repay
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 2
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 2
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__liable_to_repay
+    label: Higher education full time, plan_5, liable_to_repay
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 3
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 3
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_2__above_repayment_threshold
+    label: Higher education full time, plan_2, above_repayment_threshold
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 5
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 5
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__above_repayment_threshold
+    label: Higher education full time, plan_5, above_repayment_threshold
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 6
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 6
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__liable_to_repay
+    label: Higher education part time, plan_2, liable_to_repay
+    ordinal: 4
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 8
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 8
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__liable_to_repay
+    label: Higher education part time, plan_5, liable_to_repay
+    ordinal: 5
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 9
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 9
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__above_repayment_threshold
+    label: Higher education part time, plan_2, above_repayment_threshold
+    ordinal: 6
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 11
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 11
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__above_repayment_threshold
+    label: Higher education part time, plan_5, above_repayment_threshold
+    ordinal: 7
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 12
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 12
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__liable_to_repay
+    label: Advanced Learner loans, plan_2, liable_to_repay
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 14
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__liable_to_repay
+    label: Advanced Learner loans, plan_5, liable_to_repay
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 15
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 15
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__above_repayment_threshold
+    label: Advanced Learner loans, plan_2, above_repayment_threshold
+    ordinal: 10
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 17
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 17
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__above_repayment_threshold
+    label: Advanced Learner loans, plan_5, above_repayment_threshold
+    ordinal: 11
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 18
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 18
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: master_s_loans__plan_3__liable_to_repay
+    label: Master's loans, plan_3, liable_to_repay
+    ordinal: 12
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 22
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 22
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: master_s_loans__plan_3__above_repayment_threshold
+    label: Master's loans, plan_3, above_repayment_threshold
+    ordinal: 13
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 25
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 25
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__liable_to_repay
+    label: Doctoral loans, plan_3, liable_to_repay
+    ordinal: 14
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 28
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 28
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__above_repayment_threshold
+    label: Doctoral loans, plan_3, above_repayment_threshold
+    ordinal: 15
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 31
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 31
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_2__liable_to_repay
+    label: Higher education total, plan_2, liable_to_repay
+    ordinal: 16
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 32
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 32
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_5__liable_to_repay
+    label: Higher education total, plan_5, liable_to_repay
+    ordinal: 17
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 33
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 33
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_2__above_repayment_threshold
+    label: Higher education total, plan_2, above_repayment_threshold
+    ordinal: 18
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 35
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 35
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_5__above_repayment_threshold
+    label: Higher education total, plan_5, above_repayment_threshold
+    ordinal: 19
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 36
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 36
+      expected_value: above_repayment_threshold
+      label: borrower status
+  measures:
+  - measure_id: borrowers
+    label: Student loan borrowers, AY 2025/26
+    ordinal: 0
+    column: J
+    source_column_id: value_2026
+    expected_column_header_row: 1
+    expected_column_header: value_2026
+    concept: slc.student_loan_borrowers
+    source_concept: slc.student_loan_borrowers
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    concept_evidence_notes: Student loan forecasts for England, Table 6a, academic year 2025/26
+      (EES value column value_2026 names the END year; the fact period stores the opening
+      year per the academic_year convention).
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: slc.forecasts_2025.table_6a.ay2026
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: slc.forecasts_2025.table_6a.ay2026.v1
+  source_record_id_prefix: slc.forecasts_2025.table_6a.ay2026
+  sheet_name: table
+  period_type: academic_year
+  period: 2026
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.borrower_line
+  rows:
+  - value_id: higher_education_full_time__plan_2__liable_to_repay
+    label: Higher education full time, plan_2, liable_to_repay
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 2
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 2
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__liable_to_repay
+    label: Higher education full time, plan_5, liable_to_repay
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 3
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 3
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_2__above_repayment_threshold
+    label: Higher education full time, plan_2, above_repayment_threshold
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 5
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 5
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__above_repayment_threshold
+    label: Higher education full time, plan_5, above_repayment_threshold
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 6
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 6
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__liable_to_repay
+    label: Higher education part time, plan_2, liable_to_repay
+    ordinal: 4
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 8
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 8
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__liable_to_repay
+    label: Higher education part time, plan_5, liable_to_repay
+    ordinal: 5
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 9
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 9
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__above_repayment_threshold
+    label: Higher education part time, plan_2, above_repayment_threshold
+    ordinal: 6
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 11
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 11
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__above_repayment_threshold
+    label: Higher education part time, plan_5, above_repayment_threshold
+    ordinal: 7
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 12
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 12
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__liable_to_repay
+    label: Advanced Learner loans, plan_2, liable_to_repay
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 14
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__liable_to_repay
+    label: Advanced Learner loans, plan_5, liable_to_repay
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 15
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 15
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__above_repayment_threshold
+    label: Advanced Learner loans, plan_2, above_repayment_threshold
+    ordinal: 10
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 17
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 17
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__above_repayment_threshold
+    label: Advanced Learner loans, plan_5, above_repayment_threshold
+    ordinal: 11
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 18
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 18
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: master_s_loans__plan_3__liable_to_repay
+    label: Master's loans, plan_3, liable_to_repay
+    ordinal: 12
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 22
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 22
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: master_s_loans__plan_3__above_repayment_threshold
+    label: Master's loans, plan_3, above_repayment_threshold
+    ordinal: 13
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 25
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 25
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__liable_to_repay
+    label: Doctoral loans, plan_3, liable_to_repay
+    ordinal: 14
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 28
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 28
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__above_repayment_threshold
+    label: Doctoral loans, plan_3, above_repayment_threshold
+    ordinal: 15
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 31
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 31
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_2__liable_to_repay
+    label: Higher education total, plan_2, liable_to_repay
+    ordinal: 16
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 32
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 32
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_5__liable_to_repay
+    label: Higher education total, plan_5, liable_to_repay
+    ordinal: 17
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 33
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 33
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_2__above_repayment_threshold
+    label: Higher education total, plan_2, above_repayment_threshold
+    ordinal: 18
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 35
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 35
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_5__above_repayment_threshold
+    label: Higher education total, plan_5, above_repayment_threshold
+    ordinal: 19
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 36
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 36
+      expected_value: above_repayment_threshold
+      label: borrower status
+  measures:
+  - measure_id: borrowers
+    label: Student loan borrowers, AY 2026/27
+    ordinal: 0
+    column: I
+    source_column_id: value_2027
+    expected_column_header_row: 1
+    expected_column_header: value_2027
+    concept: slc.student_loan_borrowers
+    source_concept: slc.student_loan_borrowers
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    concept_evidence_notes: Student loan forecasts for England, Table 6a, academic year 2026/27
+      (EES value column value_2027 names the END year; the fact period stores the opening
+      year per the academic_year convention).
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: slc.forecasts_2025.table_6a.ay2027
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: slc.forecasts_2025.table_6a.ay2027.v1
+  source_record_id_prefix: slc.forecasts_2025.table_6a.ay2027
+  sheet_name: table
+  period_type: academic_year
+  period: 2027
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.borrower_line
+  rows:
+  - value_id: higher_education_full_time__plan_2__liable_to_repay
+    label: Higher education full time, plan_2, liable_to_repay
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 2
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 2
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__liable_to_repay
+    label: Higher education full time, plan_5, liable_to_repay
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 3
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 3
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_2__above_repayment_threshold
+    label: Higher education full time, plan_2, above_repayment_threshold
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 5
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 5
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__above_repayment_threshold
+    label: Higher education full time, plan_5, above_repayment_threshold
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 6
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 6
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__liable_to_repay
+    label: Higher education part time, plan_2, liable_to_repay
+    ordinal: 4
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 8
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 8
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__liable_to_repay
+    label: Higher education part time, plan_5, liable_to_repay
+    ordinal: 5
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 9
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 9
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__above_repayment_threshold
+    label: Higher education part time, plan_2, above_repayment_threshold
+    ordinal: 6
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 11
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 11
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__above_repayment_threshold
+    label: Higher education part time, plan_5, above_repayment_threshold
+    ordinal: 7
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 12
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 12
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__liable_to_repay
+    label: Advanced Learner loans, plan_2, liable_to_repay
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 14
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__liable_to_repay
+    label: Advanced Learner loans, plan_5, liable_to_repay
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 15
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 15
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__above_repayment_threshold
+    label: Advanced Learner loans, plan_2, above_repayment_threshold
+    ordinal: 10
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 17
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 17
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__above_repayment_threshold
+    label: Advanced Learner loans, plan_5, above_repayment_threshold
+    ordinal: 11
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 18
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 18
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: master_s_loans__plan_3__liable_to_repay
+    label: Master's loans, plan_3, liable_to_repay
+    ordinal: 12
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 22
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 22
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: master_s_loans__plan_3__above_repayment_threshold
+    label: Master's loans, plan_3, above_repayment_threshold
+    ordinal: 13
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 25
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 25
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__liable_to_repay
+    label: Doctoral loans, plan_3, liable_to_repay
+    ordinal: 14
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 28
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 28
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__above_repayment_threshold
+    label: Doctoral loans, plan_3, above_repayment_threshold
+    ordinal: 15
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 31
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 31
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_2__liable_to_repay
+    label: Higher education total, plan_2, liable_to_repay
+    ordinal: 16
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 32
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 32
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_5__liable_to_repay
+    label: Higher education total, plan_5, liable_to_repay
+    ordinal: 17
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 33
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 33
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_2__above_repayment_threshold
+    label: Higher education total, plan_2, above_repayment_threshold
+    ordinal: 18
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 35
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 35
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_5__above_repayment_threshold
+    label: Higher education total, plan_5, above_repayment_threshold
+    ordinal: 19
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 36
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 36
+      expected_value: above_repayment_threshold
+      label: borrower status
+  measures:
+  - measure_id: borrowers
+    label: Student loan borrowers, AY 2027/28
+    ordinal: 0
+    column: H
+    source_column_id: value_2028
+    expected_column_header_row: 1
+    expected_column_header: value_2028
+    concept: slc.student_loan_borrowers
+    source_concept: slc.student_loan_borrowers
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    concept_evidence_notes: Student loan forecasts for England, Table 6a, academic year 2027/28
+      (EES value column value_2028 names the END year; the fact period stores the opening
+      year per the academic_year convention).
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: slc.forecasts_2025.table_6a.ay2028
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: slc.forecasts_2025.table_6a.ay2028.v1
+  source_record_id_prefix: slc.forecasts_2025.table_6a.ay2028
+  sheet_name: table
+  period_type: academic_year
+  period: 2028
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.borrower_line
+  rows:
+  - value_id: higher_education_full_time__plan_2__liable_to_repay
+    label: Higher education full time, plan_2, liable_to_repay
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 2
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 2
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__liable_to_repay
+    label: Higher education full time, plan_5, liable_to_repay
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 3
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 3
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_2__above_repayment_threshold
+    label: Higher education full time, plan_2, above_repayment_threshold
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 5
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 5
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__above_repayment_threshold
+    label: Higher education full time, plan_5, above_repayment_threshold
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 6
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 6
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__liable_to_repay
+    label: Higher education part time, plan_2, liable_to_repay
+    ordinal: 4
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 8
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 8
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__liable_to_repay
+    label: Higher education part time, plan_5, liable_to_repay
+    ordinal: 5
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 9
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 9
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__above_repayment_threshold
+    label: Higher education part time, plan_2, above_repayment_threshold
+    ordinal: 6
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 11
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 11
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__above_repayment_threshold
+    label: Higher education part time, plan_5, above_repayment_threshold
+    ordinal: 7
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 12
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 12
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__liable_to_repay
+    label: Advanced Learner loans, plan_2, liable_to_repay
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 14
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__liable_to_repay
+    label: Advanced Learner loans, plan_5, liable_to_repay
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 15
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 15
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__above_repayment_threshold
+    label: Advanced Learner loans, plan_2, above_repayment_threshold
+    ordinal: 10
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 17
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 17
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__above_repayment_threshold
+    label: Advanced Learner loans, plan_5, above_repayment_threshold
+    ordinal: 11
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 18
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 18
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: master_s_loans__plan_3__liable_to_repay
+    label: Master's loans, plan_3, liable_to_repay
+    ordinal: 12
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 22
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 22
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: master_s_loans__plan_3__above_repayment_threshold
+    label: Master's loans, plan_3, above_repayment_threshold
+    ordinal: 13
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: Master's loans
+    table_record_kind: detail
+    filters:
+      row_group: Master's loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Master's loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 25
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 25
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__liable_to_repay
+    label: Doctoral loans, plan_3, liable_to_repay
+    ordinal: 14
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 28
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 28
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: doctoral_loans__plan_3__above_repayment_threshold
+    label: Doctoral loans, plan_3, above_repayment_threshold
+    ordinal: 15
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: Doctoral loans
+    table_record_kind: detail
+    filters:
+      row_group: Doctoral loans
+      repayment_plan: plan_3
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Doctoral loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_3
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 31
+      expected_value: plan_3
+      label: repayment plan
+    - column: D
+      row: 31
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_2__liable_to_repay
+    label: Higher education total, plan_2, liable_to_repay
+    ordinal: 16
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 32
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 32
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_5__liable_to_repay
+    label: Higher education total, plan_5, liable_to_repay
+    ordinal: 17
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 33
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 33
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_2__above_repayment_threshold
+    label: Higher education total, plan_2, above_repayment_threshold
+    ordinal: 18
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 35
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 35
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_5__above_repayment_threshold
+    label: Higher education total, plan_5, above_repayment_threshold
+    ordinal: 19
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 36
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 36
+      expected_value: above_repayment_threshold
+      label: borrower status
+  measures:
+  - measure_id: borrowers
+    label: Student loan borrowers, AY 2028/29
+    ordinal: 0
+    column: G
+    source_column_id: value_2029
+    expected_column_header_row: 1
+    expected_column_header: value_2029
+    concept: slc.student_loan_borrowers
+    source_concept: slc.student_loan_borrowers
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    concept_evidence_notes: Student loan forecasts for England, Table 6a, academic year 2028/29
+      (EES value column value_2029 names the END year; the fact period stores the opening
+      year per the academic_year convention).
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: slc.forecasts_2025.table_6a.ay2029
+  provenance_class: model_output
+  assertion: source_projection
+  record_set_spec_id: slc.forecasts_2025.table_6a.ay2029.v1
+  source_record_id_prefix: slc.forecasts_2025.table_6a.ay2029
+  sheet_name: table
+  period_type: academic_year
+  period: 2029
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_loan_borrower
+  domain: student_loans
+  groupby_dimension: slc.borrower_line
+  rows:
+  - value_id: higher_education_full_time__plan_2__liable_to_repay
+    label: Higher education full time, plan_2, liable_to_repay
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 2
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 2
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__liable_to_repay
+    label: Higher education full time, plan_5, liable_to_repay
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 3
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 3
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_full_time__plan_2__above_repayment_threshold
+    label: Higher education full time, plan_2, above_repayment_threshold
+    ordinal: 2
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 5
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 5
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_full_time__plan_5__above_repayment_threshold
+    label: Higher education full time, plan_5, above_repayment_threshold
+    ordinal: 3
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: Higher education full time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education full time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education full time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 6
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 6
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__liable_to_repay
+    label: Higher education part time, plan_2, liable_to_repay
+    ordinal: 4
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 8
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 8
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__liable_to_repay
+    label: Higher education part time, plan_5, liable_to_repay
+    ordinal: 5
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 9
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 9
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_part_time__plan_2__above_repayment_threshold
+    label: Higher education part time, plan_2, above_repayment_threshold
+    ordinal: 6
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 11
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 11
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_part_time__plan_5__above_repayment_threshold
+    label: Higher education part time, plan_5, above_repayment_threshold
+    ordinal: 7
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Higher education part time
+    table_record_kind: detail
+    filters:
+      row_group: Higher education part time
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education part time
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 12
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 12
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__liable_to_repay
+    label: Advanced Learner loans, plan_2, liable_to_repay
+    ordinal: 8
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 14
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 14
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__liable_to_repay
+    label: Advanced Learner loans, plan_5, liable_to_repay
+    ordinal: 9
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 15
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 15
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_2__above_repayment_threshold
+    label: Advanced Learner loans, plan_2, above_repayment_threshold
+    ordinal: 10
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 17
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 17
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: advanced_learner_loans__plan_5__above_repayment_threshold
+    label: Advanced Learner loans, plan_5, above_repayment_threshold
+    ordinal: 11
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: Advanced Learner loans
+    table_record_kind: detail
+    filters:
+      row_group: Advanced Learner loans
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Advanced Learner loans
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 18
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 18
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_2__liable_to_repay
+    label: Higher education total, plan_2, liable_to_repay
+    ordinal: 12
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 32
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 32
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_5__liable_to_repay
+    label: Higher education total, plan_5, liable_to_repay
+    ordinal: 13
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: liable_to_repay
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: liable_to_repay
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 33
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 33
+      expected_value: liable_to_repay
+      label: borrower status
+  - value_id: higher_education_total__plan_2__above_repayment_threshold
+    label: Higher education total, plan_2, above_repayment_threshold
+    ordinal: 14
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_2
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_2
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 35
+      expected_value: plan_2
+      label: repayment plan
+    - column: D
+      row: 35
+      expected_value: above_repayment_threshold
+      label: borrower status
+  - value_id: higher_education_total__plan_5__above_repayment_threshold
+    label: Higher education total, plan_5, above_repayment_threshold
+    ordinal: 15
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: Higher education total
+    table_record_kind: total
+    filters:
+      row_group: Higher education total
+      repayment_plan: plan_5
+      borrower_status: above_repayment_threshold
+    constraints:
+    - variable: row_group
+      operator: ==
+      value: Higher education total
+      label: loan product group
+    - variable: repayment_plan
+      operator: ==
+      value: plan_5
+      label: repayment plan
+    - variable: borrower_status
+      operator: ==
+      value: above_repayment_threshold
+      label: borrower status
+    guard_cells:
+    - column: C
+      row: 36
+      expected_value: plan_5
+      label: repayment plan
+    - column: D
+      row: 36
+      expected_value: above_repayment_threshold
+      label: borrower status
+  measures:
+  - measure_id: borrowers
+    label: Student loan borrowers, AY 2029/30
+    ordinal: 0
+    column: F
+    source_column_id: value_2030
+    expected_column_header_row: 1
+    expected_column_header: value_2030
+    concept: slc.student_loan_borrowers
+    source_concept: slc.student_loan_borrowers
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    concept_evidence_notes: Student loan forecasts for England, Table 6a, academic year 2029/30
+      (EES value column value_2030 names the END year; the fact period stores the opening
+      year per the academic_year convention).
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

@@ -1,0 +1,19 @@
+source_id: slc
+package_id: slc-student-loan-repayments-england-2025
+dataset: slc_slc-student-loan-repayments-england-2025
+source_page: https://www.gov.uk/government/statistics/student-loans-in-england-2024-to-2025
+table: Student loans in England, financial year 2024-25 (corrected tables), Table
+  1A
+files:
+  2025:
+    filename: slcsp012025_Corrected.xlsx
+    source_url: https://assets.publishing.service.gov.uk/media/6943ee619273c48f554cf5c5/slcsp012025_Corrected.xlsx
+    sha256: a9ee065ba2d6af4be8584022ac50302f22f7229919e4171cf132039b0ca26aac
+    size_bytes: 332185
+    fetched_at: '2026-08-10T09:31:50+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-repayments-england-2025/2025/a9ee065ba2d6af4be8584022ac50302f22f7229919e4171cf132039b0ca26aac/slcsp012025_Corrected.xlsx
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-repayments-england-2025/2025/a9ee065ba2d6af4be8584022ac50302f22f7229919e4171cf132039b0ca26aac/slcsp012025_Corrected.xlsx

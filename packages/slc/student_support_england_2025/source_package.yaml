@@ -1,0 +1,2586 @@
+# SLC 'Student support for higher education in England 2025' (slcsp052025):
+# Table 3A maintenance loans (recipients in thousands, amounts in GBP
+# million; Grand total rows over all providers and entry cohorts) and Table
+# 4C (i) other targeted support (Adult Dependents Grant and Parents Learning
+# Allowance, applicants awarded in thousands and amounts awarded in GBP
+# million). Academic-year periods store the opening year (AY 2024/25 ->
+# 2024) per the #131/#136 convention; policyengine-uk-data keys the same
+# values to END-year calendars, a populace-side mapping. Cohort detail rows
+# (Pre-2012 / Post-2012/13 / Post-2016/17) and the other 4C products
+# (Childcare Grant, Travel Grant, totals) are named exclusions for the
+# backfill lane. uk-data rounds the published GBP-million amounts to whole
+# pounds (e.g. ADG 2013/14: 33.05009068m -> 33,050,091); the publisher
+# precision is what lands here. Note 'Grand total ' carries a trailing
+# space in the workbook - guards pin the exact cell text.
+schema_version: ledger.source_package.v1
+package_id: slc-student-support-england-2025
+label: 'SLC student support for higher education in England 2025: maintenance loans (Table
+  3A) and targeted support (Table 4C i), AY2013/14-2024/25'
+artifact:
+  source_name: slc
+  source_table: Student support for higher education in England 2025, Tables 3A and 4C
+  resource_package: db
+  resource_directory: data/slc/student_support_england_2025
+  manifest: manifest.yaml
+  vintage: support_2025
+  extracted_at: '2026-08-08'
+  extraction_method: xlsx whole-workbook used-range cell parse
+  parser: xlsx_used_range
+  artifact_year: 2025
+record_sets:
+- record_set_id: slc.support_2025.table_3a.recipients.ay2013
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2013.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2013
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2013
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2013/14
+    ordinal: 0
+    column: E
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2013/14
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2013/14, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2013
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2013.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2013
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2013
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2013/14
+    ordinal: 0
+    column: E
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2013/14
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2013/14, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2014
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2014.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2014
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2014
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2014/15
+    ordinal: 0
+    column: F
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2014/15
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2014/15, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2014
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2014.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2014
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2014
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2014/15
+    ordinal: 0
+    column: F
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2014/15
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2014/15, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2015
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2015.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2015
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2015
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2015/16
+    ordinal: 0
+    column: G
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2015/16
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2015/16, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2015
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2015.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2015
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2015
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2015/16
+    ordinal: 0
+    column: G
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2015/16
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2015/16, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2016
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2016.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2016
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2016
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2016/17
+    ordinal: 0
+    column: H
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2016/17
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2016/17, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2016
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2016.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2016
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2016
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2016/17
+    ordinal: 0
+    column: H
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2016/17
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2016/17, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2017
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2017.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2017
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2017
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2017/18
+    ordinal: 0
+    column: I
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2017/18
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2017/18, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2017
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2017.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2017
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2017
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2017/18
+    ordinal: 0
+    column: I
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2017/18
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2017/18, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2018
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2018.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2018
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2018
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2018/19
+    ordinal: 0
+    column: J
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2018/19
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2018/19, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2018
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2018.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2018
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2018
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2018/19
+    ordinal: 0
+    column: J
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2018/19
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2018/19, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2019
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2019.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2019
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2019
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2019/20
+    ordinal: 0
+    column: K
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2019/20
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2019/20, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2019
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2019.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2019
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2019
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2019/20
+    ordinal: 0
+    column: K
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2019/20
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2019/20, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2020
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2020.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2020
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2020
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2020/21
+    ordinal: 0
+    column: L
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2020/21
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2020/21, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2020
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2020.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2020
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2020
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2020/21
+    ordinal: 0
+    column: L
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2020/21
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2020/21, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2021
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2021.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2021
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2021/22
+    ordinal: 0
+    column: M
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2021/22
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2021/22, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2021
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2021.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2021
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2021/22
+    ordinal: 0
+    column: M
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2021/22
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2021/22, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2022
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2022.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2022
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2022/23
+    ordinal: 0
+    column: N
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2022/23
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2022/23, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2022
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2022.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2022
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2022/23
+    ordinal: 0
+    column: N
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2022/23
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2022/23, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2023
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2023.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2023
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2023/24
+    ordinal: 0
+    column: O
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2023/24
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2023/24, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2023
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2023.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2023
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2023/24
+    ordinal: 0
+    column: O
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2023/24
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2023/24, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.recipients.ay2024
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.recipients.ay2024.v1
+  source_record_id_prefix: slc.support_2025.table_3a.recipients.ay2024
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: recipients
+    label: Maintenance loan recipients, AY 2024/25
+    ordinal: 0
+    column: P
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2024/25
+    concept: slc.maintenance_loan_recipients
+    source_concept: slc.maintenance_loan_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      (maintenance loans paid to full-time undergraduates), Grand total row, academic year
+      2024/25, thousands.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_3a.amount.ay2024
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_3a.amount.ay2024.v1
+  source_record_id_prefix: slc.support_2025.table_3a.amount.ay2024
+  sheet_name: Table 3A
+  period_type: academic_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: grand_total
+    label: Grand total, all providers and cohorts
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 'Grand total '
+    table_record_kind: total
+  measures:
+  - measure_id: amount_paid
+    label: Maintenance loans amount paid, AY 2024/25
+    ordinal: 0
+    column: P
+    source_column_id: amount_paid
+    expected_column_header_row: 17
+    expected_column_header: 2024/25
+    concept: slc.maintenance_loan_amount_paid
+    source_concept: slc.maintenance_loan_amount_paid
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 3A
+      amount-paid block, Grand total row, academic year 2024/25, GBP million.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2013
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2013.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2013
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2013
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2013/14
+    ordinal: 0
+    column: D
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2013/14
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2013/14, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2013
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2013.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2013
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2013
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2013/14
+    ordinal: 0
+    column: D
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2013/14
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2013/14, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2014
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2014.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2014
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2014
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2014/15
+    ordinal: 0
+    column: E
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2014/15
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2014/15, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2014
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2014.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2014
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2014
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2014/15
+    ordinal: 0
+    column: E
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2014/15
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2014/15, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2015
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2015.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2015
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2015
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2015/16
+    ordinal: 0
+    column: F
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2015/16
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2015/16, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2015
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2015.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2015
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2015
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2015/16
+    ordinal: 0
+    column: F
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2015/16
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2015/16, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2016
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2016.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2016
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2016
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2016/17
+    ordinal: 0
+    column: G
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2016/17
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2016/17, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2016
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2016.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2016
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2016
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2016/17
+    ordinal: 0
+    column: G
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2016/17
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2016/17, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2017
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2017.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2017
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2017
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2017/18
+    ordinal: 0
+    column: H
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2017/18
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2017/18, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2017
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2017.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2017
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2017
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2017/18
+    ordinal: 0
+    column: H
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2017/18
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2017/18, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2018
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2018.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2018
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2018
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2018/19
+    ordinal: 0
+    column: I
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2018/19
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2018/19, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2018
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2018.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2018
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2018
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2018/19
+    ordinal: 0
+    column: I
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2018/19
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2018/19, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2019
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2019.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2019
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2019
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2019/20
+    ordinal: 0
+    column: J
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2019/20
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2019/20, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2019
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2019.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2019
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2019
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2019/20
+    ordinal: 0
+    column: J
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2019/20
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2019/20, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2020
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2020.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2020
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2020
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2020/21
+    ordinal: 0
+    column: K
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2020/21
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2020/21, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2020
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2020.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2020
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2020
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2020/21
+    ordinal: 0
+    column: K
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2020/21
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2020/21, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2021
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2021.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2021
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2021/22
+    ordinal: 0
+    column: L
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2021/22
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2021/22, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2021
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2021.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2021
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2021/22
+    ordinal: 0
+    column: L
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2021/22
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2021/22, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2022
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2022.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2022
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2022/23
+    ordinal: 0
+    column: M
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2022/23
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2022/23, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2022
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2022.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2022
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2022/23
+    ordinal: 0
+    column: M
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2022/23
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2022/23, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2023
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2023.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2023
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2023/24
+    ordinal: 0
+    column: N
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2023/24
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2023/24, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2023
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2023.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2023
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2023/24
+    ordinal: 0
+    column: N
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2023/24
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2023/24, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.recipients.ay2024
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.recipients.ay2024.v1
+  source_record_id_prefix: slc.support_2025.table_4c.recipients.ay2024
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: recipients
+    label: Targeted support recipients, AY 2024/25
+    ordinal: 0
+    column: O
+    source_column_id: recipients
+    expected_column_header_row: 8
+    expected_column_header: 2024/25
+    concept: slc.targeted_support_recipients
+    source_concept: slc.targeted_support_recipients
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2024/25, thousands
+      of applicants awarded.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: slc.support_2025.table_4c.amount.ay2024
+  provenance_class: administrative
+  record_set_spec_id: slc.support_2025.table_4c.amount.ay2024.v1
+  source_record_id_prefix: slc.support_2025.table_4c.amount.ay2024
+  sheet_name: Table 4C (i)(ii)
+  period_type: academic_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: person
+  entity_role: student_support_recipient
+  domain: student_support
+  groupby_dimension: slc.student_support_line
+  rows:
+  - value_id: adult_dependants_grant
+    label: Adult Dependents Grant
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: Adult Dependents Grant
+    table_record_kind: detail
+    filters:
+      student_support_product: adult_dependants_grant
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: adult_dependants_grant
+      label: Targeted support product
+  - value_id: parents_learning_allowance
+    label: Parents Learning Allowance
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: Parents Learning Allowance
+    table_record_kind: detail
+    filters:
+      student_support_product: parents_learning_allowance
+    constraints:
+    - variable: student_support_product
+      operator: ==
+      value: parents_learning_allowance
+      label: Targeted support product
+  measures:
+  - measure_id: amount_awarded
+    label: Targeted support amount, AY 2024/25
+    ordinal: 0
+    column: O
+    source_column_id: amount_awarded
+    expected_column_header_row: 18
+    expected_column_header: 2024/25
+    concept: slc.targeted_support_amount_awarded
+    source_concept: slc.targeted_support_amount_awarded
+    concept_relation: source_label
+    concept_authority: slc
+    concept_evidence_url: https://www.gov.uk/government/statistics/student-support-for-higher-education-in-england-2025
+    concept_evidence_notes: Student support for higher education in England 2025, Table 4C
+      (i) (other targeted support for full-time applicants), academic year 2024/25, GBP million
+      awarded.
+    unit: gbp
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number

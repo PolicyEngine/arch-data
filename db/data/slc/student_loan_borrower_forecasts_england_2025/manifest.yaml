@@ -1,0 +1,19 @@
+source_id: slc
+package_id: slc-student-loan-borrower-forecasts-england-2025
+dataset: slc_slc-student-loan-borrower-forecasts-england-2025
+source_page: https://explore-education-statistics.service.gov.uk/find-statistics/student-loan-forecasts-for-england
+table: 'Student loan forecasts for England, Table 6a: forecast borrowers liable to
+  repay and earning above threshold, by product'
+files:
+  2025:
+    filename: ees-table-6a-permalink.html
+    source_url: https://explore-education-statistics.service.gov.uk/data-tables/permalink/6ff75517-7124-487c-cb4e-08de6eccf22d
+    sha256: b6de727ec0f8b1771c9a2d2c781b405830872634ed7283bf23e46a3898873922
+    size_bytes: 55511
+    fetched_at: '2026-08-10T09:31:49+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-borrower-forecasts-england-2025/2025/b6de727ec0f8b1771c9a2d2c781b405830872634ed7283bf23e46a3898873922/ees-table-6a-permalink.html
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-borrower-forecasts-england-2025/2025/b6de727ec0f8b1771c9a2d2c781b405830872634ed7283bf23e46a3898873922/ees-table-6a-permalink.html

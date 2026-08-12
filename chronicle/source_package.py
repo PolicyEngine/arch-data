@@ -172,6 +172,22 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "jct-obbba-revenue-estimates-2025": Path("jct/obbba_revenue_estimates_2025"),
     "jct-tax-expenditures-2024": Path("jct/tax_expenditures_2024"),
+    "slc-student-loan-borrower-forecasts-england-2025": Path(
+        "slc/student_loan_borrower_forecasts_england_2025"
+    ),
+    "slc-student-loan-repayments-england-2025": Path(
+        "slc/student_loan_repayments_england_2025"
+    ),
+    "slc-student-loan-repayments-northern-ireland-2025": Path(
+        "slc/student_loan_repayments_northern_ireland_2025"
+    ),
+    "slc-student-loan-repayments-scotland-2025": Path(
+        "slc/student_loan_repayments_scotland_2025"
+    ),
+    "slc-student-loan-repayments-wales-2025": Path(
+        "slc/student_loan_repayments_wales_2025"
+    ),
+    "slc-student-support-england-2025": Path("slc/student_support_england_2025"),
     "soi-table-1-1": Path("irs_soi/table_1_1"),
     "soi-table-1-2": Path("irs_soi/table_1_2"),
     "soi-table-1-4": Path("irs_soi/table_1_4"),

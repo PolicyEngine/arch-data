@@ -1,0 +1,18 @@
+source_id: slc
+package_id: slc-student-loan-repayments-wales-2025
+dataset: slc_slc-student-loan-repayments-wales-2025
+source_page: https://www.gov.uk/government/statistics/student-loans-in-wales-2024-to-2025
+table: Student loans for higher education in Wales, financial year 2024-25
+files:
+  2025:
+    filename: slc-wales-fy2024-25.html
+    source_url: https://www.gov.uk/government/statistics/student-loans-in-wales-2024-to-2025/student-loans-for-higher-education-in-wales-financial-year-2024-25
+    sha256: 1774899f189e9d2e006459e5a4bd0d01313488c196b571ff157c2970c79074b6
+    size_bytes: 223577
+    fetched_at: '2026-08-10T09:31:52+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-repayments-wales-2025/2025/1774899f189e9d2e006459e5a4bd0d01313488c196b571ff157c2970c79074b6/slc-wales-fy2024-25.html
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-repayments-wales-2025/2025/1774899f189e9d2e006459e5a4bd0d01313488c196b571ff157c2970c79074b6/slc-wales-fy2024-25.html

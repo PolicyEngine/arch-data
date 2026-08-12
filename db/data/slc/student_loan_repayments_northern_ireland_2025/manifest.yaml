@@ -1,0 +1,18 @@
+source_id: slc
+package_id: slc-student-loan-repayments-northern-ireland-2025
+dataset: slc_slc-student-loan-repayments-northern-ireland-2025
+source_page: https://www.gov.uk/government/statistics/student-loans-in-northern-ireland-2024-to-2025
+table: Student loans for higher education in Northern Ireland, financial year 2024-25
+files:
+  2025:
+    filename: slc-ni-fy2024-25.html
+    source_url: https://www.gov.uk/government/statistics/student-loans-in-northern-ireland-2024-to-2025/student-loans-for-higher-education-in-northern-ireland-financial-year-2024-25
+    sha256: 4111bd50cfa1913b3f46d8c23b1a83a2db68bc880266bc7c5d3169bf0b7d4272
+    size_bytes: 193903
+    fetched_at: '2026-08-10T09:31:53+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/slc/slc-student-loan-repayments-northern-ireland-2025/2025/4111bd50cfa1913b3f46d8c23b1a83a2db68bc880266bc7c5d3169bf0b7d4272/slc-ni-fy2024-25.html
+        uri: r2://ledger-raw/raw/slc/slc-student-loan-repayments-northern-ireland-2025/2025/4111bd50cfa1913b3f46d8c23b1a83a2db68bc880266bc7c5d3169bf0b7d4272/slc-ni-fy2024-25.html

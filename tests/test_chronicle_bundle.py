@@ -27,16 +27,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 9,
         "error_count": 0,
-        "fact_count": 44359,
+        "fact_count": 44558,
         "geography_count": 1068,
-        "period_count": 98,
+        "period_count": 115,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
-        "source_count": 35,
-        "source_package_count": 88,
+        "source_count": 36,
+        "source_package_count": 94,
         "warning_count": 1,
     }
-    assert len(rows) == 44359
+    assert len(rows) == 44558
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -54,7 +54,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 88
+    assert source_packages["source_package_count"] == 94
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -68,7 +68,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 44359
+    assert coverage["fact_count"] == 44558
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -99,6 +99,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "opgroeien_groeipakket": 11,
         "scotgov": 62,
         "sfpd_pensions": 4,
+        "slc": 199,
         "spf_finances_pit": 1,
         "ssa": 426,
         "statbel_fiscal_income": 565,
@@ -107,7 +108,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "voa": 120,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 83
+    assert len(table_counts) == 89
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert (
         table_counts[
@@ -227,6 +228,23 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         == 18
     )
     assert coverage["counts"]["by_period"] == {
+        "academic_year:2013": 6,
+        "academic_year:2014": 6,
+        "academic_year:2015": 6,
+        "academic_year:2016": 6,
+        "academic_year:2017": 6,
+        "academic_year:2018": 6,
+        "academic_year:2019": 6,
+        "academic_year:2020": 6,
+        "academic_year:2021": 6,
+        "academic_year:2022": 6,
+        "academic_year:2023": 6,
+        "academic_year:2024": 26,
+        "academic_year:2025": 20,
+        "academic_year:2026": 20,
+        "academic_year:2027": 20,
+        "academic_year:2028": 20,
+        "academic_year:2029": 16,
         "calendar_year:1951": 3,
         "calendar_year:1961": 3,
         "calendar_year:1971": 3,
@@ -268,7 +286,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2029": 214,
         "calendar_year:2031": 2,
         "fiscal_year:2023": 48,
-        "fiscal_year:2024": 566,
+        "fiscal_year:2024": 577,
         "fiscal_year:2025": 45,
         "fiscal_year:2026": 46,
         "fiscal_year:2027": 28,
@@ -347,7 +365,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "household": 466,
         "institutional_sector": 103,
         "pension_plan": 2,
-        "person": 8205,
+        "person": 8404,
         "tax_unit": 33783,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
