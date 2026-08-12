@@ -240,6 +240,7 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2023-uk-countries": Path("ons/mye_2023_uk_countries"),
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
+    "ons-pcon24-population-by-age-2024": Path("ons/pcon24_population_by_age_2024"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
     "scotgov-scottish-budget-social-security-assistance-2026": Path(
@@ -291,6 +292,7 @@ class SourceArtifactSpec:
     artifact_year: int | None = None
     delimiter: str = ","
     selected_rows: tuple[dict[str, Any], ...] = ()
+    sheets: tuple[str, ...] = ()
 
     def build_source_rows(self, year: int) -> list[SourceRow]:
         """Parse a delimited artifact for a year into full source-row records."""
@@ -384,7 +386,7 @@ class SourceArtifactSpec:
         if self.parser == "xls_used_range":
             return source_cells_from_xls(content, artifact)
         if self.parser == "xlsx_used_range":
-            return source_cells_from_xlsx(content, artifact)
+            return source_cells_from_xlsx(content, artifact, sheets=self.sheets)
         if self.parser == "zip_xlsx_used_range":
             member_content, member_name = self._archive_member_content(
                 content,
@@ -1514,6 +1516,7 @@ def _artifact_from_mapping(payload: dict[str, Any]) -> SourceArtifactSpec:
         ),
         delimiter=payload.get("delimiter", ","),
         selected_rows=tuple(payload.get("selected_rows", ())),
+        sheets=tuple(payload.get("sheets", ())),
     )
 
 

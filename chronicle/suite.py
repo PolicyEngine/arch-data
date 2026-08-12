@@ -1398,6 +1398,11 @@ def _source_row_age_range(row: SourceRow) -> tuple[int, int | None] | None:
         match = re.search(r"\bAged?\s+(\d+)\s+and\s+over\b", label, re.I)
         if match:
             return int(match.group(1)), None
+        # Nomis writes its open top band as "Aged 85+", the same statement as
+        # the "and over" wording above.
+        match = re.search(r"\bAged?\s+(\d+)\s*\+", label, re.I)
+        if match:
+            return int(match.group(1)), None
     return None
 
 

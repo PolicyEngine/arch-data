@@ -42,7 +42,7 @@ ALLOWED_GEOGRAPHY_LEVELS = {
     "congressional_district",
     "state_legislative_district_upper",
     "state_legislative_district_lower",
-    "parliamentary_constituency",
+    "constituency",
     "local_authority",
     "metro_area",
     "zip_code",
