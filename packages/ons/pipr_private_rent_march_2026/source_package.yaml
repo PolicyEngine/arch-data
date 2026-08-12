@@ -1,0 +1,242 @@
+# ONS Price Index of Private Rents: average monthly private rent levels as
+# quoted in the March-2026 'Private rent and house prices, UK' bulletin
+# (released 2026-03-25). The bulletin prose carries the publisher-communicated
+# country-level averages: UK GBP 1,374 / England 1,430 / Wales 828 / Scotland
+# 1,022 at February 2026, and Northern Ireland 875 at December 2025 - NI's
+# PIPR series lags the GB collection and the bulletin itself keys NI to
+# December, so NI lands as its own record set at month 2025-12 rather than
+# being dropped or mis-keyed. February 2026 is a provisional PIPR estimate
+# (bulletin wording) subject to routine revision in later editions; it is an
+# observation of an elapsed period, not a projection. The full monthly
+# price-statistics workbook (25 March 2026 edition, ~47,800 rows x 40 columns
+# covering regions, local authorities, bedroom counts and property types) is
+# the natural backfill artifact, but the xlsx_used_range lane materialises
+# its ~1.9M-cell grid on every bundle build, which is operationally
+# prohibitive today - regional and property-size averages are therefore a
+# named exclusion pending a row-filtered workbook lane, and local-authority
+# grain is wave-3 scope (#134). All five quoted values were cross-checked
+# against that workbook's Table 1 before authoring (rows verified equal).
+# uk-data multiplies the UK figure by an unpinned ~5.4m renter-household
+# count to build its rent_private target; the product is excluded (computed)
+# per the facts-only ADR and stays a populace-side declaration. gov.uk/ONS
+# pages embed per-request ids in page chrome, so the archived HTML is not
+# byte-reproducible across fetches; the parsed statistical content is stable
+# and the manifest sha pins the archived bytes (dwp-benefit-statistics
+# precedent).
+schema_version: ledger.source_package.v1
+package_id: ons-pipr-private-rent-march-2026
+label: 'ONS Price Index of Private Rents, March 2026 bulletin: average monthly private rent,
+  UK and countries'
+artifact:
+  source_name: ons
+  source_table: 'Private rent and house prices, UK: March 2026'
+  resource_package: db
+  resource_directory: data/ons/pipr_private_rent_march_2026
+  manifest: manifest.yaml
+  vintage: pipr_bulletin_march_2026
+  extracted_at: '2026-08-12'
+  extraction_method: HTML table and document-text number parse of the archived bulletin
+  parser: html_tables_and_text
+  artifact_year: 2026
+record_sets:
+- record_set_id: ons.pipr.mar2026.average_rent.feb2026
+  provenance_class: administrative
+  record_set_spec_id: ons.pipr.mar2026.average_rent.feb2026.v1
+  source_record_id_prefix: ons.pipr.mar2026.average_rent.feb2026
+  sheet_name: document_numbers
+  period_type: month
+  period: 2026-02
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: dwelling
+  entity_role: private_rental_property
+  domain: private_rents
+  groupby_dimension: ons.pipr_geography_row
+  rows:
+  - value_id: uk
+    label: Average monthly private rent, United Kingdom
+    ordinal: 0
+    row_number: 101
+    expected_row_header_column: D
+    expected_row_header: £1,374
+    table_record_kind: total
+    geography_id: K02000001
+    geography_level: country
+    geography_name: United Kingdom
+    guard_cells:
+    - column: A
+      row: 101
+      expected_value: '100'
+      label: HTML element index
+    - column: B
+      row: 101
+      expected_value: p
+      label: HTML element type
+    - column: C
+      row: 101
+      expected_value: The average monthly private rent in the UK was £1,374 per month in February
+        2026. This is £47 (3.5%) higher than 12 months ago.
+      label: paragraph text
+  - value_id: england
+    label: Average monthly private rent, England
+    ordinal: 1
+    row_number: 114
+    expected_row_header_column: D
+    expected_row_header: £1,430
+    table_record_kind: total
+    geography_id: E92000001
+    geography_level: country
+    geography_name: England
+    guard_cells:
+    - column: A
+      row: 114
+      expected_value: '110'
+      label: HTML element index
+    - column: B
+      row: 114
+      expected_value: p
+      label: HTML element type
+    - column: C
+      row: 114
+      expected_value: Average monthly rent for England was £1,430 in February 2026, up 3.6%
+        (£49) from a year earlier. This annual rise was higher than in the 12 months to January
+        2026 (3.5%) and is the first increase in England's annual inflation rate since November
+        2024.
+      label: paragraph text
+  - value_id: wales
+    label: Average monthly private rent, Wales
+    ordinal: 2
+    row_number: 121
+    expected_row_header_column: D
+    expected_row_header: £828
+    table_record_kind: total
+    geography_id: W92000004
+    geography_level: country
+    geography_name: Wales
+    guard_cells:
+    - column: A
+      row: 121
+      expected_value: '112'
+      label: HTML element index
+    - column: B
+      row: 121
+      expected_value: p
+      label: HTML element type
+    - column: C
+      row: 121
+      expected_value: Average monthly rent for Wales was £828 in February 2026, up 5.5% (£43)
+        from a year earlier. This annual rise was lower than in the 12 months to January 2026
+        (5.8%) and down from the recent peak of 8.9% in March 2025.
+      label: paragraph text
+  - value_id: scotland
+    label: Average monthly private rent, Scotland
+    ordinal: 3
+    row_number: 129
+    expected_row_header_column: D
+    expected_row_header: £1,022
+    table_record_kind: total
+    geography_id: S92000003
+    geography_level: country
+    geography_name: Scotland
+    guard_cells:
+    - column: A
+      row: 129
+      expected_value: '114'
+      label: HTML element index
+    - column: B
+      row: 129
+      expected_value: p
+      label: HTML element type
+    - column: C
+      row: 129
+      expected_value: Average monthly rent for Scotland was £1,022 in February 2026, up 2.4%
+        (£24) from a year earlier. This annual rise was lower than in the 12 months to January
+        2026 (2.6%) and represents the lowest annual rise for more than four years. Scotland's
+        annual inflation rate has been slowing since the record-high annual rise of 11.7%
+        in August 2023.
+      label: paragraph text
+  measures:
+  - measure_id: average_monthly_private_rent
+    label: Average monthly private rent
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: ons.pipr_average_monthly_private_rent
+    source_concept: ons.pipr_average_monthly_private_rent
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026
+    concept_evidence_notes: 'Private rent and house prices, UK: March 2026 bulletin, ''Private
+      rents across the UK'' section: average monthly private rent at February 2026 (provisional
+      PIPR estimate) for the UK, England, Wales and Scotland, as communicated in the bulletin
+      prose. Values cross-checked against Table 1 of the 25-March-2026 monthly price statistics
+      workbook.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: ons.pipr.mar2026.average_rent.ni_dec2025
+  provenance_class: administrative
+  record_set_spec_id: ons.pipr.mar2026.average_rent.ni_dec2025.v1
+  source_record_id_prefix: ons.pipr.mar2026.average_rent.ni_dec2025
+  sheet_name: document_numbers
+  period_type: month
+  period: 2025-12
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: private_rental_property
+  domain: private_rents
+  groupby_dimension: ons.pipr_geography_row
+  rows:
+  - value_id: northern_ireland
+    label: Average monthly private rent, Northern Ireland
+    ordinal: 0
+    row_number: 140
+    expected_row_header_column: D
+    expected_row_header: £875
+    table_record_kind: total
+    geography_id: N92000002
+    geography_level: country
+    geography_name: Northern Ireland
+    guard_cells:
+    - column: A
+      row: 140
+      expected_value: '117'
+      label: HTML element index
+    - column: B
+      row: 140
+      expected_value: p
+      label: HTML element type
+    - column: C
+      row: 140
+      expected_value: Average monthly rent in Northern Ireland was £875 in December 2025,
+        up 5.2% (£43) from a year earlier. This annual rise was lower than in the 12 months
+        to November 2025 (5.6%). Northern Ireland's annual inflation rate has been slowing
+        since the record-high annual rise of 9.9% in April 2024.
+      label: paragraph text
+  measures:
+  - measure_id: average_monthly_private_rent
+    label: Average monthly private rent
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: ons.pipr_average_monthly_private_rent
+    source_concept: ons.pipr_average_monthly_private_rent
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026
+    concept_evidence_notes: 'Private rent and house prices, UK: March 2026 bulletin, Northern
+      Ireland section: average monthly private rent at December 2025 - the latest month available
+      for NI''s PIPR series at this bulletin''s release, per the bulletin''s own note that
+      NI data are available up to December 2025.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number

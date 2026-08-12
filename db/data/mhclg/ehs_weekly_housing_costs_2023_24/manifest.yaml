@@ -1,0 +1,18 @@
+source_id: mhclg
+package_id: mhclg-ehs-weekly-housing-costs-2023-24
+dataset: mhclg_mhclg-ehs-weekly-housing-costs-2023-24
+source_page: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+table: English Housing Survey 2023-24 rented sectors, Chapter 1 annex tables
+files:
+  2024:
+    filename: EHS_23-24_Rented_Sectors_Chapter_1_Annex_Tables.ods
+    source_url: https://assets.publishing.service.gov.uk/media/6874ee0292691289bdb7d383/EHS_23-24_Rented_Sectors_Chapter_1_Annex_Tables.ods
+    sha256: e8777d7d0f7e14aebbea8b0a4ba239b3247b9967311b1ea81da2df262c374191
+    size_bytes: 258768
+    fetched_at: '2026-08-12T17:02:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/mhclg/mhclg-ehs-weekly-housing-costs-2023-24/2024/e8777d7d0f7e14aebbea8b0a4ba239b3247b9967311b1ea81da2df262c374191/EHS_23-24_Rented_Sectors_Chapter_1_Annex_Tables.ods
+        uri: r2://ledger-raw/raw/mhclg/mhclg-ehs-weekly-housing-costs-2023-24/2024/e8777d7d0f7e14aebbea8b0a4ba239b3247b9967311b1ea81da2df262c374191/EHS_23-24_Rented_Sectors_Chapter_1_Annex_Tables.ods

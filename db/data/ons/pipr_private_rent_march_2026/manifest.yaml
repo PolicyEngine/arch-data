@@ -1,0 +1,18 @@
+source_id: ons
+package_id: ons-pipr-private-rent-march-2026
+dataset: ons_ons-pipr-private-rent-march-2026
+source_page: https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026
+table: 'Private rent and house prices, UK: March 2026'
+files:
+  2026:
+    filename: pipr-bulletin-march2026.html
+    source_url: https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026
+    sha256: b33eb73eb72d23fe5720d64dba20c55fbf6867aaeada68aa2245b1143d5a513e
+    size_bytes: 90765
+    fetched_at: '2026-08-12T17:02:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-pipr-private-rent-march-2026/2026/b33eb73eb72d23fe5720d64dba20c55fbf6867aaeada68aa2245b1143d5a513e/pipr-bulletin-march2026.html
+        uri: r2://ledger-raw/raw/ons/ons-pipr-private-rent-march-2026/2026/b33eb73eb72d23fe5720d64dba20c55fbf6867aaeada68aa2245b1143d5a513e/pipr-bulletin-march2026.html

@@ -1,0 +1,2043 @@
+# English Housing Survey 2023-24 rented sectors report, Annex Table 1.7:
+# mean and median weekly housing costs (GBP per week) for all households
+# paying rent or mortgage, England, survey year April 2023 - March 2024
+# (fiscal_year 2023). This is the publisher base behind uk-data's
+# housing/rent_social target: the all-households 'all social renters' mean
+# (118.12, published rounded 118) is uk-data's GBP 118/week; its x52 x5.0m
+# UK-wide annualization is excluded (computed) - EHS covers England only and
+# the 5.0m/5.4m/7.5m tenure counts uk-data multiplies by are unpinned '~'
+# approximations with no published table (see the checklist row). The table
+# also carries the private-renter mean (236.59) and the all-mortgagors mean
+# (222.42, ~GBP 964/month) - the only sourced England anchor near uk-data's
+# sourceless GBP 1,100/month mortgage payment. Whole-table port at national
+# and region grain: six characteristic blocks (age of HRP, economic status,
+# region, income quintile, housing support, dependent children) plus the
+# all-households row, mean and median for the five tenure columns. Publisher
+# markers preserved as record-set splits rather than skipped cells: the
+# full-time-education row's mortgagor cells are 'u' (disclosure control,
+# note 1) and the housing-support rows have no mortgagor columns at all
+# (mortgagors are not eligible for housing support, note 3), so those two
+# blocks carry the eight non-mortgagor measures only. Known publisher
+# quirks kept as-is: mortgagor costs include nominal GBP 0.02/week values
+# (note 5), which is why the 75-or-over mortgagor median is 0.023; italic
+# small-sample flags (note 2) are formatting-only and are not carried by the
+# parser. Sample-size columns O-S are survey metadata, not facts (named
+# exclusion). Shared owners are excluded by the publisher (note 4).
+schema_version: ledger.source_package.v1
+package_id: mhclg-ehs-weekly-housing-costs-2023-24
+label: 'English Housing Survey 2023-24 rented sectors: mean and median weekly housing costs,
+  England (Annex Table 1.7)'
+artifact:
+  source_name: mhclg
+  source_table: English Housing Survey 2023-24 rented sectors, Chapter 1 annex tables
+  resource_package: db
+  resource_directory: data/mhclg/ehs_weekly_housing_costs_2023_24
+  manifest: manifest.yaml
+  vintage: ehs_2023_24_rented_sectors
+  extracted_at: '2026-08-12'
+  extraction_method: ODS whole-workbook used-range cell parse
+  parser: ods_used_range
+  artifact_year: 2024
+record_sets:
+- record_set_id: mhclg.ehs2324.at1_7.age_of_hrp
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.age_of_hrp.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.age_of_hrp
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.hrp_age_band
+  rows:
+  - value_id: age_16_24
+    label: 16 to 24
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: B
+    expected_row_header: 16 to 24
+    table_record_kind: detail
+    filters:
+      hrp_age_lower_bound: 16
+      hrp_age_upper_bound: 24
+    constraints:
+    - variable: hrp_age_lower_bound
+      operator: ==
+      value: 16
+      label: HRP age lower bound
+    - variable: hrp_age_upper_bound
+      operator: ==
+      value: 24
+      label: HRP age upper bound
+    guard_cells:
+    - column: B
+      row: 9
+      expected_value: age of HRP
+      label: block header
+    - column: B
+      row: 2
+      expected_value: 'Annex Table 1.7: Mean and median weekly housing costs, 2023-24'
+      label: table title
+    - column: G
+      row: 8
+      expected_value: £ per week (mean)
+      label: mean block unit
+    - column: M
+      row: 8
+      expected_value: £ per week (median)
+      label: median block unit
+  - value_id: age_25_34
+    label: 25 to 34
+    ordinal: 1
+    row_number: 11
+    expected_row_header_column: B
+    expected_row_header: 25 to 34
+    table_record_kind: detail
+    filters:
+      hrp_age_lower_bound: 25
+      hrp_age_upper_bound: 34
+    constraints:
+    - variable: hrp_age_lower_bound
+      operator: ==
+      value: 25
+      label: HRP age lower bound
+    - variable: hrp_age_upper_bound
+      operator: ==
+      value: 34
+      label: HRP age upper bound
+  - value_id: age_35_44
+    label: 35 to 44
+    ordinal: 2
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: 35 to 44
+    table_record_kind: detail
+    filters:
+      hrp_age_lower_bound: 35
+      hrp_age_upper_bound: 44
+    constraints:
+    - variable: hrp_age_lower_bound
+      operator: ==
+      value: 35
+      label: HRP age lower bound
+    - variable: hrp_age_upper_bound
+      operator: ==
+      value: 44
+      label: HRP age upper bound
+  - value_id: age_45_64
+    label: 45 to 64
+    ordinal: 3
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 45 to 64
+    table_record_kind: detail
+    filters:
+      hrp_age_lower_bound: 45
+      hrp_age_upper_bound: 64
+    constraints:
+    - variable: hrp_age_lower_bound
+      operator: ==
+      value: 45
+      label: HRP age lower bound
+    - variable: hrp_age_upper_bound
+      operator: ==
+      value: 64
+      label: HRP age upper bound
+  - value_id: age_65_74
+    label: 65 to 74
+    ordinal: 4
+    row_number: 14
+    expected_row_header_column: B
+    expected_row_header: 65 to 74
+    table_record_kind: detail
+    filters:
+      hrp_age_lower_bound: 65
+      hrp_age_upper_bound: 74
+    constraints:
+    - variable: hrp_age_lower_bound
+      operator: ==
+      value: 65
+      label: HRP age lower bound
+    - variable: hrp_age_upper_bound
+      operator: ==
+      value: 74
+      label: HRP age upper bound
+  - value_id: age_75_plus
+    label: 75 or over
+    ordinal: 5
+    row_number: 15
+    expected_row_header_column: B
+    expected_row_header: 75 or over
+    table_record_kind: detail
+    filters:
+      hrp_age_lower_bound: 75
+    constraints:
+    - variable: hrp_age_lower_bound
+      operator: ==
+      value: 75
+      label: HRP age lower bound
+  measures:
+  - measure_id: mean_weekly_housing_costs_mortgagors
+    label: Mean weekly housing costs, all mortgagors
+    ordinal: 0
+    column: C
+    source_column_id: mean_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 1
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 2
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 3
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 4
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_mortgagors
+    label: Median weekly housing costs, all mortgagors
+    ordinal: 5
+    column: I
+    source_column_id: median_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 6
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 7
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 8
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 9
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.economic_status
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.economic_status.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.economic_status
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.hrp_economic_status
+  rows:
+  - value_id: full_time_work
+    label: full-time work
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: full-time work
+    table_record_kind: detail
+    filters:
+      hrp_economic_status: full_time_work
+    constraints:
+    - variable: hrp_economic_status
+      operator: ==
+      value: full_time_work
+      label: HRP economic status
+    guard_cells:
+    - column: B
+      row: 17
+      expected_value: economic status of HRP
+      label: block header
+  - value_id: part_time_work
+    label: part-time work
+    ordinal: 1
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: part-time work
+    table_record_kind: detail
+    filters:
+      hrp_economic_status: part_time_work
+    constraints:
+    - variable: hrp_economic_status
+      operator: ==
+      value: part_time_work
+      label: HRP economic status
+  - value_id: retired
+    label: retired
+    ordinal: 2
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: retired
+    table_record_kind: detail
+    filters:
+      hrp_economic_status: retired
+    constraints:
+    - variable: hrp_economic_status
+      operator: ==
+      value: retired
+      label: HRP economic status
+  - value_id: unemployed
+    label: unemployed
+    ordinal: 3
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: unemployed
+    table_record_kind: detail
+    filters:
+      hrp_economic_status: unemployed
+    constraints:
+    - variable: hrp_economic_status
+      operator: ==
+      value: unemployed
+      label: HRP economic status
+  - value_id: other_inactive
+    label: other inactive
+    ordinal: 4
+    row_number: 23
+    expected_row_header_column: B
+    expected_row_header: other inactive
+    table_record_kind: detail
+    filters:
+      hrp_economic_status: other_inactive
+    constraints:
+    - variable: hrp_economic_status
+      operator: ==
+      value: other_inactive
+      label: HRP economic status
+  measures:
+  - measure_id: mean_weekly_housing_costs_mortgagors
+    label: Mean weekly housing costs, all mortgagors
+    ordinal: 0
+    column: C
+    source_column_id: mean_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 1
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 2
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 3
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 4
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_mortgagors
+    label: Median weekly housing costs, all mortgagors
+    ordinal: 5
+    column: I
+    source_column_id: median_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 6
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 7
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 8
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 9
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.economic_status_ft_education
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.economic_status_ft_education.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.economic_status_ft_education
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.hrp_economic_status
+  rows:
+  - value_id: full_time_education
+    label: full-time education
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: full-time education
+    table_record_kind: detail
+    filters:
+      hrp_economic_status: full_time_education
+    constraints:
+    - variable: hrp_economic_status
+      operator: ==
+      value: full_time_education
+      label: HRP economic status
+    guard_cells:
+    - column: C
+      row: 22
+      expected_value: u
+      label: mortgagor mean suppressed (note 1)
+    - column: I
+      row: 22
+      expected_value: u
+      label: mortgagor median suppressed (note 1)
+  measures:
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 0
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 1
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 2
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 3
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 4
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 5
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 6
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 7
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.region
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.region.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.region
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.region_row
+  rows:
+  - value_id: region_e12000001
+    label: North East
+    ordinal: 0
+    row_number: 26
+    expected_row_header_column: B
+    expected_row_header: North East
+    table_record_kind: total
+    geography_id: E12000001
+    geography_name: North East
+    geography_level: region
+    geography_vintage: current
+    guard_cells:
+    - column: B
+      row: 25
+      expected_value: region
+      label: block header
+  - value_id: region_e12000002
+    label: North West
+    ordinal: 1
+    row_number: 27
+    expected_row_header_column: B
+    expected_row_header: North West
+    table_record_kind: total
+    geography_id: E12000002
+    geography_name: North West
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000003
+    label: Yorkshire and the Humber
+    ordinal: 2
+    row_number: 28
+    expected_row_header_column: B
+    expected_row_header: Yorkshire and the Humber
+    table_record_kind: total
+    geography_id: E12000003
+    geography_name: Yorkshire and The Humber
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000004
+    label: East Midlands
+    ordinal: 3
+    row_number: 29
+    expected_row_header_column: B
+    expected_row_header: East Midlands
+    table_record_kind: total
+    geography_id: E12000004
+    geography_name: East Midlands
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000005
+    label: West Midlands
+    ordinal: 4
+    row_number: 30
+    expected_row_header_column: B
+    expected_row_header: West Midlands
+    table_record_kind: total
+    geography_id: E12000005
+    geography_name: West Midlands
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000006
+    label: East
+    ordinal: 5
+    row_number: 31
+    expected_row_header_column: B
+    expected_row_header: East
+    table_record_kind: total
+    geography_id: E12000006
+    geography_name: East of England
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000007
+    label: London
+    ordinal: 6
+    row_number: 32
+    expected_row_header_column: B
+    expected_row_header: London
+    table_record_kind: total
+    geography_id: E12000007
+    geography_name: London
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000008
+    label: South East
+    ordinal: 7
+    row_number: 33
+    expected_row_header_column: B
+    expected_row_header: South East
+    table_record_kind: total
+    geography_id: E12000008
+    geography_name: South East
+    geography_level: region
+    geography_vintage: current
+  - value_id: region_e12000009
+    label: South West
+    ordinal: 8
+    row_number: 34
+    expected_row_header_column: B
+    expected_row_header: South West
+    table_record_kind: total
+    geography_id: E12000009
+    geography_name: South West
+    geography_level: region
+    geography_vintage: current
+  measures:
+  - measure_id: mean_weekly_housing_costs_mortgagors
+    label: Mean weekly housing costs, all mortgagors
+    ordinal: 0
+    column: C
+    source_column_id: mean_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 1
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 2
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 3
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 4
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_mortgagors
+    label: Median weekly housing costs, all mortgagors
+    ordinal: 5
+    column: I
+    source_column_id: median_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 6
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 7
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 8
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 9
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.income_quintile
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.income_quintile.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.income_quintile
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.weekly_household_income_quintile
+  rows:
+  - value_id: income_quintile_1
+    label: income quintile 1 (lowest)
+    ordinal: 0
+    row_number: 37
+    expected_row_header_column: B
+    expected_row_header: income quintile 1 (lowest)
+    table_record_kind: detail
+    filters:
+      weekly_household_income_quintile: 1
+    constraints:
+    - variable: weekly_household_income_quintile
+      operator: ==
+      value: 1
+      label: weekly household income quintile (inclusive of housing support)
+    guard_cells:
+    - column: B
+      row: 36
+      expected_value: weekly household income quintile
+      label: block header
+  - value_id: income_quintile_2
+    label: income quintile 2
+    ordinal: 1
+    row_number: 38
+    expected_row_header_column: B
+    expected_row_header: income quintile 2
+    table_record_kind: detail
+    filters:
+      weekly_household_income_quintile: 2
+    constraints:
+    - variable: weekly_household_income_quintile
+      operator: ==
+      value: 2
+      label: weekly household income quintile (inclusive of housing support)
+  - value_id: income_quintile_3
+    label: income quintile 3
+    ordinal: 2
+    row_number: 39
+    expected_row_header_column: B
+    expected_row_header: income quintile 3
+    table_record_kind: detail
+    filters:
+      weekly_household_income_quintile: 3
+    constraints:
+    - variable: weekly_household_income_quintile
+      operator: ==
+      value: 3
+      label: weekly household income quintile (inclusive of housing support)
+  - value_id: income_quintile_4
+    label: income quintile 4
+    ordinal: 3
+    row_number: 40
+    expected_row_header_column: B
+    expected_row_header: income quintile 4
+    table_record_kind: detail
+    filters:
+      weekly_household_income_quintile: 4
+    constraints:
+    - variable: weekly_household_income_quintile
+      operator: ==
+      value: 4
+      label: weekly household income quintile (inclusive of housing support)
+  - value_id: income_quintile_5
+    label: income quintile 5 (highest)
+    ordinal: 4
+    row_number: 41
+    expected_row_header_column: B
+    expected_row_header: income quintile 5 (highest)
+    table_record_kind: detail
+    filters:
+      weekly_household_income_quintile: 5
+    constraints:
+    - variable: weekly_household_income_quintile
+      operator: ==
+      value: 5
+      label: weekly household income quintile (inclusive of housing support)
+  measures:
+  - measure_id: mean_weekly_housing_costs_mortgagors
+    label: Mean weekly housing costs, all mortgagors
+    ordinal: 0
+    column: C
+    source_column_id: mean_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 1
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 2
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 3
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 4
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_mortgagors
+    label: Median weekly housing costs, all mortgagors
+    ordinal: 5
+    column: I
+    source_column_id: median_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 6
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 7
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 8
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 9
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.housing_support
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.housing_support.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.housing_support
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.housing_support
+  rows:
+  - value_id: housing_support_received
+    label: receives housing support
+    ordinal: 0
+    row_number: 44
+    expected_row_header_column: B
+    expected_row_header: receives housing support
+    table_record_kind: detail
+    filters:
+      housing_support: received
+    constraints:
+    - variable: housing_support
+      operator: ==
+      value: received
+      label: receipt of housing support
+    guard_cells:
+    - column: B
+      row: 43
+      expected_value: receipt of housing support
+      label: block header
+    - column: C
+      row: 44
+      expected_value: –
+      label: no mortgagor data (note 3)
+  - value_id: housing_support_not_received
+    label: does not receive housing support
+    ordinal: 1
+    row_number: 45
+    expected_row_header_column: B
+    expected_row_header: does not receive housing support
+    table_record_kind: detail
+    filters:
+      housing_support: not_received
+    constraints:
+    - variable: housing_support
+      operator: ==
+      value: not_received
+      label: receipt of housing support
+    guard_cells:
+    - column: C
+      row: 45
+      expected_value: –
+      label: no mortgagor data (note 3)
+  measures:
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 0
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 1
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 2
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 3
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 4
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 5
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 6
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 7
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.dependent_children
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.dependent_children.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.dependent_children
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.dependent_children
+  rows:
+  - value_id: dependent_children_none
+    label: no dependent children
+    ordinal: 0
+    row_number: 48
+    expected_row_header_column: B
+    expected_row_header: no dependent children
+    table_record_kind: detail
+    filters:
+      dependent_children: none
+    constraints:
+    - variable: dependent_children
+      operator: ==
+      value: none
+      label: dependent children
+    guard_cells:
+    - column: B
+      row: 47
+      expected_value: dependent children
+      label: block header
+  - value_id: dependent_children_at_least_one
+    label: at least one dependent child
+    ordinal: 1
+    row_number: 49
+    expected_row_header_column: B
+    expected_row_header: at least one dependent child
+    table_record_kind: detail
+    filters:
+      dependent_children: at_least_one
+    constraints:
+    - variable: dependent_children
+      operator: ==
+      value: at_least_one
+      label: dependent children
+  measures:
+  - measure_id: mean_weekly_housing_costs_mortgagors
+    label: Mean weekly housing costs, all mortgagors
+    ordinal: 0
+    column: C
+    source_column_id: mean_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 1
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 2
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 3
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 4
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_mortgagors
+    label: Median weekly housing costs, all mortgagors
+    ordinal: 5
+    column: I
+    source_column_id: median_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 6
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 7
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 8
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 9
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+- record_set_id: mhclg.ehs2324.at1_7.all_households
+  provenance_class: survey_aggregate
+  survey_instrument: English Housing Survey
+  record_set_spec_id: mhclg.ehs2324.at1_7.all_households.v1
+  source_record_id_prefix: mhclg.ehs2324.at1_7.all_households
+  sheet_name: AT1_7
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: household
+  entity_role: housing_cost_payer
+  domain: housing_costs
+  groupby_dimension: mhclg.household_characteristic
+  rows:
+  - value_id: all_households
+    label: all households
+    ordinal: 0
+    row_number: 51
+    expected_row_header_column: B
+    expected_row_header: all households
+    table_record_kind: total
+    guard_cells:
+    - column: B
+      row: 58
+      expected_value: 'Source: English Housing Survey, full household sample'
+      label: source footer
+  measures:
+  - measure_id: mean_weekly_housing_costs_mortgagors
+    label: Mean weekly housing costs, all mortgagors
+    ordinal: 0
+    column: C
+    source_column_id: mean_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_private_renters
+    label: Mean weekly housing costs, private renters
+    ordinal: 1
+    column: D
+    source_column_id: mean_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_local_authority_renters
+    label: Mean weekly housing costs, local authority renters
+    ordinal: 2
+    column: E
+    source_column_id: mean_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_housing_association_renters
+    label: Mean weekly housing costs, housing association renters
+    ordinal: 3
+    column: F
+    source_column_id: mean_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: mean_weekly_housing_costs_social_renters
+    label: Mean weekly housing costs, all social renters
+    ordinal: 4
+    column: G
+    source_column_id: mean_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_mean_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all social renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_mortgagors
+    label: Median weekly housing costs, all mortgagors
+    ordinal: 5
+    column: I
+    source_column_id: median_mortgagors
+    expected_column_header_row: 6
+    expected_column_header: all mortgagors1
+    concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    source_concept: mhclg.ehs_median_weekly_housing_costs_mortgagors
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_private_renters
+    label: Median weekly housing costs, private renters
+    ordinal: 6
+    column: J
+    source_column_id: median_private_renters
+    expected_column_header_row: 6
+    expected_column_header: private renters
+    concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_private_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for private renters,
+      all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_local_authority_renters
+    label: Median weekly housing costs, local authority renters
+    ordinal: 7
+    column: K
+    source_column_id: median_local_authority_renters
+    expected_column_header_row: 6
+    expected_column_header: local authority
+    concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_local_authority_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for local authority
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_housing_association_renters
+    label: Median weekly housing costs, housing association renters
+    ordinal: 8
+    column: L
+    source_column_id: median_housing_association_renters
+    expected_column_header_row: 6
+    expected_column_header: housing association
+    concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_housing_association_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for housing association
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
+  - measure_id: median_weekly_housing_costs_social_renters
+    label: Median weekly housing costs, all social renters
+    ordinal: 9
+    column: M
+    source_column_id: median_social_renters
+    expected_column_header_row: 6
+    expected_column_header: all social renters
+    concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    source_concept: mhclg.ehs_median_weekly_housing_costs_social_renters
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
+    concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
+      tables, Annex Table 1.7: median weekly housing costs in GBP per week for all social
+      renters, all households paying rent or mortgage, England, 2023-24.'
+    unit: gbp
+    aggregation: median
+    expected_cell_type: number
