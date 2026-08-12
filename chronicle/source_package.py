@@ -120,6 +120,15 @@ SOURCE_PACKAGE_ALIASES = {
         "dwp/benefit_statistics_february_2026"
     ),
     "dwp-pip-daily-living-foi-2025": Path("dwp/pip_daily_living_foi_2025"),
+    "dwp-uc-households-by-constituency-may-2025": Path(
+        "dwp/uc_households_by_constituency_may_2025"
+    ),
+    "dwp-uc-households-by-constituency-children-may-2025": Path(
+        "dwp/uc_households_by_constituency_children_may_2025"
+    ),
+    "dwp-uc-households-by-local-authority-may-2025": Path(
+        "dwp/uc_households_by_local_authority_may_2025"
+    ),
     "dwp-uc-households-children-may-2025": Path("dwp/uc_households_children_may_2025"),
     "dwp-uc-households-family-type-may-2025": Path(
         "dwp/uc_households_family_type_may_2025"
