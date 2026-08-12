@@ -18,11 +18,17 @@
 # note 1) and the housing-support rows have no mortgagor columns at all
 # (mortgagors are not eligible for housing support, note 3), so those two
 # blocks carry the eight non-mortgagor measures only. Known publisher
-# quirks kept as-is: mortgagor costs include nominal GBP 0.02/week values
-# (note 5), which is why the 75-or-over mortgagor median is 0.023; italic
-# small-sample flags (note 2) are formatting-only and are not carried by the
-# parser. Sample-size columns O-S are survey metadata, not facts (named
-# exclusion). Shared owners are excluded by the publisher (note 4).
+# quirks: mortgagor costs include nominal GBP 0.02/week values (note 5),
+# which is why the 75-or-over mortgagor median is 0.023 - note 5 is carried
+# per-fact in the mortgagor measures' concept_evidence_notes, so bundle
+# consumers see the caveat on the value itself (concept_alignment
+# .evidence_notes), not only in this comment. Italic small-sample flags
+# (note 2) are formatting the parser drops, but the property is fully
+# recoverable, not lost: every italic cell has sample n <= 30 and every
+# non-italic data cell has n >= 36 in the same table's per-tenure
+# sample-size columns O-S, which remain in the committed sha-pinned ODS.
+# Those columns are survey metadata, not facts (named exclusion). Shared
+# owners are excluded by the publisher (note 4).
 schema_version: ledger.source_package.v1
 package_id: mhclg-ehs-weekly-housing-costs-2023-24
 label: 'English Housing Survey 2023-24 rented sectors: mean and median weekly housing costs,
@@ -197,7 +203,11 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor means.'
     unit: gbp
     aggregation: mean
     expected_cell_type: number
@@ -287,7 +297,12 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor medians, which
+      is why the 75-or-over mortgagor median is 0.023.'
     unit: gbp
     aggregation: median
     expected_cell_type: number
@@ -470,7 +485,11 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor means.'
     unit: gbp
     aggregation: mean
     expected_cell_type: number
@@ -560,7 +579,12 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor medians, which
+      is why the 75-or-over mortgagor median is 0.023.'
     unit: gbp
     aggregation: median
     expected_cell_type: number
@@ -957,7 +981,11 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor means.'
     unit: gbp
     aggregation: mean
     expected_cell_type: number
@@ -1047,7 +1075,12 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor medians, which
+      is why the 75-or-over mortgagor median is 0.023.'
     unit: gbp
     aggregation: median
     expected_cell_type: number
@@ -1230,7 +1263,11 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor means.'
     unit: gbp
     aggregation: mean
     expected_cell_type: number
@@ -1320,7 +1357,12 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor medians, which
+      is why the 75-or-over mortgagor median is 0.023.'
     unit: gbp
     aggregation: median
     expected_cell_type: number
@@ -1665,7 +1707,11 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor means.'
     unit: gbp
     aggregation: mean
     expected_cell_type: number
@@ -1755,7 +1801,12 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor medians, which
+      is why the 75-or-over mortgagor median is 0.023.'
     unit: gbp
     aggregation: median
     expected_cell_type: number
@@ -1875,7 +1926,11 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: mean weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor means.'
     unit: gbp
     aggregation: mean
     expected_cell_type: number
@@ -1965,7 +2020,12 @@ record_sets:
     concept_evidence_url: https://www.gov.uk/government/statistics/english-housing-survey-2023-to-2024-rented-sectors
     concept_evidence_notes: 'English Housing Survey 2023-24 rented sectors, Chapter 1 annex
       tables, Annex Table 1.7: median weekly housing costs in GBP per week for all mortgagors,
-      all households paying rent or mortgage, England, 2023-24.'
+      all households paying rent or mortgage, England, 2023-24. Publisher note 5: housing
+      costs for mortgagors in the EHS are sometimes set to a nominal value of GBP 0.02 per
+      week, e.g. the owner is a shared owner who stated they have no outstanding loan on
+      their property or the owner has an equity release mortgage and is aged 55 or over;
+      these nominal-value households are included in the published mortgagor medians, which
+      is why the 75-or-over mortgagor median is 0.023.'
     unit: gbp
     aggregation: median
     expected_cell_type: number

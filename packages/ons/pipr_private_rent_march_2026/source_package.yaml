@@ -22,7 +22,12 @@
 # pages embed per-request ids in page chrome, so the archived HTML is not
 # byte-reproducible across fetches; the parsed statistical content is stable
 # and the manifest sha pins the archived bytes (dwp-benefit-statistics
-# precedent).
+# precedent). The manifest source_url is the edition-pinned live bulletin
+# path (ONS keeps each edition at its own /march2026 URL), not a separate
+# archive service; the prose expected_value guards run only against the
+# committed sha-pinned bytes (mirrored to R2), so a later re-publication
+# that rewords the bulletin cannot silently break a build - re-ingesting a
+# revised edition is a deliberate act that lands as a new artifact.
 schema_version: ledger.source_package.v1
 package_id: ons-pipr-private-rent-march-2026
 label: 'ONS Price Index of Private Rents, March 2026 bulletin: average monthly private rent,
