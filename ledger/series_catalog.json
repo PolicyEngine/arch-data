@@ -4,8 +4,8 @@
   "observations_sha256": "893b06cf310d7075ed62ad1a964c3cfa025b1049415446f2c76428d77c2bbe5c",
   "observation_rows": 182,
   "current_assertion_rows": 182,
-  "docket_seed_sha256": "f86ca19d9b7ff1f44cdfa026ae506452f32033342691e0dda35dca0b353392cc",
-  "uuid_registry_sha256": "488aed798f7bcbb053e774e0e8192397d8fee7b367e6fb5fbdc00613f64f9c64",
+  "docket_seed_sha256": "2790638c9ec56b7769bd2229fd97ad77e999452c3d714d3cba4b578ff2597830",
+  "uuid_registry_sha256": "386bfb6ea5c1faf803a59c42d1c9e3fb798a60c0013025496d7b88a013ec080a",
   "suspect_segments": [],
   "stripped_segments": {
     "2026-05": [
@@ -2091,6 +2091,29 @@
       "first_observed_period": "2026-04",
       "last_observed_period": "2026-04",
       "observation_count": 1
+    },
+    {
+      "uuid": "c6c98b8b-55f6-4543-b057-96726c38a2bf",
+      "concept": "bls.qcew.child_day_care_services.annual_avg_employment",
+      "family_patterns": [
+        "bls.qcew.child_day_care_services.annual_avg_employment"
+      ],
+      "status": "docket-only",
+      "unit": "count",
+      "cadence": "year",
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "name": "United States"
+      },
+      "entity": null,
+      "sources": [],
+      "aliases": [],
+      "source_concepts": [],
+      "rid_patterns": [],
+      "first_observed_period": null,
+      "last_observed_period": null,
+      "observation_count": 0
     },
     {
       "uuid": "2e3a7126-41fd-4d88-99b6-cf4f2057c277",

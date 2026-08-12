@@ -1668,6 +1668,15 @@
     "targetUnit": "usd_millions",
     "country": "US"
    }
+  },
+  {
+   "series": "bls.qcew.child_day_care_services.annual_avg_employment",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-12 for the Thesis bills full-coverage Wave B3 admission (farm-bill-2-0 child-care context): BLS QCEW U.S. total, private ownership, NAICS 624410 Child care services, annual average monthly payroll employment. The defining geography, ownership, industry, and annual-employment measure are part of the concept identity. Not rural-county or all-ownership employment, self-employment, slots, affordability, capacity, or bill-attributable employment. Observations arrive through the annual BLS QCEW first-print resolver after the Thesis adapter and docket admission land.",
+   "extras": {
+    "targetUnit": "count",
+    "country": "US"
+   }
   }
  ]
 }

@@ -234,3 +234,4 @@
 {"concept": "usaspending.ntia.broadband_al11038_obligations", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "f37307e0-91c6-49ee-afc7-2021e33ea863"}
 {"concept": "usaspending.ondcp.hidta_al95001_obligations", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "02662bfc-b77d-48f3-938b-7a5b2f9e5c73"}
 {"concept": "usaspending.usfs.minnesota_place_of_performance_obligations", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "720be189-a4a5-4b0c-a25c-49233ff388a4"}
+{"concept": "bls.qcew.child_day_care_services.annual_avg_employment", "geography": {"level": "country", "id": "0100000US", "vintage": null}, "entity": null, "uuid": "c6c98b8b-55f6-4543-b057-96726c38a2bf"}

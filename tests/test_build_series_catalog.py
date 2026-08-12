@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 216
+    assert len(committed["series"]) == 217
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1204,8 +1204,11 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # (aerospace_product_and_parts, federal_department_of_defense,
     # ship_and_boat_building employment) — deterministic auto-mints any
     # next build would produce.
+    # Updated 2026-08-12: +1 docket-only mint for the Thesis Wave B3
+    # BLS QCEW U.S.-private NAICS 624410 annual-average employment
+    # admission. All 216 prior live bindings are unchanged (216 -> 217).
     assert digest == (
-        "bf17abbe438eddb9401cee0f5c38d4c2d25eed775c53b5a2106bd4ef1445d38d"
+        "8335bba2be865639908ac47372f097919041b182074a8c5f68c2abc158f433c9"
     )
 
 
