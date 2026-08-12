@@ -34,7 +34,7 @@ artifact:
 record_sets:
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_0
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_0.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_0
   sheet_name: api_response
   period_type: month
@@ -55,7 +55,7 @@ record_sets:
     value: '0'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -10186,7 +10186,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_1
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_1.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_1
   sheet_name: api_response
   period_type: month
@@ -10207,7 +10207,7 @@ record_sets:
     value: '1'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -20338,7 +20338,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_2
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_2.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_2
   sheet_name: api_response
   period_type: month
@@ -20359,7 +20359,7 @@ record_sets:
     value: '2'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -30490,7 +30490,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_3
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_3plus.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_3
   sheet_name: api_response
   period_type: month
@@ -30511,7 +30511,7 @@ record_sets:
     value: '3'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -40642,7 +40642,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_4
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_3plus.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_4
   sheet_name: api_response
   period_type: month
@@ -40663,7 +40663,7 @@ record_sets:
     value: '4'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -50794,7 +50794,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_5_or_more
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_3plus.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_5_or_more
   sheet_name: api_response
   period_type: month
@@ -50815,7 +50815,7 @@ record_sets:
     value: '5 or more'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -60946,7 +60946,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_not_available_prior_to_april_2019
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_not_available.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_not_available_prior_to_april_2019
   sheet_name: api_response
   period_type: month
@@ -60967,7 +60967,7 @@ record_sets:
     value: 'Not available prior to April 2019'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
@@ -71098,7 +71098,7 @@ record_sets:
       label: month
 - record_set_id: dwp.statx.uc_households.may2025.by_constituency_children.children_unknown_or_missing
   provenance_class: administrative
-  record_set_spec_id: uk.local_geography.uc_households.by_constituency_children.v1
+  record_set_spec_id: uk.local_geography.uc_households.children_unknown.v1
   source_record_id_prefix: dwp.statx.uc_households.may2025.by_constituency_children.children_unknown_or_missing
   sheet_name: api_response
   period_type: month
@@ -71119,7 +71119,7 @@ record_sets:
     value: 'Unknown or missing'
     label: number of children
   measures:
-  - measure_id: universal_credit_households
+  - measure_id: universal_credit_households_by_children
     label: Households on Universal Credit
     ordinal: 0
     column: B
