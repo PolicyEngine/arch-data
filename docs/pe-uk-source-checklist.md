@@ -94,7 +94,7 @@ cubes; measured deltas vs the revised May-2025 series run +2.6% to +15.0%
 |---|---|---|
 | SPP Review NI-relief bases ([`obr.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/targets/sources/obr.py)) | `obr/salary_sacrifice_{employee,employer}_ni_relief` (£1.2bn / £2.9bn at 2024) | uk-data's pinned asset (`media/67ce0e7c…/2025_SPP_Review.pdf`) returns `status: not found` and has **no Wayback snapshot** — the document is currently unrecoverable, and searches do not surface a re-hosted copy. The ported [`hmrc-salary-sacrifice-relief-2024`](https://github.com/PolicyEngine/chronicle/pull/141) package carries the successor TY2024-25 relief estimates (employee £1.0bn / employer £3.4bn) as an anchor. If anyone locates the SPP Review's new home, it becomes a small `pdf_text_numbers` package. |
 
-## Ported — housing base facts (PR #HOUSING_PR)
+## Ported — housing base facts ([PR #159](https://github.com/PolicyEngine/chronicle/pull/159))
 
 | uk-data family (module) | targets | Chronicle package(s) | source reuse |
 |---|---|---|---|
