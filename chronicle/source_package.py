@@ -90,6 +90,9 @@ SOURCE_PACKAGE_ALIASES = {
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
+    "mhclg-ehs-weekly-housing-costs-2023-24": Path(
+        "mhclg/ehs_weekly_housing_costs_2023_24"
+    ),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
     "statbel-fiscal-income-2023-nis-2025": Path(
         "statbel/fiscal_income_2023_nis_2025"
@@ -251,6 +254,7 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-public-sector-employment-2026": Path("ons/public_sector_employment_2026"),
     "ons-savings-interest-income": Path("ons/savings_interest_income"),
     "ons-families-households-2025": Path("ons/families_households_2025"),
+    "ons-pipr-private-rent-march-2026": Path("ons/pipr_private_rent_march_2026"),
     "ons-uk-business-firm-targets-2025": Path("ons/uk_business_firm_targets_2025"),
     "ons-uk-business-firm-sector-targets-2025": Path(
         "ons/uk_business_firm_sector_targets_2025"
