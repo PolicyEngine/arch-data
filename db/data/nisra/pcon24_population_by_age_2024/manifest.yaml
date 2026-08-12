@@ -1,0 +1,19 @@
+source_id: nisra
+package_id: nisra-pcon24-population-by-age-2024
+dataset: nisra_nisra-pcon24-population-by-age-2024
+source_page: https://data.nisra.gov.uk/table/MYE01T013
+table: MYE01T013 Mid-year population estimates by Assembly Area (2024), five year
+  age bands and sex
+files:
+  2024:
+    filename: mye01t013_population_by_constituency_five_year_age_bands.csv
+    source_url: https://ws-data.nisra.gov.uk/public/api.restful/PxStat.Data.Cube_API.ReadDataset/MYE01T013/CSV/1.0/en
+    sha256: e9c9771e791b305403c3be1d7f460afccf88595011c813be064413a013e71e90
+    size_bytes: 581742
+    fetched_at: '2026-08-12T14:39:42+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/nisra/nisra-pcon24-population-by-age-2024/2024/e9c9771e791b305403c3be1d7f460afccf88595011c813be064413a013e71e90/mye01t013_population_by_constituency_five_year_age_bands.csv
+        uri: r2://ledger-raw/raw/nisra/nisra-pcon24-population-by-age-2024/2024/e9c9771e791b305403c3be1d7f460afccf88595011c813be064413a013e71e90/mye01t013_population_by_constituency_five_year_age_bands.csv

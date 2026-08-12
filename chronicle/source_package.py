@@ -241,6 +241,10 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
     "ons-pcon24-population-by-age-2024": Path("ons/pcon24_population_by_age_2024"),
+    "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
+    "nisra-pcon24-population-by-age-2024": Path(
+        "nisra/pcon24_population_by_age_2024"
+    ),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
     "scotgov-scottish-budget-social-security-assistance-2026": Path(

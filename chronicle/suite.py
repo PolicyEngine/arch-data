@@ -1357,7 +1357,13 @@ def _source_cell_age_range(cell: SourceCell) -> tuple[int, int | None] | None:
 
 
 def _source_row_age_range(row: SourceRow) -> tuple[int, int | None] | None:
-    for variable in ("C_AGE_NAME", "AGE_NAME", "age_name", "age"):
+    for variable in (
+        "C_AGE_NAME",
+        "AGE_NAME",
+        "age_name",
+        "Five year age bands",
+        "age",
+    ):
         matched, value = _source_row_value_without_interpretation(row, variable)
         if not matched or value is None:
             continue
