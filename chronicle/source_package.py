@@ -92,6 +92,9 @@ SOURCE_PACKAGE_ALIASES = {
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
+    "mhclg-council-tax-levels-england-2026-27": Path(
+        "mhclg/council_tax_levels_england_2026_27"
+    ),
     "mhclg-ehs-weekly-housing-costs-2023-24": Path(
         "mhclg/ehs_weekly_housing_costs_2023_24"
     ),
@@ -283,9 +286,16 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "nisra-census2021-tenure-lgd": Path("nisra/census2021_tenure_lgd"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
+    "scotgov-band-d-council-tax-rates-2026-27": Path(
+        "scotgov/band_d_council_tax_rates_2026_27"
+    ),
+    "scotgov-band-d-equivalents-2025": Path("scotgov/band_d_equivalents_2025"),
     "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
     "scotgov-scottish-budget-social-security-assistance-2026": Path(
         "scotgov/scottish_budget_social_security_assistance_2026"
+    ),
+    "welshgov-council-tax-levels-2026-27": Path(
+        "welshgov/council_tax_levels_2026_27"
     ),
     "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
     "voa-council-tax-stock-by-lad-2025": Path(
