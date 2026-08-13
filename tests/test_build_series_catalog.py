@@ -792,7 +792,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 218
+    assert len(committed["series"]) == 219
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1214,8 +1214,12 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # usaspending.dod.prime_award_obligations placeholder gains its declared
     # U.S. country geography through a retire+succeeds pair, preserving its
     # UUID. The other 217 live bindings are unchanged; row count stays 218.
+    # Updated 2026-08-13 alongside one registry mint: the Thesis FLARE Act
+    # context admission adds the U.S. annual EIA N9040US2 vented-and-flared
+    # identity in million cubic feet. All 218 prior live bindings are
+    # unchanged (218 -> 219).
     assert digest == (
-        "6a65e3b8b6bfa224640d48bfd842c242320b5cd1ee64782d7dce24e56e92cc8c"
+        "c0b8a9c791fcb2b9d6e5df5ecfd1960def5210ae953698c64ae665e77b603fd9"
     )
 
 
