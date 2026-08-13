@@ -1210,8 +1210,12 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # personal-transfer-payments identity. The BEA source-linked seed makes
     # clear that only future release-day custody can enrich it; all 216 prior
     # live bindings remain unchanged (216 -> 218).
+    # Updated 2026-08-13 alongside two registry events: the docket-only
+    # usaspending.dod.prime_award_obligations placeholder gains its declared
+    # U.S. country geography through a retire+succeeds pair, preserving its
+    # UUID. The other 217 live bindings are unchanged; row count stays 218.
     assert digest == (
-        "8e8ba1974997ce4714eab462f482bccb9292f1c4317e87809d68feac869a6a5c"
+        "6a65e3b8b6bfa224640d48bfd842c242320b5cd1ee64782d7dce24e56e92cc8c"
     )
 
 
