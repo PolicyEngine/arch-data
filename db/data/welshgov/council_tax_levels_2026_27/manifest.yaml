@@ -1,0 +1,18 @@
+source_id: welshgov
+package_id: welshgov-council-tax-levels-2026-27
+dataset: welshgov_welshgov-council-tax-levels-2026-27
+source_page: https://www.gov.wales/council-tax-levels-april-2026-march-2027-html
+table: Welsh Government council tax levels, April 2026 to March 2027
+files:
+  2026:
+    filename: council-tax-levels-april-2026-march-2027-153478.xlsx
+    source_url: https://gov.wales/sites/default/files/statistics-and-research/2026-03/council-tax-levels-april-2026-march-2027-153478.xlsx
+    sha256: 4c7513aef77b2d276c533e3289e730f324efade40adc9d2da9c2ad30d2a094a1
+    size_bytes: 26893
+    fetched_at: '2026-08-13T17:31:29+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/welshgov/welshgov-council-tax-levels-2026-27/2026/4c7513aef77b2d276c533e3289e730f324efade40adc9d2da9c2ad30d2a094a1/council-tax-levels-april-2026-march-2027-153478.xlsx
+        uri: r2://ledger-raw/raw/welshgov/welshgov-council-tax-levels-2026-27/2026/4c7513aef77b2d276c533e3289e730f324efade40adc9d2da9c2ad30d2a094a1/council-tax-levels-april-2026-march-2027-153478.xlsx
