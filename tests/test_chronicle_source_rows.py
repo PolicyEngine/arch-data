@@ -280,3 +280,86 @@ def test_cdc_vsrr_live_births_parser_sets_month_period():
     assert rows[0].values["period"] == "2024-01"
     assert rows[0].values["frequency"] == "Monthly"
     assert rows[0].values["data_value"] == 4_932
+
+
+def _two_table_workbook() -> bytes:
+    from datetime import datetime
+    from io import BytesIO
+
+    import openpyxl
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = "Table 1"
+    sheet["A1"] = "Price Index of Private Rents"
+    sheet["A2"] = "This worksheet contains one table."
+    sheet.append([])  # openpyxl needs row 3 populated via append after A1/A2
+    workbook.remove(workbook["Table 1"])
+    sheet = workbook.create_sheet("Table 1")
+    sheet["A1"] = "Price Index of Private Rents"
+    sheet["A2"] = "This worksheet contains one table."
+    sheet["A3"] = "Time period"
+    sheet["B3"] = "Area code"
+    sheet["C3"] = "Rental price"
+    sheet["A4"] = datetime(2026, 6, 1)
+    sheet["B4"] = "E06000001"
+    sheet["C4"] = 612
+    sheet["A5"] = datetime(2026, 6, 1)
+    sheet["B5"] = "[z]"
+    sheet["C5"] = "[x]"
+    buffer = BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue()
+
+
+def test_source_rows_from_xlsx_table_reads_below_the_header_row():
+    from chronicle.sources.rows import source_rows_from_xlsx_table
+
+    rows = source_rows_from_xlsx_table(
+        _two_table_workbook(),
+        _artifact(),
+        sheet_name="Table 1",
+        header_row=3,
+    )
+
+    assert [row.row_number for row in rows] == [4, 5]
+    assert rows[0].values == {
+        "Time period": "2026-06-01",
+        "Area code": "E06000001",
+        "Rental price": 612,
+    }
+    assert rows[1].values["Rental price"] == "[x]"
+
+
+def test_source_rows_from_xlsx_table_rejects_a_missing_sheet():
+    from chronicle.sources.rows import source_rows_from_xlsx_table
+
+    with pytest.raises(ValueError, match="does not carry"):
+        source_rows_from_xlsx_table(
+            _two_table_workbook(),
+            _artifact(),
+            sheet_name="Renamed by publisher",
+        )
+
+
+def test_source_rows_from_delimited_text_skips_a_preamble_above_the_header():
+    from chronicle.sources.rows import source_rows_from_delimited_text
+
+    content = (
+        'SuperWEB2(tm)\n'
+        '\n'
+        '"Counting","Council Area 2019","Count",\n'
+        '"Households","Clackmannanshire",24072\n'
+    ).encode("utf-8")
+
+    rows = source_rows_from_delimited_text(
+        content,
+        _artifact(),
+        sheet_name="uv404.csv",
+        header_row=3,
+    )
+
+    assert [row.row_number for row in rows] == [4]
+    assert rows[0].values["Counting"] == "Households"
+    assert rows[0].values["Council Area 2019"] == "Clackmannanshire"
+    assert rows[0].values["Count"] == 24072

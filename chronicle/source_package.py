@@ -55,6 +55,7 @@ from chronicle.sources.rows import (
     source_rows_from_kff_state_indicator_gdocs_html,
     source_rows_from_ons_timeseries_json,
     source_rows_from_delimited_text,
+    source_rows_from_xlsx_table,
 )
 from chronicle.sources.specs import (
     SourceRecord,
@@ -252,10 +253,22 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
     "ons-lad-population-by-age-2024": Path("ons/lad_population_by_age_2024"),
     "ons-pcon24-population-by-age-2024": Path("ons/pcon24_population_by_age_2024"),
+    "ons-small-area-income-msoa-fye2023": Path(
+        "ons/small_area_income_msoa_fye2023"
+    ),
+    "ons-census2021-ts054-tenure-lad": Path("ons/census2021_ts054_tenure_lad"),
+    "ons-subnational-dwellings-by-tenure-2024": Path(
+        "ons/subnational_dwellings_by_tenure_2024"
+    ),
+    "ons-pipr-rents-by-area-june-2026": Path("ons/pipr_rents_by_area_june_2026"),
     "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
+    "nrs-census2022-uv404-tenure-council-area": Path(
+        "nrs/census2022_uv404_tenure_council_area"
+    ),
     "nisra-pcon24-population-by-age-2024": Path(
         "nisra/pcon24_population_by_age_2024"
     ),
+    "nisra-census2021-tenure-lgd": Path("nisra/census2021_tenure_lgd"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
     "scotgov-scottish-budget-social-security-assistance-2026": Path(
@@ -306,6 +319,7 @@ class SourceArtifactSpec:
     archive_member: str | None = None
     artifact_year: int | None = None
     delimiter: str = ","
+    header_row: int = 1
     selected_rows: tuple[dict[str, Any], ...] = ()
     sheets: tuple[str, ...] = ()
 
@@ -326,6 +340,14 @@ class SourceArtifactSpec:
                 artifact,
                 sheet_name=self._sheet_name(filename, year=year),
                 delimiter=self.delimiter,
+                header_row=self.header_row,
+            )
+        if self.parser == "xlsx_table_full_rows":
+            return source_rows_from_xlsx_table(
+                content,
+                artifact,
+                sheet_name=self._sheet_name(filename, year=year),
+                header_row=self.header_row,
             )
         if self.parser == "json_table_full_rows":
             return source_rows_from_json_table(
@@ -470,6 +492,28 @@ class SourceArtifactSpec:
                     artifact,
                     sheet_name=self._sheet_name(filename, year=year),
                     delimiter=self.delimiter,
+                    header_row=self.header_row,
+                )
+            )
+            return source_cells_from_source_rows(
+                rows,
+                selected_rows=tuple(
+                    {
+                        key: str(_render_value(value, year=year))
+                        for key, value in row.items()
+                    }
+                    for row in self.selected_rows
+                ),
+            )
+        if self.parser == "xlsx_table_full_rows":
+            rows = (
+                source_rows
+                if source_rows is not None
+                else source_rows_from_xlsx_table(
+                    content,
+                    artifact,
+                    sheet_name=self._sheet_name(filename, year=year),
+                    header_row=self.header_row,
                 )
             )
             return source_cells_from_source_rows(
@@ -1530,6 +1574,7 @@ def _artifact_from_mapping(payload: dict[str, Any]) -> SourceArtifactSpec:
             else None
         ),
         delimiter=payload.get("delimiter", ","),
+        header_row=int(payload.get("header_row", 1)),
         selected_rows=tuple(payload.get("selected_rows", ())),
         sheets=tuple(payload.get("sheets", ())),
     )

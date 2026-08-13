@@ -9,9 +9,12 @@ import json
 import re
 from collections import Counter
 from dataclasses import asdict, dataclass
-from io import StringIO
+from datetime import date, datetime
+from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Any
+
+import openpyxl
 
 from chronicle.sources.cells import SourceArtifactMetadata, SourceCell
 
@@ -136,21 +139,28 @@ def source_rows_from_delimited_text(
     *,
     sheet_name: str,
     delimiter: str = ",",
+    header_row: int = 1,
 ) -> list[SourceRow]:
-    """Parse every data row from a delimited text artifact."""
+    """Parse every data row from a delimited text artifact.
+
+    ``header_row`` names the physical line carrying the column headers.
+    Export tools such as SuperWEB2 write a metadata preamble above the table;
+    lines before the header are preamble, not data, and are skipped. Row
+    numbers stay physical file line numbers either way.
+    """
     text = content.decode("utf-8-sig")
     reader = csv.reader(StringIO(text), delimiter=delimiter)
-    try:
-        header = next(reader)
-    except StopIteration:
-        return []
-
-    normalized_header = [_normalize_header_cell(item) for item in header]
+    header: list[str] | None = None
     rows: list[SourceRow] = []
-    for source_line_number, raw_row in enumerate(reader, start=2):
+    for source_line_number, raw_row in enumerate(reader, start=1):
+        if source_line_number < header_row:
+            continue
+        if source_line_number == header_row:
+            header = [_normalize_header_cell(item) for item in raw_row]
+            continue
         values = {
             column: _delimited_scalar(raw_row[index]) if index < len(raw_row) else None
-            for index, column in enumerate(normalized_header)
+            for index, column in enumerate(header or ())
         }
         rows.append(
             SourceRow(
@@ -161,6 +171,79 @@ def source_rows_from_delimited_text(
             )
         )
     return rows
+
+
+def source_rows_from_xlsx_table(
+    content: bytes,
+    artifact: SourceArtifactMetadata,
+    *,
+    sheet_name: str,
+    header_row: int = 1,
+) -> list[SourceRow]:
+    """Parse one worksheet's rectangular table into full source rows.
+
+    The delimited full-row contract applied to a workbook sheet: the whole
+    table is preserved as source rows keyed by the header line's column names,
+    and packages select rows at the record-set or artifact level. This is the
+    lane for wide publisher workbooks whose used-range cell parse would cost
+    millions of cell records per build (the PIPR monthly workbook is one
+    ~49k-row sheet); the artifact's ``selected_rows`` then restricts cell
+    emission while every row stays preserved and queryable.
+
+    Row numbers are physical sheet rows. Datetime cells flatten to ISO text
+    (date-only at midnight) so criteria and guards compare against a stable
+    string form.
+    """
+    workbook = openpyxl.load_workbook(
+        BytesIO(content),
+        read_only=True,
+        data_only=True,
+    )
+    if sheet_name not in workbook.sheetnames:
+        raise ValueError(
+            f"Workbook does not carry the declared sheet {sheet_name!r}"
+        )
+    sheet = workbook[sheet_name]
+    header: list[str] | None = None
+    rows: list[SourceRow] = []
+    for row_number, raw_row in enumerate(
+        sheet.iter_rows(values_only=True),
+        start=1,
+    ):
+        if row_number < header_row:
+            continue
+        if row_number == header_row:
+            header = [
+                _normalize_header_cell("" if item is None else str(item))
+                for item in raw_row
+            ]
+            continue
+        values = {
+            column: _xlsx_row_scalar(raw_row[index]) if index < len(raw_row) else None
+            for index, column in enumerate(header or ())
+        }
+        rows.append(
+            SourceRow(
+                artifact=artifact,
+                sheet_name=sheet_name,
+                row_number=row_number,
+                values=values,
+            )
+        )
+    return rows
+
+
+def _xlsx_row_scalar(value: Any) -> Scalar:
+    """Normalize one xlsx cell value into a source-row scalar."""
+    if isinstance(value, datetime):
+        if (value.hour, value.minute, value.second, value.microsecond) == (0, 0, 0, 0):
+            return value.date().isoformat()
+        return value.isoformat()
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, str):
+        return value.strip()
+    return value
 
 
 def source_rows_from_json_table(

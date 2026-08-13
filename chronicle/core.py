@@ -44,6 +44,7 @@ ALLOWED_GEOGRAPHY_LEVELS = {
     "state_legislative_district_lower",
     "constituency",
     "local_authority",
+    "msoa",
     "metro_area",
     "zip_code",
     "statistical_scope",
