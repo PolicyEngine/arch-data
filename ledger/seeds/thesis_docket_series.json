@@ -1103,6 +1103,7 @@
     },
     "valueScale": 1e-09,
     "targetUnit": "billions USD",
+    "country": "US",
     "sourceBinding": {
      "adapter": "usaspending-api",
      "sourceUrl": "https://api.usaspending.gov/api/v2/agency/097/awards/?fiscal_year={fiscal_year}",
