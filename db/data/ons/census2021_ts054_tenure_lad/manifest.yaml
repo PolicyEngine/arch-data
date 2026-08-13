@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-census2021-ts054-tenure-lad
+dataset: ons_ons-census2021-ts054-tenure-lad
+source_page: https://www.nomisweb.co.uk/datasets/c2021ts054
+table: Census 2021 TS054 tenure of household, local authority districts (April 2023),
+  England and Wales
+files:
+  2021:
+    filename: census2021_ts054_tenure_by_lad.csv
+    source_url: https://www.nomisweb.co.uk/api/v01/dataset/NM_2072_1.data.csv?geography=TYPE424&date=latest&c2021_tenure_9=0,1,2,3,4,5,6,7,8&measures=20100&select=geography_name,geography_code,c2021_tenure_9_name,measures_name,obs_value
+    sha256: 868f695fc90da653ea9354d056b74d345f4be864841d8517fd10a162f457b795
+    size_bytes: 215161
+    fetched_at: '2026-08-13T08:57:16+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-census2021-ts054-tenure-lad/2021/868f695fc90da653ea9354d056b74d345f4be864841d8517fd10a162f457b795/census2021_ts054_tenure_by_lad.csv
+        uri: r2://ledger-raw/raw/ons/ons-census2021-ts054-tenure-lad/2021/868f695fc90da653ea9354d056b74d345f4be864841d8517fd10a162f457b795/census2021_ts054_tenure_by_lad.csv

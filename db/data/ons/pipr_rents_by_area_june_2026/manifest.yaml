@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-pipr-rents-by-area-june-2026
+dataset: ons_ons-pipr-rents-by-area-june-2026
+source_page: https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics
+table: 'Price Index of Private Rents, UK: monthly price statistics, July 2026 edition
+  (data to June 2026)'
+files:
+  2026:
+    filename: pipr_monthly_price_statistics_july2026_edition.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/22july2026/priceindexofprivaterentsukmonthlypricestatistics14.xlsx
+    sha256: d429e553ade454903b731f6c257609f14d0c2171822791e09c21a9d53d5e24a9
+    size_bytes: 18370943
+    fetched_at: '2026-08-13T08:58:37+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-pipr-rents-by-area-june-2026/2026/d429e553ade454903b731f6c257609f14d0c2171822791e09c21a9d53d5e24a9/pipr_monthly_price_statistics_july2026_edition.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-pipr-rents-by-area-june-2026/2026/d429e553ade454903b731f6c257609f14d0c2171822791e09c21a9d53d5e24a9/pipr_monthly_price_statistics_july2026_edition.xlsx

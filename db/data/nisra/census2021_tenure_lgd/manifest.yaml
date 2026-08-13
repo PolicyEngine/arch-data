@@ -1,0 +1,19 @@
+source_id: nisra
+package_id: nisra-census2021-tenure-lgd
+dataset: nisra_nisra-census2021-tenure-lgd
+source_page: https://build.nisra.gov.uk/en/custom/data?d=HOUSEHOLD&v=LGD14&v=HH_TENURE
+table: 'NISRA Census 2021 flexible table: households by tenure and local government
+  district'
+files:
+  2021:
+    filename: census2021_tenure_households_by_lgd.csv
+    source_url: https://build.nisra.gov.uk/en/custom/table.csv?d=HOUSEHOLD&v=LGD14&v=HH_TENURE
+    sha256: c4eec86dac41207e984b02c73bbb18b491121710004ee7815570059a6fae9a8c
+    size_bytes: 9634
+    fetched_at: '2026-08-13T08:57:56+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/nisra/nisra-census2021-tenure-lgd/2021/c4eec86dac41207e984b02c73bbb18b491121710004ee7815570059a6fae9a8c/census2021_tenure_households_by_lgd.csv
+        uri: r2://ledger-raw/raw/nisra/nisra-census2021-tenure-lgd/2021/c4eec86dac41207e984b02c73bbb18b491121710004ee7815570059a6fae9a8c/census2021_tenure_households_by_lgd.csv
