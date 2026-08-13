@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-census2021-ts041-households-lad
+dataset: ons_ons-census2021-ts041-households-lad
+source_page: https://www.nomisweb.co.uk/datasets/c2021ts041
+table: Census 2021 TS041 number of households, local authority districts (April 2023),
+  England and Wales
+files:
+  2021:
+    filename: census2021_ts041_households_by_lad.csv
+    source_url: https://www.nomisweb.co.uk/api/v01/dataset/NM_2059_1.data.csv?geography=TYPE424&date=latest&c2021_hh_1=0&measures=20100&select=geography_name,geography_code,c2021_hh_1_name,measures_name,obs_value
+    sha256: e431974c8f6882240364cd019e71bd1bf7d421104e578b775298dc30e67b9ecf
+    size_bytes: 20202
+    fetched_at: '2026-08-13T12:34:15+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-census2021-ts041-households-lad/2021/e431974c8f6882240364cd019e71bd1bf7d421104e578b775298dc30e67b9ecf/census2021_ts041_households_by_lad.csv
+        uri: r2://ledger-raw/raw/ons/ons-census2021-ts041-households-lad/2021/e431974c8f6882240364cd019e71bd1bf7d421104e578b775298dc30e67b9ecf/census2021_ts041_households_by_lad.csv

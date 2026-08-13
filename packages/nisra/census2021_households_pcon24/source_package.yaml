@@ -1,0 +1,245 @@
+# NISRA Census 2021 Flexible Table Builder HOUSEHOLD extract. The
+# artifact has one count per area and no category dimension, so no
+# filters or constraints are invented.
+schema_version: ledger.source_package.v1
+package_id: nisra-census2021-households-pcon24
+label: 'NISRA Census 2021: households by parliamentary constituency 2024'
+artifact:
+  source_name: nisra
+  source_table: 'NISRA Census 2021 flexible table: number of households by PARLCON24'
+  resource_package: db
+  resource_directory: data/nisra/census2021_households_pcon24
+  manifest: manifest.yaml
+  vintage: census_2021
+  extracted_at: '2026-08-13'
+  extraction_method: NISRA Flexible Table Builder delimited text full-row parse
+  parser: delimited_text_full_rows
+  sheet_name: census2021_households_by_pcon24.csv
+  artifact_year: 2021
+record_sets:
+- record_set_id: nisra.census2021.households.pcon24
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.households.by_constituency.v1
+  source_record_id_prefix: nisra.census2021.households.pcon24
+  sheet_name: census2021_households_by_pcon24.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: household_count
+  groupby_dimension: geography
+  measures:
+  - measure_id: households
+    label: Number of households
+    ordinal: 0
+    column: C
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n05000001
+    label: 'Belfast East'
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: N05000001
+    geography_id: N05000001
+    geography_level: constituency
+    geography_name: 'Belfast East'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000002
+    label: 'Belfast North'
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: N05000002
+    geography_id: N05000002
+    geography_level: constituency
+    geography_name: 'Belfast North'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000003
+    label: 'Belfast South and Mid Down'
+    ordinal: 2
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: N05000003
+    geography_id: N05000003
+    geography_level: constituency
+    geography_name: 'Belfast South and Mid Down'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000004
+    label: 'Belfast West'
+    ordinal: 3
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: N05000004
+    geography_id: N05000004
+    geography_level: constituency
+    geography_name: 'Belfast West'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000005
+    label: 'East Antrim'
+    ordinal: 4
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: N05000005
+    geography_id: N05000005
+    geography_level: constituency
+    geography_name: 'East Antrim'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000006
+    label: 'East Londonderry'
+    ordinal: 5
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: N05000006
+    geography_id: N05000006
+    geography_level: constituency
+    geography_name: 'East Londonderry'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000007
+    label: 'Fermanagh and South Tyrone'
+    ordinal: 6
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: N05000007
+    geography_id: N05000007
+    geography_level: constituency
+    geography_name: 'Fermanagh and South Tyrone'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000008
+    label: 'Foyle'
+    ordinal: 7
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: N05000008
+    geography_id: N05000008
+    geography_level: constituency
+    geography_name: 'Foyle'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000009
+    label: 'Lagan Valley'
+    ordinal: 8
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: N05000009
+    geography_id: N05000009
+    geography_level: constituency
+    geography_name: 'Lagan Valley'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000010
+    label: 'Mid Ulster'
+    ordinal: 9
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: N05000010
+    geography_id: N05000010
+    geography_level: constituency
+    geography_name: 'Mid Ulster'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000011
+    label: 'Newry and Armagh'
+    ordinal: 10
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: N05000011
+    geography_id: N05000011
+    geography_level: constituency
+    geography_name: 'Newry and Armagh'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000012
+    label: 'North Antrim'
+    ordinal: 11
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: N05000012
+    geography_id: N05000012
+    geography_level: constituency
+    geography_name: 'North Antrim'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000013
+    label: 'North Down'
+    ordinal: 12
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: N05000013
+    geography_id: N05000013
+    geography_level: constituency
+    geography_name: 'North Down'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000014
+    label: 'South Antrim'
+    ordinal: 13
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: N05000014
+    geography_id: N05000014
+    geography_level: constituency
+    geography_name: 'South Antrim'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000015
+    label: 'South Down'
+    ordinal: 14
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: N05000015
+    geography_id: N05000015
+    geography_level: constituency
+    geography_name: 'South Down'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000016
+    label: 'Strangford'
+    ordinal: 15
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: N05000016
+    geography_id: N05000016
+    geography_level: constituency
+    geography_name: 'Strangford'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000017
+    label: 'Upper Bann'
+    ordinal: 16
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: N05000017
+    geography_id: N05000017
+    geography_level: constituency
+    geography_name: 'Upper Bann'
+    geography_vintage: pcon_2024
+    table_record_kind: total
+  - value_id: n05000018
+    label: 'West Tyrone'
+    ordinal: 17
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: N05000018
+    geography_id: N05000018
+    geography_level: constituency
+    geography_name: 'West Tyrone'
+    geography_vintage: pcon_2024
+    table_record_kind: total

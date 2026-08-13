@@ -1,0 +1,171 @@
+# NISRA Census 2021 Flexible Table Builder HOUSEHOLD extract. The
+# artifact has one count per area and no category dimension, so no
+# filters or constraints are invented.
+# Scotland's local-authority household count is already carried by
+# nrs-census2022-uv404-tenure-council-area. A second Scottish
+# council-area household package would collide on fact_key.
+schema_version: ledger.source_package.v1
+package_id: nisra-census2021-households-lgd
+label: 'NISRA Census 2021: households by local government district 2014'
+artifact:
+  source_name: nisra
+  source_table: 'NISRA Census 2021 flexible table: number of households by LGD14'
+  resource_package: db
+  resource_directory: data/nisra/census2021_households_lgd
+  manifest: manifest.yaml
+  vintage: census_2021
+  extracted_at: '2026-08-13'
+  extraction_method: NISRA Flexible Table Builder delimited text full-row parse
+  parser: delimited_text_full_rows
+  sheet_name: census2021_households_by_lgd.csv
+  artifact_year: 2021
+record_sets:
+- record_set_id: nisra.census2021.households.lgd
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.households.by_local_authority.v1
+  source_record_id_prefix: nisra.census2021.households.lgd
+  sheet_name: census2021_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: household_count
+  groupby_dimension: geography
+  measures:
+  - measure_id: households
+    label: Number of households
+    ordinal: 0
+    column: C
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: total
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: total

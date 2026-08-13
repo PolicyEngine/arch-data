@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-census2021-ts041-households-pcon24
+dataset: ons_ons-census2021-ts041-households-pcon24
+source_page: https://www.nomisweb.co.uk/datasets/c2021ts041
+table: Census 2021 TS041 number of households, Westminster Parliamentary Constituencies
+  (July 2024), England and Wales
+files:
+  2021:
+    filename: census2021_ts041_households_by_pcon24.csv
+    source_url: https://www.nomisweb.co.uk/api/v01/dataset/NM_2059_1.data.csv?geography=TYPE172&date=latest&c2021_hh_1=0&measures=20100&select=geography_name,geography_code,c2021_hh_1_name,measures_name,obs_value
+    sha256: 516a59351baf261ca558e64945f3a3d8443cc97abfaed2a47d065edd80413e48
+    size_bytes: 39616
+    fetched_at: '2026-08-13T12:34:13+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-census2021-ts041-households-pcon24/2021/516a59351baf261ca558e64945f3a3d8443cc97abfaed2a47d065edd80413e48/census2021_ts041_households_by_pcon24.csv
+        uri: r2://ledger-raw/raw/ons/ons-census2021-ts041-households-pcon24/2021/516a59351baf261ca558e64945f3a3d8443cc97abfaed2a47d065edd80413e48/census2021_ts041_households_by_pcon24.csv

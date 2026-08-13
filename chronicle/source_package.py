@@ -248,6 +248,12 @@ SOURCE_PACKAGE_ALIASES = {
     "kff-marketplace-effectuated-enrollment": Path(
         "kff/marketplace_effectuated_enrollment"
     ),
+    "ons-census2021-ts041-households-lad": Path(
+        "ons/census2021_ts041_households_lad"
+    ),
+    "ons-census2021-ts041-households-pcon24": Path(
+        "ons/census2021_ts041_households_pcon24"
+    ),
     "ons-mye-2023-uk-countries": Path("ons/mye_2023_uk_countries"),
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
@@ -261,9 +267,16 @@ SOURCE_PACKAGE_ALIASES = {
         "ons/subnational_dwellings_by_tenure_2024"
     ),
     "ons-pipr-rents-by-area-june-2026": Path("ons/pipr_rents_by_area_june_2026"),
+    "nrs-census2022-households-ukpc24": Path(
+        "nrs/census2022_households_ukpc24"
+    ),
     "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
     "nrs-census2022-uv404-tenure-council-area": Path(
         "nrs/census2022_uv404_tenure_council_area"
+    ),
+    "nisra-census2021-households-lgd": Path("nisra/census2021_households_lgd"),
+    "nisra-census2021-households-pcon24": Path(
+        "nisra/census2021_households_pcon24"
     ),
     "nisra-pcon24-population-by-age-2024": Path(
         "nisra/pcon24_population_by_age_2024"
@@ -275,6 +288,9 @@ SOURCE_PACKAGE_ALIASES = {
         "scotgov/scottish_budget_social_security_assistance_2026"
     ),
     "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
+    "voa-council-tax-stock-by-lad-2025": Path(
+        "voa/council_tax_stock_by_lad_2025"
+    ),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
     "ons-national-balance-sheet-land-2025": Path(

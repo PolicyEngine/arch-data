@@ -1,0 +1,576 @@
+"GEOGRAPHY_NAME","GEOGRAPHY_CODE","C2021_HH_1_NAME","MEASURES_NAME","OBS_VALUE"
+"Bishop Auckland","E14001101","Number of households","Value",42733
+"Blaydon and Consett","E14001106","Number of households","Value",41737
+"Blyth and Ashington","E14001107","Number of households","Value",46755
+"City of Durham","E14001173","Number of households","Value",41093
+"Cramlington and Killingworth","E14001183","Number of households","Value",44055
+"Darlington","E14001190","Number of households","Value",44411
+"Easington","E14001211","Number of households","Value",42384
+"Gateshead Central and Whickham","E14001244","Number of households","Value",44309
+"Hartlepool","E14001272","Number of households","Value",40930
+"Hexham","E14001285","Number of households","Value",41294
+"Houghton and Sunderland South","E14001295","Number of households","Value",44873
+"Jarrow and Gateshead East","E14001307","Number of households","Value",42695
+"Middlesbrough and Thornaby East","E14001367","Number of households","Value",46138
+"Middlesbrough South and East Cleveland","E14001368","Number of households","Value",41014
+"Newcastle upon Tyne Central and West","E14001377","Number of households","Value",51338
+"Newcastle upon Tyne East and Wallsend","E14001378","Number of households","Value",50760
+"Newcastle upon Tyne North","E14001379","Number of households","Value",45290
+"Newton Aycliffe and Spennymoor","E14001382","Number of households","Value",43513
+"North Durham","E14001389","Number of households","Value",43950
+"North Northumberland","E14001397","Number of households","Value",42628
+"Redcar","E14001440","Number of households","Value",42180
+"South Shields","E14001492","Number of households","Value",41549
+"Stockton North","E14001518","Number of households","Value",42758
+"Stockton West","E14001519","Number of households","Value",38074
+"Sunderland Central","E14001531","Number of households","Value",43494
+"Tynemouth","E14001557","Number of households","Value",43829
+"Washington and Gateshead South","E14001567","Number of households","Value",41894
+"Altrincham and Sale West","E14001065","Number of households","Value",40763
+"Ashton-under-Lyne","E14001070","Number of households","Value",42224
+"Barrow and Furness","E14001076","Number of households","Value",44945
+"Birkenhead","E14001091","Number of households","Value",47940
+"Blackburn","E14001102","Number of households","Value",40300
+"Blackley and Middleton South","E14001103","Number of households","Value",43754
+"Blackpool North and Fleetwood","E14001104","Number of households","Value",43949
+"Blackpool South","E14001105","Number of households","Value",49725
+"Bolton North East","E14001110","Number of households","Value",47255
+"Bolton South and Walkden","E14001111","Number of households","Value",47139
+"Bolton West","E14001112","Number of households","Value",41253
+"Bootle","E14001113","Number of households","Value",44869
+"Burnley","E14001142","Number of households","Value",45122
+"Bury North","E14001144","Number of households","Value",43242
+"Bury South","E14001145","Number of households","Value",42756
+"Carlisle","E14001152","Number of households","Value",47449
+"Cheadle","E14001158","Number of households","Value",39132
+"Chester North and Neston","E14001163","Number of households","Value",41601
+"Chester South and Eddisbury","E14001164","Number of households","Value",39824
+"Chorley","E14001170","Number of households","Value",43774
+"Congleton","E14001178","Number of households","Value",39842
+"Crewe and Nantwich","E14001185","Number of households","Value",47585
+"Ellesmere Port and Bromborough","E14001222","Number of households","Value",41649
+"Fylde","E14001242","Number of households","Value",44588
+"Gorton and Denton","E14001251","Number of households","Value",43815
+"Hazel Grove","E14001277","Number of households","Value",41074
+"Heywood and Middleton North","E14001286","Number of households","Value",41705
+"Hyndburn","E14001299","Number of households","Value",39738
+"Knowsley","E14001317","Number of households","Value",40161
+"Lancaster and Wyre","E14001318","Number of households","Value",39163
+"Leigh and Atherton","E14001329","Number of households","Value",47840
+"Liverpool Garston","E14001337","Number of households","Value",40890
+"Liverpool Riverside","E14001338","Number of households","Value",49777
+"Liverpool Walton","E14001339","Number of households","Value",43077
+"Liverpool Wavertree","E14001340","Number of households","Value",43263
+"Liverpool West Derby","E14001341","Number of households","Value",42178
+"Macclesfield","E14001347","Number of households","Value",43035
+"Makerfield","E14001350","Number of households","Value",43820
+"Manchester Central","E14001352","Number of households","Value",52288
+"Manchester Rusholme","E14001353","Number of households","Value",37604
+"Manchester Withington","E14001354","Number of households","Value",37737
+"Mid Cheshire","E14001361","Number of households","Value",40547
+"Morecambe and Lunesdale","E14001372","Number of households","Value",43896
+"Oldham East and Saddleworth","E14001415","Number of households","Value",42233
+"Oldham West, Chadderton and Royton","E14001416","Number of households","Value",41416
+"Pendle and Clitheroe","E14001422","Number of households","Value",45323
+"Penrith and Solway","E14001424","Number of households","Value",43873
+"Preston","E14001433","Number of households","Value",46697
+"Ribble Valley","E14001443","Number of households","Value",41713
+"Rochdale","E14001446","Number of households","Value",39565
+"Rossendale and Darwen","E14001450","Number of households","Value",44080
+"Runcorn and Helsby","E14001455","Number of households","Value",40863
+"Salford","E14001459","Number of households","Value",52437
+"Sefton Central","E14001463","Number of households","Value",39045
+"South Ribble","E14001491","Number of households","Value",40379
+"Southport","E14001504","Number of households","Value",43630
+"St Helens North","E14001509","Number of households","Value",43922
+"St Helens South and Whiston","E14001510","Number of households","Value",42068
+"Stalybridge and Hyde","E14001515","Number of households","Value",42070
+"Stockport","E14001517","Number of households","Value",46442
+"Stretford and Urmston","E14001528","Number of households","Value",41881
+"Tatton","E14001539","Number of households","Value",42059
+"Wallasey","E14001561","Number of households","Value",43207
+"Warrington North","E14001564","Number of households","Value",41782
+"Warrington South","E14001565","Number of households","Value",43443
+"West Lancashire","E14001577","Number of households","Value",41232
+"Westmorland and Lonsdale","E14001580","Number of households","Value",41531
+"Whitehaven and Workington","E14001583","Number of households","Value",42977
+"Widnes and Halewood","E14001584","Number of households","Value",39758
+"Wigan","E14001585","Number of households","Value",45932
+"Wirral West","E14001589","Number of households","Value",38685
+"Worsley and Eccles","E14001598","Number of households","Value",46032
+"Wythenshawe and Sale East","E14001602","Number of households","Value",46836
+"Barnsley North","E14001074","Number of households","Value",45993
+"Barnsley South","E14001075","Number of households","Value",46649
+"Beverley and Holderness","E14001087","Number of households","Value",40012
+"Bradford East","E14001118","Number of households","Value",41527
+"Bradford South","E14001119","Number of households","Value",43656
+"Bradford West","E14001120","Number of households","Value",39290
+"Bridlington and The Wolds","E14001127","Number of households","Value",42369
+"Brigg and Immingham","E14001128","Number of households","Value",39883
+"Calder Valley","E14001147","Number of households","Value",44850
+"Colne Valley","E14001177","Number of households","Value",40854
+"Dewsbury and Batley","E14001196","Number of households","Value",37698
+"Doncaster Central","E14001198","Number of households","Value",49026
+"Doncaster East and the Isle of Axholme","E14001199","Number of households","Value",39343
+"Doncaster North","E14001200","Number of households","Value",42487
+"Goole and Pocklington","E14001250","Number of households","Value",44355
+"Great Grimsby and Cleethorpes","E14001255","Number of households","Value",48227
+"Halifax","E14001262","Number of households","Value",45628
+"Harrogate and Knaresborough","E14001269","Number of households","Value",45004
+"Huddersfield","E14001297","Number of households","Value",46267
+"Keighley and Ilkley","E14001308","Number of households","Value",41851
+"Kingston upon Hull East","E14001313","Number of households","Value",44034
+"Kingston upon Hull North and Cottingham","E14001314","Number of households","Value",49144
+"Kingston upon Hull West and Haltemprice","E14001315","Number of households","Value",47624
+"Leeds Central and Headingley","E14001319","Number of households","Value",39577
+"Leeds East","E14001320","Number of households","Value",45908
+"Leeds North East","E14001321","Number of households","Value",40077
+"Leeds North West","E14001322","Number of households","Value",40136
+"Leeds South","E14001323","Number of households","Value",53551
+"Leeds South West and Morley","E14001324","Number of households","Value",42195
+"Leeds West and Pudsey","E14001325","Number of households","Value",44217
+"Normanton and Hemsworth","E14001383","Number of households","Value",44504
+"Ossett and Denby Dale","E14001418","Number of households","Value",40474
+"Penistone and Stocksbridge","E14001423","Number of households","Value",39283
+"Pontefract, Castleford and Knottingley","E14001428","Number of households","Value",44132
+"Rawmarsh and Conisbrough","E14001436","Number of households","Value",41156
+"Richmond and Northallerton","E14001444","Number of households","Value",40947
+"Rother Valley","E14001451","Number of households","Value",39332
+"Rotherham","E14001452","Number of households","Value",45916
+"Scarborough and Whitby","E14001461","Number of households","Value",45602
+"Scunthorpe","E14001462","Number of households","Value",45034
+"Selby","E14001464","Number of households","Value",43292
+"Sheffield Brightside and Hillsborough","E14001466","Number of households","Value",44697
+"Sheffield Central","E14001467","Number of households","Value",34571
+"Sheffield Hallam","E14001468","Number of households","Value",37853
+"Sheffield Heeley","E14001469","Number of households","Value",46983
+"Sheffield South East","E14001470","Number of households","Value",43974
+"Shipley","E14001472","Number of households","Value",43543
+"Skipton and Ripon","E14001475","Number of households","Value",43731
+"Spen Valley","E14001506","Number of households","Value",40941
+"Thirsk and Malton","E14001544","Number of households","Value",43580
+"Wakefield and Rothwell","E14001560","Number of households","Value",45225
+"Wetherby and Easingwold","E14001582","Number of households","Value",38999
+"York Central","E14001604","Number of households","Value",45298
+"York Outer","E14001605","Number of households","Value",40162
+"Amber Valley","E14001066","Number of households","Value",40413
+"Ashfield","E14001068","Number of households","Value",40935
+"Bassetlaw","E14001079","Number of households","Value",45676
+"Bolsover","E14001109","Number of households","Value",44182
+"Boston and Skegness","E14001114","Number of households","Value",50378
+"Broxtowe","E14001140","Number of households","Value",41375
+"Chesterfield","E14001165","Number of households","Value",43402
+"Corby and East Northamptonshire","E14001179","Number of households","Value",47039
+"Daventry","E14001192","Number of households","Value",43684
+"Derby North","E14001193","Number of households","Value",43261
+"Derby South","E14001194","Number of households","Value",45075
+"Derbyshire Dales","E14001195","Number of households","Value",39778
+"Erewash","E14001228","Number of households","Value",42606
+"Gainsborough","E14001243","Number of households","Value",42345
+"Gedling","E14001245","Number of households","Value",44564
+"Grantham and Bourne","E14001253","Number of households","Value",43089
+"Harborough, Oadby and Wigston","E14001266","Number of households","Value",41009
+"High Peak","E14001287","Number of households","Value",40772
+"Hinckley and Bosworth","E14001288","Number of households","Value",42853
+"Kettering","E14001311","Number of households","Value",46190
+"Leicester East","E14001326","Number of households","Value",39728
+"Leicester South","E14001327","Number of households","Value",40161
+"Leicester West","E14001328","Number of households","Value",47499
+"Lincoln","E14001336","Number of households","Value",48216
+"Loughborough","E14001342","Number of households","Value",39360
+"Louth and Horncastle","E14001343","Number of households","Value",43780
+"Mansfield","E14001355","Number of households","Value",45937
+"Melton and Syston","E14001357","Number of households","Value",40205
+"Mid Derbyshire","E14001362","Number of households","Value",38559
+"Mid Leicestershire","E14001364","Number of households","Value",41841
+"Newark","E14001375","Number of households","Value",45490
+"North East Derbyshire","E14001391","Number of households","Value",41723
+"North West Leicestershire","E14001404","Number of households","Value",42775
+"Northampton North","E14001406","Number of households","Value",52292
+"Northampton South","E14001407","Number of households","Value",43237
+"Nottingham East","E14001410","Number of households","Value",47617
+"Nottingham North and Kimberley","E14001411","Number of households","Value",44780
+"Nottingham South","E14001412","Number of households","Value",39334
+"Rushcliffe","E14001457","Number of households","Value",42128
+"Rutland and Stamford","E14001458","Number of households","Value",39908
+"Sherwood Forest","E14001471","Number of households","Value",44031
+"Sleaford and North Hykeham","E14001476","Number of households","Value",41558
+"South Derbyshire","E14001483","Number of households","Value",40094
+"South Holland and The Deepings","E14001487","Number of households","Value",46943
+"South Leicestershire","E14001488","Number of households","Value",42391
+"South Northamptonshire","E14001490","Number of households","Value",42076
+"Wellingborough and Rushden","E14001571","Number of households","Value",47040
+"Aldridge-Brownhills","E14001064","Number of households","Value",39205
+"Birmingham Edgbaston","E14001092","Number of households","Value",43080
+"Birmingham Erdington","E14001093","Number of households","Value",49395
+"Birmingham Hall Green and Moseley","E14001094","Number of households","Value",38873
+"Birmingham Hodge Hill and Solihull North","E14001095","Number of households","Value",42742
+"Birmingham Ladywood","E14001096","Number of households","Value",53329
+"Birmingham Northfield","E14001097","Number of households","Value",45484
+"Birmingham Perry Barr","E14001098","Number of households","Value",39446
+"Birmingham Selly Oak","E14001099","Number of households","Value",41369
+"Birmingham Yardley","E14001100","Number of households","Value",39373
+"Bromsgrove","E14001138","Number of households","Value",41266
+"Burton and Uttoxeter","E14001143","Number of households","Value",46435
+"Cannock Chase","E14001150","Number of households","Value",43457
+"Coventry East","E14001180","Number of households","Value",46379
+"Coventry North West","E14001181","Number of households","Value",44299
+"Coventry South","E14001182","Number of households","Value",43462
+"Droitwich and Evesham","E14001203","Number of households","Value",43897
+"Dudley","E14001204","Number of households","Value",41623
+"Halesowen","E14001261","Number of households","Value",39813
+"Hereford and South Herefordshire","E14001281","Number of households","Value",42836
+"Kenilworth and Southam","E14001309","Number of households","Value",39381
+"Kingswinford and South Staffordshire","E14001316","Number of households","Value",38381
+"Lichfield","E14001335","Number of households","Value",41812
+"Meriden and Solihull East","E14001358","Number of households","Value",41437
+"Newcastle-under-Lyme","E14001380","Number of households","Value",40092
+"North Herefordshire","E14001395","Number of households","Value",39991
+"North Shropshire","E14001398","Number of households","Value",43469
+"North Warwickshire and Bedworth","E14001400","Number of households","Value",39472
+"Nuneaton","E14001413","Number of households","Value",41893
+"Redditch","E14001441","Number of households","Value",41332
+"Rugby","E14001453","Number of households","Value",45150
+"Shrewsbury","E14001473","Number of households","Value",43659
+"Smethwick","E14001478","Number of households","Value",42468
+"Solihull West and Shirley","E14001479","Number of households","Value",38043
+"South Shropshire","E14001493","Number of households","Value",41990
+"Stafford","E14001513","Number of households","Value",41730
+"Staffordshire Moorlands","E14001514","Number of households","Value",37742
+"Stoke-on-Trent Central","E14001520","Number of households","Value",48728
+"Stoke-on-Trent North","E14001521","Number of households","Value",43179
+"Stoke-on-Trent South","E14001522","Number of households","Value",39972
+"Stone, Great Wyrley and Penkridge","E14001523","Number of households","Value",38510
+"Stourbridge","E14001524","Number of households","Value",40385
+"Stratford-on-Avon","E14001526","Number of households","Value",42393
+"Sutton Coldfield","E14001535","Number of households","Value",40368
+"Tamworth","E14001538","Number of households","Value",41571
+"Telford","E14001541","Number of households","Value",43309
+"The Wrekin","E14001543","Number of households","Value",43662
+"Tipton and Wednesbury","E14001547","Number of households","Value",44233
+"Walsall and Bloxwich","E14001562","Number of households","Value",44054
+"Warwick and Leamington","E14001566","Number of households","Value",44973
+"West Bromwich","E14001574","Number of households","Value",42808
+"West Worcestershire","E14001579","Number of households","Value",43397
+"Wolverhampton North East","E14001594","Number of households","Value",42285
+"Wolverhampton South East","E14001595","Number of households","Value",46651
+"Wolverhampton West","E14001596","Number of households","Value",45172
+"Worcester","E14001597","Number of households","Value",44722
+"Wyre Forest","E14001601","Number of households","Value",45320
+"Basildon and Billericay","E14001077","Number of households","Value",43534
+"Bedford","E14001084","Number of households","Value",44851
+"Braintree","E14001121","Number of households","Value",43166
+"Brentwood and Ongar","E14001125","Number of households","Value",40859
+"Broadland and Fakenham","E14001136","Number of households","Value",40805
+"Broxbourne","E14001139","Number of households","Value",43539
+"Bury St Edmunds and Stowmarket","E14001146","Number of households","Value",45175
+"Cambridge","E14001149","Number of households","Value",44570
+"Castle Point","E14001154","Number of households","Value",38120
+"Central Suffolk and North Ipswich","E14001156","Number of households","Value",39508
+"Chelmsford","E14001159","Number of households","Value",45058
+"Clacton","E14001174","Number of households","Value",45395
+"Colchester","E14001176","Number of households","Value",47253
+"Dunstable and Leighton Buzzard","E14001206","Number of households","Value",44211
+"Ely and East Cambridgeshire","E14001224","Number of households","Value",44828
+"Epping Forest","E14001226","Number of households","Value",41311
+"Great Yarmouth","E14001256","Number of households","Value",44544
+"Harlow","E14001267","Number of households","Value",45079
+"Harpenden and Berkhamsted","E14001268","Number of households","Value",38512
+"Harwich and North Essex","E14001273","Number of households","Value",41997
+"Hemel Hempstead","E14001278","Number of households","Value",41843
+"Hertford and Stortford","E14001283","Number of households","Value",44215
+"Hertsmere","E14001284","Number of households","Value",41939
+"Hitchin","E14001289","Number of households","Value",40758
+"Huntingdon","E14001298","Number of households","Value",45645
+"Ipswich","E14001302","Number of households","Value",49326
+"Lowestoft","E14001344","Number of households","Value",42792
+"Luton North","E14001345","Number of households","Value",39994
+"Luton South and South Bedfordshire","E14001346","Number of households","Value",44991
+"Maldon","E14001351","Number of households","Value",41803
+"Mid Bedfordshire","E14001359","Number of households","Value",40057
+"Mid Norfolk","E14001365","Number of households","Value",40731
+"North Bedfordshire","E14001384","Number of households","Value",42897
+"North East Cambridgeshire","E14001390","Number of households","Value",44083
+"North East Hertfordshire","E14001393","Number of households","Value",43215
+"North Norfolk","E14001396","Number of households","Value",41026
+"North West Cambridgeshire","E14001401","Number of households","Value",46790
+"North West Essex","E14001402","Number of households","Value",42575
+"North West Norfolk","E14001405","Number of households","Value",45613
+"Norwich North","E14001408","Number of households","Value",44374
+"Norwich South","E14001409","Number of households","Value",47216
+"Peterborough","E14001425","Number of households","Value",49765
+"Rayleigh and Wickford","E14001437","Number of households","Value",39933
+"South Basildon and East Thurrock","E14001480","Number of households","Value",40534
+"South Cambridgeshire","E14001481","Number of households","Value",42956
+"South Norfolk","E14001489","Number of households","Value",39476
+"South Suffolk","E14001494","Number of households","Value",40200
+"South West Hertfordshire","E14001496","Number of households","Value",38995
+"South West Norfolk","E14001497","Number of households","Value",44218
+"Southend East and Rochford","E14001501","Number of households","Value",42921
+"Southend West and Leigh","E14001502","Number of households","Value",43928
+"St Albans","E14001507","Number of households","Value",39911
+"St Neots and Mid Cambridgeshire","E14001512","Number of households","Value",43529
+"Stevenage","E14001516","Number of households","Value",41031
+"Suffolk Coastal","E14001530","Number of households","Value",42806
+"Thurrock","E14001546","Number of households","Value",45057
+"Watford","E14001568","Number of households","Value",42747
+"Waveney Valley","E14001569","Number of households","Value",39383
+"Welwyn Hatfield","E14001573","Number of households","Value",43833
+"West Suffolk","E14001578","Number of households","Value",50690
+"Witham","E14001590","Number of households","Value",42668
+"Barking","E14001073","Number of households","Value",44607
+"Battersea","E14001081","Number of households","Value",47736
+"Beckenham and Penge","E14001083","Number of households","Value",46396
+"Bermondsey and Old Southwark","E14001085","Number of households","Value",47953
+"Bethnal Green and Stepney","E14001086","Number of households","Value",46156
+"Bexleyheath and Crayford","E14001089","Number of households","Value",37938
+"Brent East","E14001122","Number of households","Value",49311
+"Brent West","E14001123","Number of households","Value",41163
+"Brentford and Isleworth","E14001124","Number of households","Value",47318
+"Bromley and Biggin Hill","E14001137","Number of households","Value",39279
+"Carshalton and Wallington","E14001153","Number of households","Value",40641
+"Chelsea and Fulham","E14001160","Number of households","Value",54395
+"Chingford and Woodford Green","E14001167","Number of households","Value",42518
+"Chipping Barnet","E14001169","Number of households","Value",43476
+"Cities of London and Westminster","E14001172","Number of households","Value",59202
+"Clapham and Brixton Hill","E14001175","Number of households","Value",44711
+"Croydon East","E14001186","Number of households","Value",42666
+"Croydon South","E14001187","Number of households","Value",39671
+"Croydon West","E14001188","Number of households","Value",48176
+"Dagenham and Rainham","E14001189","Number of households","Value",42588
+"Dulwich and West Norwood","E14001205","Number of households","Value",43983
+"Ealing Central and Acton","E14001207","Number of households","Value",54003
+"Ealing North","E14001208","Number of households","Value",45201
+"Ealing Southall","E14001209","Number of households","Value",41319
+"East Ham","E14001213","Number of households","Value",37216
+"Edmonton and Winchmore Hill","E14001221","Number of households","Value",45393
+"Eltham and Chislehurst","E14001223","Number of households","Value",43432
+"Enfield North","E14001225","Number of households","Value",47010
+"Erith and Thamesmead","E14001229","Number of households","Value",49618
+"Feltham and Heston","E14001236","Number of households","Value",43662
+"Finchley and Golders Green","E14001238","Number of households","Value",49591
+"Greenwich and Woolwich","E14001257","Number of households","Value",49548
+"Hackney North and Stoke Newington","E14001259","Number of households","Value",44118
+"Hackney South and Shoreditch","E14001260","Number of households","Value",48870
+"Hammersmith and Chiswick","E14001264","Number of households","Value",52139
+"Hampstead and Highgate","E14001265","Number of households","Value",53041
+"Harrow East","E14001270","Number of households","Value",38777
+"Harrow West","E14001271","Number of households","Value",42140
+"Hayes and Harlington","E14001276","Number of households","Value",41383
+"Hendon","E14001279","Number of households","Value",48200
+"Holborn and St Pancras","E14001290","Number of households","Value",45493
+"Hornchurch and Upminster","E14001292","Number of households","Value",41963
+"Hornsey and Friern Barnet","E14001293","Number of households","Value",43556
+"Ilford North","E14001300","Number of households","Value",39010
+"Ilford South","E14001301","Number of households","Value",39950
+"Islington North","E14001305","Number of households","Value",48197
+"Islington South and Finsbury","E14001306","Number of households","Value",52357
+"Kensington and Bayswater","E14001310","Number of households","Value",62466
+"Kingston and Surbiton","E14001312","Number of households","Value",45650
+"Lewisham East","E14001331","Number of households","Value",46031
+"Lewisham North","E14001332","Number of households","Value",48998
+"Lewisham West and East Dulwich","E14001333","Number of households","Value",41158
+"Leyton and Wanstead","E14001334","Number of households","Value",44032
+"Mitcham and Morden","E14001371","Number of households","Value",44823
+"Old Bexley and Sidcup","E14001414","Number of households","Value",39715
+"Orpington","E14001417","Number of households","Value",39252
+"Peckham","E14001421","Number of households","Value",44478
+"Poplar and Limehouse","E14001430","Number of households","Value",56173
+"Putney","E14001434","Number of households","Value",46342
+"Queen's Park and Maida Vale","E14001435","Number of households","Value",51548
+"Richmond Park","E14001445","Number of households","Value",45720
+"Romford","E14001448","Number of households","Value",41834
+"Ruislip, Northwood and Pinner","E14001454","Number of households","Value",38683
+"Southgate and Wood Green","E14001503","Number of households","Value",49216
+"Stratford and Bow","E14001525","Number of households","Value",47300
+"Streatham and Croydon North","E14001527","Number of households","Value",47260
+"Sutton and Cheam","E14001534","Number of households","Value",41707
+"Tooting","E14001550","Number of households","Value",43315
+"Tottenham","E14001553","Number of households","Value",51750
+"Twickenham","E14001556","Number of households","Value",44046
+"Uxbridge and South Ruislip","E14001558","Number of households","Value",43274
+"Vauxhall and Camberwell Green","E14001559","Number of households","Value",45759
+"Walthamstow","E14001563","Number of households","Value",45292
+"West Ham and Beckton","E14001576","Number of households","Value",49201
+"Wimbledon","E14001586","Number of households","Value",43795
+"Aldershot","E14001063","Number of households","Value",46171
+"Arundel and South Downs","E14001067","Number of households","Value",42254
+"Ashford","E14001069","Number of households","Value",42351
+"Aylesbury","E14001071","Number of households","Value",44191
+"Banbury","E14001072","Number of households","Value",42519
+"Basingstoke","E14001078","Number of households","Value",45583
+"Beaconsfield","E14001082","Number of households","Value",39300
+"Bexhill and Battle","E14001088","Number of households","Value",40145
+"Bicester and Woodstock","E14001090","Number of households","Value",41359
+"Bognor Regis and Littlehampton","E14001108","Number of households","Value",47273
+"Bracknell","E14001117","Number of households","Value",40790
+"Brighton Kemptown and Peacehaven","E14001129","Number of households","Value",41451
+"Brighton Pavilion","E14001130","Number of households","Value",43844
+"Buckingham and Bletchley","E14001141","Number of households","Value",41543
+"Canterbury","E14001151","Number of households","Value",42275
+"Chatham and Aylesford","E14001157","Number of households","Value",42267
+"Chesham and Amersham","E14001162","Number of households","Value",39259
+"Chichester","E14001166","Number of households","Value",45526
+"Crawley","E14001184","Number of households","Value",45502
+"Dartford","E14001191","Number of households","Value",42525
+"Didcot and Wantage","E14001197","Number of households","Value",44055
+"Dorking and Horley","E14001201","Number of households","Value",39123
+"Dover and Deal","E14001202","Number of households","Value",44716
+"Earley and Woodley","E14001210","Number of households","Value",38905
+"East Grinstead and Uckfield","E14001212","Number of households","Value",39695
+"East Hampshire","E14001214","Number of households","Value",38262
+"East Surrey","E14001215","Number of households","Value",39976
+"East Thanet","E14001216","Number of households","Value",46212
+"East Worthing and Shoreham","E14001218","Number of households","Value",42533
+"Eastbourne","E14001219","Number of households","Value",45610
+"Eastleigh","E14001220","Number of households","Value",38852
+"Epsom and Ewell","E14001227","Number of households","Value",42644
+"Esher and Walton","E14001230","Number of households","Value",41112
+"Fareham and Waterlooville","E14001233","Number of households","Value",42844
+"Farnham and Bordon","E14001234","Number of households","Value",41014
+"Faversham and Mid Kent","E14001235","Number of households","Value",40173
+"Folkestone and Hythe","E14001239","Number of households","Value",41002
+"Gillingham and Rainham","E14001246","Number of households","Value",40768
+"Godalming and Ash","E14001249","Number of households","Value",40040
+"Gosport","E14001252","Number of households","Value",41985
+"Gravesham","E14001254","Number of households","Value",41724
+"Guildford","E14001258","Number of households","Value",38996
+"Hamble Valley","E14001263","Number of households","Value",42337
+"Hastings and Rye","E14001274","Number of households","Value",46904
+"Havant","E14001275","Number of households","Value",40761
+"Henley and Thame","E14001280","Number of households","Value",39348
+"Herne Bay and Sandwich","E14001282","Number of households","Value",43337
+"Horsham","E14001294","Number of households","Value",43452
+"Hove and Portslade","E14001296","Number of households","Value",46072
+"Isle of Wight East","E14001303","Number of households","Value",32956
+"Isle of Wight West","E14001304","Number of households","Value",31819
+"Lewes","E14001330","Number of households","Value",42024
+"Maidenhead","E14001348","Number of households","Value",41692
+"Maidstone and Malling","E14001349","Number of households","Value",44117
+"Mid Buckinghamshire","E14001360","Number of households","Value",39109
+"Mid Sussex","E14001366","Number of households","Value",40897
+"Milton Keynes Central","E14001369","Number of households","Value",48798
+"Milton Keynes North","E14001370","Number of households","Value",40657
+"New Forest East","E14001373","Number of households","Value",38908
+"New Forest West","E14001374","Number of households","Value",38657
+"Newbury","E14001376","Number of households","Value",41102
+"North East Hampshire","E14001392","Number of households","Value",41059
+"North West Hampshire","E14001403","Number of households","Value",44686
+"Oxford East","E14001419","Number of households","Value",42392
+"Oxford West and Abingdon","E14001420","Number of households","Value",38163
+"Portsmouth North","E14001431","Number of households","Value",40736
+"Portsmouth South","E14001432","Number of households","Value",45419
+"Reading Central","E14001438","Number of households","Value",46387
+"Reading West and Mid Berkshire","E14001439","Number of households","Value",37931
+"Reigate","E14001442","Number of households","Value",43062
+"Rochester and Strood","E14001447","Number of households","Value",41442
+"Romsey and Southampton North","E14001449","Number of households","Value",40039
+"Runnymede and Weybridge","E14001456","Number of households","Value",43489
+"Sevenoaks","E14001465","Number of households","Value",40299
+"Sittingbourne and Sheppey","E14001474","Number of households","Value",44242
+"Slough","E14001477","Number of households","Value",45048
+"Southampton Itchen","E14001499","Number of households","Value",46715
+"Southampton Test","E14001500","Number of households","Value",45586
+"Spelthorne","E14001505","Number of households","Value",41805
+"Surrey Heath","E14001532","Number of households","Value",38455
+"Sussex Weald","E14001533","Number of households","Value",38229
+"Tonbridge","E14001549","Number of households","Value",39706
+"Tunbridge Wells","E14001555","Number of households","Value",44382
+"Weald of Kent","E14001570","Number of households","Value",38312
+"Winchester","E14001587","Number of households","Value",42375
+"Windsor","E14001588","Number of households","Value",41900
+"Witney","E14001591","Number of households","Value",40272
+"Woking","E14001592","Number of households","Value",41437
+"Wokingham","E14001593","Number of households","Value",39180
+"Worthing West","E14001599","Number of households","Value",45327
+"Wycombe","E14001600","Number of households","Value",40573
+"Bath","E14001080","Number of households","Value",42099
+"Bournemouth East","E14001115","Number of households","Value",46803
+"Bournemouth West","E14001116","Number of households","Value",45023
+"Bridgwater","E14001126","Number of households","Value",42871
+"Bristol Central","E14001131","Number of households","Value",38201
+"Bristol East","E14001132","Number of households","Value",45627
+"Bristol North East","E14001133","Number of households","Value",40025
+"Bristol North West","E14001134","Number of households","Value",42608
+"Bristol South","E14001135","Number of households","Value",43458
+"Camborne and Redruth","E14001148","Number of households","Value",42696
+"Central Devon","E14001155","Number of households","Value",40745
+"Cheltenham","E14001161","Number of households","Value",44876
+"Chippenham","E14001168","Number of households","Value",40998
+"Christchurch","E14001171","Number of households","Value",39980
+"East Wiltshire","E14001217","Number of households","Value",39813
+"Exeter","E14001231","Number of households","Value",40290
+"Exmouth and Exeter East","E14001232","Number of households","Value",42783
+"Filton and Bradley Stoke","E14001237","Number of households","Value",42325
+"Forest of Dean","E14001240","Number of households","Value",39094
+"Frome and East Somerset","E14001241","Number of households","Value",38645
+"Glastonbury and Somerton","E14001247","Number of households","Value",40035
+"Gloucester","E14001248","Number of households","Value",48790
+"Honiton and Sidmouth","E14001291","Number of households","Value",41238
+"Melksham and Devizes","E14001356","Number of households","Value",40462
+"Mid Dorset and North Poole","E14001363","Number of households","Value",40506
+"Newton Abbot","E14001381","Number of households","Value",41470
+"North Cornwall","E14001385","Number of households","Value",43136
+"North Cotswolds","E14001386","Number of households","Value",40206
+"North Devon","E14001387","Number of households","Value",43197
+"North Dorset","E14001388","Number of households","Value",40125
+"North East Somerset and Hanham","E14001394","Number of households","Value",39439
+"North Somerset","E14001399","Number of households","Value",40791
+"Plymouth Moor View","E14001426","Number of households","Value",43057
+"Plymouth Sutton and Devonport","E14001427","Number of households","Value",47243
+"Poole","E14001429","Number of households","Value",43172
+"Salisbury","E14001460","Number of households","Value",40264
+"South Cotswolds","E14001482","Number of households","Value",40511
+"South Devon","E14001484","Number of households","Value",40872
+"South Dorset","E14001485","Number of households","Value",44272
+"South East Cornwall","E14001486","Number of households","Value",40947
+"South West Devon","E14001495","Number of households","Value",41475
+"South West Wiltshire","E14001498","Number of households","Value",41867
+"St Austell and Newquay","E14001508","Number of households","Value",43478
+"St Ives","E14001511","Number of households","Value",40358
+"Stroud","E14001529","Number of households","Value",41920
+"Swindon North","E14001536","Number of households","Value",43276
+"Swindon South","E14001537","Number of households","Value",46735
+"Taunton and Wellington","E14001540","Number of households","Value",47337
+"Tewkesbury","E14001542","Number of households","Value",41561
+"Thornbury and Yate","E14001545","Number of households","Value",39984
+"Tiverton and Minehead","E14001548","Number of households","Value",40642
+"Torbay","E14001551","Number of households","Value",47481
+"Torridge and Tavistock","E14001552","Number of households","Value",42328
+"Truro and Falmouth","E14001554","Number of households","Value",40861
+"Wells and Mendip Hills","E14001572","Number of households","Value",38033
+"West Dorset","E14001575","Number of households","Value",43222
+"Weston-super-Mare","E14001581","Number of households","Value",43124
+"Yeovil","E14001603","Number of households","Value",46506
+"Aberafan Maesteg","W07000081","Number of households","Value",40812
+"Alyn and Deeside","W07000082","Number of households","Value",43775
+"Bangor Aberconwy","W07000083","Number of households","Value",40182
+"Blaenau Gwent and Rhymney","W07000084","Number of households","Value",42525
+"Brecon, Radnor and Cwm Tawe","W07000085","Number of households","Value",41649
+"Bridgend","W07000086","Number of households","Value",40589
+"Caerfyrddin","W07000087","Number of households","Value",40938
+"Caerphilly","W07000088","Number of households","Value",41345
+"Cardiff East","W07000089","Number of households","Value",43227
+"Cardiff North","W07000090","Number of households","Value",38695
+"Cardiff South and Penarth","W07000091","Number of households","Value",42951
+"Cardiff West","W07000092","Number of households","Value",43589
+"Ceredigion Preseli","W07000093","Number of households","Value",40895
+"Clwyd East","W07000094","Number of households","Value",42460
+"Clwyd North","W07000095","Number of households","Value",44596
+"Dwyfor Meirionnydd","W07000096","Number of households","Value",42488
+"Gower","W07000097","Number of households","Value",42240
+"Llanelli","W07000098","Number of households","Value",40821
+"Merthyr Tydfil and Aberdare","W07000099","Number of households","Value",43830
+"Mid and South Pembrokeshire","W07000100","Number of households","Value",45486
+"Monmouthshire","W07000101","Number of households","Value",40923
+"Montgomeryshire and Glyndwr","W07000102","Number of households","Value",43167
+"Neath and Swansea East","W07000103","Number of households","Value",43355
+"Newport East","W07000104","Number of households","Value",45644
+"Newport West and Islwyn","W07000105","Number of households","Value",43137
+"Pontypridd","W07000106","Number of households","Value",43273
+"Rhondda and Ogmore","W07000107","Number of households","Value",43994
+"Swansea West","W07000108","Number of households","Value",46105
+"Torfaen","W07000109","Number of households","Value",40241
+"Vale of Glamorgan","W07000110","Number of households","Value",41054
+"Wrexham","W07000111","Number of households","Value",42305
+"Ynys Mon","W07000112","Number of households","Value",30822

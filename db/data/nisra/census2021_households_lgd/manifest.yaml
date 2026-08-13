@@ -1,0 +1,18 @@
+source_id: nisra
+package_id: nisra-census2021-households-lgd
+dataset: nisra_nisra-census2021-households-lgd
+source_page: https://build.nisra.gov.uk/en/custom/data?d=HOUSEHOLD&v=LGD14
+table: 'NISRA Census 2021 flexible table: number of households by LGD14'
+files:
+  2021:
+    filename: census2021_households_by_lgd.csv
+    source_url: https://build.nisra.gov.uk/en/custom/table.csv?d=HOUSEHOLD&v=LGD14
+    sha256: 3a756c9450c05b87b9970a4c701308e4c9ea39017bf154e12dab05206da3fec2
+    size_bytes: 508
+    fetched_at: '2026-08-13T14:00:01+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/nisra/nisra-census2021-households-lgd/2021/3a756c9450c05b87b9970a4c701308e4c9ea39017bf154e12dab05206da3fec2/census2021_households_by_lgd.csv
+        uri: r2://ledger-raw/raw/nisra/nisra-census2021-households-lgd/2021/3a756c9450c05b87b9970a4c701308e4c9ea39017bf154e12dab05206da3fec2/census2021_households_by_lgd.csv
