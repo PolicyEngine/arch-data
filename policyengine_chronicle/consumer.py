@@ -62,6 +62,7 @@ _SELECTOR_KEYS = {
     "record_set_spec_id",
     "groupby_dimension",
     "dimensions",
+    "dimension_values",
     "domain",
     "entity",
     "assertion",
@@ -556,12 +557,41 @@ def _select_rows(
 
 
 def _selector_matches(row: Mapping[str, Any], key: str, value: Any) -> bool:
-    actual = _selector_value(row, key)
-    if isinstance(actual, list):
+    if key == "dimensions":
+        actual = _selector_value(row, key)
         # Dimension-identity selectors match order-insensitively on the exact
         # set of dimension variable names the row carries.
         return isinstance(value, list) and sorted(actual) == sorted(value)
+    if key == "dimension_values":
+        return _dimension_values_match(row.get("dimensions", {}), value)
+    actual = _selector_value(row, key)
+    if isinstance(value, list):
+        return any(_strict_scalar_equal(actual, item) for item in value)
     return actual == value
+
+
+def _dimension_values_match(
+    dimensions: Any,
+    expected: Any,
+) -> bool:
+    if not isinstance(dimensions, Mapping) or not isinstance(expected, Mapping):
+        return False
+    for name, selector_value in expected.items():
+        if name not in dimensions:
+            return False
+        actual = dimensions[name]
+        if isinstance(selector_value, list):
+            if not any(
+                _strict_scalar_equal(actual, item) for item in selector_value
+            ):
+                return False
+        elif not _strict_scalar_equal(actual, selector_value):
+            return False
+    return True
+
+
+def _strict_scalar_equal(actual: Any, expected: Any) -> bool:
+    return type(actual) is type(expected) and actual == expected
 
 
 def _selector_value(row: Mapping[str, Any], key: str) -> Any:

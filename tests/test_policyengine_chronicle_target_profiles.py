@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from policyengine_chronicle.target_profiles import (
     load_target_profile,
     target_profile_from_mapping,
 )
+from policyengine_chronicle.target_profiles.model import BINDING_KINDS
 
 _PROFILE_DIR = Path(target_profiles_pkg.__file__).parent
 
@@ -236,6 +238,121 @@ def test__given_filter_threshold_values__then_profile_is_allowed() -> None:
     assert profile.targets[0].measurement["filters"][0]["value"] == 0
 
 
+def test__given_supported_binding_kind__then_profile_is_allowed() -> None:
+    payload = _minimal_profile_payload()
+    payload["targets"][0]["bindings"]["policyengine"].update(
+        {
+            "kind": "baseline_flag_crosstab",
+            "affected_flag_variable": "uc_is_child_limit_affected",
+            "count_of": "affected_households",
+        }
+    )
+
+    profile = target_profile_from_mapping(payload)
+
+    assert profile.targets[0].binding("policyengine").payload["kind"] in BINDING_KINDS
+
+
+def test__given_unknown_binding_kind__then_profile_is_rejected() -> None:
+    payload = _minimal_profile_payload()
+    payload["targets"][0]["bindings"]["policyengine"]["kind"] = "runtime_magic"
+
+    with pytest.raises(ValueError, match="kind"):
+        target_profile_from_mapping(payload)
+
+
+@pytest.mark.parametrize(
+    ("kind", "required"),
+    [
+        (
+            "input_substitution_counterfactual",
+            {
+                "zeroed_input": "pension_contributions_via_salary_sacrifice",
+                "folded_into": "employment_income",
+                "output_variable": "income_tax",
+                "output_delta": "counterfactual_minus_baseline",
+            },
+        ),
+        (
+            "parameter_gated_threshold",
+            {
+                "gate_parameter": "gov.hmrc.cgt.annual_exempt_amount",
+                "gated_variable": "capital_gains",
+                "gate_comparison": "above",
+            },
+        ),
+        (
+            "baseline_flag_crosstab",
+            {
+                "affected_flag_variable": "uc_is_child_limit_affected",
+                "count_of": "affected_households",
+            },
+        ),
+    ],
+)
+def test__given_kind_missing_required_field__then_profile_is_rejected(
+    kind: str,
+    required: dict[str, str],
+) -> None:
+    for missing in required:
+        payload = _minimal_profile_payload()
+        binding = payload["targets"][0]["bindings"]["policyengine"]
+        binding.update({"kind": kind, **deepcopy(required)})
+        del binding[missing]
+
+        with pytest.raises(ValueError, match=missing):
+            target_profile_from_mapping(payload)
+
+
+def test__given_bad_binding_reduce__then_profile_is_rejected() -> None:
+    payload = _minimal_profile_payload()
+    payload["targets"][0]["bindings"]["policyengine"]["reduce"] = "sum"
+
+    with pytest.raises(ValueError, match="reduce"):
+        target_profile_from_mapping(payload)
+
+
+@pytest.mark.parametrize(
+    "condition",
+    [
+        "not a predicate",
+        {"variable": "age"},
+        {"variable": "age", "operator": ">", "value": 0, "entity": "family"},
+        {"variable": "age", "operator": ">", "value": 0, "reduce": "median"},
+    ],
+)
+def test__given_bad_binding_condition__then_profile_is_rejected(
+    condition: object,
+) -> None:
+    payload = _minimal_profile_payload()
+    payload["targets"][0]["bindings"]["policyengine"]["filters"] = [condition]
+
+    with pytest.raises(ValueError, match="filters"):
+        target_profile_from_mapping(payload)
+
+
+@pytest.mark.parametrize(
+    "dimension_values",
+    [
+        "age",
+        {"": 1},
+        {"age": []},
+        {"age": [1, [2]]},
+        {"age": {"lo": 1}},
+    ],
+)
+def test__given_malformed_dimension_values_selector__then_profile_is_rejected(
+    dimension_values: object,
+) -> None:
+    payload = _minimal_profile_payload()
+    payload["targets"][0]["chronicle_selector"]["dimension_values"] = (
+        dimension_values
+    )
+
+    with pytest.raises(ValueError, match="dimension_values"):
+        target_profile_from_mapping(payload)
+
+
 def test__given_non_sum_default_operation__then_profile_is_rejected() -> None:
     # Given
     payload = {
@@ -309,11 +426,6 @@ def _minimal_profile_payload() -> dict[str, object]:
 
 # --- uk_national ------------------------------------------------------------
 
-UK_NATIONAL_COUNTERFACTUAL_KINDS = {
-    "input_substitution_counterfactual",
-    "parameter_gated_threshold",
-    "baseline_flag_crosstab",
-}
 # Families whose facts are (or include) source projections the calibration
 # intends to use: OBR EFO forecast lines, SLC borrower forecasts, and the
 # Scottish budget forward years (#154 semantics; checklist row for the
@@ -414,7 +526,7 @@ def test__given_uk_national_profile__then_structure_matches_migration_contract()
         assert "assertion" not in target.chronicle_selector
         assert set(target.bindings) == {"policyengine", "axiom"}
         kind = target.binding("policyengine").payload.get("kind")
-        assert kind is None or kind in UK_NATIONAL_COUNTERFACTUAL_KINDS, (
+        assert kind is None or kind in BINDING_KINDS, (
             target.target_id
         )
 
@@ -450,6 +562,63 @@ def test__given_uk_national_counterfactual_targets__then_payloads_declare_not_ex
     assert tcl["affected_flag_variable"] == "uc_is_child_limit_affected"
 
 
+def _load_jsonl(path: Path) -> list[dict[str, object]]:
+    return [json.loads(line) for line in path.read_text().splitlines() if line]
+
+
+def _expected_distinct_payload_count(selector: dict[str, object]) -> int | None:
+    if selector.get("dimensions") == []:
+        return 1
+    if isinstance(selector.get("source_measure_id"), list):
+        return len(selector["source_measure_id"])
+    dimension_values = selector.get("dimension_values")
+    if not isinstance(dimension_values, dict):
+        return None
+    count = 1
+    for value in dimension_values.values():
+        count *= len(value) if isinstance(value, list) else 1
+    return count
+
+
+def _selector_payload(row: dict[str, object], selector: dict[str, object]) -> tuple:
+    parts = []
+    if selector.get("dimensions") == []:
+        parts.append(("dimensions", ()))
+    if isinstance(selector.get("source_measure_id"), list):
+        observed_measure = row["observed_measure"]
+        parts.append(("source_measure_id", observed_measure["source_measure_id"]))
+    dimension_values = selector.get("dimension_values")
+    if isinstance(dimension_values, dict):
+        dimensions = row["dimensions"]
+        parts.extend(
+            (name, dimensions[name])
+            for name in sorted(dimension_values)
+        )
+    return tuple(parts)
+
+
+def _assert_row_contains_selector_pins(
+    row: dict[str, object],
+    selector: dict[str, object],
+) -> None:
+    if selector.get("dimensions") == []:
+        assert row["dimensions"] == {}
+    source_measure_id = selector.get("source_measure_id")
+    if isinstance(source_measure_id, list):
+        assert row["observed_measure"]["source_measure_id"] in source_measure_id
+    dimension_values = selector.get("dimension_values")
+    if not isinstance(dimension_values, dict):
+        return
+    dimensions = row["dimensions"]
+    for name, expected in dimension_values.items():
+        assert name in dimensions
+        actual = dimensions[name]
+        if isinstance(expected, list):
+            assert any(type(actual) is type(item) and actual == item for item in expected)
+        else:
+            assert type(actual) is type(expected) and actual == expected
+
+
 def test__given_uk_national_profile__then_every_target_resolves_built_facts(
     tmp_path,
 ) -> None:
@@ -477,20 +646,86 @@ def test__given_uk_national_profile__then_every_target_resolves_built_facts(
     coverage = json.loads((artifact_dir / "coverage.json").read_text())[
         "uk_national"
     ]
+    rows = _load_jsonl(bundle_dir / "consumer_facts.jsonl")
 
     # Then every target resolves at least one built fact at every declared
-    # geography level, with no selector issues.
+    # geography level, with no selector issues. Dimension-pinned selectors also
+    # resolve exactly their expected distinct payloads, catching over- and
+    # under-matches that row-count coverage alone cannot see.
     assert set(coverage) == {target.target_id for target in profile.targets}
     failures = []
-    for target_id, levels in coverage.items():
-        for level, info in levels.items():
-            if (target_id, level) in UK_NATIONAL_COVERAGE_EXCEPTIONS:
+    targets_by_id = {target.target_id: target for target in profile.targets}
+    for target_id, target in targets_by_id.items():
+        for level, info in coverage[target_id].items():
+            key = (target_id, level)
+            if key in UK_NATIONAL_COVERAGE_EXCEPTIONS:
                 continue
             if info.get("issues") or info.get("matched_row_count", 0) < 1:
                 failures.append((target_id, level, info))
+                continue
+            matched, issues = _select_rows(
+                profile.profile_id,
+                target,
+                rows,
+                geography_level=level,
+            )
+            if issues:
+                failures.append((target_id, level, {"issues": issues}))
+                continue
+            for row in matched:
+                _assert_row_contains_selector_pins(row, dict(target.chronicle_selector))
+            expected_count = _expected_distinct_payload_count(
+                dict(target.chronicle_selector)
+            )
+            if expected_count is not None:
+                payloads = {
+                    _selector_payload(row, dict(target.chronicle_selector))
+                    for row in matched
+                }
+                if len(payloads) != expected_count:
+                    failures.append(
+                        (
+                            target_id,
+                            level,
+                            {
+                                "expected_distinct_payloads": expected_count,
+                                "actual_distinct_payloads": len(payloads),
+                                "payloads": sorted(payloads),
+                            },
+                        )
+                    )
     assert not failures, failures
 
     # The projection-only borrower forecasts are the reason those targets
     # carry allow_source_projection - prove the facts really are projections.
     borrower = coverage["slc.borrowers.plan_2_above_threshold"]["country"]
     assert borrower["assertions"] == ["source_projection"]
+
+    def matched_rows(target_id: str, level: str = "country") -> list[dict[str, object]]:
+        matched, issues = _select_rows(
+            profile.profile_id,
+            targets_by_id[target_id],
+            rows,
+            geography_level=level,
+        )
+        assert not issues
+        return matched
+
+    assert len(matched_rows("dwp.pip.daily_living_standard_claimants")) == 1
+    assert len(matched_rows("dwp.uc.two_child_limit.households_affected")) == 1
+    assert len(matched_rows("slc.repayments.england_plan_2")) == 2
+    assert len(matched_rows("hmrc.salary_sacrifice.users_total")) == 1
+
+    female_30_34 = matched_rows("ons.population.female_30_34")
+    assert {
+        row["dimensions"]["sex"] for row in female_30_34
+    } == {"female"}
+    assert {
+        row["dimensions"]["age"] for row in female_30_34
+    } == set(range(30, 35))
+
+    uk_total = matched_rows("ons.population.uk_total")
+    assert all(row["dimensions"] == {} for row in uk_total)
+    assert "K02000001" in {
+        row["geography"]["id"] for row in uk_total
+    }

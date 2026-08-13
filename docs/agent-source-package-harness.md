@@ -574,6 +574,27 @@ resolver default a missing `assertion` and reject unknown values, so every
 pre-existing package keeps its meaning and a typo'd assertion fails loudly
 instead of vanishing from the candidate set.
 
+Consumer target-profile selectors are intentionally small and source-facing.
+Selectors can pin source identity (`source_name`, `source_table`,
+`source_measure_id`, `source_concept`, `concept`, `record_set_id`,
+`record_set_spec_id`, `groupby_dimension`, `domain`, `entity`, `assertion`,
+`provenance_class`), dimension-name identity (`dimensions`), and dimension
+values (`dimension_values`). `dimensions` is an exact, order-insensitive list of
+dimension names; `dimensions: []` selects rows with no dimension payload.
+`dimension_values` is a mapping from dimension name to either one scalar or a
+non-empty list of scalars. A scalar requires strict typed equality against the
+fact row's `dimensions` payload, so `1`, `1.0`, `true`, and `"1"` are distinct;
+a list matches by membership using the same typed comparison. Scalar selector
+keys such as `source_measure_id` may also use a list when several source lines
+sum to one target.
+
+Geography is not part of the selector vocabulary. It remains a resolve-time
+axis: the profile row declares `geography_levels`, and `resolve()`/coverage
+select the requested level from fact geography. Targets such as
+`ons.population.uk_total` and `slc.repayments.devolved_total` are deliberately
+geography-parameterized by this contract; the downstream build binds each
+resolved geography to the model geography filters.
+
 ```yaml
 record_sets:
   - record_set_id: census_acs.acs1_{year}.s0101.national_age

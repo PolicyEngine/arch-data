@@ -32,6 +32,36 @@ FORBIDDEN_RUNTIME_KEYS = {
     "script",
     "solver",
 }
+BINDING_KINDS = {
+    "input_substitution_counterfactual",
+    "parameter_gated_threshold",
+    "baseline_flag_crosstab",
+}
+BINDING_KIND_REQUIRED_FIELDS = {
+    "input_substitution_counterfactual": {
+        "zeroed_input",
+        "folded_into",
+        "output_variable",
+        "output_delta",
+    },
+    "parameter_gated_threshold": {
+        "gate_parameter",
+        "gated_variable",
+        "gate_comparison",
+    },
+    "baseline_flag_crosstab": {
+        "affected_flag_variable",
+        "count_of",
+    },
+}
+BINDING_REDUCE_VALUES = {"any"}
+CONDITION_ENTITIES = {"person", "benunit", "household"}
+CONDITION_REDUCE_VALUES = {
+    "any",
+    "any_child_under",
+    "count",
+    "sum",
+}
 
 
 @dataclass(frozen=True)
@@ -171,6 +201,10 @@ def _target_from_mapping(raw: Mapping[str, Any]) -> TargetProfileTarget:
         chronicle_selector,
         context=f"target profile row {target_id!r} chronicle_selector",
     )
+    _validate_chronicle_selector(
+        chronicle_selector,
+        context=f"target profile row {target_id!r} chronicle_selector",
+    )
     _reject_forbidden_contract_keys(
         measurement,
         context=f"target profile row {target_id!r} measurement",
@@ -233,11 +267,117 @@ def _binding_from_mapping(
         context=f"target profile row {target_id!r} {backend} binding",
     )
     metric_name = _required_string(raw, "metric_name")
+    _validate_binding_payload(
+        raw,
+        context=f"target profile row {target_id!r} {backend} binding",
+    )
     return TargetProfileBinding(
         backend=backend,
         metric_name=metric_name,
         payload=dict(raw),
     )
+
+
+def _validate_chronicle_selector(
+    selector: Mapping[str, Any],
+    *,
+    context: str,
+) -> None:
+    if "dimension_values" not in selector:
+        return
+    dimension_values = selector["dimension_values"]
+    if not isinstance(dimension_values, Mapping):
+        raise ValueError(f"{context}.dimension_values must be an object.")
+    for name, value in dimension_values.items():
+        if not isinstance(name, str) or not name:
+            raise ValueError(
+                f"{context}.dimension_values keys must be non-empty strings."
+            )
+        if isinstance(value, list | tuple):
+            if not value:
+                raise ValueError(
+                    f"{context}.dimension_values[{name!r}] must not be empty."
+                )
+            for index, item in enumerate(value):
+                if not _is_scalar(item):
+                    raise ValueError(
+                        f"{context}.dimension_values[{name!r}][{index}] "
+                        "must be a scalar."
+                    )
+        elif not _is_scalar(value):
+            raise ValueError(
+                f"{context}.dimension_values[{name!r}] must be a scalar "
+                "or a non-empty list of scalars."
+            )
+
+
+def _validate_binding_payload(raw: Mapping[str, Any], *, context: str) -> None:
+    kind = raw.get("kind")
+    if kind is not None:
+        if kind not in BINDING_KINDS:
+            raise ValueError(
+                f"{context}.kind must be one of {sorted(BINDING_KINDS)}, "
+                f"got {kind!r}."
+            )
+        missing = sorted(
+            field
+            for field in BINDING_KIND_REQUIRED_FIELDS[kind]
+            if not isinstance(raw.get(field), str) or not raw.get(field)
+        )
+        if missing:
+            raise ValueError(
+                f"{context} kind {kind!r} is missing required field(s) "
+                f"{missing}."
+            )
+    reduce = raw.get("reduce")
+    if reduce is not None and reduce not in BINDING_REDUCE_VALUES:
+        raise ValueError(
+            f"{context}.reduce must be one of {sorted(BINDING_REDUCE_VALUES)}, "
+            f"got {reduce!r}."
+        )
+    for key in ("filters", "household_conditions"):
+        if key in raw:
+            _validate_predicate_sequence(raw[key], context=f"{context}.{key}")
+
+
+def _validate_predicate_sequence(value: Any, *, context: str) -> None:
+    if not isinstance(value, list | tuple):
+        raise ValueError(f"{context} must be a list of predicate objects.")
+    for index, item in enumerate(value):
+        if not _is_predicate_shape(item):
+            raise ValueError(f"{context}[{index}] must be predicate-shaped.")
+        entity = item.get("entity")
+        if entity is not None and entity not in CONDITION_ENTITIES:
+            raise ValueError(
+                f"{context}[{index}].entity must be one of "
+                f"{sorted(CONDITION_ENTITIES)}, got {entity!r}."
+            )
+        reduce = item.get("reduce")
+        if reduce is not None and reduce not in CONDITION_REDUCE_VALUES:
+            raise ValueError(
+                f"{context}[{index}].reduce must be one of "
+                f"{sorted(CONDITION_REDUCE_VALUES)}, got {reduce!r}."
+            )
+
+
+def _is_predicate_shape(value: Any) -> bool:
+    if not isinstance(value, Mapping):
+        return False
+    if not ("variable" in value or "concept" in value):
+        return False
+    if "operator" in value:
+        return "value" in value
+    if "equals" in value:
+        return True
+    if "in" in value:
+        return isinstance(value["in"], list | tuple) and bool(value["in"])
+    if "lower" in value or "upper" in value:
+        return True
+    return False
+
+
+def _is_scalar(value: Any) -> bool:
+    return value is None or isinstance(value, str | int | float | bool)
 
 
 def _reject_forbidden_value_keys(raw: Mapping[str, Any], *, context: str) -> None:
@@ -333,6 +473,7 @@ def _required_string_sequence(raw: Mapping[str, Any], key: str) -> tuple[str, ..
 
 
 __all__ = [
+    "BINDING_KINDS",
     "TARGET_PROFILE_SCHEMA_VERSION",
     "TargetProfile",
     "TargetProfileBinding",

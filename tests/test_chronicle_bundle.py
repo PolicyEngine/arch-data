@@ -27,7 +27,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 9,
         "error_count": 0,
-        "fact_count": 44867,
+        "fact_count": 49651,
         "geography_count": 1068,
         "period_count": 116,
         "semantic_duplicate_key_count": 12,
@@ -36,7 +36,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "source_package_count": 96,
         "warning_count": 1,
     }
-    assert len(rows) == 44867
+    assert len(rows) == 49651
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -68,7 +68,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 44867
+    assert coverage["fact_count"] == 49651
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -95,7 +95,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "nbb_national_accounts": 1,
         "obr": 196,
         "onem_rva_unemployment": 1,
-        "ons": 5117,
+        "ons": 9901,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
         "scotgov": 62,
@@ -278,8 +278,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2020": 17,
         "calendar_year:2021": 19,
         "calendar_year:2022": 25,
-        "calendar_year:2023": 2228,
-        "calendar_year:2024": 2896,
+        "calendar_year:2023": 4620,
+        "calendar_year:2024": 5288,
         "calendar_year:2025": 1491,
         "calendar_year:2026": 235,
         "calendar_year:2027": 214,
@@ -356,7 +356,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 3820
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4188
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 276
     assert len(coverage["counts"]["by_geography"]) == 1068
     assert coverage["counts"]["by_entity"] == {
@@ -367,7 +367,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "household": 770,
         "institutional_sector": 103,
         "pension_plan": 2,
-        "person": 8404,
+        "person": 13188,
         "tax_unit": 33783,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]

@@ -31,6 +31,7 @@ from chronicle.core import (
 from policyengine_chronicle.consumer import (
     PeriodAlignmentDeclaration,
     PeriodContractError,
+    _selector_matches,
     build_consumer_artifact,
     load_consumer_artifact,
     resolve_profile_targets,
@@ -110,6 +111,63 @@ def _rows():
             ),
         ]
     )
+
+
+def test_selector_matches_dimension_values_with_strict_scalar_equality():
+    row = {
+        "dimensions": {
+            "age": 1,
+            "sex": "female",
+            "active": True,
+        }
+    }
+
+    assert _selector_matches(row, "dimension_values", {"age": 1})
+    assert _selector_matches(row, "dimension_values", {"sex": "female"})
+    assert _selector_matches(row, "dimension_values", {"active": True})
+    assert not _selector_matches(row, "dimension_values", {"age": "1"})
+    assert not _selector_matches(row, "dimension_values", {"age": True})
+    assert not _selector_matches(row, "dimension_values", {"active": 1})
+
+
+def test_selector_matches_dimension_values_list_membership_and_missing_names():
+    row = {"dimensions": {"age": 34, "sex": "female"}}
+
+    assert _selector_matches(
+        row,
+        "dimension_values",
+        {"age": [30, 31, 32, 33, 34], "sex": ["female"]},
+    )
+    assert not _selector_matches(row, "dimension_values", {"age": [35, 36]})
+    assert not _selector_matches(row, "dimension_values", {"repayment_plan": "plan_2"})
+
+
+def test_selector_matches_list_valued_scalar_keys():
+    row = {
+        "source": {"source_name": "slc", "source_table": "table"},
+        "observed_measure": {
+            "source_measure_id": "plan_2_part_time",
+            "source_concept": "slc.repayments",
+        },
+        "layout": {},
+    }
+
+    assert _selector_matches(
+        row,
+        "source_measure_id",
+        ["plan_2_full_time", "plan_2_part_time"],
+    )
+    assert not _selector_matches(row, "source_measure_id", ["plan_1"])
+
+
+def test_selector_dimensions_empty_set_and_name_set_semantics_are_unchanged():
+    total_row = {"dimensions": {}}
+    crosstab_row = {"dimensions": {"age": 30, "sex": "female"}}
+
+    assert _selector_matches(total_row, "dimensions", [])
+    assert not _selector_matches(crosstab_row, "dimensions", [])
+    assert _selector_matches(crosstab_row, "dimensions", ["sex", "age"])
+    assert not _selector_matches(crosstab_row, "dimensions", ["age"])
 
 
 def _profile(selector=None, target_id="soi.agi.total"):
