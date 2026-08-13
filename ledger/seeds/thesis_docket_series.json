@@ -1687,6 +1687,15 @@
     "targetUnit": "usd_millions",
     "country": "US"
    }
+  },
+  {
+   "series": "eia.ng.vented_flared.us.annual",
+   "cadence": "annual",
+   "comment": "Docket-only placeholder minted 2026-08-13 for the Thesis FLARE Act context-series admission. Identity is EIA sourcekey N9040US2, U.S. Natural Gas Vented and Flared, annual, in million cubic feet (MMcf), from the keyless DNav history workbook. The workbook is regenerated on EIA's monthly DNav cycle even when no annual row is added, so observations arrive only when the Thesis EIA resolver authenticates and archives the requested annual row; a changed workbook timestamp or hash alone does not establish a first print. This is outcome-tracking context and makes no bill-caused attribution.",
+   "extras": {
+    "targetUnit": "million_cubic_feet",
+    "country": "US"
+   }
   }
  ]
 }
