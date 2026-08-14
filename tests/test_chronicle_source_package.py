@@ -208,9 +208,7 @@ def test_every_source_package_record_set_declares_provenance_class():
         assert len(load_source_package(path).record_sets) == len(payload["record_sets"])
 
     assert not missing, "Record sets missing provenance_class:\n" + "\n".join(missing)
-    assert not malformed, "Malformed provenance declarations:\n" + "\n".join(
-        malformed
-    )
+    assert not malformed, "Malformed provenance declarations:\n" + "\n".join(malformed)
     assert record_set_line_count == provenance_line_count == record_set_count
 
 
@@ -1051,8 +1049,7 @@ def test_cms_nhe_table_24_package_builds_esi_employer_contribution_facts():
     assert total_2023.source.raw_r2_uri
     assert not total_2023.constraints
     assert [
-        (item.variable, item.operator, item.value)
-        for item in private_2023.constraints
+        (item.variable, item.operator, item.value) for item in private_2023.constraints
     ] == [("esi_employer_sector", "==", "private")]
 
 
@@ -1378,8 +1375,7 @@ def test_jct_obbba_package_builds_no_tax_provision_projection_facts():
         assert fact.measure.legal_vintage == f"fiscal_year_{year}"
         assert fact.filters["provision"] == provision
         assert [
-            (item.variable, item.operator, item.value)
-            for item in fact.constraints
+            (item.variable, item.operator, item.value) for item in fact.constraints
         ] == [("provision", "==", provision)]
 
 
@@ -1693,8 +1689,7 @@ def test_ssa_ssi_monthly_2024_12_package_builds_federal_payment_age_facts():
     assert aged_18_to_64.value == 3_905_779
     assert aged_65_or_older.value == 2_382_142
     assert (
-        under_18.value + aged_18_to_64.value + aged_65_or_older.value
-        == all_ages.value
+        under_18.value + aged_18_to_64.value + aged_65_or_older.value == all_ages.value
     )
 
     assert all_ages.period.type == "month"
@@ -1706,12 +1701,10 @@ def test_ssa_ssi_monthly_2024_12_package_builds_federal_payment_age_facts():
     assert all_ages.layout.table_record_kind == "total"
 
     assert {
-        (item.variable, item.operator, item.value)
-        for item in under_18.constraints
+        (item.variable, item.operator, item.value) for item in under_18.constraints
     } == {("age", ">=", 0), ("age", "<", 18)}
     assert {
-        (item.variable, item.operator, item.value)
-        for item in aged_18_to_64.constraints
+        (item.variable, item.operator, item.value) for item in aged_18_to_64.constraints
     } == {("age", ">=", 18), ("age", "<", 65)}
     assert {
         (item.variable, item.operator, item.value)
@@ -3215,3 +3208,141 @@ def test_build_facts_with_label_year_does_not_crash():
     # Record-set periods are literal 2024, so a label build still resolves them.
     assert facts
     assert all(fact.period.value == 2024 for fact in facts)
+
+
+def test_census_acs_sld_source_package_aliases_validate_fixture_counts():
+    expected_counts = {
+        "census-acs-s0101-sld-upper-utah-age-2024": {
+            "record_set_count": 29,
+            "row_count": 522,
+            "measure_count": 29,
+            "source_record_count": 522,
+            "source_region_count": 29,
+        },
+        "census-acs-s0101-sld-lower-utah-age-2024": {
+            "record_set_count": 75,
+            "row_count": 1_350,
+            "measure_count": 75,
+            "source_record_count": 1_350,
+            "source_region_count": 75,
+        },
+        "census-acs-b19001-sld-upper-utah-household-income-2024": {
+            "record_set_count": 29,
+            "row_count": 493,
+            "measure_count": 29,
+            "source_record_count": 493,
+            "source_region_count": 29,
+        },
+        "census-acs-b19001-sld-lower-utah-household-income-2024": {
+            "record_set_count": 75,
+            "row_count": 1_275,
+            "measure_count": 75,
+            "source_record_count": 1_275,
+            "source_region_count": 75,
+        },
+        "census-acs-b19013-sld-upper-utah-median-household-income-2024": {
+            "record_set_count": 1,
+            "row_count": 29,
+            "measure_count": 1,
+            "source_record_count": 29,
+            "source_region_count": 1,
+        },
+        "census-acs-b19013-sld-lower-utah-median-household-income-2024": {
+            "record_set_count": 1,
+            "row_count": 75,
+            "measure_count": 1,
+            "source_record_count": 75,
+            "source_region_count": 1,
+        },
+    }
+
+    for package_id, counts in expected_counts.items():
+        report = validate_source_package(package_id, year=2024)
+
+        assert report.valid, (package_id, report.to_dict())
+        assert report.counts == counts, package_id
+
+
+def test_census_acs_sld_b19001_package_builds_income_bracket_facts():
+    package = load_source_package(
+        "census-acs-b19001-sld-upper-utah-household-income-2024"
+    )
+    rows = package.build_source_rows(2024)
+    cells = package.build_source_cells(2024, source_rows=rows)
+    facts = package.build_facts(2024, cells=cells, source_rows=rows)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert validate_source_rows(rows).valid
+    assert validate_source_cells(cells).valid
+    assert validate_facts(facts).valid
+    assert len(facts) == 493
+    assert {fact.geography.level for fact in facts} == {
+        "state_legislative_district_upper"
+    }
+    assert {fact.geography.vintage for fact in facts} == {
+        "2024_state_legislative_districts"
+    }
+
+    d1_total = values_by_record[
+        "census_acs.acs5_2024.b19001.sld_upper_ut.household_income."
+        "49001.all_households.household_count"
+    ]
+    d1_under_10k = values_by_record[
+        "census_acs.acs5_2024.b19001.sld_upper_ut.household_income."
+        "49001.income_under_10000.household_count"
+    ]
+
+    assert d1_total.value == 36_483
+    assert d1_total.geography.id == "610U900US49001"
+    assert d1_total.geography.name == "State Senate District 1 (2024); Utah"
+    assert d1_total.entity.name == "household"
+    assert d1_total.survey_instrument == "ACS 5-year"
+    assert d1_total.period_coverage is not None
+    assert d1_total.period_coverage.start_date == "2020-01-01"
+    assert d1_total.period_coverage.end_date == "2024-12-31"
+    assert not d1_total.constraints
+    assert d1_under_10k.value == 1_006
+    assert {
+        (constraint.variable, constraint.operator, constraint.value)
+        for constraint in d1_under_10k.constraints
+    } == {("household_income", "<", 10_000)}
+
+
+def test_census_acs_sld_s0101_package_builds_age_band_facts():
+    package = load_source_package("census-acs-s0101-sld-lower-utah-age-2024")
+    facts = package.build_facts(2024)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert validate_facts(facts).valid
+    assert len(facts) == 1_350
+
+    d75_85_plus = values_by_record[
+        "census_acs.acs5_2024.s0101.sld_lower_ut.age.49075.age_85_and_over.population"
+    ]
+    assert d75_85_plus.value == 1_979
+    assert d75_85_plus.geography.id == "620L900US49075"
+    assert d75_85_plus.geography.level == "state_legislative_district_lower"
+    assert {
+        (constraint.variable, constraint.operator, constraint.value)
+        for constraint in d75_85_plus.constraints
+    } == {("age", ">=", 85)}
+
+
+def test_census_acs_sld_b19013_package_builds_median_income_facts():
+    package = load_source_package(
+        "census-acs-b19013-sld-lower-utah-median-household-income-2024"
+    )
+    facts = package.build_facts(2024)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert validate_facts(facts).valid
+    assert len(facts) == 75
+
+    d75_median = values_by_record[
+        "census_acs.acs5_2024.b19013.sld_lower_ut.median_household_income."
+        "district_075.median_household_income"
+    ]
+    assert d75_median.value == 69_342
+    assert d75_median.aggregation.method == "median"
+    assert d75_median.measure.unit == "usd"
+    assert d75_median.measure.concept == "census_acs.median_household_income"
