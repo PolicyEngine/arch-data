@@ -68,6 +68,55 @@ ZIP-backed PE migration example is
 `packages/cms_aca/oep_state_level/source_package.yaml`, which parses the CMS
 OEP ZIP's CSV member into full source rows and emits state-level facts.
 
+## Whole-Table Packages
+
+Some publisher tables carry hundreds of geographies. Enumerating one record set
+per geography is what makes a package unreadable — the two largest packages in
+the repo are ~200k lines for under 8k facts. The cheaper shape, confirmed on the
+650-constituency UK packages, is:
+
+- **One record set per publisher category** (age band, tenure class, benefit
+  band), not per geography.
+- **`rows:` carries geometry only** — `row_number`, an `expected_row_header`
+  guard on the code column, the per-row `geography_id` / `geography_level` /
+  `geography_name` / `geography_vintage` overrides, `table_record_kind`, and a
+  guard cell proving the row belongs to the category the record set claims.
+- **The category's semantics go in `shared_filters` and `shared_constraints`**,
+  declared once per record set rather than repeated on every geography row.
+  Both merge into every fact, so each fact still carries its filters and
+  constraints first-class.
+
+That is roughly 11 to 16 YAML lines per fact against roughly 26 for the
+per-geography orientation. `packages/ons/pcon24_population_by_age_2024` is the
+worked example.
+
+Long-format artifacts (one row per cell — the default for the Nomis, NISRA
+PxStat and Stat-Xplore APIs) fit this shape directly. For a publisher-fixed
+wide layout, where categories are columns, the orientation flips to one record
+set per column with rows as geographies —
+`packages/nrs/pcon24_population_by_age_2024` is that case, and it also shows
+the trap that digit column headers (`0`, `1`, …) cannot be expressed as
+`expected_column_header`, because the guard contract int-coerces digit
+expectations while comparing raw. Guard the non-digit endpoints instead.
+
+Two rules bite at this scale, both enforced by agent acceptance rather than
+`validate-package`:
+
+- **Row-backed filters and constraints must be evidenced by the parsed row's own
+  columns.** The filter key has to normalize to a real column name and the value
+  has to equal that column's value, so a prettier slug will not verify. Numeric
+  bounds are the exception: `_source_row_age_range` accepts a source-coded age
+  band as evidence for interpreted bounds, so a band row can carry both its
+  publisher label and `age >= 0` / `age < 5`.
+- **Geography-only rows are `table_record_kind: total`.** Detail rows in a
+  grouped set need first-class constraints.
+
+Multi-geography publisher workbooks often carry sheets a package never selects
+from, and every cell of them costs a source-cell record on each build. Declare
+`sheets:` on the artifact to restrict an `xlsx_used_range` parse to the
+worksheets the package actually reads; the NRS workbook above is 963k cells of
+which the constituency sheet is 5%.
+
 ## Selector Guards
 
 Selectors should not rely on coordinates alone once a package is ready for

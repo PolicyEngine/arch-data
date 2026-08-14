@@ -9,9 +9,12 @@ import json
 import re
 from collections import Counter
 from dataclasses import asdict, dataclass
-from io import StringIO
+from datetime import date, datetime
+from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Any
+
+import openpyxl
 
 from chronicle.sources.cells import SourceArtifactMetadata, SourceCell
 
@@ -136,21 +139,36 @@ def source_rows_from_delimited_text(
     *,
     sheet_name: str,
     delimiter: str = ",",
+    header_row: int = 1,
 ) -> list[SourceRow]:
-    """Parse every data row from a delimited text artifact."""
+    """Parse every data row from a delimited text artifact.
+
+    ``header_row`` names the physical line carrying the column headers.
+    Export tools such as SuperWEB2 write a metadata preamble above the table;
+    lines before the header are preamble, not data, and are skipped. Row
+    numbers stay physical file line numbers either way. Empty content yields
+    no rows, but content that ends before the declared header line is a
+    package error and refuses loudly rather than emitting nothing.
+    """
+    if header_row < 1:
+        raise ValueError(
+            f"header_row is a 1-based physical line number, got {header_row}"
+        )
     text = content.decode("utf-8-sig")
     reader = csv.reader(StringIO(text), delimiter=delimiter)
-    try:
-        header = next(reader)
-    except StopIteration:
-        return []
-
-    normalized_header = [_normalize_header_cell(item) for item in header]
+    header: list[str] | None = None
     rows: list[SourceRow] = []
-    for source_line_number, raw_row in enumerate(reader, start=2):
+    last_line_number = 0
+    for source_line_number, raw_row in enumerate(reader, start=1):
+        last_line_number = source_line_number
+        if source_line_number < header_row:
+            continue
+        if source_line_number == header_row:
+            header = [_normalize_header_cell(item) for item in raw_row]
+            continue
         values = {
             column: _delimited_scalar(raw_row[index]) if index < len(raw_row) else None
-            for index, column in enumerate(normalized_header)
+            for index, column in enumerate(header or ())
         }
         rows.append(
             SourceRow(
@@ -160,7 +178,103 @@ def source_rows_from_delimited_text(
                 values=values,
             )
         )
+    if header is None and last_line_number:
+        raise ValueError(
+            f"Delimited text ends at line {last_line_number} before the "
+            f"declared header row {header_row}"
+        )
     return rows
+
+
+def source_rows_from_xlsx_table(
+    content: bytes,
+    artifact: SourceArtifactMetadata,
+    *,
+    sheet_name: str,
+    header_row: int = 1,
+) -> list[SourceRow]:
+    """Parse one worksheet's rectangular table into full source rows.
+
+    The delimited full-row contract applied to a workbook sheet: the whole
+    table is preserved as source rows keyed by the header line's column names,
+    and packages select rows at the record-set or artifact level. This is the
+    lane for wide publisher workbooks whose used-range cell parse would cost
+    millions of cell records per build (the PIPR monthly workbook is one
+    ~49k-row sheet); the artifact's ``selected_rows`` then restricts cell
+    emission while every row stays preserved and queryable.
+
+    Row numbers are physical sheet rows. Datetime cells flatten to ISO text
+    (date-only at midnight) so criteria and guards compare against a stable
+    string form. A sheet that ends before the declared header row refuses
+    loudly — a package silently contributing nothing is invisible until
+    someone diffs fact counts.
+    """
+    if header_row < 1:
+        raise ValueError(
+            f"header_row is a 1-based physical sheet row, got {header_row}"
+        )
+    workbook = openpyxl.load_workbook(
+        BytesIO(content),
+        read_only=True,
+        data_only=True,
+    )
+    # Read-only mode holds its source open until close() is called; this lane
+    # exists for memory pressure, so release the handle deterministically.
+    try:
+        if sheet_name not in workbook.sheetnames:
+            raise ValueError(
+                f"Workbook does not carry the declared sheet {sheet_name!r}"
+            )
+        sheet = workbook[sheet_name]
+        header: list[str] | None = None
+        rows: list[SourceRow] = []
+        last_row_number = 0
+        for row_number, raw_row in enumerate(
+            sheet.iter_rows(values_only=True),
+            start=1,
+        ):
+            last_row_number = row_number
+            if row_number < header_row:
+                continue
+            if row_number == header_row:
+                header = [
+                    _normalize_header_cell("" if item is None else str(item))
+                    for item in raw_row
+                ]
+                continue
+            values = {
+                column: _xlsx_row_scalar(raw_row[index]) if index < len(raw_row) else None
+                for index, column in enumerate(header or ())
+            }
+            rows.append(
+                SourceRow(
+                    artifact=artifact,
+                    sheet_name=sheet_name,
+                    row_number=row_number,
+                    values=values,
+                )
+            )
+        if header is None:
+            raise ValueError(
+                f"Sheet {sheet_name!r} ends at row {last_row_number} before "
+                f"the declared header row {header_row}"
+            )
+        return rows
+    finally:
+        workbook.close()
+
+
+def _xlsx_row_scalar(value: Any) -> Scalar:
+    """Normalize one xlsx cell value into a source-row scalar."""
+    if isinstance(value, datetime):
+        if (value.hour, value.minute, value.second, value.microsecond) == (0, 0, 0, 0):
+            return value.date().isoformat()
+        return value.isoformat()
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, str):
+        return value.strip()
+    return value
 
 
 def source_rows_from_json_table(

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from io import BytesIO
 
+import openpyxl
 import pytest
 
 from chronicle.harness import (
@@ -19,6 +21,7 @@ from chronicle.sources.cells import (
     load_source_cells_jsonl,
     source_cells_from_delimited_text,
     source_cells_from_html_tables_and_text,
+    source_cells_from_xlsx,
     validate_source_cells,
 )
 from chronicle.sources.rows import (
@@ -219,3 +222,62 @@ def test_html_tables_and_text_parser_preserves_tables_and_document_numbers():
     assert cells_by_sheet_address[("document_numbers", "E2")].raw_value == 620_000
     assert cells_by_sheet_address[("document_numbers", "D3")].raw_value == "180,000"
     assert cells_by_sheet_address[("document_numbers", "E3")].raw_value == 180_000
+
+
+def _two_sheet_workbook() -> bytes:
+    workbook = openpyxl.Workbook()
+    wanted = workbook.active
+    wanted.title = "UKPC"
+    wanted["A1"] = "code"
+    wanted["B1"] = 42
+    unwanted = workbook.create_sheet("Cover_sheet")
+    unwanted["A1"] = "not selected by any record set"
+    buffer = BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue()
+
+
+def test_source_cells_from_xlsx_restricts_the_parse_to_declared_sheets():
+    artifact = SourceArtifactMetadata(
+        source_name="nrs",
+        source_table="test",
+        source_file="test.xlsx",
+        url="https://example.test/test.xlsx",
+        vintage="test",
+        sha256="abc123",
+        size_bytes=10,
+        extracted_at="2026-08-12",
+        extraction_method="test",
+    )
+    content = _two_sheet_workbook()
+
+    every_sheet = source_cells_from_xlsx(content, artifact)
+    only_ukpc = source_cells_from_xlsx(content, artifact, sheets=("UKPC",))
+
+    assert {cell.sheet_name for cell in every_sheet} == {"UKPC", "Cover_sheet"}
+    assert {cell.sheet_name for cell in only_ukpc} == {"UKPC"}
+    assert {(cell.address, cell.raw_value) for cell in only_ukpc} == {
+        ("A1", "code"),
+        ("B1", 42),
+    }
+
+
+def test_source_cells_from_xlsx_rejects_a_sheet_the_workbook_does_not_carry():
+    artifact = SourceArtifactMetadata(
+        source_name="nrs",
+        source_table="test",
+        source_file="test.xlsx",
+        url="https://example.test/test.xlsx",
+        vintage="test",
+        sha256="abc123",
+        size_bytes=10,
+        extracted_at="2026-08-12",
+        extraction_method="test",
+    )
+
+    with pytest.raises(ValueError, match="does not carry"):
+        source_cells_from_xlsx(
+            _two_sheet_workbook(),
+            artifact,
+            sheets=("UKPC", "Renamed_by_publisher"),
+        )

@@ -1,0 +1,20 @@
+source_id: ons
+package_id: ons-pcon24-population-by-age-2024
+dataset: ons_ons-pcon24-population-by-age-2024
+source_page: https://www.nomisweb.co.uk/datasets/pestsyoa2021ew
+table: 'Population estimates - small area (2021 based) by single year of age, England
+  and Wales: Westminster Parliamentary Constituencies (July 2024), mid-2024, quinary
+  age bands'
+files:
+  2024:
+    filename: pcon24_population_by_quinary_age_mid2024.csv
+    source_url: https://www.nomisweb.co.uk/api/v01/dataset/NM_2014_1.data.csv?geography=TYPE172&date=2024&gender=0&c_age=0,1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,210&measures=20100&select=date_name,geography_name,geography_code,gender_name,c_age_name,measures_name,obs_value
+    sha256: 909f4efd963066783d7154deda521697416ba9c38ed00498582baf6f263eabd0
+    size_bytes: 792245
+    fetched_at: '2026-08-12T14:14:35+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-pcon24-population-by-age-2024/2024/909f4efd963066783d7154deda521697416ba9c38ed00498582baf6f263eabd0/pcon24_population_by_quinary_age_mid2024.csv
+        uri: r2://ledger-raw/raw/ons/ons-pcon24-population-by-age-2024/2024/909f4efd963066783d7154deda521697416ba9c38ed00498582baf6f263eabd0/pcon24_population_by_quinary_age_mid2024.csv

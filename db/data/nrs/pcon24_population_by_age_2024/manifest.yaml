@@ -1,0 +1,19 @@
+source_id: nrs
+package_id: nrs-pcon24-population-by-age-2024
+dataset: nrs_nrs-pcon24-population-by-age-2024
+source_page: https://www.nrscotland.gov.uk/publications/other-geographies-mid-2022-to-mid-2024-2011-data-zones/
+table: 'Special area tables, mid-2022 to mid-2024 (2011 data zones): UK Parliamentary
+  Constituencies (2024), by single year of age'
+files:
+  2024:
+    filename: special_area_tables_mid_2022_to_mid_2024_11dz.xlsx
+    source_url: https://www.nrscotland.gov.uk/media/b33atzkp/special-area-tables-mid-2022-to-mid-2024-11-dz.xlsx
+    sha256: 57cd33db9de1fa633fd020b6377d1ce222b713ee899441f23d929d5523a94697
+    size_bytes: 6948335
+    fetched_at: '2026-08-12T14:33:43+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/nrs/nrs-pcon24-population-by-age-2024/2024/57cd33db9de1fa633fd020b6377d1ce222b713ee899441f23d929d5523a94697/special_area_tables_mid_2022_to_mid_2024_11dz.xlsx
+        uri: r2://ledger-raw/raw/nrs/nrs-pcon24-population-by-age-2024/2024/57cd33db9de1fa633fd020b6377d1ce222b713ee899441f23d929d5523a94697/special_area_tables_mid_2022_to_mid_2024_11dz.xlsx

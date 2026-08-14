@@ -1,0 +1,19 @@
+source_id: scotgov
+package_id: scotgov-band-d-council-tax-rates-2026-27
+dataset: scotgov_scotgov-band-d-council-tax-rates-2026-27
+source_page: https://www.gov.scot/publications/council-tax-datasets/
+table: 'CTAS 2026 Council Tax Assumptions: Band D council tax rates by year, 1996-97
+  to 2026-27'
+files:
+  2026:
+    filename: CTAS_2026_Band_D_Council_Tax_rates_1996_97_to_2026_27.xlsx
+    source_url: https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2019/04/council-tax-datasets/documents/band-d/band-d-council-tax-1996-97-to-2019-20-data/band-d-council-tax-1996-97-to-2019-20-data/govscot%3Adocument/CTAS%2B2026%2B-%2BCouncil%2BTax%2BAssumptions%2B-%2BBand%2BD%2BCouncil%2BTax%2Brates%2Bby%2Byear%2B-%2B1996-97%2Bto%2B2026-27.xlsx
+    sha256: 4e56c333178733c63d8729608740fbf7bf3b3d62ae58c3ad9ea297ad8188cf16
+    size_bytes: 26880
+    fetched_at: '2026-08-13T17:31:30+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/scotgov/scotgov-band-d-council-tax-rates-2026-27/2026/4e56c333178733c63d8729608740fbf7bf3b3d62ae58c3ad9ea297ad8188cf16/CTAS_2026_Band_D_Council_Tax_rates_1996_97_to_2026_27.xlsx
+        uri: r2://ledger-raw/raw/scotgov/scotgov-band-d-council-tax-rates-2026-27/2026/4e56c333178733c63d8729608740fbf7bf3b3d62ae58c3ad9ea297ad8188cf16/CTAS_2026_Band_D_Council_Tax_rates_1996_97_to_2026_27.xlsx

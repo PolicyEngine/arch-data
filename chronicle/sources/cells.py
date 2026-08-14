@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 from collections import Counter
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, time
 import hashlib
@@ -142,12 +143,28 @@ def source_cells_from_xls(
 def source_cells_from_xlsx(
     content: bytes,
     artifact: SourceArtifactMetadata,
+    *,
+    sheets: Sequence[str] = (),
 ) -> list[SourceCell]:
-    """Parse all used-range cells from an XLSX workbook."""
+    """Parse all used-range cells from an XLSX workbook.
+
+    ``sheets`` restricts the parse to the named worksheets. Multi-geography
+    publisher workbooks carry sheets a package never selects from, and parsing
+    them costs a cell record each on every build; naming the sheets a package
+    reads keeps that cost proportionate. The default parses everything.
+    """
     value_workbook = openpyxl.load_workbook(BytesIO(content), data_only=True)
     formula_workbook = openpyxl.load_workbook(BytesIO(content), data_only=False)
+    if sheets:
+        missing = [name for name in sheets if name not in value_workbook.sheetnames]
+        if missing:
+            raise ValueError(
+                f"Artifact declares sheets that the workbook does not carry: {missing}"
+            )
     cells: list[SourceCell] = []
     for sheet in value_workbook.worksheets:
+        if sheets and sheet.title not in sheets:
+            continue
         formula_sheet = formula_workbook[sheet.title]
         for row_index in range(1, sheet.max_row + 1):
             for column_index in range(1, sheet.max_column + 1):

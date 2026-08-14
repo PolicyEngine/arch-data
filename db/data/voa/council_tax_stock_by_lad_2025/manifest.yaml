@@ -1,0 +1,19 @@
+source_id: voa
+package_id: voa-council-tax-stock-by-lad-2025
+dataset: voa_voa-council-tax-stock-by-lad-2025
+source_page: https://www.gov.uk/government/statistics/council-tax-stock-of-properties-2025
+table: 'VOA Council Tax stock of properties 2025, table CTSOP1.1: properties by council
+  tax band and area at 31 March 2025'
+files:
+  2025:
+    filename: CTSOP1.1.zip
+    source_url: https://assets.publishing.service.gov.uk/media/6a0ad444c75cc34a8ff8f397/CTSOP1.1.zip
+    sha256: e1979a4196e23207489a6e049ddb10197cd127ab775be5828ee662743fe4fbe7
+    size_bytes: 749909
+    fetched_at: '2026-08-13T14:00:12+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/voa/voa-council-tax-stock-by-lad-2025/2025/e1979a4196e23207489a6e049ddb10197cd127ab775be5828ee662743fe4fbe7/CTSOP1.1.zip
+        uri: r2://ledger-raw/raw/voa/voa-council-tax-stock-by-lad-2025/2025/e1979a4196e23207489a6e049ddb10197cd127ab775be5828ee662743fe4fbe7/CTSOP1.1.zip

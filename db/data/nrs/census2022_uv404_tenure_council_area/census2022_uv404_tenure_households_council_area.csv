@@ -1,0 +1,371 @@
+SuperWEB2(tm)
+
+"Census 2022-Household-2Ev1"
+"Scotland's Census 2022 - National Records of Scotland Table UV404 - Household tenure - Households All occupied households"
+"Council Area 2019 by Household Tenure"
+"Counting: Households"
+
+Filters:
+"Default Summation","Households"
+
+"Counting","Council Area 2019","Household Tenure","Count",
+"Households","Clackmannanshire","All occupied households",24072
+"Households","Clackmannanshire","Owned: Total",15163
+"Households","Clackmannanshire","Owned: Owned outright",8146
+"Households","Clackmannanshire","Owned: Owned with a mortgage or loan",6873
+"Households","Clackmannanshire","Owned: Shared ownership (part owned and part rented)",33
+"Households","Clackmannanshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",111
+"Households","Clackmannanshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",6447
+"Households","Clackmannanshire","Private rented: Total",2131
+"Households","Clackmannanshire","Private rented: Private landlord or letting agency",2045
+"Households","Clackmannanshire","Private rented: Other",83
+"Households","Clackmannanshire","Lives Rent Free",334
+"Households","Dumfries and Galloway","All occupied households",70633
+"Households","Dumfries and Galloway","Owned: Total",45903
+"Households","Dumfries and Galloway","Owned: Owned outright",30384
+"Households","Dumfries and Galloway","Owned: Owned with a mortgage or loan",15098
+"Households","Dumfries and Galloway","Owned: Shared ownership (part owned and part rented)",174
+"Households","Dumfries and Galloway","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",247
+"Households","Dumfries and Galloway","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",13519
+"Households","Dumfries and Galloway","Private rented: Total",9506
+"Households","Dumfries and Galloway","Private rented: Private landlord or letting agency",9150
+"Households","Dumfries and Galloway","Private rented: Other",356
+"Households","Dumfries and Galloway","Lives Rent Free",1704
+"Households","East Ayrshire","All occupied households",55436
+"Households","East Ayrshire","Owned: Total",35208
+"Households","East Ayrshire","Owned: Owned outright",18854
+"Households","East Ayrshire","Owned: Owned with a mortgage or loan",16101
+"Households","East Ayrshire","Owned: Shared ownership (part owned and part rented)",47
+"Households","East Ayrshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",206
+"Households","East Ayrshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",14257
+"Households","East Ayrshire","Private rented: Total",5285
+"Households","East Ayrshire","Private rented: Private landlord or letting agency",5092
+"Households","East Ayrshire","Private rented: Other",190
+"Households","East Ayrshire","Lives Rent Free",686
+"Households","East Lothian","All occupied households",48792
+"Households","East Lothian","Owned: Total",33078
+"Households","East Lothian","Owned: Owned outright",17202
+"Households","East Lothian","Owned: Owned with a mortgage or loan",15276
+"Households","East Lothian","Owned: Shared ownership (part owned and part rented)",154
+"Households","East Lothian","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",449
+"Households","East Lothian","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",10918
+"Households","East Lothian","Private rented: Total",4165
+"Households","East Lothian","Private rented: Private landlord or letting agency",4025
+"Households","East Lothian","Private rented: Other",144
+"Households","East Lothian","Lives Rent Free",634
+"Households","East Renfrewshire","All occupied households",39732
+"Households","East Renfrewshire","Owned: Total",32819
+"Households","East Renfrewshire","Owned: Owned outright",17721
+"Households","East Renfrewshire","Owned: Owned with a mortgage or loan",14911
+"Households","East Renfrewshire","Owned: Shared ownership (part owned and part rented)",42
+"Households","East Renfrewshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",150
+"Households","East Renfrewshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",4275
+"Households","East Renfrewshire","Private rented: Total",2280
+"Households","East Renfrewshire","Private rented: Private landlord or letting agency",2177
+"Households","East Renfrewshire","Private rented: Other",104
+"Households","East Renfrewshire","Lives Rent Free",351
+"Households","Na h-Eileanan Siar","All occupied households",12717
+"Households","Na h-Eileanan Siar","Owned: Total",9459
+"Households","Na h-Eileanan Siar","Owned: Owned outright",6646
+"Households","Na h-Eileanan Siar","Owned: Owned with a mortgage or loan",2711
+"Households","Na h-Eileanan Siar","Owned: Shared ownership (part owned and part rented)",18
+"Households","Na h-Eileanan Siar","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",83
+"Households","Na h-Eileanan Siar","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",2178
+"Households","Na h-Eileanan Siar","Private rented: Total",726
+"Households","Na h-Eileanan Siar","Private rented: Private landlord or letting agency",677
+"Households","Na h-Eileanan Siar","Private rented: Other",49
+"Households","Na h-Eileanan Siar","Lives Rent Free",355
+"Households","Falkirk","All occupied households",72490
+"Households","Falkirk","Owned: Total",47540
+"Households","Falkirk","Owned: Owned outright",23906
+"Households","Falkirk","Owned: Owned with a mortgage or loan",23177
+"Households","Falkirk","Owned: Shared ownership (part owned and part rented)",112
+"Households","Falkirk","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",349
+"Households","Falkirk","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",18021
+"Households","Falkirk","Private rented: Total",5982
+"Households","Falkirk","Private rented: Private landlord or letting agency",5734
+"Households","Falkirk","Private rented: Other",248
+"Households","Falkirk","Lives Rent Free",945
+"Households","Highland","All occupied households",111727
+"Households","Highland","Owned: Total",75697
+"Households","Highland","Owned: Owned outright",46017
+"Households","Highland","Owned: Owned with a mortgage or loan",27943
+"Households","Highland","Owned: Shared ownership (part owned and part rented)",326
+"Households","Highland","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",1405
+"Households","Highland","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",21731
+"Households","Highland","Private rented: Total",11924
+"Households","Highland","Private rented: Private landlord or letting agency",11291
+"Households","Highland","Private rented: Other",633
+"Households","Highland","Lives Rent Free",2375
+"Households","Inverclyde","All occupied households",37405
+"Households","Inverclyde","Owned: Total",23687
+"Households","Inverclyde","Owned: Owned outright",13478
+"Households","Inverclyde","Owned: Owned with a mortgage or loan",9991
+"Households","Inverclyde","Owned: Shared ownership (part owned and part rented)",123
+"Households","Inverclyde","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",99
+"Households","Inverclyde","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",9399
+"Households","Inverclyde","Private rented: Total",3971
+"Households","Inverclyde","Private rented: Private landlord or letting agency",3784
+"Households","Inverclyde","Private rented: Other",184
+"Households","Inverclyde","Lives Rent Free",344
+"Households","Midlothian","All occupied households",41009
+"Households","Midlothian","Owned: Total",28014
+"Households","Midlothian","Owned: Owned outright",13075
+"Households","Midlothian","Owned: Owned with a mortgage or loan",14372
+"Households","Midlothian","Owned: Shared ownership (part owned and part rented)",67
+"Households","Midlothian","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",501
+"Households","Midlothian","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",9446
+"Households","Midlothian","Private rented: Total",3146
+"Households","Midlothian","Private rented: Private landlord or letting agency",2900
+"Households","Midlothian","Private rented: Other",246
+"Households","Midlothian","Lives Rent Free",403
+"Households","Moray","All occupied households",43116
+"Households","Moray","Owned: Total",28885
+"Households","Moray","Owned: Owned outright",17308
+"Households","Moray","Owned: Owned with a mortgage or loan",11325
+"Households","Moray","Owned: Shared ownership (part owned and part rented)",67
+"Households","Moray","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",179
+"Households","Moray","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",8287
+"Households","Moray","Private rented: Total",5134
+"Households","Moray","Private rented: Private landlord or letting agency",4365
+"Households","Moray","Private rented: Other",769
+"Households","Moray","Lives Rent Free",810
+"Households","North Ayrshire","All occupied households",64185
+"Households","North Ayrshire","Owned: Total",40040
+"Households","North Ayrshire","Owned: Owned outright",23352
+"Households","North Ayrshire","Owned: Owned with a mortgage or loan",16418
+"Households","North Ayrshire","Owned: Shared ownership (part owned and part rented)",82
+"Households","North Ayrshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",190
+"Households","North Ayrshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",16946
+"Households","North Ayrshire","Private rented: Total",6360
+"Households","North Ayrshire","Private rented: Private landlord or letting agency",6140
+"Households","North Ayrshire","Private rented: Other",220
+"Households","North Ayrshire","Lives Rent Free",836
+"Households","Orkney Islands","All occupied households",10631
+"Households","Orkney Islands","Owned: Total",7439
+"Households","Orkney Islands","Owned: Owned outright",4956
+"Households","Orkney Islands","Owned: Owned with a mortgage or loan",2301
+"Households","Orkney Islands","Owned: Shared ownership (part owned and part rented)",118
+"Households","Orkney Islands","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",64
+"Households","Orkney Islands","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",1795
+"Households","Orkney Islands","Private rented: Total",1021
+"Households","Orkney Islands","Private rented: Private landlord or letting agency",980
+"Households","Orkney Islands","Private rented: Other",41
+"Households","Orkney Islands","Lives Rent Free",373
+"Households","Scottish Borders","All occupied households",55583
+"Households","Scottish Borders","Owned: Total",34936
+"Households","Scottish Borders","Owned: Owned outright",21958
+"Households","Scottish Borders","Owned: Owned with a mortgage or loan",12648
+"Households","Scottish Borders","Owned: Shared ownership (part owned and part rented)",131
+"Households","Scottish Borders","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",199
+"Households","Scottish Borders","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",11631
+"Households","Scottish Borders","Private rented: Total",7626
+"Households","Scottish Borders","Private rented: Private landlord or letting agency",7398
+"Households","Scottish Borders","Private rented: Other",231
+"Households","Scottish Borders","Lives Rent Free",1386
+"Households","Shetland Islands","All occupied households",10576
+"Households","Shetland Islands","Owned: Total",7204
+"Households","Shetland Islands","Owned: Owned outright",4581
+"Households","Shetland Islands","Owned: Owned with a mortgage or loan",2547
+"Households","Shetland Islands","Owned: Shared ownership (part owned and part rented)",51
+"Households","Shetland Islands","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",25
+"Households","Shetland Islands","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",2406
+"Households","Shetland Islands","Private rented: Total",738
+"Households","Shetland Islands","Private rented: Private landlord or letting agency",669
+"Households","Shetland Islands","Private rented: Other",68
+"Households","Shetland Islands","Lives Rent Free",228
+"Households","South Ayrshire","All occupied households",52491
+"Households","South Ayrshire","Owned: Total",36777
+"Households","South Ayrshire","Owned: Owned outright",22233
+"Households","South Ayrshire","Owned: Owned with a mortgage or loan",14348
+"Households","South Ayrshire","Owned: Shared ownership (part owned and part rented)",76
+"Households","South Ayrshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",120
+"Households","South Ayrshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",9380
+"Households","South Ayrshire","Private rented: Total",5546
+"Households","South Ayrshire","Private rented: Private landlord or letting agency",5397
+"Households","South Ayrshire","Private rented: Other",145
+"Households","South Ayrshire","Lives Rent Free",792
+"Households","South Lanarkshire","All occupied households",147810
+"Households","South Lanarkshire","Owned: Total",102942
+"Households","South Lanarkshire","Owned: Owned outright",51518
+"Households","South Lanarkshire","Owned: Owned with a mortgage or loan",50607
+"Households","South Lanarkshire","Owned: Shared ownership (part owned and part rented)",162
+"Households","South Lanarkshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",655
+"Households","South Lanarkshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",29045
+"Households","South Lanarkshire","Private rented: Total",14088
+"Households","South Lanarkshire","Private rented: Private landlord or letting agency",13606
+"Households","South Lanarkshire","Private rented: Other",478
+"Households","South Lanarkshire","Lives Rent Free",1738
+"Households","Stirling","All occupied households",40349
+"Households","Stirling","Owned: Total",26914
+"Households","Stirling","Owned: Owned outright",15119
+"Households","Stirling","Owned: Owned with a mortgage or loan",11536
+"Households","Stirling","Owned: Shared ownership (part owned and part rented)",72
+"Households","Stirling","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",190
+"Households","Stirling","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",7654
+"Households","Stirling","Private rented: Total",5138
+"Households","Stirling","Private rented: Private landlord or letting agency",4949
+"Households","Stirling","Private rented: Other",189
+"Households","Stirling","Lives Rent Free",646
+"Households","Aberdeen City","All occupied households",109450
+"Households","Aberdeen City","Owned: Total",61804
+"Households","Aberdeen City","Owned: Owned outright",31367
+"Households","Aberdeen City","Owned: Owned with a mortgage or loan",29208
+"Households","Aberdeen City","Owned: Shared ownership (part owned and part rented)",458
+"Households","Aberdeen City","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",771
+"Households","Aberdeen City","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",24507
+"Households","Aberdeen City","Private rented: Total",21708
+"Households","Aberdeen City","Private rented: Private landlord or letting agency",21274
+"Households","Aberdeen City","Private rented: Other",434
+"Households","Aberdeen City","Lives Rent Free",1429
+"Households","Aberdeenshire","All occupied households",115769
+"Households","Aberdeenshire","Owned: Total",85574
+"Households","Aberdeenshire","Owned: Owned outright",46679
+"Households","Aberdeenshire","Owned: Owned with a mortgage or loan",37782
+"Households","Aberdeenshire","Owned: Shared ownership (part owned and part rented)",236
+"Households","Aberdeenshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",877
+"Households","Aberdeenshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",17848
+"Households","Aberdeenshire","Private rented: Total",10503
+"Households","Aberdeenshire","Private rented: Private landlord or letting agency",10165
+"Households","Aberdeenshire","Private rented: Other",338
+"Households","Aberdeenshire","Lives Rent Free",1844
+"Households","Argyll and Bute","All occupied households",41894
+"Households","Argyll and Bute","Owned: Total",28198
+"Households","Argyll and Bute","Owned: Owned outright",18483
+"Households","Argyll and Bute","Owned: Owned with a mortgage or loan",9464
+"Households","Argyll and Bute","Owned: Shared ownership (part owned and part rented)",101
+"Households","Argyll and Bute","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",150
+"Households","Argyll and Bute","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",7976
+"Households","Argyll and Bute","Private rented: Total",4863
+"Households","Argyll and Bute","Private rented: Private landlord or letting agency",4362
+"Households","Argyll and Bute","Private rented: Other",505
+"Households","Argyll and Bute","Lives Rent Free",857
+"Households","City of Edinburgh","All occupied households",238944
+"Households","City of Edinburgh","Owned: Total",143701
+"Households","City of Edinburgh","Owned: Owned outright",72401
+"Households","City of Edinburgh","Owned: Owned with a mortgage or loan",68208
+"Households","City of Edinburgh","Owned: Shared ownership (part owned and part rented)",1025
+"Households","City of Edinburgh","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",2066
+"Households","City of Edinburgh","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",37484
+"Households","City of Edinburgh","Private rented: Total",55135
+"Households","City of Edinburgh","Private rented: Private landlord or letting agency",53812
+"Households","City of Edinburgh","Private rented: Other",1323
+"Households","City of Edinburgh","Lives Rent Free",2627
+"Households","Renfrewshire","All occupied households",86721
+"Households","Renfrewshire","Owned: Total",57848
+"Households","Renfrewshire","Owned: Owned outright",28959
+"Households","Renfrewshire","Owned: Owned with a mortgage or loan",28286
+"Households","Renfrewshire","Owned: Shared ownership (part owned and part rented)",117
+"Households","Renfrewshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",485
+"Households","Renfrewshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",18413
+"Households","Renfrewshire","Private rented: Total",9555
+"Households","Renfrewshire","Private rented: Private landlord or letting agency",9214
+"Households","Renfrewshire","Private rented: Other",341
+"Households","Renfrewshire","Lives Rent Free",905
+"Households","West Dunbartonshire","All occupied households",42596
+"Households","West Dunbartonshire","Owned: Total",24290
+"Households","West Dunbartonshire","Owned: Owned outright",12671
+"Households","West Dunbartonshire","Owned: Owned with a mortgage or loan",11379
+"Households","West Dunbartonshire","Owned: Shared ownership (part owned and part rented)",111
+"Households","West Dunbartonshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",133
+"Households","West Dunbartonshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",14386
+"Households","West Dunbartonshire","Private rented: Total",3473
+"Households","West Dunbartonshire","Private rented: Private landlord or letting agency",3323
+"Households","West Dunbartonshire","Private rented: Other",151
+"Households","West Dunbartonshire","Lives Rent Free",443
+"Households","West Lothian","All occupied households",79836
+"Households","West Lothian","Owned: Total",52033
+"Households","West Lothian","Owned: Owned outright",24076
+"Households","West Lothian","Owned: Owned with a mortgage or loan",26995
+"Households","West Lothian","Owned: Shared ownership (part owned and part rented)",103
+"Households","West Lothian","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",858
+"Households","West Lothian","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",19587
+"Households","West Lothian","Private rented: Total",7378
+"Households","West Lothian","Private rented: Private landlord or letting agency",7100
+"Households","West Lothian","Private rented: Other",278
+"Households","West Lothian","Lives Rent Free",838
+"Households","Angus","All occupied households",54258
+"Households","Angus","Owned: Total",36392
+"Households","Angus","Owned: Owned outright",21553
+"Households","Angus","Owned: Owned with a mortgage or loan",14516
+"Households","Angus","Owned: Shared ownership (part owned and part rented)",98
+"Households","Angus","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",229
+"Households","Angus","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",10490
+"Households","Angus","Private rented: Total",6406
+"Households","Angus","Private rented: Private landlord or letting agency",6194
+"Households","Angus","Private rented: Other",212
+"Households","Angus","Lives Rent Free",970
+"Households","Dundee City","All occupied households",69857
+"Households","Dundee City","Owned: Total",36058
+"Households","Dundee City","Owned: Owned outright",19298
+"Households","Dundee City","Owned: Owned with a mortgage or loan",16244
+"Households","Dundee City","Owned: Shared ownership (part owned and part rented)",222
+"Households","Dundee City","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",294
+"Households","Dundee City","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",18335
+"Households","Dundee City","Private rented: Total",14728
+"Households","Dundee City","Private rented: Private landlord or letting agency",14371
+"Households","Dundee City","Private rented: Other",356
+"Households","Dundee City","Lives Rent Free",737
+"Households","East Dunbartonshire","All occupied households",46461
+"Households","East Dunbartonshire","Owned: Total",38325
+"Households","East Dunbartonshire","Owned: Owned outright",21385
+"Households","East Dunbartonshire","Owned: Owned with a mortgage or loan",16681
+"Households","East Dunbartonshire","Owned: Shared ownership (part owned and part rented)",65
+"Households","East Dunbartonshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",194
+"Households","East Dunbartonshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",5045
+"Households","East Dunbartonshire","Private rented: Total",2685
+"Households","East Dunbartonshire","Private rented: Private landlord or letting agency",2553
+"Households","East Dunbartonshire","Private rented: Other",128
+"Households","East Dunbartonshire","Lives Rent Free",406
+"Households","Fife","All occupied households",169573
+"Households","Fife","Owned: Total",110668
+"Households","Fife","Owned: Owned outright",61016
+"Households","Fife","Owned: Owned with a mortgage or loan",48438
+"Households","Fife","Owned: Shared ownership (part owned and part rented)",417
+"Households","Fife","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",793
+"Households","Fife","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",37071
+"Households","Fife","Private rented: Total",19636
+"Households","Fife","Private rented: Private landlord or letting agency",18802
+"Households","Fife","Private rented: Other",830
+"Households","Fife","Lives Rent Free",2209
+"Households","Perth and Kinross","All occupied households",69989
+"Households","Perth and Kinross","Owned: Total",47426
+"Households","Perth and Kinross","Owned: Owned outright",27866
+"Households","Perth and Kinross","Owned: Owned with a mortgage or loan",18378
+"Households","Perth and Kinross","Owned: Shared ownership (part owned and part rented)",365
+"Households","Perth and Kinross","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",817
+"Households","Perth and Kinross","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",11503
+"Households","Perth and Kinross","Private rented: Total",9617
+"Households","Perth and Kinross","Private rented: Private landlord or letting agency",9269
+"Households","Perth and Kinross","Private rented: Other",348
+"Households","Perth and Kinross","Lives Rent Free",1440
+"Households","Glasgow City","All occupied households",293802
+"Households","Glasgow City","Owned: Total",137271
+"Households","Glasgow City","Owned: Owned outright",63764
+"Households","Glasgow City","Owned: Owned with a mortgage or loan",71082
+"Households","Glasgow City","Owned: Shared ownership (part owned and part rented)",953
+"Households","Glasgow City","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",1472
+"Households","Glasgow City","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",102410
+"Households","Glasgow City","Private rented: Total",49579
+"Households","Glasgow City","Private rented: Private landlord or letting agency",48135
+"Households","Glasgow City","Private rented: Other",1444
+"Households","Glasgow City","Lives Rent Free",4542
+"Households","North Lanarkshire","All occupied households",151371
+"Households","North Lanarkshire","Owned: Total",94468
+"Households","North Lanarkshire","Owned: Owned outright",45160
+"Households","North Lanarkshire","Owned: Owned with a mortgage or loan",48370
+"Households","North Lanarkshire","Owned: Shared ownership (part owned and part rented)",179
+"Households","North Lanarkshire","Owned: Shared Equity (e.g. LIFT or Help-to-Buy)",756
+"Households","North Lanarkshire","Social Rented: Council (LA) or Housing Association/ Registered Social Landlord",42133
+"Households","North Lanarkshire","Private rented: Total",13021
+"Households","North Lanarkshire","Private rented: Private landlord or letting agency",12567
+"Households","North Lanarkshire","Private rented: Other",454
+"Households","North Lanarkshire","Lives Rent Free",1749
+
+
+"INFO","Data has been perturbed"
+
+
+"Crown copyright 2024 For further information on variables, see https://www.scotlandscensus.gov.uk/about/metadata-a-to-z/ In order to protect against disclosure of personal information, Statistical Disclosure Control has been applied to the data/outputs.  Cells might not sum to sub totals and totals due to these Statistical Disclosure Controls. To find out more on this visit https://www.scotlandscensus.gov.uk/about/2022-census/statistical-methodology/statistical-disclosure-control/"
+
+(c) Copyright WingArc Australia 2018

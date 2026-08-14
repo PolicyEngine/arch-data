@@ -1,0 +1,18 @@
+source_id: ons
+package_id: ons-subnational-dwellings-by-tenure-2024
+dataset: ons_ons-subnational-dwellings-by-tenure-2024
+source_page: https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/subnationaldwellingstockbytenureestimates
+table: Subnational dwelling stock by tenure estimates, England, 2024 edition
+files:
+  2024:
+    filename: subnationaldwellingsbytenure2024.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/housing/datasets/subnationaldwellingstockbytenureestimates/current/subnationaldwellingsbytenure2024.xlsx
+    sha256: a2368850ba885a05041c43464d4f77ec60d798174647695cfdeae900b8b44b6f
+    size_bytes: 99634
+    fetched_at: '2026-08-13T08:58:30+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-subnational-dwellings-by-tenure-2024/2024/a2368850ba885a05041c43464d4f77ec60d798174647695cfdeae900b8b44b6f/subnationaldwellingsbytenure2024.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-subnational-dwellings-by-tenure-2024/2024/a2368850ba885a05041c43464d4f77ec60d798174647695cfdeae900b8b44b6f/subnationaldwellingsbytenure2024.xlsx

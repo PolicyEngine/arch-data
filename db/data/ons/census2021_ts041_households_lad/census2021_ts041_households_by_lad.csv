@@ -1,0 +1,319 @@
+"GEOGRAPHY_NAME","GEOGRAPHY_CODE","C2021_HH_1_NAME","MEASURES_NAME","OBS_VALUE"
+"Hartlepool","E06000001","Number of households","Value",40930
+"Middlesbrough","E06000002","Number of households","Value",60262
+"Redcar and Cleveland","E06000003","Number of households","Value",61636
+"Stockton-on-Tees","E06000004","Number of households","Value",83757
+"Darlington","E06000005","Number of households","Value",48918
+"County Durham","E06000047","Number of households","Value",234761
+"Northumberland","E06000057","Number of households","Value",146922
+"Newcastle upon Tyne","E08000021","Number of households","Value",122797
+"North Tyneside","E08000022","Number of households","Value",96232
+"South Tyneside","E08000023","Number of households","Value",68287
+"Sunderland","E08000024","Number of households","Value",122177
+"Gateshead","E08000037","Number of households","Value",88999
+"Halton","E06000006","Number of households","Value",55951
+"Warrington","E06000007","Number of households","Value",90538
+"Blackburn with Darwen","E06000008","Number of households","Value",58767
+"Blackpool","E06000009","Number of households","Value",64789
+"Cheshire East","E06000049","Number of households","Value",174856
+"Cheshire West and Chester","E06000050","Number of households","Value",155156
+"Cumberland","E06000063","Number of households","Value",125425
+"Westmorland and Furness","E06000064","Number of households","Value",103529
+"Burnley","E07000117","Number of households","Value",39872
+"Chorley","E07000118","Number of households","Value",50132
+"Fylde","E07000119","Number of households","Value",37606
+"Hyndburn","E07000120","Number of households","Value",34790
+"Lancaster","E07000121","Number of households","Value",59978
+"Pendle","E07000122","Number of households","Value",38066
+"Preston","E07000123","Number of households","Value",59607
+"Ribble Valley","E07000124","Number of households","Value",26747
+"Rossendale","E07000125","Number of households","Value",30561
+"South Ribble","E07000126","Number of households","Value",48586
+"West Lancashire","E07000127","Number of households","Value",48533
+"Wyre","E07000128","Number of households","Value",50767
+"Bolton","E08000001","Number of households","Value",118790
+"Bury","E08000002","Number of households","Value",80696
+"Manchester","E08000003","Number of households","Value",214732
+"Oldham","E08000004","Number of households","Value",93140
+"Rochdale","E08000005","Number of households","Value",90223
+"Salford","E08000006","Number of households","Value",115116
+"Stockport","E08000007","Number of households","Value",126648
+"Tameside","E08000008","Number of households","Value",99527
+"Trafford","E08000009","Number of households","Value",96269
+"Wigan","E08000010","Number of households","Value",143105
+"Knowsley","E08000011","Number of households","Value",66073
+"Liverpool","E08000012","Number of households","Value",207491
+"St. Helens","E08000013","Number of households","Value",81011
+"Sefton","E08000014","Number of households","Value",123073
+"Wirral","E08000015","Number of households","Value",143252
+"Kingston upon Hull, City of","E06000010","Number of households","Value",115472
+"East Riding of Yorkshire","E06000011","Number of households","Value",152066
+"North East Lincolnshire","E06000012","Number of households","Value",69826
+"North Lincolnshire","E06000013","Number of households","Value",73173
+"York","E06000014","Number of households","Value",85459
+"North Yorkshire","E06000065","Number of households","Value",274381
+"Barnsley","E08000016","Number of households","Value",108053
+"Doncaster","E08000017","Number of households","Value",133482
+"Rotherham","E08000018","Number of households","Value",113925
+"Sheffield","E08000019","Number of households","Value",231950
+"Bradford","E08000032","Number of households","Value",209867
+"Calderdale","E08000033","Number of households","Value",90476
+"Kirklees","E08000034","Number of households","Value",177989
+"Leeds","E08000035","Number of households","Value",341466
+"Wakefield","E08000036","Number of households","Value",153075
+"Derby","E06000015","Number of households","Value",105652
+"Leicester","E06000016","Number of households","Value",127387
+"Rutland","E06000017","Number of households","Value",16694
+"Nottingham","E06000018","Number of households","Value",124745
+"North Northamptonshire","E06000061","Number of households","Value",148918
+"West Northamptonshire","E06000062","Number of households","Value",172641
+"Amber Valley","E07000032","Number of households","Value",56277
+"Bolsover","E07000033","Number of households","Value",35262
+"Chesterfield","E07000034","Number of households","Value",48058
+"Derbyshire Dales","E07000035","Number of households","Value",32283
+"Erewash","E07000036","Number of households","Value",50334
+"High Peak","E07000037","Number of households","Value",40772
+"North East Derbyshire","E07000038","Number of households","Value",45987
+"South Derbyshire","E07000039","Number of households","Value",45240
+"Blaby","E07000129","Number of households","Value",42575
+"Charnwood","E07000130","Number of households","Value",73785
+"Harborough","E07000131","Number of households","Value",40413
+"Hinckley and Bosworth","E07000132","Number of households","Value",49446
+"Melton","E07000133","Number of households","Value",22599
+"North West Leicestershire","E07000134","Number of households","Value",44973
+"Oadby and Wigston","E07000135","Number of households","Value",22617
+"Boston","E07000136","Number of households","Value",29404
+"East Lindsey","E07000137","Number of households","Value",64754
+"Lincoln","E07000138","Number of households","Value",42507
+"North Kesteven","E07000139","Number of households","Value",50989
+"South Holland","E07000140","Number of households","Value",40703
+"South Kesteven","E07000141","Number of households","Value",62850
+"West Lindsey","E07000142","Number of households","Value",42345
+"Ashfield","E07000170","Number of households","Value",54508
+"Bassetlaw","E07000171","Number of households","Value",51458
+"Broxtowe","E07000172","Number of households","Value",48361
+"Gedling","E07000173","Number of households","Value",51551
+"Mansfield","E07000174","Number of households","Value",48030
+"Newark and Sherwood","E07000175","Number of households","Value",53331
+"Rushcliffe","E07000176","Number of households","Value",49883
+"Herefordshire, County of","E06000019","Number of households","Value",82827
+"Telford and Wrekin","E06000020","Number of households","Value",76510
+"Stoke-on-Trent","E06000021","Number of households","Value",110399
+"Shropshire","E06000051","Number of households","Value",139579
+"Cannock Chase","E07000192","Number of households","Value",43457
+"East Staffordshire","E07000193","Number of households","Value",51293
+"Lichfield","E07000194","Number of households","Value",45630
+"Newcastle-under-Lyme","E07000195","Number of households","Value",53423
+"South Staffordshire","E07000196","Number of households","Value",46121
+"Stafford","E07000197","Number of households","Value",60047
+"Staffordshire Moorlands","E07000198","Number of households","Value",42355
+"Tamworth","E07000199","Number of households","Value",32895
+"North Warwickshire","E07000218","Number of households","Value",27580
+"Nuneaton and Bedworth","E07000219","Number of households","Value",56586
+"Rugby","E07000220","Number of households","Value",47013
+"Stratford-on-Avon","E07000221","Number of households","Value",59464
+"Warwick","E07000222","Number of households","Value",62619
+"Bromsgrove","E07000234","Number of households","Value",41266
+"Malvern Hills","E07000235","Number of households","Value",34892
+"Redditch","E07000236","Number of households","Value",36378
+"Worcester","E07000237","Number of households","Value",44722
+"Wychavon","E07000238","Number of households","Value",57356
+"Wyre Forest","E07000239","Number of households","Value",45320
+"Birmingham","E08000025","Number of households","Value",423456
+"Coventry","E08000026","Number of households","Value",134139
+"Dudley","E08000027","Number of households","Value",137069
+"Sandwell","E08000028","Number of households","Value",130246
+"Solihull","E08000029","Number of households","Value",89483
+"Walsall","E08000030","Number of households","Value",112226
+"Wolverhampton","E08000031","Number of households","Value",105141
+"Peterborough","E06000031","Number of households","Value",84533
+"Luton","E06000032","Number of households","Value",78940
+"Southend-on-Sea","E06000033","Number of households","Value",78344
+"Thurrock","E06000034","Number of households","Value",66377
+"Bedford","E06000055","Number of households","Value",74950
+"Central Bedfordshire","E06000056","Number of households","Value",120755
+"Cambridge","E07000008","Number of households","Value",52472
+"East Cambridgeshire","E07000009","Number of households","Value",37203
+"Fenland","E07000010","Number of households","Value",44083
+"Huntingdonshire","E07000011","Number of households","Value",76880
+"South Cambridgeshire","E07000012","Number of households","Value",66996
+"Basildon","E07000066","Number of households","Value",76362
+"Braintree","E07000067","Number of households","Value",64986
+"Brentwood","E07000068","Number of households","Value",32342
+"Castle Point","E07000069","Number of households","Value",37389
+"Chelmsford","E07000070","Number of households","Value",75401
+"Colchester","E07000071","Number of households","Value",79710
+"Epping Forest","E07000072","Number of households","Value",54557
+"Harlow","E07000073","Number of households","Value",37857
+"Maldon","E07000074","Number of households","Value",27900
+"Rochford","E07000075","Number of households","Value",35557
+"Tendring","E07000076","Number of households","Value",67451
+"Uttlesford","E07000077","Number of households","Value",36958
+"Broxbourne","E07000095","Number of households","Value",39849
+"Dacorum","E07000096","Number of households","Value",63412
+"Hertsmere","E07000098","Number of households","Value",42682
+"North Hertfordshire","E07000099","Number of households","Value",56732
+"Three Rivers","E07000102","Number of households","Value",36858
+"Watford","E07000103","Number of households","Value",39628
+"Breckland","E07000143","Number of households","Value",60359
+"Broadland","E07000144","Number of households","Value",57760
+"Great Yarmouth","E07000145","Number of households","Value",44544
+"King's Lynn and West Norfolk","E07000146","Number of households","Value",67464
+"North Norfolk","E07000147","Number of households","Value",48374
+"Norwich","E07000148","Number of households","Value",64459
+"South Norfolk","E07000149","Number of households","Value",61381
+"Babergh","E07000200","Number of households","Value",40200
+"Ipswich","E07000202","Number of households","Value",59507
+"Mid Suffolk","E07000203","Number of households","Value",44343
+"St Albans","E07000240","Number of households","Value",58991
+"Welwyn Hatfield","E07000241","Number of households","Value",46209
+"East Hertfordshire","E07000242","Number of households","Value",62021
+"Stevenage","E07000243","Number of households","Value",36511
+"East Suffolk","E07000244","Number of households","Value",110747
+"West Suffolk","E07000245","Number of households","Value",78746
+"City of London","E09000001","Number of households","Value",4914
+"Barking and Dagenham","E09000002","Number of households","Value",73902
+"Barnet","E09000003","Number of households","Value",148917
+"Bexley","E09000004","Number of households","Value",95300
+"Brent","E09000005","Number of households","Value",118612
+"Bromley","E09000006","Number of households","Value",135827
+"Camden","E09000007","Number of households","Value",92759
+"Croydon","E09000008","Number of households","Value",152946
+"Ealing","E09000009","Number of households","Value",133659
+"Enfield","E09000010","Number of households","Value",120923
+"Greenwich","E09000011","Number of households","Value",114052
+"Hackney","E09000012","Number of households","Value",106081
+"Hammersmith and Fulham","E09000013","Number of households","Value",81244
+"Haringey","E09000014","Number of households","Value",105092
+"Harrow","E09000015","Number of households","Value",89642
+"Havering","E09000016","Number of households","Value",101277
+"Hillingdon","E09000017","Number of households","Value",109228
+"Hounslow","E09000018","Number of households","Value",102961
+"Islington","E09000019","Number of households","Value",96496
+"Kensington and Chelsea","E09000020","Number of households","Value",66884
+"Kingston upon Thames","E09000021","Number of households","Value",65626
+"Lambeth","E09000022","Number of households","Value",134688
+"Lewisham","E09000023","Number of households","Value",122392
+"Merton","E09000024","Number of households","Value",81729
+"Newham","E09000025","Number of households","Value",115507
+"Redbridge","E09000026","Number of households","Value",103713
+"Richmond upon Thames","E09000027","Number of households","Value",80705
+"Southwark","E09000028","Number of households","Value",130818
+"Sutton","E09000029","Number of households","Value",82348
+"Tower Hamlets","E09000030","Number of households","Value",120539
+"Waltham Forest","E09000031","Number of households","Value",102901
+"Wandsworth","E09000032","Number of households","Value",137393
+"Westminster","E09000033","Number of households","Value",94815
+"Medway","E06000035","Number of households","Value",111458
+"Bracknell Forest","E06000036","Number of households","Value",50248
+"West Berkshire","E06000037","Number of households","Value",66658
+"Reading","E06000038","Number of households","Value",67683
+"Slough","E06000039","Number of households","Value",52423
+"Windsor and Maidenhead","E06000040","Number of households","Value",60932
+"Wokingham","E06000041","Number of households","Value",69164
+"Milton Keynes","E06000042","Number of households","Value",113102
+"Brighton and Hove","E06000043","Number of households","Value",121402
+"Portsmouth","E06000044","Number of households","Value",86155
+"Southampton","E06000045","Number of households","Value",102291
+"Isle of Wight","E06000046","Number of households","Value",64775
+"Buckinghamshire","E06000060","Number of households","Value",220328
+"Eastbourne","E07000061","Number of households","Value",45610
+"Hastings","E07000062","Number of households","Value",40453
+"Lewes","E07000063","Number of households","Value",43688
+"Rother","E07000064","Number of households","Value",42102
+"Wealden","E07000065","Number of households","Value",68266
+"Basingstoke and Deane","E07000084","Number of households","Value",76645
+"East Hampshire","E07000085","Number of households","Value",52718
+"Eastleigh","E07000086","Number of households","Value",56924
+"Fareham","E07000087","Number of households","Value",48639
+"Gosport","E07000088","Number of households","Value",35922
+"Hart","E07000089","Number of households","Value",39964
+"Havant","E07000090","Number of households","Value",53589
+"New Forest","E07000091","Number of households","Value",77566
+"Rushmoor","E07000092","Number of households","Value",39303
+"Test Valley","E07000093","Number of households","Value",54708
+"Winchester","E07000094","Number of households","Value",51715
+"Ashford","E07000105","Number of households","Value",53583
+"Canterbury","E07000106","Number of households","Value",63792
+"Dartford","E07000107","Number of households","Value",45696
+"Dover","E07000108","Number of households","Value",50548
+"Gravesham","E07000109","Number of households","Value",41724
+"Maidstone","E07000110","Number of households","Value",71208
+"Sevenoaks","E07000111","Number of households","Value",49013
+"Folkestone and Hythe","E07000112","Number of households","Value",48338
+"Swale","E07000113","Number of households","Value",60495
+"Thanet","E07000114","Number of households","Value",62200
+"Tonbridge and Malling","E07000115","Number of households","Value",53573
+"Tunbridge Wells","E07000116","Number of households","Value",48223
+"Cherwell","E07000177","Number of households","Value",65894
+"Oxford","E07000178","Number of households","Value",55238
+"South Oxfordshire","E07000179","Number of households","Value",61497
+"Vale of White Horse","E07000180","Number of households","Value",57498
+"West Oxfordshire","E07000181","Number of households","Value",47981
+"Elmbridge","E07000207","Number of households","Value",55590
+"Epsom and Ewell","E07000208","Number of households","Value",31321
+"Guildford","E07000209","Number of households","Value",55760
+"Mole Valley","E07000210","Number of households","Value",37139
+"Reigate and Banstead","E07000211","Number of households","Value",59849
+"Runnymede","E07000212","Number of households","Value",34838
+"Spelthorne","E07000213","Number of households","Value",41805
+"Surrey Heath","E07000214","Number of households","Value",36008
+"Tandridge","E07000215","Number of households","Value",35623
+"Waverley","E07000216","Number of households","Value",52448
+"Woking","E07000217","Number of households","Value",41437
+"Adur","E07000223","Number of households","Value",27678
+"Arun","E07000224","Number of households","Value",72661
+"Chichester","E07000225","Number of households","Value",54118
+"Crawley","E07000226","Number of households","Value",45502
+"Horsham","E07000227","Number of households","Value",62370
+"Mid Sussex","E07000228","Number of households","Value",63349
+"Worthing","E07000229","Number of households","Value",49538
+"Bath and North East Somerset","E06000022","Number of households","Value",79250
+"Bristol, City of","E06000023","Number of households","Value",191638
+"North Somerset","E06000024","Number of households","Value",94648
+"South Gloucestershire","E06000025","Number of households","Value",118101
+"Plymouth","E06000026","Number of households","Value",114558
+"Torbay","E06000027","Number of households","Value",62992
+"Swindon","E06000030","Number of households","Value",95862
+"Cornwall","E06000052","Number of households","Value",250535
+"Isles of Scilly","E06000053","Number of households","Value",942
+"Wiltshire","E06000054","Number of households","Value",215081
+"Bournemouth, Christchurch and Poole","E06000058","Number of households","Value",173842
+"Dorset","E06000059","Number of households","Value",169261
+"East Devon","E07000040","Number of households","Value",66788
+"Exeter","E07000041","Number of households","Value",52554
+"Mid Devon","E07000042","Number of households","Value",35633
+"North Devon","E07000043","Number of households","Value",43197
+"South Hams","E07000044","Number of households","Value",39335
+"Teignbridge","E07000045","Number of households","Value",59838
+"Torridge","E07000046","Number of households","Value",30457
+"West Devon","E07000047","Number of households","Value",24818
+"Cheltenham","E07000078","Number of households","Value",52899
+"Cotswold","E07000079","Number of households","Value",40597
+"Forest of Dean","E07000080","Number of households","Value",37217
+"Gloucester","E07000081","Number of households","Value",55407
+"Stroud","E07000082","Number of households","Value",52378
+"Tewkesbury","E07000083","Number of households","Value",40931
+"Somerset","E06000066","Number of households","Value",250120
+"Isle of Anglesey","W06000001","Number of households","Value",30822
+"Gwynedd","W06000002","Number of households","Value",51105
+"Conwy","W06000003","Number of households","Value",52235
+"Denbighshire","W06000004","Number of households","Value",42387
+"Flintshire","W06000005","Number of households","Value",66911
+"Wrexham","W06000006","Number of households","Value",57914
+"Ceredigion","W06000008","Number of households","Value",30893
+"Pembrokeshire","W06000009","Number of households","Value",55488
+"Carmarthenshire","W06000010","Number of households","Value",81759
+"Swansea","W06000011","Number of households","Value",104962
+"Neath Port Talbot","W06000012","Number of households","Value",62375
+"Bridgend","W06000013","Number of households","Value",62360
+"Vale of Glamorgan","W06000014","Number of households","Value",57450
+"Cardiff","W06000015","Number of households","Value",147333
+"Rhondda Cynon Taf","W06000016","Number of households","Value",103339
+"Caerphilly","W06000018","Number of households","Value",76257
+"Blaenau Gwent","W06000019","Number of households","Value",30340
+"Torfaen","W06000020","Number of households","Value",40241
+"Monmouthshire","W06000021","Number of households","Value",40923
+"Newport","W06000022","Number of households","Value",66054
+"Powys","W06000023","Number of households","Value",60182
+"Merthyr Tydfil","W06000024","Number of households","Value",25783

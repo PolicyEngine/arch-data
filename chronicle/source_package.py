@@ -55,6 +55,7 @@ from chronicle.sources.rows import (
     source_rows_from_kff_state_indicator_gdocs_html,
     source_rows_from_ons_timeseries_json,
     source_rows_from_delimited_text,
+    source_rows_from_xlsx_table,
 )
 from chronicle.sources.specs import (
     SourceRecord,
@@ -83,6 +84,7 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
+    "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
     "hmrc-salary-sacrifice-relief-2024-25": Path("hmrc/salary_sacrifice_relief_2024_25"),
     "hmrc-salary-sacrifice-reform-2029-headcounts": Path(
         "hmrc/salary_sacrifice_reform_2029_headcounts"
@@ -90,6 +92,9 @@ SOURCE_PACKAGE_ALIASES = {
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
+    "mhclg-council-tax-levels-england-2026-27": Path(
+        "mhclg/council_tax_levels_england_2026_27"
+    ),
     "mhclg-ehs-weekly-housing-costs-2023-24": Path(
         "mhclg/ehs_weekly_housing_costs_2023_24"
     ),
@@ -119,6 +124,15 @@ SOURCE_PACKAGE_ALIASES = {
         "dwp/benefit_statistics_february_2026"
     ),
     "dwp-pip-daily-living-foi-2025": Path("dwp/pip_daily_living_foi_2025"),
+    "dwp-uc-households-by-constituency-may-2025": Path(
+        "dwp/uc_households_by_constituency_may_2025"
+    ),
+    "dwp-uc-households-by-constituency-children-may-2025": Path(
+        "dwp/uc_households_by_constituency_children_may_2025"
+    ),
+    "dwp-uc-households-by-local-authority-may-2025": Path(
+        "dwp/uc_households_by_local_authority_may_2025"
+    ),
     "dwp-uc-households-children-may-2025": Path("dwp/uc_households_children_may_2025"),
     "dwp-uc-households-family-type-may-2025": Path(
         "dwp/uc_households_family_type_may_2025"
@@ -237,15 +251,56 @@ SOURCE_PACKAGE_ALIASES = {
     "kff-marketplace-effectuated-enrollment": Path(
         "kff/marketplace_effectuated_enrollment"
     ),
+    "ons-census2021-ts041-households-lad": Path(
+        "ons/census2021_ts041_households_lad"
+    ),
+    "ons-census2021-ts041-households-pcon24": Path(
+        "ons/census2021_ts041_households_pcon24"
+    ),
     "ons-mye-2023-uk-countries": Path("ons/mye_2023_uk_countries"),
     "ons-mye-2023-england-regions": Path("ons/mye_2023_england_regions"),
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
+    "ons-lad-population-by-age-2024": Path("ons/lad_population_by_age_2024"),
+    "ons-pcon24-population-by-age-2024": Path("ons/pcon24_population_by_age_2024"),
+    "ons-small-area-income-msoa-fye2023": Path(
+        "ons/small_area_income_msoa_fye2023"
+    ),
+    "ons-census2021-ts054-tenure-lad": Path("ons/census2021_ts054_tenure_lad"),
+    "ons-subnational-dwellings-by-tenure-2024": Path(
+        "ons/subnational_dwellings_by_tenure_2024"
+    ),
+    "ons-pipr-rents-by-area-june-2026": Path("ons/pipr_rents_by_area_june_2026"),
+    "nrs-census2022-households-ukpc24": Path(
+        "nrs/census2022_households_ukpc24"
+    ),
+    "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
+    "nrs-census2022-uv404-tenure-council-area": Path(
+        "nrs/census2022_uv404_tenure_council_area"
+    ),
+    "nisra-census2021-households-lgd": Path("nisra/census2021_households_lgd"),
+    "nisra-census2021-households-pcon24": Path(
+        "nisra/census2021_households_pcon24"
+    ),
+    "nisra-pcon24-population-by-age-2024": Path(
+        "nisra/pcon24_population_by_age_2024"
+    ),
+    "nisra-census2021-tenure-lgd": Path("nisra/census2021_tenure_lgd"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
+    "scotgov-band-d-council-tax-rates-2026-27": Path(
+        "scotgov/band_d_council_tax_rates_2026_27"
+    ),
+    "scotgov-band-d-equivalents-2025": Path("scotgov/band_d_equivalents_2025"),
     "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
     "scotgov-scottish-budget-social-security-assistance-2026": Path(
         "scotgov/scottish_budget_social_security_assistance_2026"
     ),
+    "welshgov-council-tax-levels-2026-27": Path(
+        "welshgov/council_tax_levels_2026_27"
+    ),
     "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
+    "voa-council-tax-stock-by-lad-2025": Path(
+        "voa/council_tax_stock_by_lad_2025"
+    ),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
     "ons-national-balance-sheet-land-2025": Path(
@@ -290,7 +345,9 @@ class SourceArtifactSpec:
     archive_member: str | None = None
     artifact_year: int | None = None
     delimiter: str = ","
+    header_row: int = 1
     selected_rows: tuple[dict[str, Any], ...] = ()
+    sheets: tuple[str, ...] = ()
 
     def build_source_rows(self, year: int) -> list[SourceRow]:
         """Parse a delimited artifact for a year into full source-row records."""
@@ -309,6 +366,14 @@ class SourceArtifactSpec:
                 artifact,
                 sheet_name=self._sheet_name(filename, year=year),
                 delimiter=self.delimiter,
+                header_row=self.header_row,
+            )
+        if self.parser == "xlsx_table_full_rows":
+            return source_rows_from_xlsx_table(
+                content,
+                artifact,
+                sheet_name=self._sheet_name(filename, year=year),
+                header_row=self.header_row,
             )
         if self.parser == "json_table_full_rows":
             return source_rows_from_json_table(
@@ -384,7 +449,7 @@ class SourceArtifactSpec:
         if self.parser == "xls_used_range":
             return source_cells_from_xls(content, artifact)
         if self.parser == "xlsx_used_range":
-            return source_cells_from_xlsx(content, artifact)
+            return source_cells_from_xlsx(content, artifact, sheets=self.sheets)
         if self.parser == "zip_xlsx_used_range":
             member_content, member_name = self._archive_member_content(
                 content,
@@ -453,6 +518,28 @@ class SourceArtifactSpec:
                     artifact,
                     sheet_name=self._sheet_name(filename, year=year),
                     delimiter=self.delimiter,
+                    header_row=self.header_row,
+                )
+            )
+            return source_cells_from_source_rows(
+                rows,
+                selected_rows=tuple(
+                    {
+                        key: str(_render_value(value, year=year))
+                        for key, value in row.items()
+                    }
+                    for row in self.selected_rows
+                ),
+            )
+        if self.parser == "xlsx_table_full_rows":
+            rows = (
+                source_rows
+                if source_rows is not None
+                else source_rows_from_xlsx_table(
+                    content,
+                    artifact,
+                    sheet_name=self._sheet_name(filename, year=year),
+                    header_row=self.header_row,
                 )
             )
             return source_cells_from_source_rows(
@@ -1513,7 +1600,9 @@ def _artifact_from_mapping(payload: dict[str, Any]) -> SourceArtifactSpec:
             else None
         ),
         delimiter=payload.get("delimiter", ","),
+        header_row=int(payload.get("header_row", 1)),
         selected_rows=tuple(payload.get("selected_rows", ())),
+        sheets=tuple(payload.get("sheets", ())),
     )
 
 

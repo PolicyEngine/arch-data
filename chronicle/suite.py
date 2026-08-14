@@ -1357,7 +1357,13 @@ def _source_cell_age_range(cell: SourceCell) -> tuple[int, int | None] | None:
 
 
 def _source_row_age_range(row: SourceRow) -> tuple[int, int | None] | None:
-    for variable in ("C_AGE_NAME", "AGE_NAME", "age_name", "age"):
+    for variable in (
+        "C_AGE_NAME",
+        "AGE_NAME",
+        "age_name",
+        "Five year age bands",
+        "age",
+    ):
         matched, value = _source_row_value_without_interpretation(row, variable)
         if not matched or value is None:
             continue
@@ -1398,6 +1404,15 @@ def _source_row_age_range(row: SourceRow) -> tuple[int, int | None] | None:
         match = re.search(r"\bAged?\s+(\d+)\s+and\s+over\b", label, re.I)
         if match:
             return int(match.group(1)), None
+        # Nomis writes its open top band as "Aged 85+", the same statement as
+        # the "and over" wording above.
+        match = re.search(r"\bAged?\s+(\d+)\s*\+", label, re.I)
+        if match:
+            return int(match.group(1)), None
+        # ... and its open bottom band as "Aged under 1 year".
+        match = re.search(r"\bunder\s+(\d+)\s+years?\b", label, re.I)
+        if match:
+            return 0, int(match.group(1))
     return None
 
 

@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-small-area-income-msoa-fye2023
+dataset: ons_ons-small-area-income-msoa-fye2023
+source_page: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales
+table: 'Income estimates for small areas, England and Wales: financial year ending
+  2023'
+files:
+  2022:
+    filename: small_area_income_estimates_fye2023.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales/financialyearending2023/datasetfinal.xlsx
+    sha256: 9f17da5c218d2edd336106e1f219e0f7f25e82373afa8be5d0dc7622e18c7ab7
+    size_bytes: 1863497
+    fetched_at: '2026-08-13T08:57:07+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-small-area-income-msoa-fye2023/2022/9f17da5c218d2edd336106e1f219e0f7f25e82373afa8be5d0dc7622e18c7ab7/small_area_income_estimates_fye2023.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-small-area-income-msoa-fye2023/2022/9f17da5c218d2edd336106e1f219e0f7f25e82373afa8be5d0dc7622e18c7ab7/small_area_income_estimates_fye2023.xlsx

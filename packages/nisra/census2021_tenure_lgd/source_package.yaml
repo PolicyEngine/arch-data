@@ -1,0 +1,2354 @@
+# NISRA Census 2021 households by tenure for the 11 local government
+# districts, from the pinned Flexible Table Builder extract (dataset
+# HOUSEHOLD, variables LGD14 x HH_TENURE), long format, one row per district
+# and tenure category. Census day is 2021-03-21, hence calendar_year 2021.
+#
+# The full HH_TENURE classification is ported (eleven categories), not the
+# builder's four-category roll-up: the profile needs owned-outright and
+# owned-with-mortgage separately, which only the full classification carries.
+# The extract publishes no all-households row; district totals are the sum of
+# the eleven categories, and the households family itself is batch-5 scope.
+#
+# Northern Ireland's classification splits social renting by landlord (Housing
+# Executive / housing association) and private renting five ways; the bucket
+# spec ids group them into the same social_rent and private_rent buckets the
+# other census legs use.
+schema_version: ledger.source_package.v1
+package_id: nisra-census2021-tenure-lgd
+label: 'NISRA Census 2021: households by tenure, local government districts'
+artifact:
+  source_name: nisra
+  source_table: 'NISRA Census 2021 flexible table: households by tenure and local
+    government district'
+  resource_package: db
+  resource_directory: data/nisra/census2021_tenure_lgd
+  manifest: manifest.yaml
+  vintage: census_2021
+  extracted_at: '2026-08-13'
+  extraction_method: Flexible Table Builder delimited text full-row parse, one source
+    row per district and tenure category
+  parser: delimited_text_full_rows
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  artifact_year: 2021
+record_sets:
+- record_set_id: nisra.census2021.tenure.lgd.owner_occupied_owns_outright
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.owned_outright.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.owner_occupied_owns_outright
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Owner occupied: Owns outright'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Owner occupied: Owns outright'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 2
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 13
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 13
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 24
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 24
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 35
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 35
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 46
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 46
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 57
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 57
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 68
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 68
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 79
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 79
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 90
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 90
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 101
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 101
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 112
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 112
+      expected_value: 'Owner occupied: Owns outright'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.owner_occupied_owns_with_a_mortgage_or_loan
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.owned_mortgage.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.owner_occupied_owns_with_a_mortgage_or_loan
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Owner occupied: Owns with a mortgage or loan'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Owner occupied: Owns with a mortgage or loan'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 3
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 14
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 14
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 25
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 25
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 36
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 36
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 47
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 47
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 58
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 58
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 69
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 69
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 80
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 80
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 91
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 91
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 102
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 102
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 113
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 113
+      expected_value: 'Owner occupied: Owns with a mortgage or loan'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.shared_ownership_part_owns_and_part_rents
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.shared_ownership.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.shared_ownership_part_owns_and_part_rents
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Shared ownership: Part-owns and part-rents'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Shared ownership: Part-owns and part-rents'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 4
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 15
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 15
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 26
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 26
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 37
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 37
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 48
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 48
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 59
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 59
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 70
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 70
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 81
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 81
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 92
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 92
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 103
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 103
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 114
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 114
+      expected_value: 'Shared ownership: Part-owns and part-rents'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.social_rented_northern_ireland_housing_execu
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.social_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.social_rented_northern_ireland_housing_execu
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Social rented: Northern Ireland Housing Executive'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Social rented: Northern Ireland Housing Executive'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 5
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 16
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 16
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 27
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 27
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 38
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 38
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 49
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 49
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 60
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 60
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 71
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 71
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 82
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 82
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 93
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 93
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 104
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 104
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 115
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 115
+      expected_value: 'Social rented: Northern Ireland Housing Executive'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.social_rented_housing_association_or_charita
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.social_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.social_rented_housing_association_or_charita
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Social rented: Housing association or charitable trust'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Social rented: Housing association or charitable trust'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 6
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 17
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 17
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 28
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 28
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 39
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 39
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 50
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 50
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 61
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 61
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 72
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 72
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 83
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 83
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 94
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 94
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 105
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 105
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 116
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 116
+      expected_value: 'Social rented: Housing association or charitable trust'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.private_rented_private_landlord
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.private_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.private_rented_private_landlord
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Private rented: Private landlord'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Private rented: Private landlord'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 7
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 18
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 18
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 29
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 29
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 40
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 40
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 51
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 51
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 62
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 62
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 73
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 73
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 84
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 84
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 95
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 106
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 106
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 117
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 117
+      expected_value: 'Private rented: Private landlord'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.private_rented_letting_agency
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.private_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.private_rented_letting_agency
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Private rented: Letting agency'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Private rented: Letting agency'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 8
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 19
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 19
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 30
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 30
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 41
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 41
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 52
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 52
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 63
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 63
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 74
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 74
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 85
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 85
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 96
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 96
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 107
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 107
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 118
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 118
+      expected_value: 'Private rented: Letting agency'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.private_rented_employer_of_a_household_membe
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.private_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.private_rented_employer_of_a_household_membe
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Private rented: Employer of a household member'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Private rented: Employer of a household member'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 9
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 20
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 20
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 31
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 31
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 42
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 42
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 53
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 53
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 64
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 64
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 75
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 75
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 86
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 86
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 97
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 97
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 108
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 108
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 119
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 119
+      expected_value: 'Private rented: Employer of a household member'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.private_rented_relative_or_friend_of_a_house
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.private_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.private_rented_relative_or_friend_of_a_house
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Private rented: Relative or friend of a household member'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Private rented: Relative or friend of a household member'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 10
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 21
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 32
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 32
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 43
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 43
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 54
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 54
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 65
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 65
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 76
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 76
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 87
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 87
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 98
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 98
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 109
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 109
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 120
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 120
+      expected_value: 'Private rented: Relative or friend of a household member'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.private_rented_other
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.private_rent.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.private_rented_other
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Private rented: Other'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Private rented: Other'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 11
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 22
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 33
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 33
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 44
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 44
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 55
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 55
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 66
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 66
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 77
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 77
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 88
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 88
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 99
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 99
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 110
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 110
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 121
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 121
+      expected_value: 'Private rented: Other'
+      label: publisher tenure category
+- record_set_id: nisra.census2021.tenure.lgd.lives_rent_free
+  provenance_class: census
+  record_set_spec_id: uk.local_geography.tenure.rent_free.v1
+  source_record_id_prefix: nisra.census2021.tenure.lgd.lives_rent_free
+  sheet_name: census2021_tenure_households_by_lgd.csv
+  period_type: calendar_year
+  period: 2021
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: occupied_household
+  domain: housing_tenure
+  groupby_dimension: tenure
+  shared_filters:
+    tenure_label: 'Lives rent free'
+  shared_constraints:
+  - variable: tenure_label
+    operator: ==
+    value: 'Lives rent free'
+    label: publisher tenure category
+  measures:
+  - measure_id: households
+    label: Occupied households
+    ordinal: 0
+    column: E
+    source_column_id: Count
+    concept: nisra.census2021_households
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 1
+    expected_column_header: Count
+  rows:
+  - value_id: n09000001
+    label: 'Antrim and Newtownabbey'
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: N09000001
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: 'Antrim and Newtownabbey'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 12
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000002
+    label: 'Armagh City, Banbridge and Craigavon'
+    ordinal: 1
+    row_number: 23
+    expected_row_header_column: A
+    expected_row_header: N09000002
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: 'Armagh City, Banbridge and Craigavon'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 23
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000003
+    label: 'Belfast'
+    ordinal: 2
+    row_number: 34
+    expected_row_header_column: A
+    expected_row_header: N09000003
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: 'Belfast'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 34
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000004
+    label: 'Causeway Coast and Glens'
+    ordinal: 3
+    row_number: 45
+    expected_row_header_column: A
+    expected_row_header: N09000004
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: 'Causeway Coast and Glens'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 45
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000005
+    label: 'Derry City and Strabane'
+    ordinal: 4
+    row_number: 56
+    expected_row_header_column: A
+    expected_row_header: N09000005
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: 'Derry City and Strabane'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 56
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000006
+    label: 'Fermanagh and Omagh'
+    ordinal: 5
+    row_number: 67
+    expected_row_header_column: A
+    expected_row_header: N09000006
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: 'Fermanagh and Omagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 67
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000007
+    label: 'Lisburn and Castlereagh'
+    ordinal: 6
+    row_number: 78
+    expected_row_header_column: A
+    expected_row_header: N09000007
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: 'Lisburn and Castlereagh'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 78
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000008
+    label: 'Mid and East Antrim'
+    ordinal: 7
+    row_number: 89
+    expected_row_header_column: A
+    expected_row_header: N09000008
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: 'Mid and East Antrim'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 89
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000009
+    label: 'Mid Ulster'
+    ordinal: 8
+    row_number: 100
+    expected_row_header_column: A
+    expected_row_header: N09000009
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: 'Mid Ulster'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 100
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000010
+    label: 'Newry, Mourne and Down'
+    ordinal: 9
+    row_number: 111
+    expected_row_header_column: A
+    expected_row_header: N09000010
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: 'Newry, Mourne and Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 111
+      expected_value: 'Lives rent free'
+      label: publisher tenure category
+  - value_id: n09000011
+    label: 'Ards and North Down'
+    ordinal: 10
+    row_number: 122
+    expected_row_header_column: A
+    expected_row_header: N09000011
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: 'Ards and North Down'
+    geography_vintage: lgd_2014
+    table_record_kind: detail
+    guard_cells:
+    - column: D
+      row: 122
+      expected_value: 'Lives rent free'
+      label: publisher tenure category

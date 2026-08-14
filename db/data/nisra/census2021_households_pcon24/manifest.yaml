@@ -1,0 +1,18 @@
+source_id: nisra
+package_id: nisra-census2021-households-pcon24
+dataset: nisra_nisra-census2021-households-pcon24
+source_page: https://build.nisra.gov.uk/en/custom/data?d=HOUSEHOLD&v=PARLCON24
+table: 'NISRA Census 2021 flexible table: number of households by PARLCON24'
+files:
+  2021:
+    filename: census2021_households_by_pcon24.csv
+    source_url: https://build.nisra.gov.uk/en/custom/table.csv?d=HOUSEHOLD&v=PARLCON24
+    sha256: 5c5e296b18567cc47a34a296ab3c87f117a4ea1b8bac639f933db14832430c75
+    size_bytes: 640
+    fetched_at: '2026-08-13T14:00:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/nisra/nisra-census2021-households-pcon24/2021/5c5e296b18567cc47a34a296ab3c87f117a4ea1b8bac639f933db14832430c75/census2021_households_by_pcon24.csv
+        uri: r2://ledger-raw/raw/nisra/nisra-census2021-households-pcon24/2021/5c5e296b18567cc47a34a296ab3c87f117a4ea1b8bac639f933db14832430c75/census2021_households_by_pcon24.csv
