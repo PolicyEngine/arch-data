@@ -342,6 +342,30 @@ def test_source_rows_from_xlsx_table_rejects_a_missing_sheet():
         )
 
 
+def test_source_rows_from_xlsx_table_rejects_a_header_row_below_one():
+    from chronicle.sources.rows import source_rows_from_xlsx_table
+
+    with pytest.raises(ValueError, match="1-based"):
+        source_rows_from_xlsx_table(
+            _two_table_workbook(),
+            _artifact(),
+            sheet_name="Table 1",
+            header_row=0,
+        )
+
+
+def test_source_rows_from_xlsx_table_rejects_a_header_row_past_the_sheet_end():
+    from chronicle.sources.rows import source_rows_from_xlsx_table
+
+    with pytest.raises(ValueError, match="ends at row 5 before the declared header row 40"):
+        source_rows_from_xlsx_table(
+            _two_table_workbook(),
+            _artifact(),
+            sheet_name="Table 1",
+            header_row=40,
+        )
+
+
 def test_source_rows_from_delimited_text_skips_a_preamble_above_the_header():
     from chronicle.sources.rows import source_rows_from_delimited_text
 
@@ -363,3 +387,40 @@ def test_source_rows_from_delimited_text_skips_a_preamble_above_the_header():
     assert rows[0].values["Counting"] == "Households"
     assert rows[0].values["Council Area 2019"] == "Clackmannanshire"
     assert rows[0].values["Count"] == 24072
+
+
+def test_source_rows_from_delimited_text_rejects_a_header_row_below_one():
+    from chronicle.sources.rows import source_rows_from_delimited_text
+
+    with pytest.raises(ValueError, match="1-based"):
+        source_rows_from_delimited_text(
+            b'"a","b"\n"1","2"\n',
+            _artifact(),
+            sheet_name="table.csv",
+            header_row=0,
+        )
+
+
+def test_source_rows_from_delimited_text_rejects_a_header_row_past_the_last_line():
+    from chronicle.sources.rows import source_rows_from_delimited_text
+
+    with pytest.raises(ValueError, match="ends at line 2 before the declared header row 11"):
+        source_rows_from_delimited_text(
+            b'"a","b"\n"1","2"\n',
+            _artifact(),
+            sheet_name="table.csv",
+            header_row=11,
+        )
+
+
+def test_source_rows_from_delimited_text_keeps_empty_content_empty():
+    from chronicle.sources.rows import source_rows_from_delimited_text
+
+    assert (
+        source_rows_from_delimited_text(
+            b"",
+            _artifact(),
+            sheet_name="table.csv",
+        )
+        == []
+    )
