@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Thin shim over receipt==0.2.0 (hash-pinned in uv.lock). Any receipt upgrade
+# Thin shim over receipt==0.5.1 (hash-pinned in uv.lock). Any receipt upgrade
 # requires a fresh byte-equivalence proof at this repo's then-current pin BEFORE
 # the bump.
 """Gate every change to the thesis-facts observation ledger."""

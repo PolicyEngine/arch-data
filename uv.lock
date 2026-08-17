@@ -1687,7 +1687,7 @@ requires-dist = [
     { name = "pypdf", specifier = ">=6.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0,<9" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "receipt", specifier = "==0.2.0" },
+    { name = "receipt", specifier = "==0.5.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.5.0" },
     { name = "scipy", specifier = ">=1.11.0" },
     { name = "sqlmodel", specifier = ">=0.0.22" },
@@ -2327,14 +2327,14 @@ wheels = [
 
 [[package]]
 name = "receipt"
-version = "0.2.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9e/d5/ee2efdb0903a37ecd389d344e4822e0ff03b0fda79bc3a801a83dd84d777/receipt-0.2.0.tar.gz", hash = "sha256:41ef973355cf0cc18fdb1f5f78e116a3b95b5b7b27f67f48cb4fcbdd1561448d", size = 65898, upload-time = "2026-07-21T12:45:54.407Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/86/d57c13d77a8357d2cebb59365587867324186bd5751a902a338eb74baed6/receipt-0.5.1.tar.gz", hash = "sha256:17f8eaec43aab450193a9d793c92f75364c6055fbd634ee5ab4ea69bbe4ba958", size = 1173686, upload-time = "2026-08-17T19:08:01.001Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/53/71/9efb03a89f382e5bdf33588bfe38ce04ce992d9c08c46c9c02ac4fc3b9d9/receipt-0.2.0-py3-none-any.whl", hash = "sha256:365b680ebec7e27de108cf990c807f8f45a8e9ccb40801a570c451afdd4aaf7a", size = 32646, upload-time = "2026-07-21T12:45:53.346Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/06/e455ce392677130b7d55272a7ff486fa4825f43cea2c242eb1fbfc7752af/receipt-0.5.1-py3-none-any.whl", hash = "sha256:baacd750659773c84fe6a0da3ece9f50804ce3e8ccd23e21bced7440b7dee350", size = 78025, upload-time = "2026-08-17T19:07:59.633Z" },
 ]
 
 [[package]]
