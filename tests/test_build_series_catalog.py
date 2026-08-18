@@ -780,7 +780,8 @@ def test_committed_catalog_is_current_and_valid() -> None:
         "june_2026", "may_2026", "q1_2026", "week_2026-06-13",
         "week_2026-06-20", "week_2026-06-27", "week_2026-07-04",
         "week_2026-07-11", "week_2026-07-18", "week_2026-07-25",
-        "week_2026-08-01", "week_2026_06_13", "week_ending_2026_06_06",
+        "week_2026-08-01", "week_2026-08-08", "week_2026_06_13",
+        "week_ending_2026_06_06",
     ]
     assert committed["stripped_segments"]["after_mpc_june_2026"] == [
         "boe.bank_rate"
