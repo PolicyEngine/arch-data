@@ -27,16 +27,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 11,
         "error_count": 0,
-        "fact_count": 155431,
+        "fact_count": 155504,
         "geography_count": 12536,
         "period_count": 151,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
         "source_count": 41,
-        "source_package_count": 128,
+        "source_package_count": 130,
         "warning_count": 1,
     }
-    assert len(rows) == 155431
+    assert len(rows) == 155504
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -54,7 +54,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 128
+    assert source_packages["source_package_count"] == 130
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -68,7 +68,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 155431
+    assert coverage["fact_count"] == 155504
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -96,9 +96,9 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "nbb_national_accounts": 1,
         "nisra": 510,
         "nrs": 5589,
-        "obr": 196,
+        "obr": 253,
         "onem_rva_unemployment": 1,
-        "ons": 65630,
+        "ons": 65646,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
         "scotgov": 2504,
@@ -113,7 +113,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 198,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 123
+    assert len(table_counts) == 125
     assert table_counts["usda_snap:SNAP FY2025 Monthly State Participation"] == 636
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert table_counts["irs_soi:IRS SOI County Data 2022"] == 6286
@@ -315,18 +315,18 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2015": 74,
         "calendar_year:2016": 72,
         "calendar_year:2017": 72,
-        "calendar_year:2018": 84,
-        "calendar_year:2019": 83,
-        "calendar_year:2020": 83,
-        "calendar_year:2021": 3990,
-        "calendar_year:2022": 1911,
-        "calendar_year:2023": 6200,
-        "calendar_year:2024": 33791,
-        "calendar_year:2025": 4438,
-        "calendar_year:2026": 235,
-        "calendar_year:2027": 214,
-        "calendar_year:2028": 214,
-        "calendar_year:2029": 214,
+        "calendar_year:2018": 86,
+        "calendar_year:2019": 85,
+        "calendar_year:2020": 85,
+        "calendar_year:2021": 3992,
+        "calendar_year:2022": 1913,
+        "calendar_year:2023": 6202,
+        "calendar_year:2024": 33799,
+        "calendar_year:2025": 4446,
+        "calendar_year:2026": 241,
+        "calendar_year:2027": 220,
+        "calendar_year:2028": 220,
+        "calendar_year:2029": 220,
         "calendar_year:2031": 2,
         "fiscal_year:1996": 33,
         "fiscal_year:1997": 33,
@@ -356,12 +356,12 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fiscal_year:2021": 33,
         "fiscal_year:2022": 33,
         "fiscal_year:2023": 385,
-        "fiscal_year:2024": 610,
-        "fiscal_year:2025": 1284,
-        "fiscal_year:2026": 1439,
-        "fiscal_year:2027": 28,
-        "fiscal_year:2028": 28,
-        "fiscal_year:2029": 28,
+        "fiscal_year:2024": 611,
+        "fiscal_year:2025": 1288,
+        "fiscal_year:2026": 1443,
+        "fiscal_year:2027": 32,
+        "fiscal_year:2028": 32,
+        "fiscal_year:2029": 32,
         "fiscal_year:2030": 28,
         "month:2023-01": 1,
         "month:2023-12": 6,
@@ -443,8 +443,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dwelling": 12708,
         "family": 107,
         "firm": 1439,
-        "government": 237,
-        "household": 40432,
+        "government": 294,
+        "household": 40448,
         "institutional_sector": 103,
         "pension_plan": 2,
         "person": 60272,

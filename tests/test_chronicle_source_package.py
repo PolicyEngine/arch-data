@@ -3463,6 +3463,124 @@ def test_kff_marketplace_effectuated_enrollment_builds_2024_state_facts():
     assert values_by_record[ca].value == 1_795_695
 
 
+def test_obr_efo_economy_package_validates_macro_series_counts():
+    report = validate_source_package("obr-efo-economy-march-2026", year=2026)
+
+    assert report.valid
+    assert report.counts == {
+        "record_set_count": 36,
+        "row_count": 36,
+        "measure_count": 36,
+        "source_record_count": 36,
+        "source_region_count": 36,
+    }
+
+
+def test_obr_efo_economy_package_builds_cell_faithful_macro_facts():
+    package = load_source_package("obr-efo-economy-march-2026")
+    cells = package.build_source_cells(2026)
+    facts = package.build_facts(2026, cells=cells)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert validate_source_cells(cells).valid
+    assert validate_facts(facts).valid
+    assert len(facts) == 36
+
+    nominal_gdp_2024 = values_by_record[
+        "obr.efo_2026_03.economy.nominal_gdp_nsa.cy2024."
+        "nominal_gdp_nsa.nominal_gdp_nsa"
+    ]
+    cpi_2025 = values_by_record[
+        "obr.efo_2026_03.economy.cpi_inflation.cy2025."
+        "cpi_inflation.cpi_inflation"
+    ]
+    bank_rate_2029 = values_by_record[
+        "obr.efo_2026_03.economy.bank_rate.cy2029.bank_rate.bank_rate"
+    ]
+
+    assert nominal_gdp_2024.value == 2_890_664_000_000
+    assert nominal_gdp_2024.period.type == "calendar_year"
+    assert nominal_gdp_2024.assertion == "observation"
+    assert nominal_gdp_2024.measure.concept == "obr.nominal_gdp_nsa"
+    assert cpi_2025.value == pytest.approx(3.3730368724933735)
+    assert cpi_2025.assertion == "source_projection"
+    assert bank_rate_2029.value == pytest.approx(3.741552661678499)
+
+
+def test_obr_efo_aggregates_package_validates_fiscal_series_counts():
+    report = validate_source_package("obr-efo-aggregates-march-2026", year=2026)
+
+    assert report.valid
+    assert report.counts == {
+        "record_set_count": 21,
+        "row_count": 21,
+        "measure_count": 21,
+        "source_record_count": 21,
+        "source_region_count": 21,
+    }
+
+
+def test_obr_efo_aggregates_package_builds_cell_faithful_fiscal_facts():
+    package = load_source_package("obr-efo-aggregates-march-2026")
+    cells = package.build_source_cells(2026)
+    facts = package.build_facts(2026, cells=cells)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert validate_source_cells(cells).valid
+    assert validate_facts(facts).valid
+    assert len(facts) == 21
+
+    psnb_2025 = values_by_record[
+        "obr.efo_2026_03.aggregates.public_sector_net_borrowing.fy2025."
+        "public_sector_net_borrowing.public_sector_net_borrowing"
+    ]
+    psnd_2024 = values_by_record[
+        "obr.efo_2026_03.aggregates.public_sector_net_debt_percent_gdp.fy2024."
+        "public_sector_net_debt_percent_gdp.public_sector_net_debt_percent_gdp"
+    ]
+
+    assert psnb_2025.value == pytest.approx(132_735_075_755.52568)
+    assert psnb_2025.period.type == "fiscal_year"
+    assert psnb_2025.assertion == "source_projection"
+    assert psnb_2025.measure.concept == "obr.public_sector_net_borrowing"
+    assert psnd_2024.value == pytest.approx(93.16136288446387)
+    assert psnd_2024.measure.unit == "percent_of_gdp"
+    assert psnd_2024.assertion == "observation"
+
+
+def test_ons_families_households_package_adds_household_totals_and_size():
+    report = validate_source_package("ons-families-households-2025", year=2025)
+
+    assert report.valid
+    assert report.counts == {
+        "record_set_count": 24,
+        "row_count": 96,
+        "measure_count": 24,
+        "source_record_count": 96,
+        "source_region_count": 24,
+    }
+
+    package = load_source_package("ons-families-households-2025")
+    cells = package.build_source_cells(2025)
+    facts = package.build_facts(2025, cells=cells)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    households_2025 = values_by_record[
+        "ons.families_households_2025.table5.all_households.cy2025."
+        "all_households.households_total"
+    ]
+    average_size_2025 = values_by_record[
+        "ons.families_households_2025.table5.average_household_size.cy2025."
+        "average_household_size.average_household_size"
+    ]
+
+    assert households_2025.value == 29_003_000
+    assert households_2025.measure.concept == "ons.households_total"
+    assert average_size_2025.value == pytest.approx(2.36)
+    assert average_size_2025.measure.concept == "ons.average_household_size"
+    assert average_size_2025.measure.unit == "people_per_household"
+
+
 def test_render_string_templates_integer_year_with_filing_year():
     """Integer years must still template both ``{year}`` and ``{filing_year}``."""
     template = "Tax Year {year} (Filing Year {filing_year})"
