@@ -37,6 +37,8 @@ repository-wide fixture updates are in progress. Work remains offline on branch
   +1 source package).
 - Rebuilt the canonical merged bundle after the snapshot update; its complete
   aggregate-contract test passed (1 test in 12m31s).
+- Added the required functional-change fragment at
+  `changelog.d/179.added.md`, following the parent repository convention.
 
 ## Next
 
