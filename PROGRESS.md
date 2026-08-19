@@ -2,9 +2,9 @@
 
 ## State
 
-Both source ingestions are implemented and their focused checks pass. The
-repository-wide fixture updates are in progress. Work remains offline on branch
-`passive-pass-through-anchors` in `.claude/worktrees/passive-179`.
+Complete. Both source ingestions, repository-wide snapshots, changelog, and
+final validation are finished on branch `passive-pass-through-anchors` in
+`.claude/worktrees/passive-179`.
 
 ## Done
 
@@ -39,8 +39,13 @@ repository-wide fixture updates are in progress. Work remains offline on branch
   aggregate-contract test passed (1 test in 12m31s).
 - Added the required functional-change fragment at
   `changelog.d/179.added.md`, following the parent repository convention.
+- Passed the final repository-wide checks: Ruff; 67 targeted governance,
+  boundary, facts-only, consumer-contract, alias, and Form tests; both package
+  validators and source-suite builds; and the full suite with 650 passed, one
+  skipped, and no failures.
+- Wrote the requested handoff, record-set/fact inventory, exact Microcosm
+  concept IDs, and check results to `FINAL_REPORT.md`.
 
 ## Next
 
-- Run the repository's deterministic, governance, boundary, formatting, and
-  unit checks; record results and consumer concept IDs in the final output.
+- No implementation work remains. The branch is ready for supervisor review.
