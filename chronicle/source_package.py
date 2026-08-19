@@ -219,6 +219,7 @@ SOURCE_PACKAGE_ALIASES = {
     "soi-filing-season-week47-2024-eitc-total": Path(
         "irs_soi/filing_season_week47_2024"
     ),
+    "soi-form-8960-2023": Path("irs_soi/form_8960_2023"),
     "soi-table-4-3": Path("irs_soi/table_4_3"),
     "soi-state-2022": Path("irs_soi/state_2022"),
     "soi-congressional-district-2022": Path("irs_soi/congressional_district_2022"),
