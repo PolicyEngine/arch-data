@@ -2,8 +2,8 @@
 
 ## State
 
-Form 8960 ingestion is implemented and locally validated. Table 1.4 Schedule E
-entity measures are next. Work remains offline on branch
+Both source ingestions are implemented and their focused checks pass. The
+repository-wide fixture updates are in progress. Work remains offline on branch
 `passive-pass-through-anchors` in `.claude/worktrees/passive-179`.
 
 ## Done
@@ -22,11 +22,18 @@ entity measures are next. Work remains offline on branch
   the published one-$1,000 line 4 rounding residual.
 - Passed the focused tests (10 tests), source-package validation, and the full
   Form 8960 source-suite build (20 consumer facts; all reports valid).
+- Extended the existing `irs_soi.ty2023.table_1_4` record set with partnership
+  and S-corporation net-income/net-loss return counts and amounts across all 20
+  AGI classes (160 new facts); the existing estate/trust measures remain intact.
+- Added strict per-measure year scoping so TY2020 retains its combined
+  partnership/S-corporation layout while TY2021 through TY2023 ingest the
+  separately published lines.
+- Passed Table 1.4 source-package compilation for TY2020 and TY2023, focused
+  package/suite tests, Ruff checks, and full fact builds for TY2020 through
+  TY2023 (580 facts in 2020; 740 facts in each later year).
 
 ## Next
 
-- Extend Table 1.4 with Schedule E entity income/loss returns and amounts by AGI
-  class.
 - Update bundle and package fixture counts for the 180 net-new facts.
 - Run the repository's deterministic, governance, boundary, formatting, and
   unit checks; record results and consumer concept IDs in the final output.
