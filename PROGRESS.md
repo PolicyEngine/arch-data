@@ -31,9 +31,14 @@ repository-wide fixture updates are in progress. Work remains offline on branch
 - Passed Table 1.4 source-package compilation for TY2020 and TY2023, focused
   package/suite tests, Ruff checks, and full fact builds for TY2020 through
   TY2023 (580 facts in 2020; 740 facts in each later year).
+- Ran the full 651-test suite once: 649 passed, one skipped, and the sole
+  failure was the expected stale merged-bundle count snapshot. Updated that
+  snapshot from the generated bundle's exact coverage report (+180 facts and
+  +1 source package).
+- Rebuilt the canonical merged bundle after the snapshot update; its complete
+  aggregate-contract test passed (1 test in 12m31s).
 
 ## Next
 
-- Update bundle and package fixture counts for the 180 net-new facts.
 - Run the repository's deterministic, governance, boundary, formatting, and
   unit checks; record results and consumer concept IDs in the final output.

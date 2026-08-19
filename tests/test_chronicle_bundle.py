@@ -27,16 +27,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 9,
         "error_count": 0,
-        "fact_count": 145222,
+        "fact_count": 145402,
         "geography_count": 9390,
         "period_count": 144,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
         "source_count": 40,
-        "source_package_count": 120,
+        "source_package_count": 121,
         "warning_count": 1,
     }
-    assert len(rows) == 145222
+    assert len(rows) == 145402
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -54,7 +54,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 120
+    assert source_packages["source_package_count"] == 121
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -68,7 +68,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 145222
+    assert coverage["fact_count"] == 145402
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -87,7 +87,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "hhs_acf_tanf": 110,
         "hmrc": 20533,
         "ici": 12,
-        "irs_soi": 33777,
+        "irs_soi": 33957,
         "isc": 2,
         "jrc_euromod_be": 18,
         "kff": 52,
@@ -112,7 +112,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 198,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 115
+    assert len(table_counts) == 116
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert (
         table_counts[
@@ -123,6 +123,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert table_counts["ssa:SSI Monthly Statistics, December 2024, Table 1"] == 4
     assert table_counts["irs_soi:Publication 1304 Table 1.1"] == 80
+    assert table_counts["irs_soi:Publication 1304 Table 1.4"] == 740
+    assert (
+        table_counts["irs_soi:Publication 4801 Form 8960, pages 214–215"] == 20
+    )
     assert (
         table_counts[
             "irs_soi:Publication 1304 Table 2.5 EITC by AGI and qualifying children"
@@ -374,7 +378,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2020": 9,
         "tax_year:2021": 9,
         "tax_year:2022": 34951,
-        "tax_year:2023": 48436,
+        "tax_year:2023": 48616,
         "tax_year:2024": 40,
     }
     assert coverage["counts"]["by_geography"]["country:BE"] == 31
@@ -382,7 +386,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert coverage["counts"]["by_geography"]["nuts1:BE2"] == 17
     assert coverage["counts"]["by_geography"]["nuts1:BE3"] == 6
     assert coverage["counts"]["by_geography"]["commune:11002"] == 1
-    assert coverage["counts"]["by_geography"]["country:0100000US"] == 2109
+    assert coverage["counts"]["by_geography"]["country:0100000US"] == 2289
     assert coverage["counts"]["by_geography"]["state:0400000US06"] == 217
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
@@ -399,7 +403,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "institutional_sector": 103,
         "pension_plan": 2,
         "person": 56753,
-        "tax_unit": 33783,
+        "tax_unit": 33963,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
     assert len(coverage["duplicates"]["semantic_fact_keys"]) == 12
