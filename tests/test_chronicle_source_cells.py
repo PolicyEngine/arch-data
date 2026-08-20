@@ -183,6 +183,29 @@ def test_delimited_text_parsers_preserve_underscore_identifiers():
     ] == ["0_4", "10_19"]
 
 
+def test_delimited_text_parsers_accept_cp1252_publisher_text():
+    artifact = SourceArtifactMetadata(
+        source_name="census_pep",
+        source_table="test",
+        source_file="test.csv",
+        url="https://example.test/test.csv",
+        vintage="test",
+        sha256="abc123",
+        size_bytes=10,
+        extracted_at="2026-07-22",
+        extraction_method="test",
+    )
+    content = "county,value\nDoña Ana County,123\n".encode("cp1252")
+
+    rows = source_rows_from_delimited_text(content, artifact, sheet_name="test")
+    cells = source_cells_from_delimited_text(content, artifact, sheet_name="test")
+
+    assert rows[0].values["county"] == "Doña Ana County"
+    assert next(cell for cell in cells if cell.address == "A2").raw_value == (
+        "Doña Ana County"
+    )
+
+
 def test_html_tables_and_text_parser_preserves_tables_and_document_numbers():
     artifact = SourceArtifactMetadata(
         source_name="dwp",

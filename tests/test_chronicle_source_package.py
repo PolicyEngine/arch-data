@@ -2575,6 +2575,230 @@ def test_usda_snap_source_package_alias_validates_fixture_counts():
     }
 
 
+def test_county_admin_source_package_aliases_validate_production_counts():
+    # Reviewed counts from the real publisher bytes: 3,143 IRS SOI county
+    # rows (two measures each) and 3,144 PEP county equivalents.
+    expected_counts = {
+        "soi-county-2022": {
+            "record_set_count": 1,
+            "row_count": 3143,
+            "measure_count": 2,
+            "source_record_count": 6286,
+            "source_region_count": 1,
+        },
+        "census-pep-county-population-2024": {
+            "record_set_count": 1,
+            "row_count": 3144,
+            "measure_count": 1,
+            "source_record_count": 3144,
+            "source_region_count": 1,
+        },
+    }
+
+    for package_id, counts in expected_counts.items():
+        year = 2022 if package_id == "soi-county-2022" else 2024
+        report = validate_source_package(package_id, year=year)
+
+        assert report.valid, package_id
+        assert report.counts == counts
+
+
+def test_soi_county_production_package_builds_exportable_county_facts():
+    # Real publisher bytes (verified against FETCH-MANIFEST sha256); Autauga
+    # and Los Angeles values cross-checked directly against the raw CSV
+    # (N1 and A00100, thousands of dollars scaled by 1,000).
+    package = load_source_package("soi-county-2022")
+    rows = package.build_source_rows(2022)
+    cells = package.build_source_cells(2022, source_rows=rows)
+    facts = package.build_facts(2022, cells=cells, source_rows=rows)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert len(rows) == 3194
+    assert validate_source_rows(rows).valid
+    assert len(facts) == 6286
+    assert validate_facts(facts).valid
+    assert all(fact.source_row_keys for fact in facts)
+    assert {fact.provenance_class for fact in facts} == {"administrative"}
+    assert {fact.geography.level for fact in facts} == {"county"}
+    assert {fact.source.source_name for fact in facts} == {"irs_soi"}
+    assert not any("TEST FIXTURE" in fact.source.source_table for fact in facts)
+
+    autauga_returns = values_by_record[
+        "irs_soi.ty2022.county_totals.county_01001.return_count"
+    ]
+    autauga_agi = values_by_record[
+        "irs_soi.ty2022.county_totals.county_01001.adjusted_gross_income"
+    ]
+    la_agi = values_by_record[
+        "irs_soi.ty2022.county_totals.county_06037.adjusted_gross_income"
+    ]
+
+    assert autauga_returns.value == 25_750
+    assert autauga_returns.geography.id == "0500000US01001"
+    assert autauga_agi.value == 1_795_342_000
+    assert autauga_agi.measure.unit == "usd"
+    assert la_agi.value == 457_528_383_000
+
+    # Connecticut reports the nine planning-region county equivalents that
+    # replaced its legacy counties in the 2022 boundary vintage; the facts
+    # must carry that vintage, not 2020_census (where 09110+ do not exist).
+    capitol_returns = values_by_record[
+        "irs_soi.ty2022.county_totals.county_09110.return_count"
+    ]
+    capitol_agi = values_by_record[
+        "irs_soi.ty2022.county_totals.county_09110.adjusted_gross_income"
+    ]
+    assert capitol_returns.value == 492_650
+    assert capitol_returns.geography.id == "0500000US09110"
+    assert capitol_agi.value == 47_178_097_000
+    assert {fact.geography.vintage for fact in facts} == {"2022"}
+    assert not any(
+        fact.geography.id.startswith("0500000US09")
+        and fact.geography.id not in {
+            f"0500000US09{code}"
+            for code in ("110", "120", "130", "140", "150", "160", "170", "180", "190")
+        }
+        for fact in facts
+    )
+
+    contract = validate_consumer_fact_contract(facts)
+    assert contract.valid
+    assert all(
+        fact.source.raw_r2_uri and fact.source.raw_r2_uri.startswith(
+            "r2://ledger-raw/raw/irs_soi/soi-county-2022/2022/"
+        )
+        for fact in facts
+    )
+
+
+def test_census_pep_county_production_package_builds_exportable_facts():
+    # Real Vintage 2024 publisher bytes; Autauga and District of Columbia
+    # populations cross-checked against the raw co-est2024-alldata CSV.
+    package = load_source_package("census-pep-county-population-2024")
+    rows = package.build_source_rows(2024)
+    cells = package.build_source_cells(2024, source_rows=rows)
+    facts = package.build_facts(2024, cells=cells, source_rows=rows)
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert len(rows) == 3195
+    assert validate_source_rows(rows).valid
+    assert len(facts) == 3144
+    assert validate_facts(facts).valid
+    assert {fact.provenance_class for fact in facts} == {"census"}
+    assert {fact.geography.level for fact in facts} == {"county"}
+    assert {fact.source.source_name for fact in facts} == {"census_pep"}
+
+    autauga = values_by_record[
+        "census_pep.vintage2024.county_population."
+        "county_01001.resident_population"
+    ]
+    dc = values_by_record[
+        "census_pep.vintage2024.county_population."
+        "county_11001.resident_population"
+    ]
+
+    assert autauga.value == 61_464
+    assert autauga.geography.id == "0500000US01001"
+    assert autauga.period.value == 2024
+    assert dc.value == 702_250
+    assert dc.geography.id == "0500000US11001"
+    assert {fact.geography.vintage for fact in facts} == {"2024"}
+
+    contract = validate_consumer_fact_contract(facts)
+    assert contract.valid
+
+
+def test_usda_snap_fy2025_monthly_package_alias_validates_counts():
+    report = validate_source_package(
+        "usda-snap-fy2025-monthly-state-caseloads",
+        year=2025,
+    )
+
+    assert report.valid
+    assert report.counts == {
+        "record_set_count": 84,
+        "row_count": 636,
+        "measure_count": 84,
+        "source_record_count": 636,
+        "source_region_count": 84,
+    }
+
+
+def test_usda_snap_fy2025_monthly_package_builds_state_caseload_facts():
+    package = load_source_package("usda-snap-fy2025-monthly-state-caseloads")
+    cells = package.build_source_cells(2025)
+    records = package.build_source_records(2025, cells=cells)
+    facts = package.build_facts(2025, cells=cells)
+    records_by_id = {record.source_record_id: record for record in records}
+    values_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert len(cells) == 6_288
+    assert validate_source_cells(cells).valid
+    assert len(facts) == 636
+    assert validate_facts(facts).valid
+    assert validate_consumer_fact_contract(facts).valid
+    assert all(fact.source_cell_keys for fact in facts)
+    assert all(fact.source.raw_r2_uri for fact in facts)
+    assert {fact.provenance_class for fact in facts} == {"administrative"}
+    assert {fact.geography.level for fact in facts} == {"state"}
+    assert {fact.measure.unit for fact in facts} == {"count"}
+    assert {fact.aggregation.method for fact in facts} == {"sum"}
+    assert {fact.period.value for fact in facts} == {
+        "2024-10",
+        "2024-11",
+        "2024-12",
+        "2025-01",
+        "2025-02",
+        "2025-03",
+    }
+    assert {
+        fact.measure.concept for fact in facts
+    } == {
+        "usda_snap.monthly_participating_households",
+        "usda_snap.monthly_participating_persons",
+    }
+
+    for period in {fact.period.value for fact in facts}:
+        for entity in ("household", "person"):
+            assert sum(
+                fact.period.value == period and fact.entity.name == entity
+                for fact in facts
+            ) == 53
+
+    geography_ids = {fact.geography.id for fact in facts}
+    assert {"0400000US11", "0400000US66", "0400000US78"} <= geography_ids
+    assert {"0400000US60", "0400000US69", "0400000US72"}.isdisjoint(
+        geography_ids
+    )
+
+    ca_households = (
+        "usda_snap.month2024_10.state_households.wro."
+        "ca.participating_households"
+    )
+    tx_persons = (
+        "usda_snap.month2025_03.state_persons.swro.tx.participating_persons"
+    )
+    assert records_by_id[ca_households].source_cell_addresses == (
+        "B39",
+        "B7",
+        "A2",
+        "A38",
+    )
+    assert records_by_id[tx_persons].source_cell_addresses == (
+        "C89",
+        "C7",
+        "A2",
+        "A83",
+    )
+    assert values_by_record[ca_households].value == 3_216_228
+    assert values_by_record[ca_households].entity.role == "snap_household"
+    assert values_by_record[tx_persons].value == 3_489_678
+    assert values_by_record[tx_persons].entity.role == "snap_participant"
+    assert values_by_record[tx_persons].source.source_file == (
+        "snap-zip-fy69tocurrent-6.zip!FY25.xlsx"
+    )
+
+
 def test_soi_historic_table_2_source_package_alias_validates_fixture_counts():
     report = validate_source_package("soi-historic-table-2", year=2023)
 

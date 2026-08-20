@@ -1,0 +1,24 @@
+source_id: census_pep
+package_id: census-pep-county-population-2024
+dataset: census_pep_county_population_2024
+source_page: https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-total.html
+vintage: Vintage 2024
+table: Annual Estimates of the Resident Population for Counties
+notes: Publisher bytes fetched per FETCH-MANIFEST.json; sha256 verified against the
+  recorded digest. Package YAML is deterministically regenerated from these bytes
+  by chronicle.sources.admin_packages.
+files:
+  2024:
+    filename: co-est2024-alldata.csv
+    source_url: https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/counties/totals/co-est2024-alldata.csv
+    sha256: abcc8720d669e793bbfdcd440eeec37a78db3b452adbe4ccd1eadf7c72b522b9
+    size_bytes: 1769182
+    fetched_at: '2026-08-14'
+    source_table: Vintage 2024 county population totals
+    year: 2024
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/census_pep/census-pep-county-population-2024/2024/abcc8720d669e793bbfdcd440eeec37a78db3b452adbe4ccd1eadf7c72b522b9/co-est2024-alldata.csv
+        uri: r2://ledger-raw/raw/census_pep/census-pep-county-population-2024/2024/abcc8720d669e793bbfdcd440eeec37a78db3b452adbe4ccd1eadf7c72b522b9/co-est2024-alldata.csv

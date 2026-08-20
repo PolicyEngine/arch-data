@@ -332,7 +332,7 @@ def source_cells_from_delimited_text(
     stay stable even when the publisher file is large. Data cells carry the
     original source line number in ``note``.
     """
-    text = content.decode("utf-8-sig")
+    text = decode_delimited_text(content)
     reader = csv.reader(StringIO(text), delimiter=delimiter)
     try:
         header = next(reader)
@@ -392,6 +392,14 @@ def source_cells_from_delimited_text(
                 )
             )
     return cells
+
+
+def decode_delimited_text(content: bytes) -> str:
+    """Decode publisher-delimited text, including common Census ANSI files."""
+    try:
+        return content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return content.decode("cp1252")
 
 
 def validate_source_cells(cells: list[SourceCell]) -> SourceCellReport:

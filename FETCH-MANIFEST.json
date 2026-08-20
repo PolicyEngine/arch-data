@@ -1,0 +1,78 @@
+{
+ "schema_version": "ledger.offline_fetch_manifest.v1",
+ "generated_for": "SOL-D2A county administrative calibration packages",
+ "artifacts": [
+  {
+   "package_id": "soi-county-2022",
+   "url": "https://www.irs.gov/pub/irs-soi/22incyallnoagi.csv",
+   "expected_filename": "22incyallnoagi.csv",
+   "destination_path": "db/data/irs_soi/county_2022/22incyallnoagi.csv",
+   "manifest_path": "db/data/irs_soi/county_2022/manifest.yaml",
+   "manifest_year": 2022,
+   "expected_sha256": "2c04ff235bcbacb990b316bf79c7c628089a9a4c1dd9593ac51f74a109b13343",
+   "r2": {
+    "provider": "r2",
+    "bucket": "ledger-raw",
+    "key_template": "raw/irs_soi/soi-county-2022/2022/{sha256}/22incyallnoagi.csv",
+    "uri_template": "r2://ledger-raw/raw/irs_soi/soi-county-2022/2022/{sha256}/22incyallnoagi.csv"
+   },
+   "replaces_synthetic_fixture": true,
+   "post_download_steps": [
+    "Verify the downloaded bytes hash to expected_sha256; on mismatch STOP - the pin is established, so different bytes are a new publisher vintage requiring its own reviewed artifact, never a pin replacement.",
+    "Confirm files.2022.sha256, size_bytes, and storage.r2 in the manifest match the pinned bytes (storage.r2 substitutes the pinned sha256 into this entry's content-addressed templates).",
+    "Run: uv run python -m chronicle.sources.admin_packages --check"
+   ]
+  },
+  {
+   "package_id": "census-pep-county-population-2024",
+   "url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/counties/totals/co-est2024-alldata.csv",
+   "expected_filename": "co-est2024-alldata.csv",
+   "destination_path": "db/data/census/pep_county_2024/co-est2024-alldata.csv",
+   "manifest_path": "db/data/census/pep_county_2024/manifest.yaml",
+   "manifest_year": 2024,
+   "expected_sha256": "abcc8720d669e793bbfdcd440eeec37a78db3b452adbe4ccd1eadf7c72b522b9",
+   "r2": {
+    "provider": "r2",
+    "bucket": "ledger-raw",
+    "key_template": "raw/census_pep/census-pep-county-population-2024/2024/{sha256}/co-est2024-alldata.csv",
+    "uri_template": "r2://ledger-raw/raw/census_pep/census-pep-county-population-2024/2024/{sha256}/co-est2024-alldata.csv"
+   },
+   "replaces_synthetic_fixture": true,
+   "post_download_steps": [
+    "Verify the downloaded bytes hash to expected_sha256; on mismatch STOP - the pin is established, so different bytes are a new publisher vintage requiring its own reviewed artifact, never a pin replacement.",
+    "Confirm files.2024.sha256, size_bytes, and storage.r2 in the manifest match the pinned bytes (storage.r2 substitutes the pinned sha256 into this entry's content-addressed templates).",
+    "Run: uv run python -m chronicle.sources.admin_packages --check"
+   ]
+  },
+  {
+   "package_id": "usda-snap-fy2025-monthly-state-caseloads",
+   "url": "https://www.fns.usda.gov/sites/default/files/resource-files/snap-zip-fy69tocurrent-6.zip",
+   "expected_filename": "snap-zip-fy69tocurrent-6.zip",
+   "destination_path": "db/data/usda_snap/fy69_to_current/snap-zip-fy69tocurrent-6.zip",
+   "manifest_path": "db/data/usda_snap/fy69_to_current/manifest_fy2025_monthly_source_package.yaml",
+   "manifest_year": 2025,
+   "expected_sha256": "3eee091653335a00a80c6fe76b84904b309dddba0c8b63a256b7e079e4101abe",
+   "r2": {
+    "provider": "r2",
+    "bucket": "ledger-raw",
+    "key": "raw/usda_snap/usda-snap-fy69-to-current/2024/3eee091653335a00a80c6fe76b84904b309dddba0c8b63a256b7e079e4101abe/snap-zip-fy69tocurrent-6.zip",
+    "uri": "r2://ledger-raw/raw/usda_snap/usda-snap-fy69-to-current/2024/3eee091653335a00a80c6fe76b84904b309dddba0c8b63a256b7e079e4101abe/snap-zip-fy69tocurrent-6.zip"
+   },
+   "already_archived": true,
+   "archive_member": "FY25.xlsx",
+   "post_download_steps": [
+    "Verify the fetched outer ZIP against expected_sha256; the matching bytes are already archived at r2.uri and need no manifest change.",
+    "If the mutable publisher URL has different bytes, treat it as a new reviewed artifact: archive it under its new content hash, update both SNAP manifests, inspect the newest numeric FY/month coverage, and update the package label, vintage, generator, and count/value assertions before validation.",
+    "Run: uv run python -m chronicle.sources.admin_packages --package usda-snap-fy2025-monthly-state-caseloads",
+    "Confirm that only numeric publisher months are emitted; '--' placeholder months must remain absent."
+   ],
+   "note_new_vintage_sha256": "94c6db7563806e682c5bfd82da4fd7529ff3b17cec9d36eb2b1bb5feabc1b063"
+  }
+ ],
+ "final_validation": [
+  "uv run python -m chronicle.sources.admin_packages --check",
+  "uv run pytest tests/test_chronicle_source_package.py tests/test_chronicle_bundle.py",
+  "uv run pytest",
+  "uv run ruff check chronicle/source_package.py chronicle/sources/__init__.py chronicle/sources/admin_packages.py chronicle/sources/cells.py chronicle/sources/rows.py tests/test_etl_admin_packages.py tests/test_chronicle_bundle.py tests/test_chronicle_source_cells.py tests/test_chronicle_source_package.py"
+ ]
+}
