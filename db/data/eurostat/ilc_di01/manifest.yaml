@@ -1,0 +1,24 @@
+source_id: eurostat-ilc-di01
+source_name: Eurostat ilc_di01
+publisher: Eurostat
+source_page: https://ec.europa.eu/eurostat/databrowser/view/ilc_di01/default/table?lang=en
+files:
+  2024:
+    filename: ilc_di01.json
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_di01?format=JSON&lang=en&freq=A&quant_inc=D1&quant_inc=D2&quant_inc=D3&quant_inc=D4&quant_inc=D5&quant_inc=D6&quant_inc=D7&quant_inc=D8&quant_inc=D9&statinfo=TC&statinfo=SHARE&unit=EUR&geo=BE&geo=DE&geo=FR&time=2024
+    source_table: Eurostat ilc_di01 Distribution of income by quantiles for Belgium, Germany, and France
+    sha256: 1c3bb1277f98f257d00725ded6b6d8b1678834329eb6b66954b8f42c19a0ad17
+    size_bytes: 4091
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/eurostat/eurostat-ilc-di01/2024/1c3bb1277f98f257d00725ded6b6d8b1678834329eb6b66954b8f42c19a0ad17/ilc_di01.json
+        uri: r2://ledger-raw/raw/eurostat/eurostat-ilc-di01/2024/1c3bb1277f98f257d00725ded6b6d8b1678834329eb6b66954b8f42c19a0ad17/ilc_di01.json
+    source_urls:
+      - https://ec.europa.eu/eurostat/databrowser/view/ilc_di01/default/table?lang=en
+      - https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_di01?format=JSON&lang=en&freq=A&quant_inc=D1&quant_inc=D2&quant_inc=D3&quant_inc=D4&quant_inc=D5&quant_inc=D6&quant_inc=D7&quant_inc=D8&quant_inc=D9&statinfo=TC&statinfo=SHARE&unit=EUR&geo=BE&geo=DE&geo=FR&time=2024
+    notes: >-
+      Real Eurostat dissemination API bytes for the filtered request in
+      source_url; hash-pinned and content-addressed. Different bytes at
+      the mutable API endpoint are a new vintage, never a pin update.

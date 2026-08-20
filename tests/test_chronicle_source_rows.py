@@ -13,6 +13,7 @@ from chronicle.sources.rows import (
     source_rows_from_census_b01001_female_age_json,
     source_rows_from_cdc_vsrr_live_births_json,
     source_rows_from_ees_permalink_table_html,
+    source_rows_from_json_stat_2,
     source_rows_from_json_table,
 )
 
@@ -166,6 +167,121 @@ def test_json_table_parser_reads_object_rows():
 
     assert [row.row_number for row in rows] == [1, 2]
     assert rows[0].values == {"state": "ALABAMA", "data_value": 4_932}
+
+
+def test_json_stat_2_parser_flattens_dense_dimensions_and_sparse_observations():
+    payload = {
+        "version": "2.0",
+        "class": "dataset",
+        "id": ["geo", "time"],
+        "size": [2, 2],
+        "dimension": {
+            "geo": {
+                "category": {
+                    "index": {"BE": 0, "DE": 1},
+                    "label": {"BE": "Belgium", "DE": "Germany"},
+                }
+            },
+            "time": {
+                "category": {
+                    "index": ["2023", "2024"],
+                    "label": {"2023": "2023", "2024": "2024"},
+                }
+            },
+        },
+        "value": {"0": 11.5, "1": 12.0, "3": 15.0},
+        "status": {"1": "p"},
+    }
+
+    rows = source_rows_from_json_stat_2(
+        json.dumps(payload).encode(),
+        _artifact(),
+        sheet_name="api",
+    )
+
+    assert [row.row_number for row in rows] == [1, 2, 3, 4]
+    assert [(row.values["geo"], row.values["time"]) for row in rows] == [
+        ("BE", "2023"),
+        ("BE", "2024"),
+        ("DE", "2023"),
+        ("DE", "2024"),
+    ]
+    assert [row.values["value"] for row in rows] == [11.5, 12.0, None, 15.0]
+    assert [row.values["status"] for row in rows] == [None, "p", None, None]
+    assert rows[0].values == {
+        "geo": "BE",
+        "time": "2023",
+        "value": 11.5,
+        "status": None,
+        "source_index": 0,
+        "geo_label": "Belgium",
+        "time_label": "2023",
+    }
+
+
+def test_json_stat_2_parser_preserves_dense_values_and_statuses():
+    payload = {
+        "version": "2.0",
+        "class": "dataset",
+        "id": ["geo", "time"],
+        "size": [1, 2],
+        "dimension": {
+            "geo": {"category": {"index": ["BE"]}},
+            "time": {"category": {"index": ["2023", "2024"]}},
+        },
+        "value": [10, 11.5],
+        "status": ["p", None],
+    }
+
+    rows = source_rows_from_json_stat_2(
+        json.dumps(payload).encode(),
+        _artifact(),
+        sheet_name="api",
+    )
+
+    assert [row.values["value"] for row in rows] == [10, 11.5]
+    assert [row.values["status"] for row in rows] == ["p", None]
+    assert [row.values["source_index"] for row in rows] == [0, 1]
+
+
+def test_json_stat_2_parser_rejects_non_contiguous_category_positions():
+    payload = {
+        "version": "2.0",
+        "class": "dataset",
+        "id": ["geo"],
+        "size": [2],
+        "dimension": {
+            "geo": {"category": {"index": {"BE": 0, "DE": 2}}},
+        },
+        "value": [1, 2],
+    }
+
+    with pytest.raises(ValueError, match="positions must cover 0 through 1"):
+        source_rows_from_json_stat_2(
+            json.dumps(payload).encode(),
+            _artifact(),
+            sheet_name="api",
+        )
+
+
+def test_json_stat_2_parser_rejects_misaligned_dense_values():
+    payload = {
+        "version": "2.0",
+        "class": "dataset",
+        "id": ["geo"],
+        "size": [2],
+        "dimension": {
+            "geo": {"category": {"index": ["BE", "DE"]}},
+        },
+        "value": [1],
+    }
+
+    with pytest.raises(ValueError, match="value array must contain 2 entries"):
+        source_rows_from_json_stat_2(
+            json.dumps(payload).encode(),
+            _artifact(),
+            sheet_name="api",
+        )
 
 
 def test_census_acs_s0101_age_parser_unpivots_age_columns():

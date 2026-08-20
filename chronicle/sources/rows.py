@@ -11,6 +11,7 @@ from collections import Counter
 from dataclasses import asdict, dataclass
 from datetime import date, datetime
 from io import BytesIO, StringIO
+from itertools import product
 from pathlib import Path
 from typing import Any
 
@@ -336,6 +337,217 @@ def source_rows_from_json_table(
         return rows
 
     raise ValueError("JSON table must be an array of arrays or objects.")
+
+
+def source_rows_from_json_stat_2(
+    content: bytes,
+    artifact: SourceArtifactMetadata,
+    *,
+    sheet_name: str,
+) -> list[SourceRow]:
+    """Flatten a JSON-stat 2.0 dataset cube into deterministic source rows.
+
+    JSON-stat stores observations in row-major order, with the last dimension
+    changing fastest. The returned rows preserve that order, retain every cube
+    position (including null observations), and expose dimension codes before
+    the observation value so declarative packages can select exact series.
+    """
+    data = json.loads(content.decode("utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("JSON-stat 2.0 payload must be an object.")
+    if data.get("class") != "dataset":
+        raise ValueError("JSON-stat 2.0 payload class must be 'dataset'.")
+    if data.get("version") != "2.0":
+        raise ValueError("JSON-stat payload version must be '2.0'.")
+
+    dimension_ids = data.get("id")
+    sizes = data.get("size")
+    dimensions = data.get("dimension")
+    if not isinstance(dimension_ids, list) or not dimension_ids:
+        raise ValueError("JSON-stat dataset id must be a non-empty array.")
+    if not all(isinstance(item, str) and item for item in dimension_ids):
+        raise ValueError("JSON-stat dataset dimension IDs must be non-empty strings.")
+    if len(set(dimension_ids)) != len(dimension_ids):
+        raise ValueError("JSON-stat dataset dimension IDs must be unique.")
+    if not isinstance(sizes, list) or len(sizes) != len(dimension_ids):
+        raise ValueError("JSON-stat dataset size must align with id.")
+    if not all(type(size) is int and size > 0 for size in sizes):
+        raise ValueError("JSON-stat dataset sizes must be positive integers.")
+    if not isinstance(dimensions, dict):
+        raise ValueError("JSON-stat dataset dimension must be an object.")
+
+    codes_by_dimension: list[list[str]] = []
+    labels_by_dimension: list[dict[str, str]] = []
+    for dimension_id, size in zip(dimension_ids, sizes, strict=True):
+        codes, labels = _json_stat_dimension_categories(
+            dimensions,
+            dimension_id=dimension_id,
+            expected_size=size,
+        )
+        codes_by_dimension.append(codes)
+        labels_by_dimension.append(labels)
+
+    observation_count = 1
+    for size in sizes:
+        observation_count *= size
+    values = _json_stat_observations(
+        data.get("value"),
+        field="value",
+        observation_count=observation_count,
+        required=True,
+    )
+    statuses = _json_stat_observations(
+        data.get("status"),
+        field="status",
+        observation_count=observation_count,
+        required=False,
+    )
+
+    rows: list[SourceRow] = []
+    coordinates = product(*(range(size) for size in sizes))
+    for source_index, positions in enumerate(coordinates):
+        dimension_codes = {
+            dimension_id: codes_by_dimension[index][position]
+            for index, (dimension_id, position) in enumerate(
+                zip(dimension_ids, positions, strict=True)
+            )
+        }
+        row_values: dict[str, Scalar] = dict(dimension_codes)
+        row_values["value"] = _json_stat_scalar(values[source_index], field="value")
+        row_values["status"] = _json_stat_scalar(
+            statuses[source_index],
+            field="status",
+        )
+        row_values["source_index"] = source_index
+        for index, dimension_id in enumerate(dimension_ids):
+            code = dimension_codes[dimension_id]
+            row_values[f"{dimension_id}_label"] = labels_by_dimension[index].get(
+                code,
+                code,
+            )
+        rows.append(
+            SourceRow(
+                artifact=artifact,
+                sheet_name=sheet_name,
+                row_number=source_index + 1,
+                values=row_values,
+            )
+        )
+    return rows
+
+
+def _json_stat_dimension_categories(
+    dimensions: dict[str, Any],
+    *,
+    dimension_id: str,
+    expected_size: int,
+) -> tuple[list[str], dict[str, str]]:
+    dimension = dimensions.get(dimension_id)
+    if not isinstance(dimension, dict):
+        raise ValueError(f"JSON-stat dimension {dimension_id!r} is missing.")
+    category = dimension.get("category")
+    if not isinstance(category, dict):
+        raise ValueError(
+            f"JSON-stat dimension {dimension_id!r} category must be an object."
+        )
+    category_index = category.get("index")
+    if isinstance(category_index, list):
+        if not all(isinstance(code, str) and code for code in category_index):
+            raise ValueError(
+                f"JSON-stat dimension {dimension_id!r} category index values "
+                "must be non-empty strings."
+            )
+        codes = list(category_index)
+    elif isinstance(category_index, dict):
+        positions: dict[int, str] = {}
+        for code, position in category_index.items():
+            if not isinstance(code, str) or not code:
+                raise ValueError(
+                    f"JSON-stat dimension {dimension_id!r} category codes "
+                    "must be non-empty strings."
+                )
+            if type(position) is not int or position < 0:
+                raise ValueError(
+                    f"JSON-stat dimension {dimension_id!r} category positions "
+                    "must be non-negative integers."
+                )
+            if position in positions:
+                raise ValueError(
+                    f"JSON-stat dimension {dimension_id!r} category positions "
+                    "must be unique."
+                )
+            positions[position] = code
+        if set(positions) != set(range(expected_size)):
+            raise ValueError(
+                f"JSON-stat dimension {dimension_id!r} category positions must "
+                f"cover 0 through {expected_size - 1}."
+            )
+        codes = [positions[position] for position in range(expected_size)]
+    else:
+        raise ValueError(
+            f"JSON-stat dimension {dimension_id!r} category index must be an "
+            "array or object."
+        )
+
+    if len(codes) != expected_size or len(set(codes)) != len(codes):
+        raise ValueError(
+            f"JSON-stat dimension {dimension_id!r} categories must contain "
+            f"{expected_size} unique codes."
+        )
+
+    raw_labels = category.get("label", {})
+    if not isinstance(raw_labels, dict):
+        raise ValueError(
+            f"JSON-stat dimension {dimension_id!r} category labels must be an object."
+        )
+    labels = {
+        code: str(raw_labels[code])
+        for code in codes
+        if raw_labels.get(code) is not None
+    }
+    return codes, labels
+
+
+def _json_stat_observations(
+    observations: Any,
+    *,
+    field: str,
+    observation_count: int,
+    required: bool,
+) -> list[Any]:
+    if observations is None:
+        if required:
+            raise ValueError(f"JSON-stat dataset {field} is required.")
+        return [None] * observation_count
+    if isinstance(observations, list):
+        if len(observations) != observation_count:
+            raise ValueError(
+                f"JSON-stat dataset {field} array must contain "
+                f"{observation_count} entries."
+            )
+        return list(observations)
+    if isinstance(observations, dict):
+        dense = [None] * observation_count
+        for raw_index, value in observations.items():
+            try:
+                index = int(raw_index)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"JSON-stat dataset {field} keys must be integer indexes."
+                ) from exc
+            if str(index) != str(raw_index) or not 0 <= index < observation_count:
+                raise ValueError(
+                    f"JSON-stat dataset {field} index {raw_index!r} is out of range."
+                )
+            dense[index] = value
+        return dense
+    raise ValueError(f"JSON-stat dataset {field} must be an array or object.")
+
+
+def _json_stat_scalar(value: Any, *, field: str) -> Scalar:
+    if value is None or isinstance(value, bool | int | float | str):
+        return _json_scalar(value)
+    raise ValueError(f"JSON-stat dataset {field} entries must be scalar values.")
 
 
 S0101_TOTAL_AGE_COLUMNS: tuple[tuple[str, str], ...] = (

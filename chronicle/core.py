@@ -60,12 +60,14 @@ ALLOWED_ENTITIES = {
     "government",
     "dwelling",
     "institutional_sector",
+    "social_protection_scheme",
     "firm",
 }
 ALLOWED_AGGREGATIONS = {
     "sum",
     "mean",
     "median",
+    "quantile",
     "rate",
     "ratio",
     "share",

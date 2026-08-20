@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict, dataclass, field
+from decimal import Decimal
 
 from chronicle.core import (
     DEFAULT_ASSERTION,
@@ -711,6 +712,14 @@ def _scale_value(value: Scalar, scale: int | float) -> int | float | str:
         raise ValueError(f"Cannot scale nonnumeric source value {value!r}")
     if isinstance(value, int | float):
         scaled = value * scale
+        # Integrality is decided in decimal, not binary: publisher lexemes
+        # like 16448.06 scaled by 1_000_000 are exactly 16448060000, where
+        # binary multiplication alone emits 16448060000.000002. Non-integral
+        # products keep the binary result unchanged, so no existing
+        # non-integral fact value shifts.
+        exact = Decimal(str(value)) * Decimal(str(scale))
+        if exact == exact.to_integral_value():
+            return int(exact)
         if isinstance(scaled, float) and scaled.is_integer():
             return int(scaled)
         return scaled

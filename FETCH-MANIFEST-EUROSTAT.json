@@ -1,0 +1,30 @@
+{
+ "schema_version": "ledger.fetch_manifest.v1",
+ "network_policy": "Fetch only in an authorized network-enabled handoff environment.",
+ "fetches": [
+  {
+   "dataset_id": "gov_10a_taxag",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag?format=JSON&lang=en&freq=A&unit=MIO_EUR&sector=S13&na_item=D2&na_item=D5&na_item=D51&na_item=D61&geo=BE&geo=DE&geo=FR&time=2023&time=2024",
+   "destination": "db/data/eurostat/gov_10a_taxag/gov_10a_taxag.json",
+   "sha256": "5b4e4b99f0778855e164481a52eb16306ef4ac99afef874a91f22315bd0c472a"
+  },
+  {
+   "dataset_id": "spr_exp_func",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_func?format=JSON&lang=en&freq=A&spdeps=SPR&spfunc=TOTAL&spfunc=SICK&spfunc=DIS&spfunc=OLD&spfunc=SRV&spfunc=FAM&spfunc=UNE&spfunc=HOU&spfunc=EXCL&unit=MIO_EUR&geo=BE&geo=DE&geo=FR&time=2023",
+   "destination": "db/data/eurostat/spr_exp_func/spr_exp_func.json",
+   "sha256": "24ad3c0115efef790ff8cb2ff8fb269d4ceb7de70ac3fad673ebd1340e4f650f"
+  },
+  {
+   "dataset_id": "ilc_li02",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_li02?format=JSON&lang=en&freq=A&statinfo=MED_EI&unit=PC&rskpovth=B_60&sex=T&age=TOTAL&geo=BE&geo=DE&geo=FR&time=2024",
+   "destination": "db/data/eurostat/ilc_li02/ilc_li02.json",
+   "sha256": "789535c86cac56c4c5b29559ef037eeb2f0b06f882a8393bfe7ad4d0c09e0052"
+  },
+  {
+   "dataset_id": "ilc_di01",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_di01?format=JSON&lang=en&freq=A&quant_inc=D1&quant_inc=D2&quant_inc=D3&quant_inc=D4&quant_inc=D5&quant_inc=D6&quant_inc=D7&quant_inc=D8&quant_inc=D9&statinfo=TC&statinfo=SHARE&unit=EUR&geo=BE&geo=DE&geo=FR&time=2024",
+   "destination": "db/data/eurostat/ilc_di01/ilc_di01.json",
+   "sha256": "1c3bb1277f98f257d00725ded6b6d8b1678834329eb6b66954b8f42c19a0ad17"
+  }
+ ]
+}

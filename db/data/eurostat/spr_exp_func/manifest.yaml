@@ -1,0 +1,24 @@
+source_id: eurostat-spr-exp-func
+source_name: Eurostat spr_exp_func ESSPROS social protection expenditure by function
+publisher: Eurostat
+source_page: https://ec.europa.eu/eurostat/databrowser/view/spr_exp_func/default/table?lang=en
+files:
+  2023:
+    filename: spr_exp_func.json
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_func?format=JSON&lang=en&freq=A&spdeps=SPR&spfunc=TOTAL&spfunc=SICK&spfunc=DIS&spfunc=OLD&spfunc=SRV&spfunc=FAM&spfunc=UNE&spfunc=HOU&spfunc=EXCL&unit=MIO_EUR&geo=BE&geo=DE&geo=FR&time=2023
+    source_table: Eurostat spr_exp_func Expenditure on social benefits by function for Belgium, Germany, and France
+    sha256: 24ad3c0115efef790ff8cb2ff8fb269d4ceb7de70ac3fad673ebd1340e4f650f
+    size_bytes: 4130
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/eurostat/eurostat-spr-exp-func/2023/24ad3c0115efef790ff8cb2ff8fb269d4ceb7de70ac3fad673ebd1340e4f650f/spr_exp_func.json
+        uri: r2://ledger-raw/raw/eurostat/eurostat-spr-exp-func/2023/24ad3c0115efef790ff8cb2ff8fb269d4ceb7de70ac3fad673ebd1340e4f650f/spr_exp_func.json
+    source_urls:
+      - https://ec.europa.eu/eurostat/databrowser/view/spr_exp_func/default/table?lang=en
+      - https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_func?format=JSON&lang=en&freq=A&spdeps=SPR&spfunc=TOTAL&spfunc=SICK&spfunc=DIS&spfunc=OLD&spfunc=SRV&spfunc=FAM&spfunc=UNE&spfunc=HOU&spfunc=EXCL&unit=MIO_EUR&geo=BE&geo=DE&geo=FR&time=2023
+    notes: >-
+      Real Eurostat dissemination API bytes for the filtered request in
+      source_url; hash-pinned and content-addressed. Different bytes at
+      the mutable API endpoint are a new vintage, never a pin update.
