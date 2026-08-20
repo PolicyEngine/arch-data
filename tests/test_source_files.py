@@ -3,12 +3,22 @@
 from __future__ import annotations
 
 import json
+import os
 import zipfile
+from types import SimpleNamespace
+from unittest.mock import patch
 
+import pytest
 from sqlmodel import Session, select
 
-from db.pe_source_inventory import pe_source_specs
-from db.pe_source_inventory import UK_TARGET_URL_FILES
+from db import source_files
+from db.cli import cmd_load_source_files
+from db.pe_source_inventory import (
+    PE_UK_DATA_ROOT_ENV,
+    PE_US_DATA_ROOT_ENV,
+    UK_TARGET_URL_FILES,
+    pe_source_specs,
+)
 from db.schema import (
     Jurisdiction,
     SourceArtifact,
@@ -17,7 +27,6 @@ from db.schema import (
     get_engine,
     init_db,
 )
-from db import source_files
 from db.source_files import SourceArtifactSpec, ingest_source_artifact
 
 
@@ -182,6 +191,84 @@ def test_pe_source_inventory_finds_both_pipeline_roots(tmp_path):
     assert {spec.source_id for spec in specs} == {"irs-soi", "usda-snap"}
 
 
+def test_pe_source_inventory_requires_us_root_flag_or_env():
+    with patch.dict(os.environ, {}, clear=True), pytest.raises(ValueError) as excinfo:
+        pe_source_specs(include_us=True, include_uk=False)
+
+    assert "--pe-us-root" in str(excinfo.value)
+    assert PE_US_DATA_ROOT_ENV in str(excinfo.value)
+
+
+def test_pe_source_inventory_reads_us_root_from_env(tmp_path):
+    pe_us = tmp_path / "policyengine-us-data"
+    raw_inputs = (
+        pe_us / "policyengine_us_data" / "storage" / "calibration" / "raw_inputs"
+    )
+    raw_inputs.mkdir(parents=True)
+    (raw_inputs / "irs_soi_sample.csv").write_text("x\n1\n", encoding="utf-8")
+
+    with patch.dict(os.environ, {PE_US_DATA_ROOT_ENV: str(pe_us)}, clear=True):
+        specs = pe_source_specs(include_us=True, include_uk=False)
+
+    assert [spec.source_id for spec in specs] == ["irs-soi"]
+
+
+def test_pe_source_inventory_scopes_required_roots_to_jurisdiction(tmp_path):
+    pe_us = tmp_path / "policyengine-us-data"
+    raw_inputs = (
+        pe_us / "policyengine_us_data" / "storage" / "calibration" / "raw_inputs"
+    )
+    raw_inputs.mkdir(parents=True)
+    (raw_inputs / "irs_soi_sample.csv").write_text("x\n1\n", encoding="utf-8")
+
+    with patch.dict(os.environ, {PE_US_DATA_ROOT_ENV: str(pe_us)}, clear=True):
+        specs = pe_source_specs(include_us=True, include_uk=False)
+
+    assert specs
+
+
+def test_pe_source_inventory_all_uses_configured_uk_root_without_us_root(tmp_path):
+    pe_uk = tmp_path / "policyengine-uk-data"
+    pe_uk.mkdir()
+
+    with patch.dict(os.environ, {PE_UK_DATA_ROOT_ENV: str(pe_uk)}, clear=True):
+        specs = pe_source_specs(include_us=True, include_uk=True)
+
+    assert specs
+    assert {spec.jurisdiction for spec in specs} == {Jurisdiction.UK}
+
+
+def test_pe_source_inventory_all_uses_configured_us_root_without_uk_root(tmp_path):
+    pe_us = tmp_path / "policyengine-us-data"
+    raw_inputs = (
+        pe_us / "policyengine_us_data" / "storage" / "calibration" / "raw_inputs"
+    )
+    raw_inputs.mkdir(parents=True)
+    (raw_inputs / "irs_soi_sample.csv").write_text("x\n1\n", encoding="utf-8")
+
+    with patch.dict(os.environ, {PE_US_DATA_ROOT_ENV: str(pe_us)}, clear=True):
+        specs = pe_source_specs(include_us=True, include_uk=True)
+
+    assert specs
+    assert {spec.jurisdiction for spec in specs} == {Jurisdiction.US}
+
+
+def test_pe_source_inventory_reports_nonexistent_uk_root(tmp_path):
+    missing_root = tmp_path / "missing-policyengine-uk-data"
+
+    with pytest.raises(ValueError) as excinfo:
+        pe_source_specs(
+            pe_uk_root=missing_root,
+            include_us=False,
+            include_uk=True,
+        )
+
+    assert "--pe-uk-root" in str(excinfo.value)
+    assert PE_UK_DATA_ROOT_ENV in str(excinfo.value)
+    assert "does not exist" in str(excinfo.value)
+    assert str(missing_root) in str(excinfo.value)
+
+
 def test_pe_source_inventory_includes_long_term_ssa_inputs(tmp_path):
     pe_us = tmp_path / "policyengine-us-data"
     storage = pe_us / "policyengine_us_data" / "storage"
@@ -221,3 +308,22 @@ def test_pe_uk_inventory_includes_registry_config_and_reference_pages(tmp_path):
     assert len(filenames) >= len(UK_TARGET_URL_FILES)
     assert "dwp_stat_xplore.html" in filenames
     assert "uk_government_2025_spp_review.pdf" in filenames
+
+
+def test_load_source_files_refuses_empty_inventory_prune(tmp_path):
+    pe_us = tmp_path / "policyengine-us-data"
+    pe_us.mkdir()
+
+    args = SimpleNamespace(
+        db=tmp_path / "sources.db",
+        inventory="pe",
+        jurisdiction="us",
+        pe_us_root=pe_us,
+        pe_uk_root=None,
+        limit=None,
+    )
+
+    with pytest.raises(ValueError) as excinfo:
+        cmd_load_source_files(args)
+
+    assert "Refusing to prune source artifacts" in str(excinfo.value)

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from .schema import Jurisdiction
 from .source_files import SourceArtifactSpec, make_slug, make_url_slug
 
-DEFAULT_PE_US_ROOT = Path("/Users/maxghenis/PolicyEngine/policyengine-us-data")
-DEFAULT_PE_UK_ROOT = Path("/Users/maxghenis/PolicyEngine/policyengine-uk-data")
+PE_US_DATA_ROOT_ENV = "LEDGER_PE_US_DATA_ROOT"
+PE_UK_DATA_ROOT_ENV = "LEDGER_PE_UK_DATA_ROOT"
 
 SOURCE_SUFFIXES = {
     ".csv",
@@ -270,6 +271,29 @@ UK_TARGET_URL_FILES = [
 ]
 
 
+def _env_value(*names: str) -> str | None:
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value
+    return None
+
+
+def _resolve_required_root(
+    root: Path | None,
+    *,
+    flag: str,
+    env_var: str,
+) -> Path:
+    value = root if root is not None else _env_value(env_var)
+    if value is None:
+        raise ValueError(f"{flag} or {env_var} is required.")
+    path = Path(value).expanduser()
+    if not path.exists():
+        raise ValueError(f"{flag} / {env_var} path does not exist: {path}")
+    return path
+
+
 def _is_source_file(path: Path) -> bool:
     if path.name.startswith("~$"):
         return False
@@ -282,12 +306,8 @@ def _infer_us_source_id(path: Path) -> str:
     name = path.name.lower()
     if "irs_soi" in name or "soi" in name or "agi" in name or "eitc" in name:
         return "irs-soi"
-    if (
-        name.startswith("acs")
-        or name.startswith("census")
-        or name.startswith("age_")
-        or name.startswith("population_")
-        or "real_estate_taxes" in name
+    if name.startswith(("acs", "census", "age_", "population_")) or (
+        "real_estate_taxes" in name
     ):
         return "census"
     if "snap" in name:
@@ -383,9 +403,14 @@ def _url_spec(
 
 
 def pe_us_source_specs(
-    pe_us_root: Path = DEFAULT_PE_US_ROOT,
+    pe_us_root: Path | None = None,
 ) -> list[SourceArtifactSpec]:
     """Return public PE-US target source files available in a local checkout."""
+    pe_us_root = _resolve_required_root(
+        pe_us_root,
+        flag="--pe-us-root",
+        env_var=PE_US_DATA_ROOT_ENV,
+    )
     root = pe_us_root / "policyengine_us_data" / "storage"
     specs: list[SourceArtifactSpec] = []
 
@@ -505,9 +530,14 @@ def pe_us_source_specs(
 
 
 def pe_uk_source_specs(
-    pe_uk_root: Path = DEFAULT_PE_UK_ROOT,
+    pe_uk_root: Path | None = None,
 ) -> list[SourceArtifactSpec]:
     """Return public PE-UK target source files available in a local checkout."""
+    pe_uk_root = _resolve_required_root(
+        pe_uk_root,
+        flag="--pe-uk-root",
+        env_var=PE_UK_DATA_ROOT_ENV,
+    )
     storage = pe_uk_root / "policyengine_uk_data" / "storage"
     specs: list[SourceArtifactSpec] = []
 
@@ -574,15 +604,17 @@ def pe_uk_source_specs(
 
 
 def pe_source_specs(
-    pe_us_root: Path = DEFAULT_PE_US_ROOT,
-    pe_uk_root: Path = DEFAULT_PE_UK_ROOT,
+    pe_us_root: Path | None = None,
+    pe_uk_root: Path | None = None,
     include_us: bool = True,
     include_uk: bool = True,
 ) -> list[SourceArtifactSpec]:
     """Return source files used by the PE-US and PE-UK calibration pipelines."""
     specs: list[SourceArtifactSpec] = []
-    if include_us and pe_us_root.exists():
+    us_configured = pe_us_root is not None or _env_value(PE_US_DATA_ROOT_ENV)
+    uk_configured = pe_uk_root is not None or _env_value(PE_UK_DATA_ROOT_ENV)
+    if include_us and (us_configured or not include_uk or not uk_configured):
         specs.extend(pe_us_source_specs(pe_us_root))
-    if include_uk and pe_uk_root.exists():
+    if include_uk and (uk_configured or not include_us or not us_configured):
         specs.extend(pe_uk_source_specs(pe_uk_root))
     return specs

@@ -464,13 +464,25 @@ def test_artifact_load_rejects_malformed_provenance(tmp_path, case, message):
         load_consumer_artifact(out_dir)
 
 
-def test_artifact_requires_profiles(tmp_path):
+def test_artifact_facts_only_round_trips(tmp_path):
     facts_path, _ = _write_artifact_inputs(tmp_path)
-    with pytest.raises(ValueError, match="at least one target profile"):
-        build_consumer_artifact(
-            tmp_path / "artifact",
-            facts_path=facts_path,
-        )
+    out_dir = tmp_path / "artifact"
+
+    report = build_consumer_artifact(
+        out_dir,
+        facts_path=facts_path,
+    )
+    artifact = load_consumer_artifact(out_dir)
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+
+    assert report.fact_row_count == 3
+    assert report.profile_ids == ()
+    assert report.coverage == {}
+    assert manifest["profiles"] == {}
+    assert (out_dir / "profiles").is_dir()
+    assert list((out_dir / "profiles").iterdir()) == []
+    assert len(artifact.rows) == 3
+    assert artifact.profiles == {}
 
 
 def test_artifact_is_reproducible(tmp_path):

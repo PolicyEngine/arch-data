@@ -4,12 +4,58 @@ from __future__ import annotations
 
 import json
 
-from chronicle.bundle import build_bundle, build_bundle_coverage
+from chronicle.bundle import UK_BUNDLE_SOURCES, build_bundle, build_bundle_coverage
+from chronicle.harness import build_bundle_dir
 from chronicle.harness import main as harness_main
 
 
 def _load_jsonl(path):
     return [json.loads(line) for line in path.read_text().splitlines() if line]
+
+
+def test_build_bundle_dir_uk_suite_uses_curated_sources(tmp_path, monkeypatch):
+    captured = {}
+
+    class FakeReport:
+        valid = True
+
+        def to_dict(self):
+            return {"valid": True}
+
+    def fake_build_bundle(output_dir, **kwargs):
+        captured["output_dir"] = output_dir
+        captured.update(kwargs)
+        return FakeReport()
+
+    monkeypatch.setattr("chronicle.harness.build_bundle", fake_build_bundle)
+
+    report = build_bundle_dir(tmp_path / "bundle", year=2023, suite="uk")
+
+    assert report.valid
+    assert tuple(captured["sources"]) == UK_BUNDLE_SOURCES
+    assert captured["output_dir"] == tmp_path / "bundle"
+
+
+def test_build_bundle_cli_accepts_uk_suite(tmp_path, monkeypatch):
+    captured = {}
+
+    class FakeReport:
+        valid = True
+
+        def to_dict(self):
+            return {"valid": True}
+
+    def fake_build_bundle_dir(output_dir, **kwargs):
+        captured["output_dir"] = output_dir
+        captured.update(kwargs)
+        return FakeReport()
+
+    monkeypatch.setattr("chronicle.harness.build_bundle_dir", fake_build_bundle_dir)
+
+    status = harness_main(["build-bundle", "--suite", "uk", "--out", str(tmp_path)])
+
+    assert status == 0
+    assert captured["suite"] == "uk"
 
 
 def test_build_bundle_writes_merged_consumer_contract(tmp_path):

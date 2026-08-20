@@ -82,7 +82,10 @@ def test_uk_legacy_etl_cleanup_checklist_accounts_for_legacy_series():
     assert "obr-efo-aggregates-march-2026" in checklist
     assert "ons-families-households-2025" in checklist
     assert "2026-2034 remain gaps" in checklist
-    assert "not ported in PR A" in checklist
+    assert "Explicit source gap or non-equivalence" in checklist
+    assert "assertion" in checklist
+    assert "period_type" in checklist
+    assert "2023 through 2026" in checklist
 
 
 def test_retired_uk_legacy_etl_modules_are_not_shipped():
@@ -92,7 +95,8 @@ def test_retired_uk_legacy_etl_modules_are_not_shipped():
     assert not (repo_root / "db" / "etl_ons.py").exists()
     assert not (repo_root / "tests" / "test_etl_obr.py").exists()
     assert not (repo_root / "tests" / "test_etl_ons.py").exists()
-    assert (repo_root / "db" / "etl_hmrc.py").exists()
+    assert not (repo_root / "db" / "etl_hmrc.py").exists()
+    assert not (repo_root / "tests" / "test_etl_hmrc.py").exists()
 
 
 def test_load_cli_no_longer_accepts_retired_uk_legacy_etl_sources():
@@ -100,7 +104,10 @@ def test_load_cli_no_longer_accepts_retired_uk_legacy_etl_sources():
 
     assert 'if args.source == "obr"' not in cli_source
     assert 'if args.source == "ons"' not in cli_source
+    assert 'if args.source == "hmrc"' not in cli_source
     assert "load_obr_targets" not in cli_source
     assert "load_ons_targets" not in cli_source
+    assert "load_hmrc_targets" not in cli_source
     assert '"obr",' not in cli_source
     assert '"ons",' not in cli_source
+    assert '"hmrc",' not in cli_source

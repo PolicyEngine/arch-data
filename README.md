@@ -296,6 +296,17 @@ files are diagnostic reports for gating and review. Consumer-contract rows must
 carry canonical constraints explicitly in `universe_constraints`; source-layout
 `dimensions` are metadata and are not target constraints.
 
+For the UK source-package feed, build the curated UK suite and then a facts-only
+consumer artifact:
+
+```bash
+uv run chronicle build-bundle --suite uk --out /tmp/chronicle-uk --replace
+uv run chronicle build-consumer-artifact --facts /tmp/chronicle-uk --out /tmp/chronicle-uk-artifact --replace
+```
+
+`--year` is inert for `--suite uk` because the UK packages are year-pinned.
+The US off-year bundle behavior is unchanged and out of scope here.
+
 Builds without an Axiom CLI still pass when the source package is otherwise
 valid, but `agent_acceptance.json` warns with
 `concept_alignment_validation_skipped`. For strict agent review, require every

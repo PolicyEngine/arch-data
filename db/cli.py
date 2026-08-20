@@ -94,13 +94,6 @@ def cmd_load(args):
                 f"Loaded ACA Marketplace targets for years: {years or 'all available'}"
             )
 
-        if args.source == "hmrc" or args.source == "all":
-            from .etl_hmrc import load_hmrc_targets
-
-            years = [int(y) for y in args.years.split(",")] if args.years else None
-            load_hmrc_targets(session, years=years)
-            print(f"Loaded HMRC targets for years: {years or 'all available'}")
-
         if args.source == "census" or args.source == "all":
             from .etl_census import load_census_targets
 
@@ -184,13 +177,17 @@ def cmd_load_source_files(args):
     include_us = args.jurisdiction in {"all", "us"}
     include_uk = args.jurisdiction in {"all", "uk"}
     specs = pe_source_specs(
-        pe_us_root=Path(args.pe_us_root),
-        pe_uk_root=Path(args.pe_uk_root),
+        pe_us_root=Path(args.pe_us_root) if args.pe_us_root else None,
+        pe_uk_root=Path(args.pe_uk_root) if args.pe_uk_root else None,
         include_us=include_us,
         include_uk=include_uk,
     )
     if args.limit:
         specs = specs[: args.limit]
+    if not specs and not args.limit:
+        raise ValueError(
+            "Refusing to prune source artifacts with an empty source-file inventory."
+        )
 
     with Session(engine) as session:
         results = ingest_source_artifacts(session, specs)
@@ -278,6 +275,17 @@ def cmd_query(args):
             )
 
 
+def _pe_source_root_env_default(jurisdiction: str) -> str | None:
+    from .pe_source_inventory import (
+        PE_UK_DATA_ROOT_ENV,
+        PE_US_DATA_ROOT_ENV,
+        _env_value,
+    )
+
+    env_var = PE_US_DATA_ROOT_ENV if jurisdiction == "us" else PE_UK_DATA_ROOT_ENV
+    return _env_value(env_var)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Manage Chronicle target input data")
     parser.add_argument("--db", help=f"Database path (default: {DEFAULT_DB_PATH})")
@@ -301,7 +309,6 @@ def main():
             "snap",
             "medicaid",
             "aca",
-            "hmrc",
             "census",
             "ssa",
             "ssi",
@@ -339,12 +346,12 @@ def main():
     )
     source_parser.add_argument(
         "--pe-us-root",
-        default="/Users/maxghenis/PolicyEngine/policyengine-us-data",
+        default=_pe_source_root_env_default("us"),
         help="Path to the policyengine-us-data checkout",
     )
     source_parser.add_argument(
         "--pe-uk-root",
-        default="/Users/maxghenis/PolicyEngine/policyengine-uk-data",
+        default=_pe_source_root_env_default("uk"),
         help="Path to the policyengine-uk-data checkout",
     )
     source_parser.add_argument(

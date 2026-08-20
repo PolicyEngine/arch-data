@@ -501,6 +501,17 @@ The bundle emits a root `consumer_facts.jsonl`, `source_packages.json`,
 `coverage.json`, and `reports/build_bundle.json`, while preserving each
 source-package suite under `sources/<source-package>/`.
 
+For the UK source-package feed, use the curated UK suite and build a facts-only
+consumer artifact:
+
+```bash
+uv run chronicle build-bundle --suite uk --out /tmp/chronicle-uk --replace
+uv run chronicle build-consumer-artifact --facts /tmp/chronicle-uk --out /tmp/chronicle-uk-artifact --replace
+```
+
+`--year` is inert for `--suite uk` because the UK packages are year-pinned.
+The US off-year bundle behavior is unchanged and out of scope here.
+
 The first agent-facing gate is now
 `/tmp/chronicle-suite/reports/agent_acceptance.json`; it summarizes whether raw
 artifacts have R2 pointers, the full source document was parsed, facts have
