@@ -306,12 +306,8 @@ def _infer_us_source_id(path: Path) -> str:
     name = path.name.lower()
     if "irs_soi" in name or "soi" in name or "agi" in name or "eitc" in name:
         return "irs-soi"
-    if (
-        name.startswith("acs")
-        or name.startswith("census")
-        or name.startswith("age_")
-        or name.startswith("population_")
-        or "real_estate_taxes" in name
+    if name.startswith(("acs", "census", "age_", "population_")) or (
+        "real_estate_taxes" in name
     ):
         return "census"
     if "snap" in name:
@@ -615,8 +611,10 @@ def pe_source_specs(
 ) -> list[SourceArtifactSpec]:
     """Return source files used by the PE-US and PE-UK calibration pipelines."""
     specs: list[SourceArtifactSpec] = []
-    if include_us:
+    us_configured = pe_us_root is not None or _env_value(PE_US_DATA_ROOT_ENV)
+    uk_configured = pe_uk_root is not None or _env_value(PE_UK_DATA_ROOT_ENV)
+    if include_us and (us_configured or not include_uk or not uk_configured):
         specs.extend(pe_us_source_specs(pe_us_root))
-    if include_uk:
+    if include_uk and (uk_configured or not include_us or not us_configured):
         specs.extend(pe_uk_source_specs(pe_uk_root))
     return specs
