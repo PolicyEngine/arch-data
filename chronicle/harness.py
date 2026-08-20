@@ -19,7 +19,12 @@ from chronicle.artifacts import (
     publish_derived_artifacts,
     publish_source_artifacts,
 )
-from chronicle.bundle import BuildBundleReport, build_bundle
+from chronicle.bundle import (
+    UK_BUNDLE_SOURCES,
+    BuildBundleReport,
+    assert_uk_bundle_sources_match_aliases,
+    build_bundle,
+)
 from chronicle.concepts import ConceptAlignmentReport, validate_concept_alignments
 from chronicle.consumer_contract import (
     ConsumerFactExportReport,
@@ -262,12 +267,18 @@ def build_bundle_dir(
     *,
     year: int,
     sources: list[str | Path] | None = None,
+    suite: str | None = None,
     axiom_command: list[str] | None = None,
     axiom_roots: list[str | Path] | None = None,
     require_axiom_validation: bool = False,
     replace: bool = False,
 ) -> BuildBundleReport:
     """Build a merged Chronicle consumer bundle from source-package suites."""
+    if suite == "uk":
+        if sources:
+            raise ValueError("--suite uk cannot be combined with --source.")
+        assert_uk_bundle_sources_match_aliases()
+        sources = list(UK_BUNDLE_SOURCES)
     return build_bundle(
         output_dir,
         year=year,
@@ -706,6 +717,11 @@ def main(argv: list[str] | None = None) -> int:
             "Source package alias, package directory, or source_package.yaml "
             "path. May be repeated. Defaults to available packages for --year."
         ),
+    )
+    bundle_parser.add_argument(
+        "--suite",
+        choices=["uk"],
+        help="Curated source-package suite to build.",
     )
     bundle_parser.add_argument(
         "--out",
@@ -1255,6 +1271,7 @@ def main(argv: list[str] | None = None) -> int:
             args.out,
             year=args.year,
             sources=args.source,
+            suite=args.suite,
             axiom_command=axiom_command,
             axiom_roots=args.axiom_root,
             require_axiom_validation=args.require_axiom_validation,

@@ -1117,10 +1117,7 @@ def _load_profiles(
     profile_paths: Sequence[str | Path],
 ) -> dict[str, dict[str, Any]]:
     if not profile_ids and not profile_paths:
-        raise ValueError(
-            "Consumer artifacts need at least one target profile "
-            "(profile_ids or profile_paths)."
-        )
+        return {}
     payloads: dict[str, dict[str, Any]] = {}
     for profile_id in profile_ids:
         profile = load_target_profile(profile_id)

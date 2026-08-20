@@ -11,8 +11,14 @@ from __future__ import annotations
 
 import pytest
 
-from chronicle.bundle import build_bundle
+from chronicle.bundle import (
+    UK_BUNDLE_SOURCE_PREFIXES,
+    UK_BUNDLE_SOURCES,
+    assert_uk_bundle_sources_match_aliases,
+    build_bundle,
+)
 from chronicle.source_package import (
+    SOURCE_PACKAGE_ALIASES,
     SourcePackageAliasDriftError,
     assert_alias_map_covers_packages,
     discover_source_package_dirs,
@@ -43,6 +49,20 @@ def test_repo_alias_map_matches_packages_on_disk():
     assert unmapped_dirs == []
     # And the strict assertion form does not raise for the committed tree.
     assert_alias_map_covers_packages()
+
+
+def test_uk_bundle_sources_match_uk_prefixed_aliases():
+    """The UK bundle suite must include every alias under a UK source prefix."""
+    expected = tuple(
+        sorted(
+            alias
+            for alias, path in SOURCE_PACKAGE_ALIASES.items()
+            if path.parts and path.parts[0] in UK_BUNDLE_SOURCE_PREFIXES
+        )
+    )
+
+    assert UK_BUNDLE_SOURCES == expected
+    assert_uk_bundle_sources_match_aliases()
 
 
 def test_discover_source_package_dirs_finds_real_packages():
