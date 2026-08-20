@@ -208,10 +208,75 @@ def test_every_source_package_record_set_declares_provenance_class():
         assert len(load_source_package(path).record_sets) == len(payload["record_sets"])
 
     assert not missing, "Record sets missing provenance_class:\n" + "\n".join(missing)
-    assert not malformed, "Malformed provenance declarations:\n" + "\n".join(
-        malformed
-    )
+    assert not malformed, "Malformed provenance declarations:\n" + "\n".join(malformed)
     assert record_set_line_count == provenance_line_count == record_set_count
+
+
+def test_dwp_uc_deductions_package_preserves_rows_and_derives_uc_units():
+    package = load_source_package("dwp-uc-deductions-march-2025-february-2026")
+    facts = package.build_facts(2026)
+
+    published_counts = [
+        fact.value
+        for fact in facts
+        if fact.measure.concept == "dwp.uc_benefit_units_with_deduction"
+    ]
+    published_shares = [
+        fact.value
+        for fact in facts
+        if fact.measure.concept == "dwp.uc_benefit_units_with_deduction_share"
+    ]
+    derived_units = {
+        fact.period.value: fact.value
+        for fact in facts
+        if fact.measure.concept == "dwp.uc_benefit_units"
+    }
+
+    assert published_counts == [
+        3_000_000,
+        3_000_000,
+        3_100_000,
+        3_100_000,
+        3_100_000,
+        3_100_000,
+        3_200_000,
+        3_200_000,
+        3_200_000,
+        3_300_000,
+        3_300_000,
+        3_300_000,
+    ]
+    assert published_shares == pytest.approx([0.47] * 6 + [0.46] * 6)
+    assert derived_units == {
+        "2025-04": 6_380_000,
+        "2025-05": 6_600_000,
+        "2025-06": 6_600_000,
+        "2025-07": 6_600_000,
+        "2025-08": 6_600_000,
+        "2025-09": 6_960_000,
+        "2025-10": 6_960_000,
+        "2025-11": 6_960_000,
+        "2025-12": 7_170_000,
+        "2026-01": 7_170_000,
+        "2026-02": 7_170_000,
+    }
+    assert all(fact.entity.name == "benefit_unit" for fact in facts)
+    assert all(
+        len(fact.source_cell_keys) == 2
+        for fact in facts
+        if fact.measure.concept == "dwp.uc_benefit_units"
+    )
+    derived_regions = {
+        region.record_set_id: region
+        for region in package.build_source_regions(2026)
+        if region.record_set_id is not None
+        and region.record_set_id.endswith(".total_units")
+    }
+    assert derived_regions[
+        "dwp.uc_deductions.month2025_04.total_units"
+    ].right_column == 4
+    assert validate_consumer_fact_contract(facts).valid
+    assert len(consumer_fact_rows(facts)) == len(facts)
 
 
 def test_source_package_alias_compiles_soi_table_1_1_specs():
@@ -1051,8 +1116,7 @@ def test_cms_nhe_table_24_package_builds_esi_employer_contribution_facts():
     assert total_2023.source.raw_r2_uri
     assert not total_2023.constraints
     assert [
-        (item.variable, item.operator, item.value)
-        for item in private_2023.constraints
+        (item.variable, item.operator, item.value) for item in private_2023.constraints
     ] == [("esi_employer_sector", "==", "private")]
 
 
@@ -1378,8 +1442,7 @@ def test_jct_obbba_package_builds_no_tax_provision_projection_facts():
         assert fact.measure.legal_vintage == f"fiscal_year_{year}"
         assert fact.filters["provision"] == provision
         assert [
-            (item.variable, item.operator, item.value)
-            for item in fact.constraints
+            (item.variable, item.operator, item.value) for item in fact.constraints
         ] == [("provision", "==", provision)]
 
 
@@ -1693,8 +1756,7 @@ def test_ssa_ssi_monthly_2024_12_package_builds_federal_payment_age_facts():
     assert aged_18_to_64.value == 3_905_779
     assert aged_65_or_older.value == 2_382_142
     assert (
-        under_18.value + aged_18_to_64.value + aged_65_or_older.value
-        == all_ages.value
+        under_18.value + aged_18_to_64.value + aged_65_or_older.value == all_ages.value
     )
 
     assert all_ages.period.type == "month"
@@ -1706,12 +1768,10 @@ def test_ssa_ssi_monthly_2024_12_package_builds_federal_payment_age_facts():
     assert all_ages.layout.table_record_kind == "total"
 
     assert {
-        (item.variable, item.operator, item.value)
-        for item in under_18.constraints
+        (item.variable, item.operator, item.value) for item in under_18.constraints
     } == {("age", ">=", 0), ("age", "<", 18)}
     assert {
-        (item.variable, item.operator, item.value)
-        for item in aged_18_to_64.constraints
+        (item.variable, item.operator, item.value) for item in aged_18_to_64.constraints
     } == {("age", ">=", 18), ("age", "<", 65)}
     assert {
         (item.variable, item.operator, item.value)

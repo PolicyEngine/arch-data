@@ -92,6 +92,8 @@ class SourceRecordSpec:
     filters: dict[str, Scalar] = field(default_factory=dict)
     constraints: tuple[AggregateConstraint, ...] = ()
     value_scale: int | float = 1
+    divisor_selector: CellSelectorSpec | None = None
+    round_to: int | float | None = None
     source_concept: str | None = None
     concept_relation: str | None = None
     concept_authority: str | None = None
@@ -162,6 +164,8 @@ class SourceRecordSetMeasure:
     unit: str
     aggregation: str
     value_scale: int | float = 1
+    divisor_column: str | None = None
+    round_to: int | float | None = None
     source_column_id: str | None = None
     expected_cell_type: str = "number"
     expected_column_header_row: int | None = None
@@ -298,6 +302,17 @@ def compile_source_record_set_specs(
                     provenance_class=spec.provenance_class,
                     survey_instrument=spec.survey_instrument,
                     value_scale=measure.value_scale * row.value_scale,
+                    divisor_selector=(
+                        CellSelectorSpec(
+                            selector_id=f"{source_record_id}.divisor_selector",
+                            sheet_name=spec.sheet_name,
+                            address=f"{measure.divisor_column}{row.row_number}",
+                            expected_cell_type="number",
+                        )
+                        if measure.divisor_column is not None
+                        else None
+                    ),
+                    round_to=measure.round_to,
                     assertion=spec.assertion,
                     period_coverage=spec.period_coverage,
                     source_concept=measure.source_concept,
@@ -343,6 +358,11 @@ def source_regions_from_record_set_spec(
     columns = [
         1,
         *(_excel_column_number(measure.column) for measure in spec.measures),
+        *(
+            _excel_column_number(measure.divisor_column)
+            for measure in spec.measures
+            if measure.divisor_column is not None
+        ),
         *(
             _excel_column_number(row.column)
             for row in spec.rows
@@ -435,8 +455,25 @@ def resolve_source_record(
         cells_by_sheet_address=cells_by_sheet_address,
     )
     value = _scale_value(_sum_cell_values(value_cells), spec.value_scale)
+    divisor_cells: list[SourceCell] = []
+    if spec.divisor_selector is not None:
+        divisor_cells = _resolve_value_cells(
+            cells,
+            spec.divisor_selector,
+            cells_by_sheet_address=cells_by_sheet_address,
+        )
+        divisor = _sum_cell_values(divisor_cells)
+        if not isinstance(divisor, (int, float)) or divisor == 0:
+            raise ValueError(
+                f"Source record {spec.source_record_id!r} has invalid divisor "
+                f"{divisor!r}."
+            )
+        value = value / divisor
+        if spec.round_to is not None:
+            value = round(value / spec.round_to) * spec.round_to
     lineage_cells = [
         *value_cells,
+        *divisor_cells,
         *_selector_lineage_guard_cells(
             cells,
             spec.selector,
@@ -805,6 +842,10 @@ def _record_set_spec_hash(spec: SourceRecordSetSpec) -> str:
             if row.get(key) is None:
                 row.pop(key, None)
     for measure in payload["measures"]:
+        if measure.get("divisor_column") is None:
+            measure.pop("divisor_column", None)
+        if measure.get("round_to") is None:
+            measure.pop("round_to", None)
         if measure.get("expected_column_header") is None:
             measure.pop("expected_column_header", None)
         if measure.get("expected_column_header_row") is None:
