@@ -266,6 +266,17 @@ def test_dwp_uc_deductions_package_preserves_rows_and_derives_uc_units():
         for fact in facts
         if fact.measure.concept == "dwp.uc_benefit_units"
     )
+    derived_regions = {
+        region.record_set_id: region
+        for region in package.build_source_regions(2026)
+        if region.record_set_id is not None
+        and region.record_set_id.endswith(".total_units")
+    }
+    assert derived_regions[
+        "dwp.uc_deductions.month2025_04.total_units"
+    ].right_column == 4
+    assert validate_consumer_fact_contract(facts).valid
+    assert len(consumer_fact_rows(facts)) == len(facts)
 
 
 def test_source_package_alias_compiles_soi_table_1_1_specs():

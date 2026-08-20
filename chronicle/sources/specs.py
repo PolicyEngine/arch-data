@@ -359,6 +359,11 @@ def source_regions_from_record_set_spec(
         1,
         *(_excel_column_number(measure.column) for measure in spec.measures),
         *(
+            _excel_column_number(measure.divisor_column)
+            for measure in spec.measures
+            if measure.divisor_column is not None
+        ),
+        *(
             _excel_column_number(row.column)
             for row in spec.rows
             if row.column is not None
@@ -837,6 +842,10 @@ def _record_set_spec_hash(spec: SourceRecordSetSpec) -> str:
             if row.get(key) is None:
                 row.pop(key, None)
     for measure in payload["measures"]:
+        if measure.get("divisor_column") is None:
+            measure.pop("divisor_column", None)
+        if measure.get("round_to") is None:
+            measure.pop("round_to", None)
         if measure.get("expected_column_header") is None:
             measure.pop("expected_column_header", None)
         if measure.get("expected_column_header_row") is None:
