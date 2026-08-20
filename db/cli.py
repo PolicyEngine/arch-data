@@ -94,13 +94,6 @@ def cmd_load(args):
                 f"Loaded ACA Marketplace targets for years: {years or 'all available'}"
             )
 
-        if args.source == "hmrc" or args.source == "all":
-            from .etl_hmrc import load_hmrc_targets
-
-            years = [int(y) for y in args.years.split(",")] if args.years else None
-            load_hmrc_targets(session, years=years)
-            print(f"Loaded HMRC targets for years: {years or 'all available'}")
-
         if args.source == "census" or args.source == "all":
             from .etl_census import load_census_targets
 
@@ -316,7 +309,6 @@ def main():
             "snap",
             "medicaid",
             "aca",
-            "hmrc",
             "census",
             "ssa",
             "ssi",

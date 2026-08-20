@@ -40,6 +40,7 @@ UK_BUNDLE_SOURCES = (
     "dwp-benefit-cap-november-2025",
     "dwp-benefit-statistics-february-2026",
     "dwp-pip-daily-living-foi-2025",
+    "dwp-uc-deductions-march-2025-february-2026",
     "dwp-uc-households-by-constituency-children-may-2025",
     "dwp-uc-households-by-constituency-may-2025",
     "dwp-uc-households-by-local-authority-may-2025",

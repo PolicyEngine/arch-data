@@ -168,6 +168,63 @@ def test_record_set_provenance_fields_propagate_to_specs_and_facts():
     assert survey_spec.survey_instrument == "ACS 1-year"
 
 
+def test_hmrc_packages_preserve_provenance_and_definition_year_metadata():
+    """HMRC facts must retain the axes needed to distinguish source claims."""
+    hmrc_packages = sorted(
+        (REPO_ROOT / "packages" / "hmrc").glob("*/source_package.yaml")
+    )
+
+    assert hmrc_packages
+    for path in hmrc_packages:
+        payload = yaml.safe_load(path.read_text())
+        artifact = payload["artifact"]
+        assert artifact["vintage"]
+        assert isinstance(artifact["artifact_year"], int)
+        for record_set in payload["record_sets"]:
+            assert record_set["period_type"]
+            assert record_set["period"] is not None
+            assert record_set["record_set_spec_id"]
+            assert record_set["provenance_class"]
+            for measure in record_set["measures"]:
+                assert measure["concept"]
+                assert measure.get("source_concept", measure["concept"])
+                assert measure["unit"]
+
+
+def test_hmrc_cgt_reuses_one_publisher_series_across_definition_years():
+    """CGT years are facts in one package, not competing hardcoded targets."""
+    package = load_source_package("hmrc-cgt-statistics-2025")
+    facts = [
+        fact
+        for fact in package.build_facts(2023)
+        if fact.measure.concept == "hmrc.cgt_tax_total"
+    ]
+
+    assert {fact.period.type for fact in facts} == {"tax_year"}
+    assert {fact.period.value for fact in facts} >= {2021, 2022, 2023}
+    assert {fact.assertion for fact in facts} == {"observation"}
+    assert all(fact.source.source_name == "hmrc" for fact in facts)
+    assert all(fact.measure.source_concept == "hmrc.cgt_tax_total" for fact in facts)
+    assert len(
+        {
+            (
+                fact.measure.concept,
+                fact.measure.source_concept,
+                fact.measure.unit,
+                fact.period.type,
+                fact.period.value,
+                fact.geography.level,
+                fact.geography.id,
+                fact.entity.name,
+                fact.entity.role,
+                fact.assertion,
+                fact.layout.record_set_spec_id,
+            )
+            for fact in facts
+        }
+    ) == len(facts)
+
+
 def test_every_source_package_record_set_declares_provenance_class():
     missing: list[str] = []
     malformed: list[str] = []
