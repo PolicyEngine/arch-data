@@ -1,0 +1,18 @@
+source_id: obr
+package_id: obr-efo-aggregates-march-2026
+dataset: obr_obr-efo-aggregates-march-2026
+source_page: https://obr.uk/efo/economic-and-fiscal-outlook-march-2026/
+table: 'EFO March 2026 fiscal supplementary tables: aggregates'
+files:
+  2026:
+    filename: efo_aggregates.xlsx
+    source_url: https://obr.uk/download/march-2026-economic-and-fiscal-outlook-detailed-forecast-tables-aggregates/
+    sha256: f9eee880e9f39cc8c86d288a803a032b735fea5f9bbd1532f26bfca898a669d9
+    size_bytes: 231008
+    fetched_at: '2026-08-19T00:00:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/obr/obr-efo-aggregates-march-2026/2026/f9eee880e9f39cc8c86d288a803a032b735fea5f9bbd1532f26bfca898a669d9/efo_aggregates.xlsx
+        uri: r2://ledger-raw/raw/obr/obr-efo-aggregates-march-2026/2026/f9eee880e9f39cc8c86d288a803a032b735fea5f9bbd1532f26bfca898a669d9/efo_aggregates.xlsx

@@ -295,6 +295,8 @@ SOURCE_PACKAGE_ALIASES = {
     "voa-council-tax-stock-by-lad-2025": Path("voa/council_tax_stock_by_lad_2025"),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
+    "obr-efo-economy-march-2026": Path("obr/efo_economy_march_2026"),
+    "obr-efo-aggregates-march-2026": Path("obr/efo_aggregates_march_2026"),
     "ons-national-balance-sheet-land-2025": Path(
         "ons/national_balance_sheet_land_2025"
     ),

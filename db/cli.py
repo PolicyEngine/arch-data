@@ -143,20 +143,6 @@ def cmd_load(args):
             load_cbo_targets(session, years=years)
             print(f"Loaded CBO projections for years: {years or 'all available'}")
 
-        if args.source == "obr" or args.source == "all":
-            from .etl_obr import load_obr_targets
-
-            years = [int(y) for y in args.years.split(",")] if args.years else None
-            load_obr_targets(session, years=years)
-            print(f"Loaded OBR projections for years: {years or 'all available'}")
-
-        if args.source == "ons" or args.source == "all":
-            from .etl_ons import load_ons_targets
-
-            years = [int(y) for y in args.years.split(",")] if args.years else None
-            load_ons_targets(session, years=years)
-            print(f"Loaded ONS projections for years: {years or 'all available'}")
-
 
 def cmd_stats(args):
     """Show database statistics."""
@@ -322,8 +308,6 @@ def main():
             "bls",
             "cps",
             "cbo",
-            "obr",
-            "ons",
             "all",
         ],
         help="Data source to load",
