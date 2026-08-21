@@ -120,6 +120,9 @@ SOURCE_PACKAGE_ALIASES = {
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"
     ),
+    "dwp-uc-childcare-element-march-2021-august-2025": Path(
+        "dwp/uc_childcare_element_march_2021_august_2025"
+    ),
     "dwp-uc-deductions-march-2025-february-2026": Path(
         "dwp/uc_deductions_march_2025_february_2026"
     ),
@@ -133,9 +136,20 @@ SOURCE_PACKAGE_ALIASES = {
     "dwp-uc-households-by-local-authority-may-2025": Path(
         "dwp/uc_households_by_local_authority_may_2025"
     ),
-    "dwp-uc-households-children-may-2025": Path("dwp/uc_households_children_may_2025"),
-    "dwp-uc-households-family-type-may-2025": Path(
-        "dwp/uc_households_family_type_may_2025"
+    "dwp-uc-households-carer-entitlement-april-december-2025": Path(
+        "dwp/uc_households_carer_entitlement_april_december_2025"
+    ),
+    "dwp-uc-households-children-april-december-2025": Path(
+        "dwp/uc_households_children_april_december_2025"
+    ),
+    "dwp-uc-households-family-type-april-december-2025": Path(
+        "dwp/uc_households_family_type_april_december_2025"
+    ),
+    "dwp-uc-households-housing-entitlement-april-december-2025": Path(
+        "dwp/uc_households_housing_entitlement_april_december_2025"
+    ),
+    "dwp-uc-households-lcwra-entitlement-april-december-2025": Path(
+        "dwp/uc_households_lcwra_entitlement_april_december_2025"
     ),
     "dwp-uc-payment-distribution-may-2025": Path(
         "dwp/uc_payment_distribution_may_2025"

@@ -340,16 +340,40 @@ uv run chronicle build-suite dwp-uc-payment-distribution-may-2025 \
   --out /tmp/chronicle-dwp-uc-payment-distribution-may-2025 \
   --replace
 
-uv run chronicle validate-package dwp-uc-households-children-may-2025 --year 2025
-uv run chronicle build-suite dwp-uc-households-children-may-2025 \
+uv run chronicle validate-package dwp-uc-childcare-element-march-2021-august-2025 --year 2025
+uv run chronicle build-suite dwp-uc-childcare-element-march-2021-august-2025 \
   --year 2025 \
-  --out /tmp/chronicle-dwp-uc-households-children-may-2025 \
+  --out /tmp/chronicle-dwp-uc-childcare-element-2025 \
   --replace
 
-uv run chronicle validate-package dwp-uc-households-family-type-may-2025 --year 2025
-uv run chronicle build-suite dwp-uc-households-family-type-may-2025 \
+uv run chronicle validate-package dwp-uc-households-carer-entitlement-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-carer-entitlement-april-december-2025 \
   --year 2025 \
-  --out /tmp/chronicle-dwp-uc-households-family-type-may-2025 \
+  --out /tmp/chronicle-dwp-uc-carer-entitlement-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-children-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-children-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-households-children-april-december-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-family-type-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-family-type-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-households-family-type-april-december-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-housing-entitlement-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-housing-entitlement-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-housing-entitlement-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-lcwra-entitlement-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-lcwra-entitlement-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-lcwra-entitlement-2025 \
   --replace
 
 uv run chronicle validate-package dwp-uc-scotland-youngest-child-may-2025 --year 2025

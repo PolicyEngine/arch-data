@@ -329,11 +329,115 @@ def test_dwp_uc_deductions_package_preserves_rows_and_derives_uc_units():
         if region.record_set_id is not None
         and region.record_set_id.endswith(".total_units")
     }
-    assert derived_regions[
-        "dwp.uc_deductions.month2025_04.total_units"
-    ].right_column == 4
+    assert (
+        derived_regions["dwp.uc_deductions.month2025_04.total_units"].right_column == 4
+    )
     assert validate_consumer_fact_contract(facts).valid
     assert len(consumer_fact_rows(facts)) == len(facts)
+
+
+def test_dwp_uc_childcare_element_package_preserves_monthly_publisher_series():
+    package = load_source_package("dwp-uc-childcare-element-march-2021-august-2025")
+    facts = package.build_facts(2025)
+    values = {fact.period.value: fact.value for fact in facts}
+
+    assert len(facts) == 54
+    assert values["2021-03"] == 88_000
+    assert values["2024-08"] == 171_000
+    assert values["2025-08"] == 160_000
+    assert all(
+        fact.measure.concept == "dwp.uc_benefit_units_with_childcare_element"
+        for fact in facts
+    )
+    assert all(fact.period.type == "month" for fact in facts)
+    assert all(fact.entity.name == "benefit_unit" for fact in facts)
+    assert all(fact.geography.id == "K03000001" for fact in facts)
+    assert all(fact.assertion == "observation" for fact in facts)
+    assert all(fact.provenance_class == "administrative" for fact in facts)
+    # Each fact retains both its monthly value cell and the guarded column header.
+    assert all(len(fact.source_cell_keys) == 2 for fact in facts)
+    assert validate_consumer_fact_contract(facts).valid
+    assert len(consumer_fact_rows(facts)) == len(facts)
+
+
+@pytest.mark.parametrize(
+    ("alias", "concept", "april_value", "december_value"),
+    [
+        (
+            "dwp-uc-households-housing-entitlement-april-december-2025",
+            "dwp.uc_benefit_units_with_housing_element",
+            4_097_119,
+            4_464_277,
+        ),
+        (
+            "dwp-uc-households-lcwra-entitlement-april-december-2025",
+            "dwp.uc_benefit_units_with_lcwra_element",
+            2_071_127,
+            2_706_904,
+        ),
+        (
+            "dwp-uc-households-carer-entitlement-april-december-2025",
+            "dwp.uc_benefit_units_with_carer_element",
+            1_081_717,
+            1_181_358,
+        ),
+    ],
+)
+def test_dwp_uc_element_packages_emit_one_benefit_unit_fact_per_month(
+    alias,
+    concept,
+    april_value,
+    december_value,
+):
+    facts = load_source_package(alias).build_facts(2025)
+
+    assert [fact.period.value for fact in facts] == [
+        "2025-04",
+        "2025-05",
+        "2025-06",
+        "2025-07",
+        "2025-08",
+        "2025-09",
+        "2025-10",
+        "2025-11",
+        "2025-12",
+    ]
+    assert all(fact.measure.concept == concept for fact in facts)
+    assert all(fact.period.type == "month" for fact in facts)
+    assert all(fact.entity.name == "benefit_unit" for fact in facts)
+    assert all(fact.geography.id == "K03000001" for fact in facts)
+    assert all(fact.assertion == "observation" for fact in facts)
+    assert all(fact.provenance_class == "administrative" for fact in facts)
+    assert all(fact.source_row_keys for fact in facts)
+    assert facts[0].value == april_value
+    assert facts[-1].value == december_value
+    assert validate_consumer_fact_contract(facts).valid
+
+
+@pytest.mark.parametrize(
+    ("alias", "facts_per_month"),
+    [
+        ("dwp-uc-households-family-type-april-december-2025", 5),
+        ("dwp-uc-households-children-april-december-2025", 8),
+    ],
+)
+def test_dwp_uc_composition_packages_cover_the_caseload_months(
+    alias,
+    facts_per_month,
+):
+    facts = load_source_package(alias).build_facts(2025)
+    periods = [f"2025-{month:02d}" for month in range(4, 13)]
+
+    assert len(facts) == facts_per_month * len(periods)
+    assert {fact.period.value for fact in facts} == set(periods)
+    assert all(fact.measure.concept == "dwp.uc_benefit_units" for fact in facts)
+    assert all(fact.period.type == "month" for fact in facts)
+    assert all(fact.entity.name == "benefit_unit" for fact in facts)
+    assert all(fact.geography.id == "K03000001" for fact in facts)
+    assert all(fact.assertion == "observation" for fact in facts)
+    assert all(fact.provenance_class == "administrative" for fact in facts)
+    assert all(fact.source_row_keys for fact in facts)
+    assert validate_consumer_fact_contract(facts).valid
 
 
 def test_source_package_alias_compiles_soi_table_1_1_specs():
@@ -2771,7 +2875,8 @@ def test_soi_county_production_package_builds_exportable_county_facts():
     assert {fact.geography.vintage for fact in facts} == {"2022"}
     assert not any(
         fact.geography.id.startswith("0500000US09")
-        and fact.geography.id not in {
+        and fact.geography.id
+        not in {
             f"0500000US09{code}"
             for code in ("110", "120", "130", "140", "150", "160", "170", "180", "190")
         }
@@ -2781,7 +2886,8 @@ def test_soi_county_production_package_builds_exportable_county_facts():
     contract = validate_consumer_fact_contract(facts)
     assert contract.valid
     assert all(
-        fact.source.raw_r2_uri and fact.source.raw_r2_uri.startswith(
+        fact.source.raw_r2_uri
+        and fact.source.raw_r2_uri.startswith(
             "r2://ledger-raw/raw/irs_soi/soi-county-2022/2022/"
         )
         for fact in facts
@@ -2806,12 +2912,10 @@ def test_census_pep_county_production_package_builds_exportable_facts():
     assert {fact.source.source_name for fact in facts} == {"census_pep"}
 
     autauga = values_by_record[
-        "census_pep.vintage2024.county_population."
-        "county_01001.resident_population"
+        "census_pep.vintage2024.county_population.county_01001.resident_population"
     ]
     dc = values_by_record[
-        "census_pep.vintage2024.county_population."
-        "county_11001.resident_population"
+        "census_pep.vintage2024.county_population.county_11001.resident_population"
     ]
 
     assert autauga.value == 61_464
@@ -2868,33 +2972,29 @@ def test_usda_snap_fy2025_monthly_package_builds_state_caseload_facts():
         "2025-02",
         "2025-03",
     }
-    assert {
-        fact.measure.concept for fact in facts
-    } == {
+    assert {fact.measure.concept for fact in facts} == {
         "usda_snap.monthly_participating_households",
         "usda_snap.monthly_participating_persons",
     }
 
     for period in {fact.period.value for fact in facts}:
         for entity in ("household", "person"):
-            assert sum(
-                fact.period.value == period and fact.entity.name == entity
-                for fact in facts
-            ) == 53
+            assert (
+                sum(
+                    fact.period.value == period and fact.entity.name == entity
+                    for fact in facts
+                )
+                == 53
+            )
 
     geography_ids = {fact.geography.id for fact in facts}
     assert {"0400000US11", "0400000US66", "0400000US78"} <= geography_ids
-    assert {"0400000US60", "0400000US69", "0400000US72"}.isdisjoint(
-        geography_ids
-    )
+    assert {"0400000US60", "0400000US69", "0400000US72"}.isdisjoint(geography_ids)
 
     ca_households = (
-        "usda_snap.month2024_10.state_households.wro."
-        "ca.participating_households"
+        "usda_snap.month2024_10.state_households.wro.ca.participating_households"
     )
-    tx_persons = (
-        "usda_snap.month2025_03.state_persons.swro.tx.participating_persons"
-    )
+    tx_persons = "usda_snap.month2025_03.state_persons.swro.tx.participating_persons"
     assert records_by_id[ca_households].source_cell_addresses == (
         "B39",
         "B7",
@@ -3544,12 +3644,10 @@ def test_obr_efo_economy_package_builds_cell_faithful_macro_facts():
     assert len(facts) == 36
 
     nominal_gdp_2024 = values_by_record[
-        "obr.efo_2026_03.economy.nominal_gdp_nsa.cy2024."
-        "nominal_gdp_nsa.nominal_gdp_nsa"
+        "obr.efo_2026_03.economy.nominal_gdp_nsa.cy2024.nominal_gdp_nsa.nominal_gdp_nsa"
     ]
     cpi_2025 = values_by_record[
-        "obr.efo_2026_03.economy.cpi_inflation.cy2025."
-        "cpi_inflation.cpi_inflation"
+        "obr.efo_2026_03.economy.cpi_inflation.cy2025.cpi_inflation.cpi_inflation"
     ]
     bank_rate_2029 = values_by_record[
         "obr.efo_2026_03.economy.bank_rate.cy2029.bank_rate.bank_rate"

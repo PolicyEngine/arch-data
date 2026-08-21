@@ -4,7 +4,7 @@
     "measures" : [ "str:count:UC_Households:V_F_UC_HOUSEHOLDS" ],
     "recodes" : {
       "str:field:UC_Households:F_UC_HH_DATE:DATE_NAME" : {
-        "map" : [ [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202505" ] ],
+        "map" : [ [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202504" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202505" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202506" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202507" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202508" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202509" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202510" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202511" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202512" ] ],
         "total" : false
       },
       "str:field:UC_Households:V_F_UC_HOUSEHOLDS:NUMBER_OF_CHILDREN" : {
@@ -31,8 +31,48 @@
     "label" : "Month",
     "items" : [ {
       "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202504" ],
+      "labels" : [ "April 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
       "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202505" ],
       "labels" : [ "May 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202506" ],
+      "labels" : [ "June 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202507" ],
+      "labels" : [ "July 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202508" ],
+      "labels" : [ "August 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202509" ],
+      "labels" : [ "September 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202510" ],
+      "labels" : [ "October 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202511" ],
+      "labels" : [ "November 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202512" ],
+      "labels" : [ "December 2025" ],
       "annotationKeys" : [ "r" ]
     } ]
   }, {
@@ -75,7 +115,7 @@
   } ],
   "cubes" : {
     "str:count:UC_Households:V_F_UC_HOUSEHOLDS" : {
-      "values" : [ [ 3457473, 1269512, 1103880, 497665, 176202, 77894, 1613, 0 ] ],
+      "values" : [ [ 3394739, 1266902, 1103424, 498264, 176622, 78050, 1193, 0 ], [ 3459403, 1269011, 1102910, 497655, 176302, 77960, 1193, 0 ], [ 3556793, 1273255, 1102909, 496740, 175887, 77813, 1217, 0 ], [ 3642317, 1276272, 1102361, 495810, 175485, 77663, 1259, 0 ], [ 3746544, 1279180, 1100776, 494622, 174708, 77374, 1223, 0 ], [ 3842241, 1282886, 1099737, 493189, 173991, 77094, 1176, 0 ], [ 3920511, 1285276, 1098626, 492211, 173493, 76914, 1197, 0 ], [ 3991675, 1286351, 1097688, 491419, 172938, 76819, 1261, 0 ], [ 4027547, 1287700, 1097127, 491069, 172594, 76704, 1301, 0 ] ],
       "precision" : 0
     }
   },
