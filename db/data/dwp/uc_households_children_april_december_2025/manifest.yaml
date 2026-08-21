@@ -1,0 +1,18 @@
+source_id: dwp
+package_id: dwp-uc-households-children-april-december-2025
+dataset: dwp_dwp-uc-households-children-april-december-2025
+source_page: https://stat-xplore.dwp.gov.uk/
+table: Households on Universal Credit by number of children, April to December 2025
+files:
+  2025:
+    filename: uc_households_by_number_of_children_april_december_2025.json
+    source_url: https://stat-xplore.dwp.gov.uk/webapi/rest/v1/table
+    sha256: 010270fd62c6e8adbed5e272b9c07f51968f205b5c741522a372b336840afb0c
+    size_bytes: 7959
+    fetched_at: '2026-08-21T11:45:49Z'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/dwp/dwp-uc-households-children-april-december-2025/2025/010270fd62c6e8adbed5e272b9c07f51968f205b5c741522a372b336840afb0c/uc_households_by_number_of_children_april_december_2025.json
+        uri: r2://ledger-raw/raw/dwp/dwp-uc-households-children-april-december-2025/2025/010270fd62c6e8adbed5e272b9c07f51968f205b5c741522a372b336840afb0c/uc_households_by_number_of_children_april_december_2025.json
