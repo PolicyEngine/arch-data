@@ -73,16 +73,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 11,
         "error_count": 0,
-        "fact_count": 155504,
+        "fact_count": 155689,
         "geography_count": 12536,
-        "period_count": 151,
+        "period_count": 191,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
         "source_count": 41,
-        "source_package_count": 130,
+        "source_package_count": 134,
         "warning_count": 1,
     }
-    assert len(rows) == 155504
+    assert len(rows) == 155689
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -100,7 +100,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 130
+    assert source_packages["source_package_count"] == 134
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 155504
+    assert coverage["fact_count"] == 155689
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -127,7 +127,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "cms_medicare": 1,
         "cms_nhe": 3,
         "dft": 81,
-        "dwp": 6362,
+        "dwp": 6547,
         "eurostat": 108,
         "federal_reserve": 1,
         "hhs_acf_liheap": 2,
@@ -159,7 +159,47 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 198,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 125
+    assert len(table_counts) == 129
+    assert (
+        table_counts[
+            "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
+        ]
+        == 54
+    )
+    assert (
+        table_counts[
+            "dwp:Households on Universal Credit with carer entitlement, "
+            "April to December 2025"
+        ]
+        == 9
+    )
+    assert (
+        table_counts[
+            "dwp:Households on Universal Credit by number of children, "
+            "April to December 2025"
+        ]
+        == 72
+    )
+    assert (
+        table_counts[
+            "dwp:Households on Universal Credit by family type, April to December 2025"
+        ]
+        == 45
+    )
+    assert (
+        table_counts[
+            "dwp:Households on Universal Credit with housing entitlement, "
+            "April to December 2025"
+        ]
+        == 9
+    )
+    assert (
+        table_counts[
+            "dwp:Households on Universal Credit with LCWRA entitlement, "
+            "April to December 2025"
+        ]
+        == 9
+    )
     assert table_counts["usda_snap:SNAP FY2025 Monthly State Participation"] == 636
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert table_counts["irs_soi:IRS SOI County Data 2022"] == 6286
@@ -409,24 +449,64 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fiscal_year:2028": 32,
         "fiscal_year:2029": 32,
         "fiscal_year:2030": 28,
-        "month:2023-01": 1,
-        "month:2023-12": 6,
-        "month:2024-01": 1,
-        "month:2024-10": 106,
-        "month:2024-11": 106,
-        "month:2024-12": 376,
-        "month:2025-01": 108,
-        "month:2025-02": 106,
-        "month:2025-03": 228,
-        "month:2025-04": 95,
-        "month:2025-05": 6217,
-        "month:2025-06": 3,
-        "month:2025-07": 3,
-        "month:2025-08": 7,
-        "month:2025-09": 12,
-        "month:2025-10": 3,
-        "month:2025-11": 18,
-        "month:2025-12": 259,
+        "month:2021-03": 1,
+        "month:2021-04": 1,
+        "month:2021-05": 1,
+        "month:2021-06": 1,
+        "month:2021-07": 1,
+        "month:2021-08": 1,
+        "month:2021-09": 1,
+        "month:2021-10": 1,
+        "month:2021-11": 1,
+        "month:2021-12": 1,
+        "month:2022-01": 1,
+        "month:2022-02": 1,
+        "month:2022-03": 1,
+        "month:2022-04": 1,
+        "month:2022-05": 1,
+        "month:2022-06": 1,
+        "month:2022-07": 1,
+        "month:2022-08": 1,
+        "month:2022-09": 1,
+        "month:2022-10": 1,
+        "month:2022-11": 1,
+        "month:2022-12": 1,
+        "month:2023-01": 2,
+        "month:2023-02": 1,
+        "month:2023-03": 1,
+        "month:2023-04": 1,
+        "month:2023-05": 1,
+        "month:2023-06": 1,
+        "month:2023-07": 1,
+        "month:2023-08": 1,
+        "month:2023-09": 1,
+        "month:2023-10": 1,
+        "month:2023-11": 1,
+        "month:2023-12": 7,
+        "month:2024-01": 2,
+        "month:2024-02": 1,
+        "month:2024-03": 1,
+        "month:2024-04": 1,
+        "month:2024-05": 1,
+        "month:2024-06": 1,
+        "month:2024-07": 1,
+        "month:2024-08": 1,
+        "month:2024-09": 1,
+        "month:2024-10": 107,
+        "month:2024-11": 107,
+        "month:2024-12": 377,
+        "month:2025-01": 109,
+        "month:2025-02": 107,
+        "month:2025-03": 229,
+        "month:2025-04": 112,
+        "month:2025-05": 6221,
+        "month:2025-06": 20,
+        "month:2025-07": 20,
+        "month:2025-08": 24,
+        "month:2025-09": 28,
+        "month:2025-10": 19,
+        "month:2025-11": 34,
+        "month:2025-12": 275,
         "month:2026-01": 3,
         "month:2026-02": 7,
         "month:2026-06": 348,
@@ -482,15 +562,15 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
     assert coverage["counts"]["by_geography"]["country:K02000001"] == 4262
-    assert coverage["counts"]["by_geography"]["country:K03000001"] == 312
+    assert coverage["counts"]["by_geography"]["country:K03000001"] == 497
     assert len(coverage["counts"]["by_geography"]) == 12536
     assert coverage["counts"]["by_entity"] == {
-        "benefit_unit": 35,
+        "benefit_unit": 233,
         "dwelling": 12708,
         "family": 107,
         "firm": 1439,
         "government": 294,
-        "household": 40448,
+        "household": 40435,
         "institutional_sector": 103,
         "pension_plan": 2,
         "person": 60272,
@@ -508,6 +588,15 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
             ),
         }
     ]
+    for source in (
+        "dwp-uc-childcare-element-march-2021-august-2025",
+        "dwp-uc-households-carer-entitlement-april-december-2025",
+        "dwp-uc-households-children-april-december-2025",
+        "dwp-uc-households-family-type-april-december-2025",
+        "dwp-uc-households-housing-entitlement-april-december-2025",
+        "dwp-uc-households-lcwra-entitlement-april-december-2025",
+    ):
+        assert (output_dir / "sources" / source / "consumer_facts.jsonl").exists()
     assert (output_dir / "sources" / "soi-table-1-1" / "consumer_facts.jsonl").exists()
     assert (
         output_dir / "sources" / "soi-table-1-4" / "reports" / "build_summary.json"
