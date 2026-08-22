@@ -73,16 +73,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 11,
         "error_count": 0,
-        "fact_count": 155689,
+        "fact_count": 155869,
         "geography_count": 12536,
         "period_count": 191,
         "semantic_duplicate_key_count": 12,
         "skipped_source_count": 10,
         "source_count": 41,
-        "source_package_count": 134,
+        "source_package_count": 135,
         "warning_count": 1,
     }
-    assert len(rows) == 155689
+    assert len(rows) == 155869
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 155689
+    assert coverage["fact_count"] == 155869
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
