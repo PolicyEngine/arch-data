@@ -100,7 +100,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 134
+    assert source_packages["source_package_count"] == 135
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -134,7 +134,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "hhs_acf_tanf": 110,
         "hmrc": 20533,
         "ici": 12,
-        "irs_soi": 40063,
+        "irs_soi": 40243,
         "isc": 2,
         "jrc_euromod_be": 18,
         "kff": 52,
@@ -159,7 +159,11 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 198,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 129
+    assert len(table_counts) == 130
+    assert table_counts["irs_soi:Publication 1304 Table 1.4"] == 740
+    assert (
+        table_counts["irs_soi:Publication 4801 Form 8960, pages 214–215"] == 20
+    )
     assert (
         table_counts[
             "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
@@ -546,7 +550,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2020": 9,
         "tax_year:2021": 9,
         "tax_year:2022": 41237,
-        "tax_year:2023": 48436,
+        "tax_year:2023": 48616,
         "tax_year:2024": 40,
     }
     assert coverage["counts"]["by_geography"]["country:BE"] == 67
@@ -556,7 +560,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert coverage["counts"]["by_geography"]["nuts1:BE2"] == 17
     assert coverage["counts"]["by_geography"]["nuts1:BE3"] == 6
     assert coverage["counts"]["by_geography"]["commune:11002"] == 1
-    assert coverage["counts"]["by_geography"]["country:0100000US"] == 2109
+    assert coverage["counts"]["by_geography"]["country:0100000US"] == 2289
     assert coverage["counts"]["by_geography"]["state:0400000US06"] == 229
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
@@ -575,7 +579,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "pension_plan": 2,
         "person": 60272,
         "social_protection_scheme": 27,
-        "tax_unit": 40069,
+        "tax_unit": 40249,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
     assert len(coverage["duplicates"]["semantic_fact_keys"]) == 12
