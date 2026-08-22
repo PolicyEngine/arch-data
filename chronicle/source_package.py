@@ -52,6 +52,7 @@ from chronicle.sources.rows import (
     source_rows_from_json_table,
     source_rows_from_statxplore_table,
     source_rows_from_ees_permalink_table_html,
+    source_rows_from_json_stat_2,
     source_rows_from_kff_state_indicator_gdocs_html,
     source_rows_from_ons_timeseries_json,
     source_rows_from_delimited_text,
@@ -85,7 +86,9 @@ SOURCE_PACKAGE_ALIASES = {
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
-    "hmrc-salary-sacrifice-relief-2024-25": Path("hmrc/salary_sacrifice_relief_2024_25"),
+    "hmrc-salary-sacrifice-relief-2024-25": Path(
+        "hmrc/salary_sacrifice_relief_2024_25"
+    ),
     "hmrc-salary-sacrifice-reform-2029-headcounts": Path(
         "hmrc/salary_sacrifice_reform_2029_headcounts"
     ),
@@ -99,9 +102,7 @@ SOURCE_PACKAGE_ALIASES = {
         "mhclg/ehs_weekly_housing_costs_2023_24"
     ),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
-    "statbel-fiscal-income-2023-nis-2025": Path(
-        "statbel/fiscal_income_2023_nis_2025"
-    ),
+    "statbel-fiscal-income-2023-nis-2025": Path("statbel/fiscal_income_2023_nis_2025"),
     "spf-finances-pit-2023": Path("spf_finances/pit_2023"),
     "onss-contributions-2024": Path("onss/contributions_2024"),
     "onem-rva-unemployment-2024": Path("onem_rva/unemployment_2024"),
@@ -111,17 +112,19 @@ SOURCE_PACKAGE_ALIASES = {
     "jrc-euromod-be-baseline-statistics-2025": Path(
         "jrc/euromod_be_baseline_statistics_2025"
     ),
-    "sfpd-legal-pension-caseload-2025": Path(
-        "sfpd/legal_pension_caseload_2025"
-    ),
-    "opgroeien-groeipakket-caseload-2025": Path(
-        "opgroeien/groeipakket_caseload_2025"
-    ),
+    "sfpd-legal-pension-caseload-2025": Path("sfpd/legal_pension_caseload_2025"),
+    "opgroeien-groeipakket-caseload-2025": Path("opgroeien/groeipakket_caseload_2025"),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"
+    ),
+    "dwp-uc-childcare-element-march-2021-august-2025": Path(
+        "dwp/uc_childcare_element_march_2021_august_2025"
+    ),
+    "dwp-uc-deductions-march-2025-february-2026": Path(
+        "dwp/uc_deductions_march_2025_february_2026"
     ),
     "dwp-pip-daily-living-foi-2025": Path("dwp/pip_daily_living_foi_2025"),
     "dwp-uc-households-by-constituency-may-2025": Path(
@@ -133,9 +136,20 @@ SOURCE_PACKAGE_ALIASES = {
     "dwp-uc-households-by-local-authority-may-2025": Path(
         "dwp/uc_households_by_local_authority_may_2025"
     ),
-    "dwp-uc-households-children-may-2025": Path("dwp/uc_households_children_may_2025"),
-    "dwp-uc-households-family-type-may-2025": Path(
-        "dwp/uc_households_family_type_may_2025"
+    "dwp-uc-households-carer-entitlement-april-december-2025": Path(
+        "dwp/uc_households_carer_entitlement_april_december_2025"
+    ),
+    "dwp-uc-households-children-april-december-2025": Path(
+        "dwp/uc_households_children_april_december_2025"
+    ),
+    "dwp-uc-households-family-type-april-december-2025": Path(
+        "dwp/uc_households_family_type_april_december_2025"
+    ),
+    "dwp-uc-households-housing-entitlement-april-december-2025": Path(
+        "dwp/uc_households_housing_entitlement_april_december_2025"
+    ),
+    "dwp-uc-households-lcwra-entitlement-april-december-2025": Path(
+        "dwp/uc_households_lcwra_entitlement_april_december_2025"
     ),
     "dwp-uc-payment-distribution-may-2025": Path(
         "dwp/uc_payment_distribution_may_2025"
@@ -159,6 +173,7 @@ SOURCE_PACKAGE_ALIASES = {
         "census/acs_s2201_district_2024"
     ),
     "census-b01001-female-age-2023": Path("census/b01001_female_15_44_2023"),
+    "census-pep-county-population-2024": Path("census/pep_county_2024"),
     "census-pep-2024-national-age-sex": Path("census/pep_2024_national_age_sex"),
     "census-pep-2024-state-age-sex": Path("census/pep_2024_state_age_sex"),
     "census-population-projections-2023": Path("census/population_projections_2023"),
@@ -222,6 +237,7 @@ SOURCE_PACKAGE_ALIASES = {
     "soi-form-8960-2023": Path("irs_soi/form_8960_2023"),
     "soi-table-4-3": Path("irs_soi/table_4_3"),
     "soi-state-2022": Path("irs_soi/state_2022"),
+    "soi-county-2022": Path("irs_soi/county_2022"),
     "soi-congressional-district-2022": Path("irs_soi/congressional_district_2022"),
     "soi-historic-table-2": Path("irs_soi/historic_table_2"),
     "soi-historic-table-2-state-agi-2022": Path(
@@ -249,12 +265,14 @@ SOURCE_PACKAGE_ALIASES = {
     "hmrc-vat-firm-sector-targets-2024-25": Path(
         "hmrc/vat_firm_sector_targets_2024_25"
     ),
+    "eurostat-gov-10a-taxag": Path("eurostat/gov_10a_taxag"),
+    "eurostat-spr-exp-func": Path("eurostat/spr_exp_func"),
+    "eurostat-ilc-li02": Path("eurostat/ilc_li02"),
+    "eurostat-ilc-di01": Path("eurostat/ilc_di01"),
     "kff-marketplace-effectuated-enrollment": Path(
         "kff/marketplace_effectuated_enrollment"
     ),
-    "ons-census2021-ts041-households-lad": Path(
-        "ons/census2021_ts041_households_lad"
-    ),
+    "ons-census2021-ts041-households-lad": Path("ons/census2021_ts041_households_lad"),
     "ons-census2021-ts041-households-pcon24": Path(
         "ons/census2021_ts041_households_pcon24"
     ),
@@ -263,28 +281,20 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-mye-2024-uk": Path("ons/mye_2024_uk"),
     "ons-lad-population-by-age-2024": Path("ons/lad_population_by_age_2024"),
     "ons-pcon24-population-by-age-2024": Path("ons/pcon24_population_by_age_2024"),
-    "ons-small-area-income-msoa-fye2023": Path(
-        "ons/small_area_income_msoa_fye2023"
-    ),
+    "ons-small-area-income-msoa-fye2023": Path("ons/small_area_income_msoa_fye2023"),
     "ons-census2021-ts054-tenure-lad": Path("ons/census2021_ts054_tenure_lad"),
     "ons-subnational-dwellings-by-tenure-2024": Path(
         "ons/subnational_dwellings_by_tenure_2024"
     ),
     "ons-pipr-rents-by-area-june-2026": Path("ons/pipr_rents_by_area_june_2026"),
-    "nrs-census2022-households-ukpc24": Path(
-        "nrs/census2022_households_ukpc24"
-    ),
+    "nrs-census2022-households-ukpc24": Path("nrs/census2022_households_ukpc24"),
     "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
     "nrs-census2022-uv404-tenure-council-area": Path(
         "nrs/census2022_uv404_tenure_council_area"
     ),
     "nisra-census2021-households-lgd": Path("nisra/census2021_households_lgd"),
-    "nisra-census2021-households-pcon24": Path(
-        "nisra/census2021_households_pcon24"
-    ),
-    "nisra-pcon24-population-by-age-2024": Path(
-        "nisra/pcon24_population_by_age_2024"
-    ),
+    "nisra-census2021-households-pcon24": Path("nisra/census2021_households_pcon24"),
+    "nisra-pcon24-population-by-age-2024": Path("nisra/pcon24_population_by_age_2024"),
     "nisra-census2021-tenure-lgd": Path("nisra/census2021_tenure_lgd"),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "scotgov-band-d-council-tax-rates-2026-27": Path(
@@ -295,15 +305,13 @@ SOURCE_PACKAGE_ALIASES = {
     "scotgov-scottish-budget-social-security-assistance-2026": Path(
         "scotgov/scottish_budget_social_security_assistance_2026"
     ),
-    "welshgov-council-tax-levels-2026-27": Path(
-        "welshgov/council_tax_levels_2026_27"
-    ),
+    "welshgov-council-tax-levels-2026-27": Path("welshgov/council_tax_levels_2026_27"),
     "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
-    "voa-council-tax-stock-by-lad-2025": Path(
-        "voa/council_tax_stock_by_lad_2025"
-    ),
+    "voa-council-tax-stock-by-lad-2025": Path("voa/council_tax_stock_by_lad_2025"),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),
     "obr-efo-expenditure-march-2026": Path("obr/efo_expenditure_march_2026"),
+    "obr-efo-economy-march-2026": Path("obr/efo_economy_march_2026"),
+    "obr-efo-aggregates-march-2026": Path("obr/efo_aggregates_march_2026"),
     "ons-national-balance-sheet-land-2025": Path(
         "ons/national_balance_sheet_land_2025"
     ),
@@ -316,6 +324,9 @@ SOURCE_PACKAGE_ALIASES = {
         "ons/uk_business_firm_sector_targets_2025"
     ),
     "usda-snap-fy69-to-current": Path("usda_snap/fy69_to_current"),
+    "usda-snap-fy2025-monthly-state-caseloads": Path(
+        "usda_snap/fy2025_monthly_state_caseloads"
+    ),
 }
 SOURCE_ARTIFACT_CACHE_ENV = "LEDGER_SOURCE_ARTIFACT_CACHE_DIR"
 SOURCE_ARTIFACT_FETCH_ENV = "LEDGER_SOURCE_ARTIFACT_FETCH"
@@ -325,7 +336,9 @@ DEFAULT_SOURCE_ARTIFACT_CACHE_DIR = (
 SOURCE_PACKAGE_FILENAME = "source_package.yaml"
 # Repository ``packages/`` directory: the source-package authoring surface a
 # complete bundle must cover (see PolicyEngine/chronicle#78).
-SOURCE_PACKAGE_ROOT = Path(__file__).resolve().parents[1] / SOURCE_PACKAGE_RESOURCE_PACKAGE
+SOURCE_PACKAGE_ROOT = (
+    Path(__file__).resolve().parents[1] / SOURCE_PACKAGE_RESOURCE_PACKAGE
+)
 EXCEL_COLUMN_RE = re.compile(r"^[A-Z]+$")
 
 
@@ -384,6 +397,12 @@ class SourceArtifactSpec:
             )
         if self.parser == "statxplore_table_json_rows":
             return source_rows_from_statxplore_table(
+                content,
+                artifact,
+                sheet_name=self._sheet_name(filename, year=year),
+            )
+        if self.parser == "json_stat_2_full_rows":
+            return source_rows_from_json_stat_2(
                 content,
                 artifact,
                 sheet_name=self._sheet_name(filename, year=year),
@@ -558,6 +577,26 @@ class SourceArtifactSpec:
                 source_rows
                 if source_rows is not None
                 else source_rows_from_json_table(
+                    content,
+                    artifact,
+                    sheet_name=self._sheet_name(filename, year=year),
+                )
+            )
+            return source_cells_from_source_rows(
+                rows,
+                selected_rows=tuple(
+                    {
+                        key: str(_render_value(value, year=year))
+                        for key, value in row.items()
+                    }
+                    for row in self.selected_rows
+                ),
+            )
+        if self.parser == "json_stat_2_full_rows":
+            rows = (
+                source_rows
+                if source_rows is not None
+                else source_rows_from_json_stat_2(
                     content,
                     artifact,
                     sheet_name=self._sheet_name(filename, year=year),
@@ -1791,6 +1830,12 @@ def _measure_from_mapping(
         unit=_required(payload, "unit", "measure"),
         aggregation=_required(payload, "aggregation", "measure"),
         value_scale=_render_value(payload.get("value_scale", 1), year=year),
+        divisor_column=payload.get("divisor_column"),
+        round_to=(
+            _render_value(payload["round_to"], year=year)
+            if "round_to" in payload
+            else None
+        ),
         source_column_id=(
             str(_render_value(payload["source_column_id"], year=year))
             if payload.get("source_column_id") is not None
@@ -2007,9 +2052,7 @@ def _provenance_fields_from_mapping(
     survey_instrument = payload.get("survey_instrument")
     if provenance_class == "survey_aggregate":
         if not has_survey_instrument:
-            raise KeyError(
-                "Missing required record_set field: survey_instrument"
-            )
+            raise KeyError("Missing required record_set field: survey_instrument")
         if type(survey_instrument) is not str or not survey_instrument.strip():
             raise TypeError(
                 "record_set survey_instrument must be a non-empty string for "
@@ -2061,9 +2104,7 @@ def _period_coverage_from_mapping(
     }
     unknown = sorted(set(payload) - allowed_keys)
     if unknown:
-        raise ValueError(
-            f"record_set period_coverage has unknown keys: {unknown}."
-        )
+        raise ValueError(f"record_set period_coverage has unknown keys: {unknown}.")
     return PeriodCoverage(
         **{
             key: _optional_rendered_string(payload.get(key), year=year)

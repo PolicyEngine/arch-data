@@ -20,6 +20,117 @@ BUNDLE_SCHEMA_VERSION = "ledger.bundle.v1"
 BUNDLE_COVERAGE_SCHEMA_VERSION = "ledger.bundle_coverage.v1"
 BUNDLE_SOURCES_SCHEMA_VERSION = "ledger.bundle_sources.v1"
 DEFAULT_BUNDLE_SOURCES = tuple(sorted(SOURCE_PACKAGE_ALIASES))
+UK_BUNDLE_SOURCE_PREFIXES = (
+    "dft",
+    "dwp",
+    "hmrc",
+    "isc",
+    "mhclg",
+    "nisra",
+    "nrs",
+    "obr",
+    "ons",
+    "scotgov",
+    "slc",
+    "voa",
+    "welshgov",
+)
+UK_BUNDLE_SOURCES = (
+    "dft-nts-vehicle-ownership-2024",
+    "dwp-benefit-cap-november-2025",
+    "dwp-benefit-statistics-february-2026",
+    "dwp-pip-daily-living-foi-2025",
+    "dwp-uc-childcare-element-march-2021-august-2025",
+    "dwp-uc-deductions-march-2025-february-2026",
+    "dwp-uc-households-by-constituency-children-may-2025",
+    "dwp-uc-households-by-constituency-may-2025",
+    "dwp-uc-households-by-local-authority-may-2025",
+    "dwp-uc-households-carer-entitlement-april-december-2025",
+    "dwp-uc-households-children-april-december-2025",
+    "dwp-uc-households-family-type-april-december-2025",
+    "dwp-uc-households-housing-entitlement-april-december-2025",
+    "dwp-uc-households-lcwra-entitlement-april-december-2025",
+    "dwp-uc-payment-distribution-may-2025",
+    "dwp-uc-scotland-youngest-child-may-2025",
+    "dwp-uc-two-child-limit-2025",
+    "hmrc-cgt-statistics-2025",
+    "hmrc-salary-sacrifice-reform-2029-headcounts",
+    "hmrc-salary-sacrifice-relief-2024-25",
+    "hmrc-spi-income-bands-2023-24",
+    "hmrc-spi-income-by-area-2023-24",
+    "hmrc-vat-firm-sector-targets-2024-25",
+    "hmrc-vat-firm-targets-2024-25",
+    "isc-annual-census-2023",
+    "isc-annual-census-2024",
+    "mhclg-council-tax-levels-england-2026-27",
+    "mhclg-ehs-weekly-housing-costs-2023-24",
+    "nisra-census2021-households-lgd",
+    "nisra-census2021-households-pcon24",
+    "nisra-census2021-tenure-lgd",
+    "nisra-pcon24-population-by-age-2024",
+    "nrs-census2022-households-ukpc24",
+    "nrs-census2022-uv404-tenure-council-area",
+    "nrs-pcon24-population-by-age-2024",
+    "obr-efo-aggregates-march-2026",
+    "obr-efo-economy-march-2026",
+    "obr-efo-expenditure-march-2026",
+    "obr-efo-receipts-march-2026",
+    "ons-census2021-ts041-households-lad",
+    "ons-census2021-ts041-households-pcon24",
+    "ons-census2021-ts054-tenure-lad",
+    "ons-families-households-2025",
+    "ons-lad-population-by-age-2024",
+    "ons-mye-2023-england-regions",
+    "ons-mye-2023-uk-countries",
+    "ons-mye-2024-uk",
+    "ons-national-balance-sheet-land-2025",
+    "ons-pcon24-population-by-age-2024",
+    "ons-pipr-private-rent-march-2026",
+    "ons-pipr-rents-by-area-june-2026",
+    "ons-public-sector-employment-2026",
+    "ons-savings-interest-income",
+    "ons-small-area-income-msoa-fye2023",
+    "ons-subnational-dwellings-by-tenure-2024",
+    "ons-uk-business-firm-sector-targets-2025",
+    "ons-uk-business-firm-targets-2025",
+    "ons-uk-population-projections-2024",
+    "scotgov-band-d-council-tax-rates-2026-27",
+    "scotgov-band-d-equivalents-2025",
+    "scotgov-council-tax-bands-2025",
+    "scotgov-scottish-budget-social-security-assistance-2026",
+    "slc-student-loan-borrower-forecasts-england-2025",
+    "slc-student-loan-repayments-england-2025",
+    "slc-student-loan-repayments-northern-ireland-2025",
+    "slc-student-loan-repayments-scotland-2025",
+    "slc-student-loan-repayments-wales-2025",
+    "slc-student-support-england-2025",
+    "voa-council-tax-bands-2025",
+    "voa-council-tax-stock-by-lad-2025",
+    "welshgov-council-tax-levels-2026-27",
+)
+
+
+def uk_bundle_sources_from_aliases() -> tuple[str, ...]:
+    """Return UK-package aliases implied by the source-package directory prefixes."""
+    return tuple(
+        sorted(
+            alias
+            for alias, path in SOURCE_PACKAGE_ALIASES.items()
+            if path.parts and path.parts[0] in UK_BUNDLE_SOURCE_PREFIXES
+        )
+    )
+
+
+def assert_uk_bundle_sources_match_aliases() -> None:
+    """Fail loudly if the curated UK suite omits a UK-prefixed alias."""
+    expected = uk_bundle_sources_from_aliases()
+    if UK_BUNDLE_SOURCES != expected:
+        missing = sorted(set(expected) - set(UK_BUNDLE_SOURCES))
+        extra = sorted(set(UK_BUNDLE_SOURCES) - set(expected))
+        raise ValueError(
+            "UK_BUNDLE_SOURCES drifted from UK-prefixed SOURCE_PACKAGE_ALIASES: "
+            f"missing={missing}, extra={extra}"
+        )
 
 
 @dataclass(frozen=True)

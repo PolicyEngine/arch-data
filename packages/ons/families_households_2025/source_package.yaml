@@ -5,10 +5,10 @@
 # production fixture are enumerated at the populace consumption gate.
 schema_version: ledger.source_package.v1
 package_id: ons-families-households-2025
-label: 'ONS families and households 2025, Table 7: UK households by household type, 2018-2025'
+label: 'ONS families and households 2025, Tables 5 and 7: UK household size and households by household type, 2018-2025'
 artifact:
   source_name: ons
-  source_table: 'Families and households in the UK 2025, Table 7: households by type'
+  source_table: 'Families and households in the UK 2025, Tables 5 and 7: household size and households by type'
   resource_package: db
   resource_directory: data/ons/families_households_2025
   manifest: manifest.yaml
@@ -1426,3 +1426,683 @@ record_sets:
     aggregation: sum
     value_scale: 1000
     expected_cell_type: number
+- record_set_id: ons.families_households_2025.table5.all_households.cy2018
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2018.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2018
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2018 estimate
+    ordinal: 0
+    column: W
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2018 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2018
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2018.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2018
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2018
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2018 estimate
+    ordinal: 0
+    column: W
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2018 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2019
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2019.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2019
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2019 estimate
+    ordinal: 0
+    column: T
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2019 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2019
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2019.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2019
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2019
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2019 estimate
+    ordinal: 0
+    column: T
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2019 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2020
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2020.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2020
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2020 estimate
+    ordinal: 0
+    column: Q
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2020 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2020
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2020.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2020
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2020
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2020 estimate
+    ordinal: 0
+    column: Q
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2020 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2021
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2021.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2021
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2021 estimate
+    ordinal: 0
+    column: N
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2021 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2021
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2021.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2021
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2021
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2021 estimate
+    ordinal: 0
+    column: N
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2021 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2022
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2022.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2022
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2022 estimate
+    ordinal: 0
+    column: K
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2022 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2022
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2022.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2022
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2022
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2022 estimate
+    ordinal: 0
+    column: K
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2022 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2023
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2023.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2023
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2023 estimate
+    ordinal: 0
+    column: H
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2023 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2023
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2023.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2023
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2023
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2023 estimate
+    ordinal: 0
+    column: H
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2023 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2024
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2024.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2024
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2024 estimate
+    ordinal: 0
+    column: E
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2024 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2024
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2024.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2024
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2024
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2024 estimate
+    ordinal: 0
+    column: E
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2024 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.all_households.cy2025
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.all_households.cy2025.v1
+  source_record_id_prefix: ons.families_households_2025.table5.all_households.cy2025
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: all_households
+    label: All households
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: A
+    expected_row_header: All households
+    table_record_kind: total
+  measures:
+  - measure_id: households_total
+    label: All households, 2025 estimate
+    ordinal: 0
+    column: B
+    source_column_id: households_total
+    concept: ons.households_total
+    source_concept: ons.families_households_table5.all_households
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 all households
+      row, thousands.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+    expected_column_header_row: 12
+    expected_column_header: 2025 Estimate
+  survey_instrument: Labour Force Survey
+- record_set_id: ons.families_households_2025.table5.average_household_size.cy2025
+  provenance_class: survey_aggregate
+  record_set_spec_id: ons.families_households_2025.table5.average_household_size.cy2025.v1
+  source_record_id_prefix: ons.families_households_2025.table5.average_household_size.cy2025
+  sheet_name: '5'
+  period_type: calendar_year
+  period: 2025
+  geography_id: K02000001
+  geography_level: country
+  geography_name: United Kingdom
+  geography_vintage: current
+  entity: household
+  entity_role: resident_household
+  domain: household_composition
+  groupby_dimension: ons.household_size_summary
+  rows:
+  - value_id: average_household_size
+    label: Average household size (number of people)
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: A
+    expected_row_header: Average household size (number of people)
+    table_record_kind: total
+  measures:
+  - measure_id: average_household_size
+    label: Average household size, 2025 estimate
+    ordinal: 0
+    column: B
+    source_column_id: average_household_size
+    concept: ons.average_household_size
+    source_concept: ons.families_households_table5.average_household_size
+    concept_relation: source_label
+    concept_authority: ons
+    concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds
+    concept_evidence_notes: Families and households in the UK, 2025 edition, Table 5 average
+      household size row, number of people.
+    unit: people_per_household
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 12
+    expected_column_header: 2025 Estimate
+  survey_instrument: Labour Force Survey

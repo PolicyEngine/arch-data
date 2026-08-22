@@ -1,9 +1,8 @@
-"""United Kingdom Chronicle target loaders."""
+"""United Kingdom Chronicle target loaders.
 
-from chronicle.targets.loaders import (
-    load_hmrc_targets,
-    load_obr_targets,
-    load_ons_targets,
-)
+UK national measures are facts-only source packages. Target selection belongs
+to the consumer contract, so this module intentionally exports no legacy DB
+target loaders.
+"""
 
-__all__ = ["load_hmrc_targets", "load_obr_targets", "load_ons_targets"]
+__all__: list[str] = []

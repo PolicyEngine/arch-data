@@ -1,0 +1,25 @@
+source_id: usda_snap
+package_id: usda-snap-fy2025-monthly-state-caseloads
+dataset: usda_snap_fy2025_monthly_state_caseloads
+source_page: https://www.fns.usda.gov/pd/supplemental-nutrition-assistance-program-snap
+vintage: Fiscal year 2025 data available through March 2025
+table: SNAP Monthly State Participation and Benefit Summary FY69 to current
+notes: >-
+  FY25.xlsx contains numeric state and territory participation counts for
+  October 2024 through March 2025. Later FY2025 cells are publisher '--'
+  placeholders and are not emitted as facts.
+files:
+  2025:
+    filename: snap-zip-fy69tocurrent-6.zip
+    source_url: https://www.fns.usda.gov/sites/default/files/resource-files/snap-zip-fy69tocurrent-6.zip
+    sha256: 3eee091653335a00a80c6fe76b84904b309dddba0c8b63a256b7e079e4101abe
+    size_bytes: 1581035
+    fetched_at: '2026-05-11T11:57:29+00:00'
+    source_table: SNAP FY2025 monthly state participation through March 2025
+    year: 2025
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/usda_snap/usda-snap-fy69-to-current/2024/3eee091653335a00a80c6fe76b84904b309dddba0c8b63a256b7e079e4101abe/snap-zip-fy69tocurrent-6.zip
+        uri: r2://ledger-raw/raw/usda_snap/usda-snap-fy69-to-current/2024/3eee091653335a00a80c6fe76b84904b309dddba0c8b63a256b7e079e4101abe/snap-zip-fy69tocurrent-6.zip

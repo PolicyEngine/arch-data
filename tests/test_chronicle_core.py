@@ -63,6 +63,17 @@ def test_unknown_period_type_is_rejected():
     assert any(issue.code == "malformed_period" for issue in validate_fact(fact))
 
 
+def test_quantile_aggregation_passes_validation():
+    fact = _fact(
+        measure=Measure(concept="income_quantile_cut_point", unit="eur"),
+        aggregation=Aggregation(method="quantile"),
+        filters={"eurostat.quant_inc": "D1"},
+    )
+
+    assert validate_fact(fact) == ()
+
+
+
 def test_stable_key_ignores_human_label():
     fact = _fact()
     relabeled = _fact(label="A different display label")

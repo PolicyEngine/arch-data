@@ -1,0 +1,150 @@
+schema_version: ledger.source_package.v1
+package_id: eurostat-ilc-li02
+label: Eurostat ilc_li02 at-risk-of-poverty rate for Belgium, Germany, and France
+artifact:
+  source_name: eurostat
+  source_table: Eurostat ilc_li02 At-risk-of-poverty rate by poverty threshold, age and sex - EU-SILC and ECHP surveys for Belgium, Germany, and France
+  resource_package: db
+  resource_directory: data/eurostat/ilc_li02
+  manifest: manifest.yaml
+  vintage: eurostat_ilc_li02_2024
+  extracted_at: "2026-08-09"
+  extraction_method: >-
+    Eurostat dissemination API v1.0 JSON-stat 2.0 full-cube row parse of
+    the filtered request recorded in the manifest source_url
+  parser: json_stat_2_full_rows
+  artifact_year: 2024
+  sheet_name: ilc_li02
+  # Live category labels: B_60 is "Below 60%" and selects the AROP side of
+  # the threshold; A_60 is "Above 60%" and is therefore rejected. MED_EI is
+  # "Median equivalised income", the statistic that anchors the 60% threshold.
+  selected_rows:
+    - {freq: A, statinfo: MED_EI, unit: PC, rskpovth: B_60, sex: T, age: TOTAL, geo: BE, time: "2024"}
+    - {freq: A, statinfo: MED_EI, unit: PC, rskpovth: B_60, sex: T, age: TOTAL, geo: DE, time: "2024"}
+    - {freq: A, statinfo: MED_EI, unit: PC, rskpovth: B_60, sex: T, age: TOTAL, geo: FR, time: "2024"}
+# EVALUATION-ONLY by class: Ledger ingests everything; the Populace gate decides use.
+record_sets:
+  - record_set_id: eurostat.ilc_li02.cy2024.at_risk_of_poverty_rate.country
+    provenance_class: survey_aggregate
+    survey_instrument: EU-SILC
+    record_set_spec_id: eurostat.ilc_li02.at_risk_of_poverty_rate.country.v1
+    source_record_id_prefix: eurostat.ilc_li02.cy2024.at_risk_of_poverty_rate.country
+    sheet_name: ilc_li02
+    period_type: calendar_year
+    period: 2024
+    period_coverage:
+      basis: survey_reference
+      source_period_label: "2024"
+      start_date: "2023-01-01"
+      end_date: "2023-12-31"
+      notes: >-
+        The fact period preserves Eurostat TIME_PERIOD 2024 (survey year).
+        For BE, DE, and FR the EU-SILC income reference period is the
+        previous calendar year, 2023; start_date and end_date record that
+        income reference span.
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: person
+    entity_role: private_household_resident
+    domain: income_and_living_conditions
+    groupby_dimension: geo
+    shared_filters:
+      freq: A
+      statinfo: MED_EI
+      unit: PC
+      rskpovth: B_60
+      sex: T
+      age: TOTAL
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: Eurostat frequency}
+      - {variable: statinfo, operator: "==", value: MED_EI, label: Median equivalised income}
+      - {variable: unit, operator: "==", value: PC, label: Eurostat source unit}
+      - {variable: rskpovth, operator: "==", value: B_60, label: Below 60% threshold}
+      - {variable: sex, operator: "==", value: T, label: Eurostat sex total}
+      - {variable: age, operator: "==", value: TOTAL, label: Eurostat age total}
+      - {variable: time, operator: "==", value: "2024", label: Eurostat time}
+    rows:
+      - value_id: be
+        label: Belgium at-risk-of-poverty rate
+        ordinal: 0
+        row_number: 2
+        expected_row_header_column: G
+        expected_row_header: BE
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MED_EI, label: Eurostat statinfo dimension}
+          - {column: C, expected_value: PC, label: Eurostat unit dimension}
+          - {column: D, expected_value: B_60, label: Eurostat threshold dimension}
+          - {column: E, expected_value: T, label: Eurostat sex dimension}
+          - {column: F, expected_value: TOTAL, label: Eurostat age dimension}
+          - {column: G, expected_value: BE, label: Eurostat geo dimension}
+        filters: {geo: BE}
+        constraints:
+          - {variable: geo, operator: "==", value: BE, label: Eurostat geography}
+      - value_id: de
+        label: Germany at-risk-of-poverty rate
+        ordinal: 1
+        row_number: 3
+        expected_row_header_column: G
+        expected_row_header: DE
+        geography_id: DE
+        geography_name: Germany
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MED_EI, label: Eurostat statinfo dimension}
+          - {column: C, expected_value: PC, label: Eurostat unit dimension}
+          - {column: D, expected_value: B_60, label: Eurostat threshold dimension}
+          - {column: E, expected_value: T, label: Eurostat sex dimension}
+          - {column: F, expected_value: TOTAL, label: Eurostat age dimension}
+          - {column: G, expected_value: DE, label: Eurostat geo dimension}
+        filters: {geo: DE}
+        constraints:
+          - {variable: geo, operator: "==", value: DE, label: Eurostat geography}
+      - value_id: fr
+        label: France at-risk-of-poverty rate
+        ordinal: 2
+        row_number: 4
+        expected_row_header_column: G
+        expected_row_header: FR
+        geography_id: FR
+        geography_name: France
+        guard_cells:
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MED_EI, label: Eurostat statinfo dimension}
+          - {column: C, expected_value: PC, label: Eurostat unit dimension}
+          - {column: D, expected_value: B_60, label: Eurostat threshold dimension}
+          - {column: E, expected_value: T, label: Eurostat sex dimension}
+          - {column: F, expected_value: TOTAL, label: Eurostat age dimension}
+          - {column: G, expected_value: FR, label: Eurostat geo dimension}
+        filters: {geo: FR}
+        constraints:
+          - {variable: geo, operator: "==", value: FR, label: Eurostat geography}
+    measures:
+      - measure_id: at_risk_of_poverty_rate
+        label: At-risk-of-poverty rate after social transfers
+        ordinal: 0
+        column: I
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: at_risk_of_poverty_rate_after_social_transfers
+        source_concept: eurostat.ilc_li02.MED_EI.B_60
+        concept_relation: exact
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/ilc_li02/default/table?lang=en
+        concept_evidence_notes: >-
+          ilc_li02 is the after-social-transfers AROP table. MED_EI (Median
+          equivalised income), B_60 (Below 60%), PC, total sex, and total age
+          select its headline rate. EU-SILC universe: private households and
+          their current members; persons in collective households and
+          institutions are generally excluded, and France is covered
+          excluding Mayotte, per the Eurostat ilc_sieusilc reference
+          metadata.
+        unit: percent
+        aggregation: rate
+        expected_cell_type: number
