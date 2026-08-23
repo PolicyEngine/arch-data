@@ -69,6 +69,14 @@ BELGIUM_TARGET_STREAMS = (
 )
 EUROMOD_BE_COMPARATOR_ALIAS = "jrc-euromod-be-baseline-statistics-2025"
 FISCAL_DISTRIBUTION_ALIAS = "statbel-fiscal-income-distribution-2023"
+EUROMOD_BE_COMPARATOR_PATH = (
+    REPO_ROOT
+    / "db"
+    / "data"
+    / "jrc"
+    / "euromod_be_baseline_statistics_2025"
+    / "jrc_euromod_be_baseline_statistics_2025.csv"
+)
 
 
 @lru_cache
@@ -420,18 +428,11 @@ def test_belgium_nis_2025_crosswalk_round_trips_merged_communes():
 
 
 def test_belgium_euromod_comparator_has_source_urls_per_row():
-    comparator_rows = _csv_rows(
-        REPO_ROOT
-        / "db"
-        / "data"
-        / "jrc"
-        / "euromod_be_baseline_statistics_2025"
-        / "jrc_euromod_be_baseline_statistics_2025.csv"
-    )
+    comparator_rows = _csv_rows(EUROMOD_BE_COMPARATOR_PATH)
     facts = _facts(EUROMOD_BE_COMPARATOR_ALIAS, 2025)
 
-    assert len(comparator_rows) == 41
-    assert len(facts) == 41
+    assert len(comparator_rows) == 90
+    assert len(facts) == 90
     assert {row["source_url"] for row in comparator_rows} == {
         "https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf"
     }
@@ -444,13 +445,78 @@ def test_belgium_euromod_comparator_has_source_urls_per_row():
         "ratio",
     }
     assert sum(fact.provenance_class == "administrative" for fact in facts) == 25
-    assert sum(fact.provenance_class == "model_output" for fact in facts) == 14
+    assert sum(fact.provenance_class == "model_output" for fact in facts) == 63
     assert sum(fact.provenance_class == "survey_aggregate" for fact in facts) == 2
+    assert sum(row["validation.series"] == "euromod" for row in comparator_rows) == 32
+    assert sum(row["validation.series"] == "ratio" for row in comparator_rows) == 29
+    assert {
+        fact.provenance_class
+        for fact in facts
+        if fact.filters["validation.series"] in {"euromod", "ratio"}
+    } == {"model_output"}
     survey_facts = [
         fact for fact in facts if fact.provenance_class == "survey_aggregate"
     ]
     assert {fact.survey_instrument for fact in survey_facts} == {"EU-SILC"}
     assert validate_facts(facts).valid
+
+
+def test_belgium_euromod_comparator_preserves_original_rows_byte_for_byte():
+    original_prefix = b"".join(
+        EUROMOD_BE_COMPARATOR_PATH.read_bytes().splitlines(keepends=True)[:42]
+    )
+
+    # Header plus the original 41 rows is exactly the C2 artifact.
+    assert hashlib.sha256(original_prefix).hexdigest() == (
+        "2ef69251a72caaab042706c77143fa4f86dde2f800747ebb421b5f7b9a45e394"
+    )
+
+
+def test_belgium_euromod_comparator_pairs_c2_rows_with_model_outputs():
+    comparator_rows = _csv_rows(EUROMOD_BE_COMPARATOR_PATH)
+    ids = {row["value_id"] for row in comparator_rows}
+    c2_rows = comparator_rows[18:41]
+
+    assert len(c2_rows) == 23
+    assert {row["validation.series"] for row in c2_rows} == {"external", "silc"}
+
+    # The cached report has no blank same-period EUROMOD cells for these rows.
+    documented_euromod_blanks: set[str] = set()
+    missing_euromod = {
+        row["value_id"]
+        for row in c2_rows
+        if row["value_id"]
+        .replace("_external_", "_euromod_")
+        .replace("_silc_", "_euromod_")
+        not in ids
+    }
+    assert missing_euromod == documented_euromod_blanks
+
+    missing_ratios = {
+        row["value_id"]
+        for row in c2_rows
+        if row["value_id"]
+        .replace("_external_", "_ratio_")
+        .replace("_silc_", "_ratio_")
+        not in ids
+    }
+    assert not missing_ratios
+
+    # A3.2 prints these EUROMOD yse amounts but no External values or ratios.
+    yse_amounts = {
+        int(row["period"]): int(row["value"])
+        for row in comparator_rows
+        if row["table_id"] == "A3.2"
+        and row["validation.metric"] == "self_employment_income_yse"
+        and row["validation.series"] == "euromod"
+    }
+    assert yse_amounts == {2021: 20_965, 2022: 21_981, 2023: 23_764}
+    assert not any(
+        row["table_id"] == "A3.2"
+        and row["validation.metric"] == "self_employment_income_yse"
+        and row["validation.series"] == "ratio"
+        for row in comparator_rows
+    )
 
 
 SFPD_PENSION_ALIAS = "sfpd-legal-pension-caseload-2025"

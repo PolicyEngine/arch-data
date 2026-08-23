@@ -1,0 +1,19 @@
+source_id: welshgov
+package_id: welshgov-ctrs-annual-report-2024-25
+dataset: welshgov_welshgov-ctrs-annual-report-2024-25
+source_page: https://www.gov.wales/council-tax-reduction-scheme-annual-report-2024-2025
+table: 'Council Tax Reduction Scheme: annual report 2024 to 2025, Table 2 total value
+  of CTRS awards in Wales'
+files:
+  2025:
+    filename: council-tax-reduction-scheme-annual-report-2024-to-2025_0.pdf
+    source_url: https://www.gov.wales/sites/default/files/publications/2025-08/council-tax-reduction-scheme-annual-report-2024-to-2025_0.pdf
+    sha256: 3f447d6550b96708649d9bf1c1b6d282ce4b7d18c51043da07c0b0597c5e674c
+    size_bytes: 526183
+    fetched_at: '2026-08-23T08:43:02+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/welshgov/welshgov-ctrs-annual-report-2024-25/2025/3f447d6550b96708649d9bf1c1b6d282ce4b7d18c51043da07c0b0597c5e674c/council-tax-reduction-scheme-annual-report-2024-to-2025_0.pdf
+        uri: r2://ledger-raw/raw/welshgov/welshgov-ctrs-annual-report-2024-25/2025/3f447d6550b96708649d9bf1c1b6d282ce4b7d18c51043da07c0b0597c5e674c/council-tax-reduction-scheme-annual-report-2024-to-2025_0.pdf
