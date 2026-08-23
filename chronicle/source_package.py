@@ -98,6 +98,12 @@ SOURCE_PACKAGE_ALIASES = {
     "mhclg-council-tax-levels-england-2026-27": Path(
         "mhclg/council_tax_levels_england_2026_27"
     ),
+    "mhclg-council-tax-levels-england-summary-2025-26": Path(
+        "mhclg/council_tax_levels_england_summary_2025_26"
+    ),
+    "mhclg-council-tax-collection-england-2025-26": Path(
+        "mhclg/council_tax_collection_england_2025_26"
+    ),
     "mhclg-ehs-weekly-housing-costs-2023-24": Path(
         "mhclg/ehs_weekly_housing_costs_2023_24"
     ),
@@ -267,6 +273,7 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "eurostat-gov-10a-taxag": Path("eurostat/gov_10a_taxag"),
     "eurostat-spr-exp-func": Path("eurostat/spr_exp_func"),
+    "eurostat-nasa-10-nf-tr": Path("eurostat/nasa_10_nf_tr"),
     "eurostat-ilc-li02": Path("eurostat/ilc_li02"),
     "eurostat-ilc-di01": Path("eurostat/ilc_di01"),
     "kff-marketplace-effectuated-enrollment": Path(
@@ -302,10 +309,25 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "scotgov-band-d-equivalents-2025": Path("scotgov/band_d_equivalents_2025"),
     "scotgov-council-tax-bands-2025": Path("scotgov/council_tax_bands_2025"),
+    "scotgov-council-tax-collection-2024-25": Path(
+        "scotgov/council_tax_collection_2024_25"
+    ),
+    "scotgov-council-tax-collection-2025-26": Path(
+        "scotgov/council_tax_collection_2025_26"
+    ),
+    "scotgov-slgfs-council-tax-2024-25": Path("scotgov/slgfs_council_tax_2024_25"),
     "scotgov-scottish-budget-social-security-assistance-2026": Path(
         "scotgov/scottish_budget_social_security_assistance_2026"
     ),
     "welshgov-council-tax-levels-2026-27": Path("welshgov/council_tax_levels_2026_27"),
+    "welshgov-council-tax-collection-2024-25": Path(
+        "welshgov/council_tax_collection_2024_25"
+    ),
+    "welshgov-council-tax-collection-2025-26": Path(
+        "welshgov/council_tax_collection_2025_26"
+    ),
+    "welshgov-ctrs-annual-report-2024-25": Path("welshgov/ctrs_annual_report_2024_25"),
+    "welshgov-ctrs-annual-report-2025-26": Path("welshgov/ctrs_annual_report_2025_26"),
     "voa-council-tax-bands-2025": Path("voa/council_tax_bands_2025"),
     "voa-council-tax-stock-by-lad-2025": Path("voa/council_tax_stock_by_lad_2025"),
     "obr-efo-receipts-march-2026": Path("obr/efo_receipts_march_2026"),

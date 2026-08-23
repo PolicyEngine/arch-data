@@ -1,0 +1,667 @@
+schema_version: ledger.source_package.v1
+package_id: eurostat-nasa-10-nf-tr
+label: Eurostat nasa_10_nf_tr Belgian household-sector non-financial transactions
+artifact:
+  source_name: eurostat
+  source_table: Eurostat nasa_10_nf_tr Non-financial transactions - annual data for Belgian households and NPISH
+  resource_package: db
+  resource_directory: data/eurostat/nasa_10_nf_tr
+  manifest: manifest.yaml
+  vintage: eurostat_nasa_10_nf_tr_2024
+  extracted_at: "2026-08-23"
+  extraction_method: >-
+    Eurostat dissemination API v1.0 JSON-stat 2.0 full-cube row parse of
+    the filtered request recorded in the manifest source_url
+  parser: json_stat_2_full_rows
+  artifact_year: 2024
+  sheet_name: nasa_10_nf_tr
+  # The returned cube has 84 positions. Chronicle preserves every position
+  # as a source row, including null PAID D42 and RECV D5 cells, but selects
+  # only the 78 publisher-populated observations as facts. B3N was requested
+  # but is absent from the returned na_item dimension and is not fabricated.
+  selected_rows:
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B2G, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B3G, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B6G, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D1, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D11, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D12, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D4, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D41, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D44, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D45, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D5, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D61, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D62, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B2G, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B3G, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B6G, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D1, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D11, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D12, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D4, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D41, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D42, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D44, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D45, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D61, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D62, sector: S14_S15, geo: BE, time: "2022"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B2G, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B3G, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B6G, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D1, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D11, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D12, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D4, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D41, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D44, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D45, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D5, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D61, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D62, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B2G, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B3G, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B6G, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D1, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D11, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D12, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D4, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D41, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D42, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D44, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D45, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D61, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D62, sector: S14_S15, geo: BE, time: "2023"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B2G, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B3G, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: B6G, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D1, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D11, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D12, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D4, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D41, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D44, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D45, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D5, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D61, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: PAID, na_item: D62, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B2G, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B3G, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: B6G, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D1, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D11, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D12, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D4, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D41, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D42, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D44, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D45, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D61, sector: S14_S15, geo: BE, time: "2024"}
+    - {freq: A, unit: CP_MEUR, direct: RECV, na_item: D62, sector: S14_S15, geo: BE, time: "2024"}
+record_sets:
+  - &paid_record_set
+    record_set_id: eurostat.nasa_10_nf_tr.cy2022.household_non_financial_transactions.paid.be
+    provenance_class: administrative
+    record_set_spec_id: eurostat.nasa_10_nf_tr.household_non_financial_transactions.direction.country.v1
+    source_record_id_prefix: eurostat.nasa_10_nf_tr.cy2022.household_non_financial_transactions.paid.be
+    sheet_name: nasa_10_nf_tr
+    period_type: calendar_year
+    period: 2022
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: household
+    entity_role: resident_households_and_npish
+    domain: national_accounts
+    groupby_dimension: na_item
+    shared_filters:
+      freq: A
+      unit: CP_MEUR
+      direct: PAID
+      sector: S14_S15
+      geo: BE
+      time: "2022"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: annual frequency}
+      - {variable: unit, operator: "==", value: CP_MEUR, label: current-price million euro source unit}
+      - {variable: direct, operator: "==", value: PAID, label: paid direction}
+      - {variable: sector, operator: "==", value: S14_S15, label: households and NPISH institutional sector}
+      - {variable: geo, operator: "==", value: BE, label: Belgium}
+      - {variable: time, operator: "==", value: "2022", label: source time}
+    rows:
+      - &paid_b2g_row
+        value_id: belgium_household_operating_surplus_gross
+        label: Operating surplus, gross (B.2G), paid-direction cell
+        ordinal: 0
+        row_number: 2
+        expected_row_header_column: D
+        expected_row_header: B2G
+        filters: {na_item: B2G}
+        constraints:
+          - {variable: na_item, operator: "==", value: B2G, label: ESA 2010 operating surplus gross}
+        guard_cells: &paid_2022_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: CP_MEUR, label: current-price million euro source unit}
+          - {column: C, expected_value: PAID, label: paid direction}
+          - {column: E, expected_value: S14_S15, label: households and NPISH institutional sector}
+          - {column: F, expected_value: BE, label: Belgium}
+          - {column: G, row: 1, expected_value: time, label: time dimension header}
+      - &paid_b3g_row
+        value_id: belgium_household_mixed_income_gross
+        label: Mixed income, gross (B.3G), paid-direction cell
+        ordinal: 1
+        row_number: 3
+        expected_row_header_column: D
+        expected_row_header: B3G
+        filters: {na_item: B3G}
+        constraints:
+          - {variable: na_item, operator: "==", value: B3G, label: ESA 2010 mixed income gross}
+        guard_cells: *paid_2022_guards
+      - &paid_b6g_row
+        value_id: belgium_household_disposable_income_gross
+        label: Disposable income, gross (B.6G), paid-direction cell
+        ordinal: 2
+        row_number: 4
+        expected_row_header_column: D
+        expected_row_header: B6G
+        filters: {na_item: B6G}
+        constraints:
+          - {variable: na_item, operator: "==", value: B6G, label: ESA 2010 disposable income gross}
+        guard_cells: *paid_2022_guards
+      - &paid_d1_row
+        value_id: belgium_household_compensation_of_employees_paid
+        label: Compensation of employees paid (D.1)
+        ordinal: 3
+        row_number: 5
+        expected_row_header_column: D
+        expected_row_header: D1
+        filters: {na_item: D1}
+        constraints:
+          - {variable: na_item, operator: "==", value: D1, label: ESA 2010 compensation of employees}
+        guard_cells: *paid_2022_guards
+      - &paid_d11_row
+        value_id: belgium_household_wages_and_salaries_paid
+        label: Wages and salaries paid (D.11)
+        ordinal: 4
+        row_number: 6
+        expected_row_header_column: D
+        expected_row_header: D11
+        filters: {na_item: D11}
+        constraints:
+          - {variable: na_item, operator: "==", value: D11, label: ESA 2010 wages and salaries}
+        guard_cells: *paid_2022_guards
+      - &paid_d12_row
+        value_id: belgium_household_employers_social_contributions_paid
+        label: Employers' social contributions paid (D.12)
+        ordinal: 5
+        row_number: 7
+        expected_row_header_column: D
+        expected_row_header: D12
+        filters: {na_item: D12}
+        constraints:
+          - {variable: na_item, operator: "==", value: D12, label: ESA 2010 employers' social contributions}
+        guard_cells: *paid_2022_guards
+      - &paid_d4_row
+        value_id: belgium_household_property_income_paid
+        label: Property income paid (D.4)
+        ordinal: 6
+        row_number: 8
+        expected_row_header_column: D
+        expected_row_header: D4
+        filters: {na_item: D4}
+        constraints:
+          - {variable: na_item, operator: "==", value: D4, label: ESA 2010 property income}
+        guard_cells: *paid_2022_guards
+      - &paid_d41_row
+        value_id: belgium_household_interest_paid
+        label: Interest paid (D.41)
+        ordinal: 7
+        row_number: 9
+        expected_row_header_column: D
+        expected_row_header: D41
+        filters: {na_item: D41}
+        constraints:
+          - {variable: na_item, operator: "==", value: D41, label: ESA 2010 interest}
+        guard_cells: *paid_2022_guards
+      - &paid_d44_row
+        value_id: belgium_household_other_investment_income_paid
+        label: Other investment income paid (D.44)
+        ordinal: 8
+        row_number: 10
+        expected_row_header_column: D
+        expected_row_header: D44
+        filters: {na_item: D44}
+        constraints:
+          - {variable: na_item, operator: "==", value: D44, label: ESA 2010 other investment income}
+        guard_cells: *paid_2022_guards
+      - &paid_d45_row
+        value_id: belgium_household_rents_paid
+        label: Rents paid (D.45)
+        ordinal: 9
+        row_number: 11
+        expected_row_header_column: D
+        expected_row_header: D45
+        filters: {na_item: D45}
+        constraints:
+          - {variable: na_item, operator: "==", value: D45, label: ESA 2010 rents}
+        guard_cells: *paid_2022_guards
+      - &paid_d5_row
+        value_id: belgium_household_current_taxes_on_income_paid
+        label: Current taxes on income, wealth, etc. paid (D.5)
+        ordinal: 10
+        row_number: 12
+        expected_row_header_column: D
+        expected_row_header: D5
+        filters: {na_item: D5}
+        constraints:
+          - {variable: na_item, operator: "==", value: D5, label: ESA 2010 current taxes on income, wealth, etc.}
+        guard_cells: *paid_2022_guards
+      - &paid_d61_row
+        value_id: belgium_household_net_social_contributions_paid
+        label: Net social contributions paid (D.61)
+        ordinal: 11
+        row_number: 13
+        expected_row_header_column: D
+        expected_row_header: D61
+        filters: {na_item: D61}
+        constraints:
+          - {variable: na_item, operator: "==", value: D61, label: ESA 2010 net social contributions}
+        guard_cells: *paid_2022_guards
+      - &paid_d62_row
+        value_id: belgium_household_social_benefits_paid
+        label: Social benefits other than social transfers in kind paid (D.62)
+        ordinal: 12
+        row_number: 14
+        expected_row_header_column: D
+        expected_row_header: D62
+        filters: {na_item: D62}
+        constraints:
+          - {variable: na_item, operator: "==", value: D62, label: ESA 2010 social benefits other than social transfers in kind}
+        guard_cells: *paid_2022_guards
+    measures: &transaction_measure
+      - measure_id: amount
+        label: Household-sector national-accounts non-financial transaction amount
+        ordinal: 0
+        column: H
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: belgium_household_national_accounts_non_financial_transaction_amount
+        source_concept: eurostat.nasa_10_nf_tr.non_financial_transaction_amount
+        concept_relation: exact
+        concept_authority: ledger-be
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/nasa_10_nf_tr/default/table?lang=en
+        concept_evidence_notes: >-
+          Each row is the exact current-price ESA 2010 amount published by
+          Eurostat for Belgium and institutional sector S14_S15, which combines
+          households and non-profit institutions serving households. B.2G,
+          B.3G, and B.6G are balancing items, not independent paid and received
+          flows; the API repeats their published levels under both directions.
+          Eurostat marks the populated 2024 observations provisional in the
+          returned status dimension.
+          B.3G is mixed income before deducting consumption of fixed capital
+          and combines labour and capital returns of household unincorporated
+          enterprises. D.1 comprises D.11 wages and salaries plus D.12 actual
+          and imputed employers' social contributions; on the resources side,
+          D.12 is imputed to households and is not cash wages. D.4 and its
+          components overlap: D.41 is ESA interest after the FISIM adjustment;
+          D.42 is distributed income of corporations; D.44 is investment
+          income attributable to insurance policyholders, pension entitlement
+          holders, and collective investment fund shareholders, not taxable
+          movable income; and D.45 is rent on natural resources, not tenant
+          housing rent. D.5 covers current taxes on income, wealth, etc., not
+          personal income tax alone. D.61 is the broad ESA net social
+          contribution aggregate, and D.62 covers social benefits other than
+          social transfers in kind. Chronicle stores every published aggregate
+          without reconciling overlapping totals or constructing calibration
+          targets.
+        unit: eur
+        aggregation: sum
+        value_scale: 1000000
+        expected_cell_type: number
+  - &received_record_set
+    record_set_id: eurostat.nasa_10_nf_tr.cy2022.household_non_financial_transactions.received.be
+    provenance_class: administrative
+    record_set_spec_id: eurostat.nasa_10_nf_tr.household_non_financial_transactions.direction.country.v1
+    source_record_id_prefix: eurostat.nasa_10_nf_tr.cy2022.household_non_financial_transactions.received.be
+    sheet_name: nasa_10_nf_tr
+    period_type: calendar_year
+    period: 2022
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: household
+    entity_role: resident_households_and_npish
+    domain: national_accounts
+    groupby_dimension: na_item
+    shared_filters:
+      freq: A
+      unit: CP_MEUR
+      direct: RECV
+      sector: S14_S15
+      geo: BE
+      time: "2022"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: annual frequency}
+      - {variable: unit, operator: "==", value: CP_MEUR, label: current-price million euro source unit}
+      - {variable: direct, operator: "==", value: RECV, label: received direction}
+      - {variable: sector, operator: "==", value: S14_S15, label: households and NPISH institutional sector}
+      - {variable: geo, operator: "==", value: BE, label: Belgium}
+      - {variable: time, operator: "==", value: "2022", label: source time}
+    rows:
+      - &received_b2g_row
+        value_id: belgium_household_operating_surplus_gross
+        label: Operating surplus, gross (B.2G), received-direction cell
+        ordinal: 0
+        row_number: 15
+        expected_row_header_column: D
+        expected_row_header: B2G
+        filters: {na_item: B2G}
+        constraints:
+          - {variable: na_item, operator: "==", value: B2G, label: ESA 2010 operating surplus gross}
+        guard_cells: &received_2022_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: CP_MEUR, label: current-price million euro source unit}
+          - {column: C, expected_value: RECV, label: received direction}
+          - {column: E, expected_value: S14_S15, label: households and NPISH institutional sector}
+          - {column: F, expected_value: BE, label: Belgium}
+          - {column: G, row: 1, expected_value: time, label: time dimension header}
+      - &received_b3g_row
+        value_id: belgium_household_mixed_income_gross
+        label: Mixed income, gross (B.3G), received-direction cell
+        ordinal: 1
+        row_number: 16
+        expected_row_header_column: D
+        expected_row_header: B3G
+        filters: {na_item: B3G}
+        constraints:
+          - {variable: na_item, operator: "==", value: B3G, label: ESA 2010 mixed income gross}
+        guard_cells: *received_2022_guards
+      - &received_b6g_row
+        value_id: belgium_household_disposable_income_gross
+        label: Disposable income, gross (B.6G), received-direction cell
+        ordinal: 2
+        row_number: 17
+        expected_row_header_column: D
+        expected_row_header: B6G
+        filters: {na_item: B6G}
+        constraints:
+          - {variable: na_item, operator: "==", value: B6G, label: ESA 2010 disposable income gross}
+        guard_cells: *received_2022_guards
+      - &received_d1_row
+        value_id: belgium_household_compensation_of_employees_received
+        label: Compensation of employees received (D.1)
+        ordinal: 3
+        row_number: 18
+        expected_row_header_column: D
+        expected_row_header: D1
+        filters: {na_item: D1}
+        constraints:
+          - {variable: na_item, operator: "==", value: D1, label: ESA 2010 compensation of employees}
+        guard_cells: *received_2022_guards
+      - &received_d11_row
+        value_id: belgium_household_wages_and_salaries_received
+        label: Wages and salaries received (D.11)
+        ordinal: 4
+        row_number: 19
+        expected_row_header_column: D
+        expected_row_header: D11
+        filters: {na_item: D11}
+        constraints:
+          - {variable: na_item, operator: "==", value: D11, label: ESA 2010 wages and salaries}
+        guard_cells: *received_2022_guards
+      - &received_d12_row
+        value_id: belgium_household_employers_social_contributions_received
+        label: Employers' social contributions received (D.12)
+        ordinal: 5
+        row_number: 20
+        expected_row_header_column: D
+        expected_row_header: D12
+        filters: {na_item: D12}
+        constraints:
+          - {variable: na_item, operator: "==", value: D12, label: ESA 2010 employers' social contributions}
+        guard_cells: *received_2022_guards
+      - &received_d4_row
+        value_id: belgium_household_property_income_received
+        label: Property income received (D.4)
+        ordinal: 6
+        row_number: 21
+        expected_row_header_column: D
+        expected_row_header: D4
+        filters: {na_item: D4}
+        constraints:
+          - {variable: na_item, operator: "==", value: D4, label: ESA 2010 property income}
+        guard_cells: *received_2022_guards
+      - &received_d41_row
+        value_id: belgium_household_interest_received
+        label: Interest received (D.41)
+        ordinal: 7
+        row_number: 22
+        expected_row_header_column: D
+        expected_row_header: D41
+        filters: {na_item: D41}
+        constraints:
+          - {variable: na_item, operator: "==", value: D41, label: ESA 2010 interest}
+        guard_cells: *received_2022_guards
+      - &received_d42_row
+        value_id: belgium_household_distributed_income_of_corporations_received
+        label: Distributed income of corporations received (D.42)
+        ordinal: 8
+        row_number: 23
+        expected_row_header_column: D
+        expected_row_header: D42
+        filters: {na_item: D42}
+        constraints:
+          - {variable: na_item, operator: "==", value: D42, label: ESA 2010 distributed income of corporations}
+        guard_cells: *received_2022_guards
+      - &received_d44_row
+        value_id: belgium_household_other_investment_income_received
+        label: Other investment income received (D.44)
+        ordinal: 9
+        row_number: 24
+        expected_row_header_column: D
+        expected_row_header: D44
+        filters: {na_item: D44}
+        constraints:
+          - {variable: na_item, operator: "==", value: D44, label: ESA 2010 other investment income}
+        guard_cells: *received_2022_guards
+      - &received_d45_row
+        value_id: belgium_household_rents_received
+        label: Rents received (D.45)
+        ordinal: 10
+        row_number: 25
+        expected_row_header_column: D
+        expected_row_header: D45
+        filters: {na_item: D45}
+        constraints:
+          - {variable: na_item, operator: "==", value: D45, label: ESA 2010 rents}
+        guard_cells: *received_2022_guards
+      - &received_d61_row
+        value_id: belgium_household_net_social_contributions_received
+        label: Net social contributions received (D.61)
+        ordinal: 11
+        row_number: 26
+        expected_row_header_column: D
+        expected_row_header: D61
+        filters: {na_item: D61}
+        constraints:
+          - {variable: na_item, operator: "==", value: D61, label: ESA 2010 net social contributions}
+        guard_cells: *received_2022_guards
+      - &received_d62_row
+        value_id: belgium_household_social_benefits_received
+        label: Social benefits other than social transfers in kind received (D.62)
+        ordinal: 12
+        row_number: 27
+        expected_row_header_column: D
+        expected_row_header: D62
+        filters: {na_item: D62}
+        constraints:
+          - {variable: na_item, operator: "==", value: D62, label: ESA 2010 social benefits other than social transfers in kind}
+        guard_cells: *received_2022_guards
+    measures: *transaction_measure
+  - <<: *paid_record_set
+    record_set_id: eurostat.nasa_10_nf_tr.cy2023.household_non_financial_transactions.paid.be
+    provenance_class: administrative
+    source_record_id_prefix: eurostat.nasa_10_nf_tr.cy2023.household_non_financial_transactions.paid.be
+    period: 2023
+    shared_filters:
+      freq: A
+      unit: CP_MEUR
+      direct: PAID
+      sector: S14_S15
+      geo: BE
+      time: "2023"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: annual frequency}
+      - {variable: unit, operator: "==", value: CP_MEUR, label: current-price million euro source unit}
+      - {variable: direct, operator: "==", value: PAID, label: paid direction}
+      - {variable: sector, operator: "==", value: S14_S15, label: households and NPISH institutional sector}
+      - {variable: geo, operator: "==", value: BE, label: Belgium}
+      - {variable: time, operator: "==", value: "2023", label: source time}
+    rows:
+      - <<: *paid_b2g_row
+        row_number: 28
+        guard_cells: &paid_2023_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: CP_MEUR, label: current-price million euro source unit}
+          - {column: C, expected_value: PAID, label: paid direction}
+          - {column: E, expected_value: S14_S15, label: households and NPISH institutional sector}
+          - {column: F, expected_value: BE, label: Belgium}
+          - {column: G, row: 1, expected_value: time, label: time dimension header}
+      - {<<: *paid_b3g_row, row_number: 29, guard_cells: *paid_2023_guards}
+      - {<<: *paid_b6g_row, row_number: 30, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d1_row, row_number: 31, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d11_row, row_number: 32, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d12_row, row_number: 33, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d4_row, row_number: 34, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d41_row, row_number: 35, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d44_row, row_number: 36, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d45_row, row_number: 37, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d5_row, row_number: 38, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d61_row, row_number: 39, guard_cells: *paid_2023_guards}
+      - {<<: *paid_d62_row, row_number: 40, guard_cells: *paid_2023_guards}
+  - <<: *received_record_set
+    record_set_id: eurostat.nasa_10_nf_tr.cy2023.household_non_financial_transactions.received.be
+    provenance_class: administrative
+    source_record_id_prefix: eurostat.nasa_10_nf_tr.cy2023.household_non_financial_transactions.received.be
+    period: 2023
+    shared_filters:
+      freq: A
+      unit: CP_MEUR
+      direct: RECV
+      sector: S14_S15
+      geo: BE
+      time: "2023"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: annual frequency}
+      - {variable: unit, operator: "==", value: CP_MEUR, label: current-price million euro source unit}
+      - {variable: direct, operator: "==", value: RECV, label: received direction}
+      - {variable: sector, operator: "==", value: S14_S15, label: households and NPISH institutional sector}
+      - {variable: geo, operator: "==", value: BE, label: Belgium}
+      - {variable: time, operator: "==", value: "2023", label: source time}
+    rows:
+      - <<: *received_b2g_row
+        row_number: 41
+        guard_cells: &received_2023_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: CP_MEUR, label: current-price million euro source unit}
+          - {column: C, expected_value: RECV, label: received direction}
+          - {column: E, expected_value: S14_S15, label: households and NPISH institutional sector}
+          - {column: F, expected_value: BE, label: Belgium}
+          - {column: G, row: 1, expected_value: time, label: time dimension header}
+      - {<<: *received_b3g_row, row_number: 42, guard_cells: *received_2023_guards}
+      - {<<: *received_b6g_row, row_number: 43, guard_cells: *received_2023_guards}
+      - {<<: *received_d1_row, row_number: 44, guard_cells: *received_2023_guards}
+      - {<<: *received_d11_row, row_number: 45, guard_cells: *received_2023_guards}
+      - {<<: *received_d12_row, row_number: 46, guard_cells: *received_2023_guards}
+      - {<<: *received_d4_row, row_number: 47, guard_cells: *received_2023_guards}
+      - {<<: *received_d41_row, row_number: 48, guard_cells: *received_2023_guards}
+      - {<<: *received_d42_row, row_number: 49, guard_cells: *received_2023_guards}
+      - {<<: *received_d44_row, row_number: 50, guard_cells: *received_2023_guards}
+      - {<<: *received_d45_row, row_number: 51, guard_cells: *received_2023_guards}
+      - {<<: *received_d61_row, row_number: 52, guard_cells: *received_2023_guards}
+      - {<<: *received_d62_row, row_number: 53, guard_cells: *received_2023_guards}
+  - <<: *paid_record_set
+    record_set_id: eurostat.nasa_10_nf_tr.cy2024.household_non_financial_transactions.paid.be
+    provenance_class: administrative
+    source_record_id_prefix: eurostat.nasa_10_nf_tr.cy2024.household_non_financial_transactions.paid.be
+    period: 2024
+    shared_filters:
+      freq: A
+      unit: CP_MEUR
+      direct: PAID
+      sector: S14_S15
+      geo: BE
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: annual frequency}
+      - {variable: unit, operator: "==", value: CP_MEUR, label: current-price million euro source unit}
+      - {variable: direct, operator: "==", value: PAID, label: paid direction}
+      - {variable: sector, operator: "==", value: S14_S15, label: households and NPISH institutional sector}
+      - {variable: geo, operator: "==", value: BE, label: Belgium}
+      - {variable: time, operator: "==", value: "2024", label: source time}
+    rows:
+      - <<: *paid_b2g_row
+        row_number: 54
+        guard_cells: &paid_2024_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: CP_MEUR, label: current-price million euro source unit}
+          - {column: C, expected_value: PAID, label: paid direction}
+          - {column: E, expected_value: S14_S15, label: households and NPISH institutional sector}
+          - {column: F, expected_value: BE, label: Belgium}
+          - {column: G, row: 1, expected_value: time, label: time dimension header}
+      - {<<: *paid_b3g_row, row_number: 55, guard_cells: *paid_2024_guards}
+      - {<<: *paid_b6g_row, row_number: 56, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d1_row, row_number: 57, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d11_row, row_number: 58, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d12_row, row_number: 59, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d4_row, row_number: 60, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d41_row, row_number: 61, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d44_row, row_number: 62, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d45_row, row_number: 63, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d5_row, row_number: 64, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d61_row, row_number: 65, guard_cells: *paid_2024_guards}
+      - {<<: *paid_d62_row, row_number: 66, guard_cells: *paid_2024_guards}
+  - <<: *received_record_set
+    record_set_id: eurostat.nasa_10_nf_tr.cy2024.household_non_financial_transactions.received.be
+    provenance_class: administrative
+    source_record_id_prefix: eurostat.nasa_10_nf_tr.cy2024.household_non_financial_transactions.received.be
+    period: 2024
+    shared_filters:
+      freq: A
+      unit: CP_MEUR
+      direct: RECV
+      sector: S14_S15
+      geo: BE
+      time: "2024"
+    shared_constraints:
+      - {variable: freq, operator: "==", value: A, label: annual frequency}
+      - {variable: unit, operator: "==", value: CP_MEUR, label: current-price million euro source unit}
+      - {variable: direct, operator: "==", value: RECV, label: received direction}
+      - {variable: sector, operator: "==", value: S14_S15, label: households and NPISH institutional sector}
+      - {variable: geo, operator: "==", value: BE, label: Belgium}
+      - {variable: time, operator: "==", value: "2024", label: source time}
+    rows:
+      - <<: *received_b2g_row
+        row_number: 67
+        guard_cells: &received_2024_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: CP_MEUR, label: current-price million euro source unit}
+          - {column: C, expected_value: RECV, label: received direction}
+          - {column: E, expected_value: S14_S15, label: households and NPISH institutional sector}
+          - {column: F, expected_value: BE, label: Belgium}
+          - {column: G, row: 1, expected_value: time, label: time dimension header}
+      - {<<: *received_b3g_row, row_number: 68, guard_cells: *received_2024_guards}
+      - {<<: *received_b6g_row, row_number: 69, guard_cells: *received_2024_guards}
+      - {<<: *received_d1_row, row_number: 70, guard_cells: *received_2024_guards}
+      - {<<: *received_d11_row, row_number: 71, guard_cells: *received_2024_guards}
+      - {<<: *received_d12_row, row_number: 72, guard_cells: *received_2024_guards}
+      - {<<: *received_d4_row, row_number: 73, guard_cells: *received_2024_guards}
+      - {<<: *received_d41_row, row_number: 74, guard_cells: *received_2024_guards}
+      - {<<: *received_d42_row, row_number: 75, guard_cells: *received_2024_guards}
+      - {<<: *received_d44_row, row_number: 76, guard_cells: *received_2024_guards}
+      - {<<: *received_d45_row, row_number: 77, guard_cells: *received_2024_guards}
+      - {<<: *received_d61_row, row_number: 78, guard_cells: *received_2024_guards}
+      - {<<: *received_d62_row, row_number: 79, guard_cells: *received_2024_guards}

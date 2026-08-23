@@ -465,6 +465,52 @@ uv run chronicle build-suite scotgov-scottish-budget-social-security-assistance-
   --out /tmp/chronicle-scotgov-scottish-budget-social-security-assistance-2026 \
   --replace
 
+uv run chronicle validate-package scotgov-council-tax-collection-2025-26 --year 2026
+uv run chronicle build-suite scotgov-council-tax-collection-2025-26 \
+  --year 2026 \
+  --out /tmp/chronicle-scotgov-council-tax-collection-2025-26 \
+  --replace
+uv run chronicle validate-package scotgov-council-tax-collection-2024-25 --year 2025
+uv run chronicle build-suite scotgov-council-tax-collection-2024-25 \
+  --year 2025 \
+  --out /tmp/chronicle-scotgov-council-tax-collection-2024-25 \
+  --replace
+uv run chronicle validate-package scotgov-slgfs-council-tax-2024-25 --year 2026
+uv run chronicle build-suite scotgov-slgfs-council-tax-2024-25 \
+  --year 2026 \
+  --out /tmp/chronicle-scotgov-slgfs-council-tax-2024-25 \
+  --replace
+uv run chronicle validate-package welshgov-council-tax-collection-2025-26 --year 2026
+uv run chronicle build-suite welshgov-council-tax-collection-2025-26 \
+  --year 2026 \
+  --out /tmp/chronicle-welshgov-council-tax-collection-2025-26 \
+  --replace
+uv run chronicle validate-package welshgov-council-tax-collection-2024-25 --year 2025
+uv run chronicle build-suite welshgov-council-tax-collection-2024-25 \
+  --year 2025 \
+  --out /tmp/chronicle-welshgov-council-tax-collection-2024-25 \
+  --replace
+uv run chronicle validate-package welshgov-ctrs-annual-report-2025-26 --year 2026
+uv run chronicle build-suite welshgov-ctrs-annual-report-2025-26 \
+  --year 2026 \
+  --out /tmp/chronicle-welshgov-ctrs-annual-report-2025-26 \
+  --replace
+uv run chronicle validate-package welshgov-ctrs-annual-report-2024-25 --year 2025
+uv run chronicle build-suite welshgov-ctrs-annual-report-2024-25 \
+  --year 2025 \
+  --out /tmp/chronicle-welshgov-ctrs-annual-report-2024-25 \
+  --replace
+uv run chronicle validate-package mhclg-council-tax-levels-england-summary-2025-26 --year 2026
+uv run chronicle build-suite mhclg-council-tax-levels-england-summary-2025-26 \
+  --year 2026 \
+  --out /tmp/chronicle-mhclg-council-tax-levels-england-summary-2025-26 \
+  --replace
+uv run chronicle validate-package mhclg-council-tax-collection-england-2025-26 --year 2026
+uv run chronicle build-suite mhclg-council-tax-collection-england-2025-26 \
+  --year 2026 \
+  --out /tmp/chronicle-mhclg-council-tax-collection-england-2025-26 \
+  --replace
+
 uv run chronicle validate-package dft-nts-vehicle-ownership-2024 --year 2024
 uv run chronicle build-suite dft-nts-vehicle-ownership-2024 \
   --year 2024 \

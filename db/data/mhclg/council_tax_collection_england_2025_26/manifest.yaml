@@ -1,0 +1,19 @@
+source_id: mhclg
+package_id: mhclg-council-tax-collection-england-2025-26
+dataset: mhclg_mhclg-council-tax-collection-england-2025-26
+source_page: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+table: Collection rates for council tax and non-domestic rates in England 2025 to
+  2026, Table 5 amount collected in year
+files:
+  2026:
+    filename: Table_5_2025-26.ods
+    source_url: https://assets.publishing.service.gov.uk/media/6a6b2fb88319ab05f7caa210/Table_5_2025-26.ods
+    sha256: cb73da5b159feb359248b48c32220fdbc23c8e4832b60045e873d2c2b2fcc729
+    size_bytes: 5472
+    fetched_at: '2026-08-23T07:44:01+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/mhclg/mhclg-council-tax-collection-england-2025-26/2026/cb73da5b159feb359248b48c32220fdbc23c8e4832b60045e873d2c2b2fcc729/Table_5_2025-26.ods
+        uri: r2://ledger-raw/raw/mhclg/mhclg-council-tax-collection-england-2025-26/2026/cb73da5b159feb359248b48c32220fdbc23c8e4832b60045e873d2c2b2fcc729/Table_5_2025-26.ods

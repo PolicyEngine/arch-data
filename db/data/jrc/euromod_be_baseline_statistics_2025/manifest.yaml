@@ -8,16 +8,19 @@ files:
     filename: jrc_euromod_be_baseline_statistics_2025.csv
     source_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
     source_table: EUROMOD Country Report Belgium 2025 validation tables
-    sha256: 2ed1f8a677799fefe7cc2f092b4f30221940a2a2fc9deecbf29e7a5f7d71b69f
-    size_bytes: 3024
+    sha256: 2ef69251a72caaab042706c77143fa4f86dde2f800747ebb421b5f7b9a45e394
+    size_bytes: 6956
     storage:
       r2:
         provider: r2
         bucket: ledger-raw
-        key: raw/belgium/jrc-euromod-be-baseline-statistics-2025/2025/2ed1f8a677799fefe7cc2f092b4f30221940a2a2fc9deecbf29e7a5f7d71b69f/jrc_euromod_be_baseline_statistics_2025.csv
-        uri: r2://ledger-raw/raw/belgium/jrc-euromod-be-baseline-statistics-2025/2025/2ed1f8a677799fefe7cc2f092b4f30221940a2a2fc9deecbf29e7a5f7d71b69f/jrc_euromod_be_baseline_statistics_2025.csv
+        key: raw/belgium/jrc-euromod-be-baseline-statistics-2025/2025/2ef69251a72caaab042706c77143fa4f86dde2f800747ebb421b5f7b9a45e394/jrc_euromod_be_baseline_statistics_2025.csv
+        uri: r2://ledger-raw/raw/belgium/jrc-euromod-be-baseline-statistics-2025/2025/2ef69251a72caaab042706c77143fa4f86dde2f800747ebb421b5f7b9a45e394/jrc_euromod_be_baseline_statistics_2025.csv
     source_urls:
     - https://euromod-web.jrc.ec.europa.eu/resources/country-reports
     - https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
-    notes: Curated comparator rows from Annex 3 validation tables in the 2025 EUROMOD
-      Country Report for Belgium. Each row carries the report PDF URL.
+    notes: >-
+      Curated comparator rows from Annex 3 validation tables in the 2025
+      EUROMOD Country Report for Belgium. Each row carries the report PDF URL;
+      publisher periods are preserved exactly, including the administrative
+      External series ending in 2023.
