@@ -76,10 +76,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fact_count": 170797,
         "geography_count": 12536,
         "period_count": 191,
-        "semantic_duplicate_key_count": 117,
+        "semantic_duplicate_key_count": 121,
         "skipped_source_count": 10,
-        "source_count": 41,
-        "source_package_count": 144,
+        "source_count": 42,
+        "source_package_count": 145,
         "warning_count": 1,
     }
     assert len(rows) == 170797
@@ -100,7 +100,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 144
+    assert source_packages["source_package_count"] == 145
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -160,7 +160,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 139
+    assert len(table_counts) == 140
     assert (
         table_counts[
             "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
@@ -630,7 +630,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2023": 63036,
         "tax_year:2024": 40,
     }
-    assert coverage["counts"]["by_geography"]["country:BE"] == 217
+    assert coverage["counts"]["by_geography"]["country:BE"] == 3867
     assert coverage["counts"]["by_geography"]["country:DE"] == 36
     assert coverage["counts"]["by_geography"]["country:FR"] == 36
     assert coverage["counts"]["by_geography"]["nuts1:BE1"] == 3656
@@ -660,7 +660,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_unit": 40069,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
-    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 117
+    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 121
     assert summary["warnings"] == [
         {
             "code": "duplicate_semantic_fact_key",
