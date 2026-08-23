@@ -19,11 +19,12 @@
 #
 # Ported: the Wales row's 2023-24 and 2024-25 totals, one record set per year
 # because a period is not a measure; 2023-24 also appears in the previous
-# report, where the same value is printed. Excluded: the '% change' column
-# (publisher-labelled arithmetic over the two totals) and the 22 authority
-# rows (wave-3 local-geography scope). The caseload tables (annex workbook)
-# are counts and out of scope. Split-year labels store the opening year:
-# 2024-25 is fiscal_year 2024.
+# report, where the same value is printed, so a consumer selecting that year
+# pins the source_table. Excluded: the '% change' column (publisher-labelled
+# arithmetic over the two totals) and the 22 authority rows (wave-3
+# local-geography scope). The caseload tables (annex workbook) are counts and
+# out of scope. Split-year labels store the opening year: 2024-25 is
+# fiscal_year 2024.
 #
 # gov.wales 403s a plain fetch (a bare Mozilla user agent included); the PDF
 # was retrieved with a full browser user agent and Accept headers and is
