@@ -4,8 +4,7 @@
 
 - Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
 - Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
-- All four source-package additions and regression tests are complete; the
-  source-backed handoff report and final audit are next.
+- Lane C5 is complete, validated, independently reviewed, and ready for handoff.
 - The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
   to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
 
@@ -42,7 +41,11 @@
   and the declared 0.25% Statbel/FPB population comparison tolerance.
 - Passed 43 focused tests and the full merged-bundle regression: 157,177 facts,
   148 packages, zero aggregate-key duplicates, and expected goldens throughout.
+- Recorded pins, counts, boundary evidence, curator commands, validation tails,
+  and consumer fact families in `LANE_C5_REPORT.md`.
+- Passed independent `ledger-source-fidelity` and `ledger-boundary` reviews with
+  no required corrections.
 
 ## Next
 
-- Write `LANE_C5_REPORT.md`, run final formatting/status checks, and commit it.
+- None; ready for handoff. No push was performed.

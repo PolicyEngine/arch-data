@@ -246,6 +246,18 @@ Merged bundle regression:
 Warnings are upstream PyIceberg deprecations plus openpyxl's existing
 header/footer parser warning. Ruff check and format-check passed.
 
+### Chronicle judge reviews
+
+- `ledger-source-fidelity`: **PASS**. An independent read-only review verified
+  all five staged artifact pins, all FPB labels/cells/counts/scaling, Eurostat
+  non-overlap and prior-output stability, an independent Statbel re-aggregation
+  of all 466,822 source rows, and clean suite lineage. No correction required.
+- `ledger-boundary`: **PASS**. An independent read-only review found no stored
+  aging factor, ratio, reconciled/aligned value, imputation, target value,
+  activation decision, or solver construct. The population comparison remains
+  QA only and the target-surface section assigns every consumer operation to
+  the consumer. No correction required.
+
 ## Command ledger
 
 Commands ran from
