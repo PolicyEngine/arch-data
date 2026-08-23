@@ -38466,3 +38466,533 @@ record_sets:
     expected_cell_type: number
     value_scale: 1000000
   groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2022.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2022.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2022
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: observation
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AB
+    source_column_id: '2022'
+    expected_column_header_row: 3
+    expected_column_header: 2022
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2023.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2023.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2023
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: observation
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AC
+    source_column_id: '2023'
+    expected_column_header_row: 3
+    expected_column_header: 2023
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2024.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2024.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2024
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: observation
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AD
+    source_column_id: '2024'
+    expected_column_header_row: 3
+    expected_column_header: 2024
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2025.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2025.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2025
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: observation
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AE
+    source_column_id: '2025'
+    expected_column_header_row: 3
+    expected_column_header: 2025
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2026.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2026.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2026
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: source_projection
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AF
+    source_column_id: '2026'
+    expected_column_header_row: 3
+    expected_column_header: 2026
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2027.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2027.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2027
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: source_projection
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AG
+    source_column_id: '2027'
+    expected_column_header_row: 3
+    expected_column_header: 2027
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2028.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2028.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2028
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: source_projection
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AH
+    source_column_id: '2028'
+    expected_column_header_row: 3
+    expected_column_header: 2028
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2029.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2029.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2029
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: source_projection
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AI
+    source_column_id: '2029'
+    expected_column_header_row: 3
+    expected_column_header: 2029
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2030.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2030.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2030
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: source_projection
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AJ
+    source_column_id: '2030'
+    expected_column_header_row: 3
+    expected_column_header: 2030
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row
+- record_set_id: fpb.economic_outlook_2026_2031.cy2031.household_account.total_resources
+  record_set_spec_id: fpb.economic_outlook_2026_2031.household_account.total_resources.country.v1
+  source_record_id_prefix: fpb.economic_outlook_2026_2031.cy2031.household_account
+  sheet_name: T11
+  period_type: calendar_year
+  period: 2031
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: household
+  entity_role: households_and_npish
+  domain: economic_outlook
+  provenance_class: model_output
+  assertion: source_projection
+  rows:
+  - value_id: total_resources
+    label: a. Ressources
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: a. Ressources
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: C.1 Compte des particuliers (1)
+      label: T11 table title
+    - column: A
+      row: 2
+      expected_value: Millions d'euros
+      label: T11 source unit
+  measures:
+  - measure_id: amount_meur
+    label: Household account amount, source million euro
+    ordinal: 0
+    column: AK
+    source_column_id: '2031'
+    expected_column_header_row: 3
+    expected_column_header: 2031
+    concept: fpb.economic_outlook_2026_2031.household_account.total_resources
+    source_concept: fpb.economic_outlook_2026_2031.t11.published_cell
+    concept_relation: source_label
+    concept_authority: fpb
+    concept_evidence_url: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+    concept_evidence_notes: Federal Planning Bureau June 2026 statistical annex, T11, source unit caption "Millions d'euros".
+      Each selected value is a publisher cell. Chronicle scales source millions/thousands to canonical EUR/count units but
+      does not age, align, reconcile, or construct targets.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+  groupby_dimension: fpb.published_row

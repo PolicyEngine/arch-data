@@ -355,23 +355,23 @@ def test_fpb_annex_has_requested_table_counts_and_vintage_boundary():
 
     assert package_report.valid, package_report.to_dict()
     assert package_report.counts == {
-        "record_set_count": 990,
-        "row_count": 990,
-        "measure_count": 990,
-        "source_record_count": 990,
-        "source_region_count": 990,
+        "record_set_count": 1000,
+        "row_count": 1000,
+        "measure_count": 1000,
+        "source_record_count": 1000,
+        "source_region_count": 1000,
     }
     assert Counter(fact.measure.source_concept for fact in facts) == {
         "fpb.economic_outlook_2026_2031.t01.published_cell": 40,
         "fpb.economic_outlook_2026_2031.t06.published_cell": 30,
         "fpb.economic_outlook_2026_2031.t07.published_cell": 100,
-        "fpb.economic_outlook_2026_2031.t11.published_cell": 200,
+        "fpb.economic_outlook_2026_2031.t11.published_cell": 210,
         "fpb.economic_outlook_2026_2031.t17.published_cell": 70,
         "fpb.economic_outlook_2026_2031.t24.published_cell": 550,
     }
     assert Counter((fact.period.value, fact.assertion) for fact in facts) == {
-        **{(year, "observation"): 99 for year in range(2022, 2026)},
-        **{(year, "source_projection"): 99 for year in range(2026, 2032)},
+        **{(year, "observation"): 100 for year in range(2022, 2026)},
+        **{(year, "source_projection"): 100 for year in range(2026, 2032)},
     }
     assert {fact.provenance_class for fact in facts} == {"model_output"}
     assert validate_facts(facts).valid
@@ -407,6 +407,19 @@ def test_fpb_annex_pins_publisher_cells_and_compiled_values():
     assert direct_tax.layout.groupby_value_label == "- Ménages"
     assert unemployment.value == 5_602_000_000
     assert unemployment.layout.groupby_value_label == "a. Chômage"
+
+    resources_2023 = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2023.household_account."
+        "total_resources.amount_meur"
+    ]
+    resources_2025 = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2025.household_account."
+        "total_resources.amount_meur"
+    ]
+    assert resources_2023.value == 518_286_000_000
+    assert resources_2025.value == 554_117_000_000
+    assert resources_2023.layout.groupby_value_label == "a. Ressources"
+    assert resources_2025.layout.groupby_value_label == "a. Ressources"
 
 
 def test_statbel_2025_population_matches_fpb_annual_average_with_declared_tolerance():
