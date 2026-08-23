@@ -121,6 +121,9 @@ SOURCE_PACKAGE_ALIASES = {
     "sfpd-legal-pension-caseload-2025": Path("sfpd/legal_pension_caseload_2025"),
     "opgroeien-groeipakket-caseload-2025": Path("opgroeien/groeipakket_caseload_2025"),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
+    "fpb-economic-outlook-2026-2031-june-2026": Path(
+        "fpb/economic_outlook_2026_2031_june_2026"
+    ),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
