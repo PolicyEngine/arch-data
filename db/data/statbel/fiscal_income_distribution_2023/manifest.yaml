@@ -1,0 +1,133 @@
+source_id: belgium
+package_id: statbel-fiscal-income-distribution-2023
+source_name: Statbel fiscal income distribution 2023
+publisher: Statbel
+source_page: https://statbel.fgov.be/en/themes/households/taxable-income
+files:
+  2023:
+    filename: statbel_fiscal_income_distribution_2023.csv
+    source_url: https://statbel.fgov.be/en/themes/households/taxable-income
+    source_table: Curated cell-level extract of Statbel A.1, B.1, B.3, B.4, and B.5
+    sha256: 866a29188f3a2e343c89a16c134a9543c50c3ca75041cdecc814239fe4cddff0
+    size_bytes: 1383565
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/866a29188f3a2e343c89a16c134a9543c50c3ca75041cdecc814239fe4cddff0/statbel_fiscal_income_distribution_2023.csv
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/866a29188f3a2e343c89a16c134a9543c50c3ca75041cdecc814239fe4cddff0/statbel_fiscal_income_distribution_2023.csv
+    notes: Deterministic representation-only extract. Each row retains the publisher workbook, sheet,
+      row, selected cell coordinates, and raw numeric lexemes. Monetary values are represented to cents;
+      no values are aggregated, reconciled, aged, imputed, or aligned.
+  A_1:
+    filename: fisc2023_A_1_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_A_1_NL.xlsx
+    source_table: Statbel fiscal income table A_1, income year 2023
+    sha256: b51711ed09bc4339bd331785c533d7d728c36c7e4f2e3eb63f91537838932f96
+    size_bytes: 616745
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/b51711ed09bc4339bd331785c533d7d728c36c7e4f2e3eb63f91537838932f96/fisc2023_A_1_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/b51711ed09bc4339bd331785c533d7d728c36c7e4f2e3eb63f91537838932f96/fisc2023_A_1_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  A_2:
+    filename: fisc2023_A_2_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_A_2_NL.xlsx
+    source_table: Statbel fiscal income table A_2, income year 2023
+    sha256: b5e4fc0ad47101bdf3664237020286824a09025ae38021d010448623d57ef683
+    size_bytes: 411403
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/b5e4fc0ad47101bdf3664237020286824a09025ae38021d010448623d57ef683/fisc2023_A_2_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/b5e4fc0ad47101bdf3664237020286824a09025ae38021d010448623d57ef683/fisc2023_A_2_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  A_3:
+    filename: fisc2023_A_3_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_A_3_NL.xlsx
+    source_table: Statbel fiscal income table A_3, income year 2023
+    sha256: e2f10edd92c55c010a1ed0d2f0fd8757f39114ad2ef1da944b745cada9fc011a
+    size_bytes: 361545
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/e2f10edd92c55c010a1ed0d2f0fd8757f39114ad2ef1da944b745cada9fc011a/fisc2023_A_3_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/e2f10edd92c55c010a1ed0d2f0fd8757f39114ad2ef1da944b745cada9fc011a/fisc2023_A_3_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  B_1:
+    filename: fisc2023_B_1_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_B_1_NL.xlsx
+    source_table: Statbel fiscal income table B_1, income year 2023
+    sha256: b5dd48ed14cfadd2aa65addd49828387fc70d517da87847608f1cf66eb516c38
+    size_bytes: 326306
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/b5dd48ed14cfadd2aa65addd49828387fc70d517da87847608f1cf66eb516c38/fisc2023_B_1_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/b5dd48ed14cfadd2aa65addd49828387fc70d517da87847608f1cf66eb516c38/fisc2023_B_1_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  B_2:
+    filename: fisc2023_B_2_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_B_2_NL.xlsx
+    source_table: Statbel fiscal income table B_2, income year 2023
+    sha256: 4a80321f8d40478d183c6950defde45709619f9842bca45cfc6be26354e70224
+    size_bytes: 451903
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/4a80321f8d40478d183c6950defde45709619f9842bca45cfc6be26354e70224/fisc2023_B_2_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/4a80321f8d40478d183c6950defde45709619f9842bca45cfc6be26354e70224/fisc2023_B_2_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  B_3:
+    filename: fisc2023_B_3_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_B_3_NL.xlsx
+    source_table: Statbel fiscal income table B_3, income year 2023
+    sha256: 2ede83e4f813c7f7675281996ca2a1815e0dc1db1c219600370f2c26dfa57198
+    size_bytes: 82136
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/2ede83e4f813c7f7675281996ca2a1815e0dc1db1c219600370f2c26dfa57198/fisc2023_B_3_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/2ede83e4f813c7f7675281996ca2a1815e0dc1db1c219600370f2c26dfa57198/fisc2023_B_3_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  B_4:
+    filename: fisc2023_B_4_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_B_4_NL.xlsx
+    source_table: Statbel fiscal income table B_4, income year 2023
+    sha256: 7b00e340c74c7de4d2cb1fa5ea2f86fe9bd15e9a259d98a4af92fc4fd322f660
+    size_bytes: 101224
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/7b00e340c74c7de4d2cb1fa5ea2f86fe9bd15e9a259d98a4af92fc4fd322f660/fisc2023_B_4_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/7b00e340c74c7de4d2cb1fa5ea2f86fe9bd15e9a259d98a4af92fc4fd322f660/fisc2023_B_4_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
+  B_5:
+    filename: fisc2023_B_5_NL.xlsx
+    source_url: https://statbel.fgov.be/sites/default/files/files/documents/Huishoudens/10.9%20Fiscale%20inkomens/fisc2023_B_5_NL.xlsx
+    source_table: Statbel fiscal income table B_5, income year 2023
+    sha256: ff84f65475e19037a82cd8f504ee1022372daa379abc8820cecbb4b1184ee3d4
+    size_bytes: 360249
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-fiscal-income-distribution-2023/2023/ff84f65475e19037a82cd8f504ee1022372daa379abc8820cecbb4b1184ee3d4/fisc2023_B_5_NL.xlsx
+        uri: r2://ledger-raw/raw/belgium/statbel-fiscal-income-distribution-2023/2023/ff84f65475e19037a82cd8f504ee1022372daa379abc8820cecbb4b1184ee3d4/fisc2023_B_5_NL.xlsx
+    notes: Verbatim Statbel XLSX source capture. R2 location is declared only; upload occurs after lane
+      review.
