@@ -1,0 +1,1122 @@
+# Scottish Local Government Finance Statistics (SLGFS) 2024-25, publication
+# tables (first published 3 February 2026; the pinned workbook is the 5
+# February 2026 re-issue: Table 2.14a was revised on 4 February and Chart 2.1
+# on 5 February, neither of them a sheet this package reads). The council-tax
+# tables carry the Scotland-level Council Tax Reduction (CTR) cost that the
+# collection statistics only describe: Table 2.11 prints CTR funding from the
+# Scottish Government and the final total reduction in liability (source: CTR
+# extracts and LFR 12); Table 2.8 prints council tax income after CTR (LFR
+# A0); Table 2.6 prints the same income as a general funding source for
+# 2020-21 to 2024-25 (LFR A0); Chart 2.7 prints the 2024-25 potential-yield
+# breakdown by band (council tax billed estimate, CTR, single person discount,
+# exempt dwellings, other discounts); Table 2.10 prints the average bill per
+# dwelling before and after CTR for 2020-21 to 2024-25 (CTAS, CTaxbase and LFR
+# 12).
+#
+# Ported: the Scotland rows of Tables 2.8 and 2.11 (GBP thousands, value_scale
+# 1000; Table 2.11's CTR funding cell is stored as 350999.99999999977, the
+# workbook's own float for GBP 351,000 thousand, and is carried as stored);
+# Table 2.6's 'Council Tax' row for 2020-21 to 2023-24 (GBP millions,
+# value_scale 1000000) under the same concept as Table 2.8, because its
+# 2024-25 cell equals the Table 2.8 Scotland total exactly and is carried
+# once, from Table 2.8; the whole Chart 2.7 table, six component rows
+# including the 'Gross Potential Council Tax' total row (table_record_kind
+# total) x bands A-H plus the 'Total' column (GBP millions, value_scale
+# 1000000; band in the measure filter, component in the row filter); all five
+# years of Table 2.10 (GBP per dwelling, aggregation mean, one record set per
+# year because a period is not a measure; 'per dwelling' is read as per
+# chargeable dwelling, which the CTR arithmetic of the sheet supports).
+#
+# Excluded: the 32 per-authority rows of Tables 2.8 and 2.11 (wave-3
+# local-geography scope; they sit in this pinned artifact); Table 2.6's
+# 2024-25 cell (as above) and its '% change' column (publisher-labelled
+# arithmetic); Tables 2.7, 2.9, 2.12, 2.13 and Charts 2.8 and 2.9, which are
+# band ratios, dwelling counts (including Table 2.13's Scotland-level count of
+# Council Tax Reduction recipients, a caseload rather than an amount),
+# definitions and a Band D rate already carried for every year by
+# scotgov-band-d-council-tax-rates-2026-27. Chart 2.7's CTR total (GBP 390.3m,
+# CTRR-based estimate) and Table 2.11's reduction in liability (GBP 389.0m,
+# CTR extracts and LFR 12) are two publisher measures of the same cost and are
+# both ported.
+#
+# The collection statistics' 'Further context' page attributes Figure 9 to
+# SLGFS Chart 2.7. The GBP 389m Scottish CTR cost quoted in the
+# policyengine-uk-data#448 diagnosis (the _uk-defects-452-448 report) is Table
+# 2.11's Scotland total; its comparator file cited a news release that carries
+# no CTR amount.
+#
+# The workbook was fetched with browser headers (gov.scot has intermittently
+# blocked non-browser fetches) and is pinned byte-for-byte (sha256 in
+# manifest.yaml).
+schema_version: ledger.source_package.v1
+package_id: scotgov-slgfs-council-tax-2024-25
+label: 'Scottish Local Government Finance Statistics 2024-25: council tax income after CTR
+  (2020-21 to 2024-25), CTR funding and reduction in liability, potential yield by band, and
+  average bill before and after CTR, Scotland'
+artifact:
+  source_name: scotgov
+  source_table: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25: publication
+    tables, council tax tables 2.6, 2.8, 2.10, 2.11 and chart 2.7'
+  resource_package: db
+  resource_directory: data/scotgov/slgfs_council_tax_2024_25
+  manifest: manifest.yaml
+  vintage: slgfs_2024_25
+  extracted_at: '2026-08-23'
+  extraction_method: xlsx used-range cell parse restricted to the Table 2.6, Table 2.8, Table
+    2.10, Table 2.11 and Chart 2.7 worksheets
+  parser: xlsx_used_range
+  sheets:
+  - Table 2.11
+  - Table 2.8
+  - Table 2.6
+  - Chart 2.7
+  - Table 2.10
+  artifact_year: 2026
+record_sets:
+- record_set_id: scotgov.slgfs_2024_25.table_2_11.ctr_funding.scotland
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_11.ctr_funding.scotland.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_11.ctr_funding.scotland
+  sheet_name: Table 2.11
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax_reduction
+  groupby_dimension: scotgov.geography_row
+  rows: &id001
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 39
+    expected_row_header_column: A
+    expected_row_header: Scotland
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 38
+      expected_value: West Lothian
+      label: last local-authority row above the Scotland total
+    - column: A
+      row: 1
+      expected_value: "Table 2.11: CTR Funding and Reduction in Liability in 2024-25 by Local\
+        \ Authority, \xA3 thousands"
+      label: table title
+  measures:
+  - measure_id: ctr_funding_from_scottish_government
+    label: Council Tax Reduction funding from the Scottish Government, 2024-25 (GBP thousands)
+    ordinal: 0
+    column: B
+    source_column_id: ctr_funding_from_scottish_government
+    expected_column_header_row: 6
+    expected_column_header: "CTR Funding \nfrom SG"
+    concept: scotgov.council_tax_reduction.funding_from_scottish_government
+    source_concept: scotgov.council_tax_reduction.funding_from_scottish_government
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.11' (Table 2.11: CTR Funding and Reduction\
+      \ in Liability in 2024-25 by Local Authority, \xA3 thousands), Scotland row, column\
+      \ B 'CTR Funding from SG'. Source line on the sheet: CTR Extracts and LFR 12. GBP thousands\
+      \ (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+- record_set_id: scotgov.slgfs_2024_25.table_2_11.ctr_reduction_in_liability.scotland
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_11.ctr_reduction_in_liability.scotland.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_11.ctr_reduction_in_liability.scotland
+  sheet_name: Table 2.11
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax_reduction
+  groupby_dimension: scotgov.geography_row
+  rows: *id001
+  measures:
+  - measure_id: ctr_reduction_in_liability
+    label: 'Council Tax Reduction: final total reduction in liability, 2024-25 (GBP thousands)'
+    ordinal: 0
+    column: C
+    source_column_id: ctr_reduction_in_liability
+    expected_column_header_row: 6
+    expected_column_header: "Final total \nreduction in liability"
+    concept: scotgov.council_tax_reduction.reduction_in_liability
+    source_concept: scotgov.council_tax_reduction.reduction_in_liability
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.11' (Table 2.11: CTR Funding and Reduction\
+      \ in Liability in 2024-25 by Local Authority, \xA3 thousands), Scotland row, column\
+      \ C 'Final total reduction in liability'. Source line on the sheet: CTR Extracts and\
+      \ LFR 12. GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+- record_set_id: scotgov.slgfs_2024_25.table_2_8.council_tax_income_after_ctr.scotland
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_8.council_tax_income_after_ctr.scotland.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_8.council_tax_income_after_ctr.scotland
+  sheet_name: Table 2.8
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 39
+    expected_row_header_column: A
+    expected_row_header: Scotland
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 38
+      expected_value: West Lothian
+      label: last local-authority row above the Scotland total
+    - column: A
+      row: 1
+      expected_value: "Table 2.8: Council Tax Income after CTR in 2024-25 by Local Authority,\
+        \ \xA3 thousands"
+      label: table title
+  measures:
+  - measure_id: council_tax_income_after_ctr
+    label: Council tax income after Council Tax Reduction, 2024-25 (GBP thousands)
+    ordinal: 0
+    column: B
+    source_column_id: council_tax_income_after_ctr
+    expected_column_header_row: 6
+    expected_column_header: Council Tax Income after CTR
+    concept: scotgov.council_tax.income_after_ctr
+    source_concept: scotgov.council_tax.income_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.8' (Table 2.8: Council Tax Income after\
+      \ CTR in 2024-25 by Local Authority, \xA3 thousands), Scotland row, column B 'Council\
+      \ Tax Income after CTR'. Source line on the sheet: LFR A0. GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+- record_set_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2020
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2020.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2020
+  sheet_name: Table 2.6
+  period_type: fiscal_year
+  period: 2020
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Council Tax
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 9
+      expected_value: General Funding Source
+      label: header row of the general funding table
+    - column: A
+      row: 1
+      expected_value: "Table 2.6: General Funding from 2020-21 to 2024-25 by Source, \xA3\
+        \ millions"
+      label: table title
+  measures:
+  - measure_id: council_tax_income_after_ctr
+    label: Council tax income after Council Tax Reduction (general funding), 2020-21 (GBP
+      millions)
+    ordinal: 0
+    column: B
+    source_column_id: council_tax_income_after_ctr
+    expected_column_header_row: 9
+    expected_column_header: 2020-21
+    concept: scotgov.council_tax.income_after_ctr
+    source_concept: scotgov.council_tax.income_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.6' (Table 2.6: General Funding from 2020-21\
+      \ to 2024-25 by Source, \xA3 millions), row 'Council Tax', column '2020-21'. Source\
+      \ line on the sheet: LFR A0. GBP millions (value_scale 1000000). The 2024-25 cell of\
+      \ this row equals the Table 2.8 Scotland total and is carried once, from Table 2.8."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2021
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2021.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2021
+  sheet_name: Table 2.6
+  period_type: fiscal_year
+  period: 2021
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Council Tax
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 9
+      expected_value: General Funding Source
+      label: header row of the general funding table
+    - column: A
+      row: 1
+      expected_value: "Table 2.6: General Funding from 2020-21 to 2024-25 by Source, \xA3\
+        \ millions"
+      label: table title
+  measures:
+  - measure_id: council_tax_income_after_ctr
+    label: Council tax income after Council Tax Reduction (general funding), 2021-22 (GBP
+      millions)
+    ordinal: 0
+    column: C
+    source_column_id: council_tax_income_after_ctr
+    expected_column_header_row: 9
+    expected_column_header: 2021-22
+    concept: scotgov.council_tax.income_after_ctr
+    source_concept: scotgov.council_tax.income_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.6' (Table 2.6: General Funding from 2020-21\
+      \ to 2024-25 by Source, \xA3 millions), row 'Council Tax', column '2021-22'. Source\
+      \ line on the sheet: LFR A0. GBP millions (value_scale 1000000). The 2024-25 cell of\
+      \ this row equals the Table 2.8 Scotland total and is carried once, from Table 2.8."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2022
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2022.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2022
+  sheet_name: Table 2.6
+  period_type: fiscal_year
+  period: 2022
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Council Tax
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 9
+      expected_value: General Funding Source
+      label: header row of the general funding table
+    - column: A
+      row: 1
+      expected_value: "Table 2.6: General Funding from 2020-21 to 2024-25 by Source, \xA3\
+        \ millions"
+      label: table title
+  measures:
+  - measure_id: council_tax_income_after_ctr
+    label: Council tax income after Council Tax Reduction (general funding), 2022-23 (GBP
+      millions)
+    ordinal: 0
+    column: D
+    source_column_id: council_tax_income_after_ctr
+    expected_column_header_row: 9
+    expected_column_header: 2022-23
+    concept: scotgov.council_tax.income_after_ctr
+    source_concept: scotgov.council_tax.income_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.6' (Table 2.6: General Funding from 2020-21\
+      \ to 2024-25 by Source, \xA3 millions), row 'Council Tax', column '2022-23'. Source\
+      \ line on the sheet: LFR A0. GBP millions (value_scale 1000000). The 2024-25 cell of\
+      \ this row equals the Table 2.8 Scotland total and is carried once, from Table 2.8."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2023
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2023.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_6.council_tax_income_after_ctr.fy2023
+  sheet_name: Table 2.6
+  period_type: fiscal_year
+  period: 2023
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Council Tax
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 9
+      expected_value: General Funding Source
+      label: header row of the general funding table
+    - column: A
+      row: 1
+      expected_value: "Table 2.6: General Funding from 2020-21 to 2024-25 by Source, \xA3\
+        \ millions"
+      label: table title
+  measures:
+  - measure_id: council_tax_income_after_ctr
+    label: Council tax income after Council Tax Reduction (general funding), 2023-24 (GBP
+      millions)
+    ordinal: 0
+    column: E
+    source_column_id: council_tax_income_after_ctr
+    expected_column_header_row: 9
+    expected_column_header: 2023-24
+    concept: scotgov.council_tax.income_after_ctr
+    source_concept: scotgov.council_tax.income_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Table 2.6' (Table 2.6: General Funding from 2020-21\
+      \ to 2024-25 by Source, \xA3 millions), row 'Council Tax', column '2023-24'. Source\
+      \ line on the sheet: LFR A0. GBP millions (value_scale 1000000). The 2024-25 cell of\
+      \ this row equals the Table 2.8 Scotland total and is carried once, from Table 2.8."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: scotgov.slgfs_2024_25.chart_2_7.potential_yield.scotland
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.chart_2_7.potential_yield.scotland.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.chart_2_7.potential_yield.scotland
+  sheet_name: Chart 2.7
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.potential_yield_component
+  rows:
+  - value_id: council_tax_billed_estimate
+    label: Council tax billed (estimate)
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Council Tax Billed (Estimate)
+    table_record_kind: detail
+    filters:
+      potential_yield_component: council_tax_billed_estimate
+    constraints:
+    - variable: potential_yield_component
+      operator: ==
+      value: council_tax_billed_estimate
+      label: Council tax potential yield component
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: Category
+      label: header row above the component rows
+    - column: A
+      row: 1
+      expected_value: "Chart 2.7: Council Tax Potential Yield in 2024-25, \xA3 millions"
+      label: chart title
+  - value_id: council_tax_reduction
+    label: Council Tax Reduction (CTR)
+    ordinal: 1
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: Council Tax Reduction (CTR)
+    table_record_kind: detail
+    filters:
+      potential_yield_component: council_tax_reduction
+    constraints:
+    - variable: potential_yield_component
+      operator: ==
+      value: council_tax_reduction
+      label: Council tax potential yield component
+  - value_id: single_person_discount
+    label: Reduction in yield due to single person discount
+    ordinal: 2
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: Reduction in yield due to Single Person Discount (25%)
+    table_record_kind: detail
+    filters:
+      potential_yield_component: single_person_discount
+    constraints:
+    - variable: potential_yield_component
+      operator: ==
+      value: single_person_discount
+      label: Council tax potential yield component
+  - value_id: exempt_dwellings
+    label: Reduction in yield due to exempt dwellings
+    ordinal: 3
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: Reduction in yield due to exempt dwellings (no CT)
+    table_record_kind: detail
+    filters:
+      potential_yield_component: exempt_dwellings
+    constraints:
+    - variable: potential_yield_component
+      operator: ==
+      value: exempt_dwellings
+      label: Council tax potential yield component
+  - value_id: other_discounts
+    label: Other discounts
+    ordinal: 4
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: Other Discounts
+    table_record_kind: detail
+    filters:
+      potential_yield_component: other_discounts
+    constraints:
+    - variable: potential_yield_component
+      operator: ==
+      value: other_discounts
+      label: Council tax potential yield component
+  - value_id: gross_potential_council_tax
+    label: Gross potential council tax
+    ordinal: 5
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: Gross Potential Council Tax
+    table_record_kind: total
+    filters:
+      potential_yield_component: gross_potential_council_tax
+    constraints:
+    - variable: potential_yield_component
+      operator: ==
+      value: gross_potential_council_tax
+      label: Council tax potential yield component
+  measures:
+  - measure_id: band_a
+    label: Council tax potential yield component, Band A, 2024-25 (GBP millions)
+    ordinal: 0
+    column: B
+    source_column_id: band_a
+    expected_column_header_row: 6
+    expected_column_header: Band A
+    concept: scotgov.council_tax_potential_yield.band_a
+    source_concept: scotgov.council_tax_potential_yield.band_a
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band A', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: A
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: A
+      label: Council tax band
+  - measure_id: band_b
+    label: Council tax potential yield component, Band B, 2024-25 (GBP millions)
+    ordinal: 1
+    column: C
+    source_column_id: band_b
+    expected_column_header_row: 6
+    expected_column_header: Band B
+    concept: scotgov.council_tax_potential_yield.band_b
+    source_concept: scotgov.council_tax_potential_yield.band_b
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band B', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: B
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: B
+      label: Council tax band
+  - measure_id: band_c
+    label: Council tax potential yield component, Band C, 2024-25 (GBP millions)
+    ordinal: 2
+    column: D
+    source_column_id: band_c
+    expected_column_header_row: 6
+    expected_column_header: Band C
+    concept: scotgov.council_tax_potential_yield.band_c
+    source_concept: scotgov.council_tax_potential_yield.band_c
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band C', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: C
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: C
+      label: Council tax band
+  - measure_id: band_d
+    label: Council tax potential yield component, Band D, 2024-25 (GBP millions)
+    ordinal: 3
+    column: E
+    source_column_id: band_d
+    expected_column_header_row: 6
+    expected_column_header: Band D
+    concept: scotgov.council_tax_potential_yield.band_d
+    source_concept: scotgov.council_tax_potential_yield.band_d
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band D', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: D
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: D
+      label: Council tax band
+  - measure_id: band_e
+    label: Council tax potential yield component, Band E, 2024-25 (GBP millions)
+    ordinal: 4
+    column: F
+    source_column_id: band_e
+    expected_column_header_row: 6
+    expected_column_header: Band E
+    concept: scotgov.council_tax_potential_yield.band_e
+    source_concept: scotgov.council_tax_potential_yield.band_e
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band E', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: E
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: E
+      label: Council tax band
+  - measure_id: band_f
+    label: Council tax potential yield component, Band F, 2024-25 (GBP millions)
+    ordinal: 5
+    column: G
+    source_column_id: band_f
+    expected_column_header_row: 6
+    expected_column_header: Band F
+    concept: scotgov.council_tax_potential_yield.band_f
+    source_concept: scotgov.council_tax_potential_yield.band_f
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band F', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: F
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: F
+      label: Council tax band
+  - measure_id: band_g
+    label: Council tax potential yield component, Band G, 2024-25 (GBP millions)
+    ordinal: 6
+    column: H
+    source_column_id: band_g
+    expected_column_header_row: 6
+    expected_column_header: Band G
+    concept: scotgov.council_tax_potential_yield.band_g
+    source_concept: scotgov.council_tax_potential_yield.band_g
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band G', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: G
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: G
+      label: Council tax band
+  - measure_id: band_h
+    label: Council tax potential yield component, Band H, 2024-25 (GBP millions)
+    ordinal: 7
+    column: I
+    source_column_id: band_h
+    expected_column_header_row: 6
+    expected_column_header: Band H
+    concept: scotgov.council_tax_potential_yield.band_h
+    source_concept: scotgov.council_tax_potential_yield.band_h
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Band H', one row per potential-yield component\
+      \ (the row filter potential_yield_component names it). Source line on the sheet: CTaxbase\
+      \ and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+    filters:
+      council_tax_band: H
+    constraints:
+    - variable: council_tax_band
+      operator: ==
+      value: H
+      label: Council tax band
+  - measure_id: total
+    label: Council tax potential yield component, all bands, 2024-25 (GBP millions)
+    ordinal: 8
+    column: J
+    source_column_id: total
+    expected_column_header_row: 6
+    expected_column_header: Total
+    concept: scotgov.council_tax_potential_yield.total
+    source_concept: scotgov.council_tax_potential_yield.total
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: "Scottish Local Government Finance Statistics (SLGFS) 2024-25,\
+      \ publication tables workbook, sheet 'Chart 2.7' (Chart 2.7: Council Tax Potential Yield\
+      \ in 2024-25, \xA3 millions), column 'Total' (all bands), one row per potential-yield\
+      \ component (the row filter potential_yield_component names it). Source line on the\
+      \ sheet: CTaxbase and CTRR. GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2020
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2020.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2020
+  sheet_name: Table 2.10
+  period_type: fiscal_year
+  period: 2020
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: 2020-21
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: 'Table 2.10: Average Council Tax Bill per Dwelling from 2020-21 to 2024-25'
+      label: table title
+  measures:
+  - measure_id: average_bill_before_ctr
+    label: Average council tax bill per dwelling before Council Tax Reduction, 2020-21 (GBP)
+    ordinal: 0
+    column: B
+    source_column_id: average_bill_before_ctr
+    expected_column_header_row: 7
+    expected_column_header: Before CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2020-21'', column B ''Before CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: average_bill_after_ctr
+    label: Average council tax bill per dwelling after Council Tax Reduction, 2020-21 (GBP)
+    ordinal: 1
+    column: C
+    source_column_id: average_bill_after_ctr
+    expected_column_header_row: 7
+    expected_column_header: After CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2020-21'', column C ''After CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2021
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2021.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2021
+  sheet_name: Table 2.10
+  period_type: fiscal_year
+  period: 2021
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: 2021-22
+    table_record_kind: total
+  measures:
+  - measure_id: average_bill_before_ctr
+    label: Average council tax bill per dwelling before Council Tax Reduction, 2021-22 (GBP)
+    ordinal: 0
+    column: B
+    source_column_id: average_bill_before_ctr
+    expected_column_header_row: 7
+    expected_column_header: Before CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2021-22'', column B ''Before CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: average_bill_after_ctr
+    label: Average council tax bill per dwelling after Council Tax Reduction, 2021-22 (GBP)
+    ordinal: 1
+    column: C
+    source_column_id: average_bill_after_ctr
+    expected_column_header_row: 7
+    expected_column_header: After CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2021-22'', column C ''After CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2022
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2022.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2022
+  sheet_name: Table 2.10
+  period_type: fiscal_year
+  period: 2022
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 10
+    expected_row_header_column: A
+    expected_row_header: 2022-23
+    table_record_kind: total
+  measures:
+  - measure_id: average_bill_before_ctr
+    label: Average council tax bill per dwelling before Council Tax Reduction, 2022-23 (GBP)
+    ordinal: 0
+    column: B
+    source_column_id: average_bill_before_ctr
+    expected_column_header_row: 7
+    expected_column_header: Before CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2022-23'', column B ''Before CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: average_bill_after_ctr
+    label: Average council tax bill per dwelling after Council Tax Reduction, 2022-23 (GBP)
+    ordinal: 1
+    column: C
+    source_column_id: average_bill_after_ctr
+    expected_column_header_row: 7
+    expected_column_header: After CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2022-23'', column C ''After CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2023
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2023.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2023
+  sheet_name: Table 2.10
+  period_type: fiscal_year
+  period: 2023
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 11
+    expected_row_header_column: A
+    expected_row_header: 2023-24
+    table_record_kind: total
+  measures:
+  - measure_id: average_bill_before_ctr
+    label: Average council tax bill per dwelling before Council Tax Reduction, 2023-24 (GBP)
+    ordinal: 0
+    column: B
+    source_column_id: average_bill_before_ctr
+    expected_column_header_row: 7
+    expected_column_header: Before CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2023-24'', column B ''Before CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: average_bill_after_ctr
+    label: Average council tax bill per dwelling after Council Tax Reduction, 2023-24 (GBP)
+    ordinal: 1
+    column: C
+    source_column_id: average_bill_after_ctr
+    expected_column_header_row: 7
+    expected_column_header: After CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2023-24'', column C ''After CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2024
+  provenance_class: administrative
+  record_set_spec_id: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2024.v1
+  source_record_id_prefix: scotgov.slgfs_2024_25.table_2_10.average_bill.fy2024
+  sheet_name: Table 2.10
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: A
+    expected_row_header: 2024-25
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 7
+      expected_value: Financial Year
+      label: header row above the year rows
+  measures:
+  - measure_id: average_bill_before_ctr
+    label: Average council tax bill per dwelling before Council Tax Reduction, 2024-25 (GBP)
+    ordinal: 0
+    column: B
+    source_column_id: average_bill_before_ctr
+    expected_column_header_row: 7
+    expected_column_header: Before CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_before_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2024-25'', column B ''Before CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+  - measure_id: average_bill_after_ctr
+    label: Average council tax bill per dwelling after Council Tax Reduction, 2024-25 (GBP)
+    ordinal: 1
+    column: C
+    source_column_id: average_bill_after_ctr
+    expected_column_header_row: 7
+    expected_column_header: After CTR
+    concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    source_concept: scotgov.council_tax.average_bill_per_dwelling_after_ctr
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25,
+      publication tables workbook, sheet ''Table 2.10'' (Table 2.10: Average Council Tax Bill
+      per Dwelling from 2020-21 to 2024-25), row ''2024-25'', column C ''After CTR''. Source
+      line on the sheet: CTAS, CTaxbase and LFR 12. GBP per dwelling.'
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number

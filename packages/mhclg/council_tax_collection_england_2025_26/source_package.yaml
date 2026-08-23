@@ -1,0 +1,555 @@
+# MHCLG Collection rates for council tax and non-domestic rates in England
+# 2025 to 2026 (QRC4 returns; the 2025-26 figures were revised to include
+# Kensington & Chelsea in the re-issue gov.uk dates 31 July 2026, workbook
+# dated 30 July 2026). Table 5 prints, for 2021-22 to 2025-26, the council tax
+# net collectable debit and the amount collected in year, England, in GBP
+# millions. The net collectable debit is the council tax that authorities
+# would collect for the year if everyone liable had paid, after local council
+# tax support, discounts and exemptions: the England counterpart of the
+# Scottish net amount billed and the Welsh net collectable debit, and a
+# billed-basis companion to the council tax requirement in the levels release.
+#
+# One record set per line and year, as in the OBR EFO packages. Ported: the
+# two council tax amount rows x five years. Excluded: the two rows the
+# publisher labels 'percentage change (%)' (their 2021-22 column compares with
+# a 2020-21 base that is not printed in this artifact) and the four
+# non-domestic rates rows (out of scope). The same release's Table 1 (receipts
+# irrespective of the year billed) and Table 2 (collection rates by authority
+# class) are not ported; the 2024-25 release prints identical values for
+# 2021-22 to 2024-25 and adds only 2020-21, so it is superseded by this
+# artifact. Split-year labels store the opening year: '2025 to 2026 [r]' is
+# fiscal_year 2025.
+schema_version: ledger.source_package.v1
+package_id: mhclg-council-tax-collection-england-2025-26
+label: 'MHCLG collection rates, England 2025-26: council tax net collectable debit and amount
+  collected in year, England 2021-22 to 2025-26'
+artifact:
+  source_name: mhclg
+  source_table: Collection rates for council tax and non-domestic rates in England 2025 to
+    2026, Table 5 amount collected in year
+  resource_package: db
+  resource_directory: data/mhclg/council_tax_collection_england_2025_26
+  manifest: manifest.yaml
+  vintage: collection_rates_2025_26
+  extracted_at: '2026-08-23'
+  extraction_method: ods used-range cell parse of the Table_5 worksheet
+  parser: ods_used_range
+  sheet_name: Table_5
+  artifact_year: 2026
+record_sets:
+- record_set_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2021.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2021
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: net_collectable_debit
+    label: 'Council tax: net collectable debit (GBP millions)'
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Net Collectable Debit (\xA3 million) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: 'Council tax: Net Collectable Debit percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+    - column: A
+      row: 1
+      expected_value: 'Table 5: Council tax and non-domestic rates - amount collected in year,
+        England, 2021-22 to 2025-26'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: 'Council tax: net collectable debit (GBP millions), 2021 to 2022'
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2021 to 2022
+    concept: mhclg.council_tax.net_collectable_debit
+    source_concept: mhclg.council_tax.net_collectable_debit
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Net Collectable\
+      \ Debit (\xA3 million) [note a]', column '2021 to 2022'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2021.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2021
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: amount_collected_in_year
+    label: 'Council tax: amount collected in year (GBP millions)'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Amount collected in year (\xA3 million)"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 8
+      expected_value: 'Council tax: Amount collected in year percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+  measures:
+  - measure_id: amount
+    label: 'Council tax: amount collected in year (GBP millions), 2021 to 2022'
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2021 to 2022
+    concept: mhclg.council_tax.amount_collected_in_year
+    source_concept: mhclg.council_tax.amount_collected_in_year
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Amount collected\
+      \ in year (\xA3 million)', column '2021 to 2022'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2022.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2022
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: net_collectable_debit
+    label: 'Council tax: net collectable debit (GBP millions)'
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Net Collectable Debit (\xA3 million) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: 'Council tax: Net Collectable Debit percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+    - column: A
+      row: 1
+      expected_value: 'Table 5: Council tax and non-domestic rates - amount collected in year,
+        England, 2021-22 to 2025-26'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: 'Council tax: net collectable debit (GBP millions), 2022 to 2023'
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2022 to 2023
+    concept: mhclg.council_tax.net_collectable_debit
+    source_concept: mhclg.council_tax.net_collectable_debit
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Net Collectable\
+      \ Debit (\xA3 million) [note a]', column '2022 to 2023'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2022.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2022
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: amount_collected_in_year
+    label: 'Council tax: amount collected in year (GBP millions)'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Amount collected in year (\xA3 million)"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 8
+      expected_value: 'Council tax: Amount collected in year percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+  measures:
+  - measure_id: amount
+    label: 'Council tax: amount collected in year (GBP millions), 2022 to 2023'
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2022 to 2023
+    concept: mhclg.council_tax.amount_collected_in_year
+    source_concept: mhclg.council_tax.amount_collected_in_year
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Amount collected\
+      \ in year (\xA3 million)', column '2022 to 2023'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2023.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2023
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: net_collectable_debit
+    label: 'Council tax: net collectable debit (GBP millions)'
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Net Collectable Debit (\xA3 million) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: 'Council tax: Net Collectable Debit percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+    - column: A
+      row: 1
+      expected_value: 'Table 5: Council tax and non-domestic rates - amount collected in year,
+        England, 2021-22 to 2025-26'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: 'Council tax: net collectable debit (GBP millions), 2023 to 2024'
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2023 to 2024
+    concept: mhclg.council_tax.net_collectable_debit
+    source_concept: mhclg.council_tax.net_collectable_debit
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Net Collectable\
+      \ Debit (\xA3 million) [note a]', column '2023 to 2024'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2023.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2023
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: amount_collected_in_year
+    label: 'Council tax: amount collected in year (GBP millions)'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Amount collected in year (\xA3 million)"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 8
+      expected_value: 'Council tax: Amount collected in year percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+  measures:
+  - measure_id: amount
+    label: 'Council tax: amount collected in year (GBP millions), 2023 to 2024'
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2023 to 2024
+    concept: mhclg.council_tax.amount_collected_in_year
+    source_concept: mhclg.council_tax.amount_collected_in_year
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Amount collected\
+      \ in year (\xA3 million)', column '2023 to 2024'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2024.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2024
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: net_collectable_debit
+    label: 'Council tax: net collectable debit (GBP millions)'
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Net Collectable Debit (\xA3 million) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: 'Council tax: Net Collectable Debit percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+    - column: A
+      row: 1
+      expected_value: 'Table 5: Council tax and non-domestic rates - amount collected in year,
+        England, 2021-22 to 2025-26'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: 'Council tax: net collectable debit (GBP millions), 2024 to 2025'
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2024 to 2025
+    concept: mhclg.council_tax.net_collectable_debit
+    source_concept: mhclg.council_tax.net_collectable_debit
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Net Collectable\
+      \ Debit (\xA3 million) [note a]', column '2024 to 2025'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2024.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2024
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: amount_collected_in_year
+    label: 'Council tax: amount collected in year (GBP millions)'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Amount collected in year (\xA3 million)"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 8
+      expected_value: 'Council tax: Amount collected in year percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+  measures:
+  - measure_id: amount
+    label: 'Council tax: amount collected in year (GBP millions), 2024 to 2025'
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2024 to 2025
+    concept: mhclg.council_tax.amount_collected_in_year
+    source_concept: mhclg.council_tax.amount_collected_in_year
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Amount collected\
+      \ in year (\xA3 million)', column '2024 to 2025'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2025.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.net_collectable_debit.fy2025
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: net_collectable_debit
+    label: 'Council tax: net collectable debit (GBP millions)'
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Net Collectable Debit (\xA3 million) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 6
+      expected_value: 'Council tax: Net Collectable Debit percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+    - column: A
+      row: 1
+      expected_value: 'Table 5: Council tax and non-domestic rates - amount collected in year,
+        England, 2021-22 to 2025-26'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: 'Council tax: net collectable debit (GBP millions), 2025 to 2026 [r]'
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.net_collectable_debit
+    source_concept: mhclg.council_tax.net_collectable_debit
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Net Collectable\
+      \ Debit (\xA3 million) [note a]', column '2025 to 2026 [r]'; GBP millions (value_scale\
+      \ 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2025.v1
+  source_record_id_prefix: mhclg.ct_collection_2025_26.table_5.amount_collected_in_year.fy2025
+  sheet_name: Table_5
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.collection_line
+  rows:
+  - value_id: amount_collected_in_year
+    label: 'Council tax: amount collected in year (GBP millions)'
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: "Council tax: Amount collected in year (\xA3 million)"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 8
+      expected_value: 'Council tax: Amount collected in year percentage change (%)'
+      label: percentage-change row below the amount row (not ported)
+  measures:
+  - measure_id: amount
+    label: 'Council tax: amount collected in year (GBP millions), 2025 to 2026 [r]'
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 4
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.amount_collected_in_year
+    source_concept: mhclg.council_tax.amount_collected_in_year
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/collection-rates-for-council-tax-and-non-domestic-rates-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Collection rates for council tax and non-domestic rates\
+      \ in England 2025 to 2026, Table 5 (Table 5: Council tax and non-domestic rates - amount\
+      \ collected in year, England, 2021-22 to 2025-26), row 'Council tax: Amount collected\
+      \ in year (\xA3 million)', column '2025 to 2026 [r]'; GBP millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
