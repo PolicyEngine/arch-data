@@ -73,7 +73,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 11,
         "error_count": 0,
-        "fact_count": 156131,
+        "fact_count": 156148,
         "geography_count": 12536,
         "period_count": 191,
         "semantic_duplicate_key_count": 117,
@@ -82,7 +82,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "source_package_count": 144,
         "warning_count": 1,
     }
-    assert len(rows) == 156131
+    assert len(rows) == 156148
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 156131
+    assert coverage["fact_count"] == 156148
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -142,7 +142,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "nbb_national_accounts": 1,
         "nisra": 510,
         "nrs": 5589,
-        "obr": 253,
+        "obr": 270,
         "onem_rva_unemployment": 1,
         "ons": 65646,
         "onss_contributions": 1,
@@ -515,13 +515,13 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fiscal_year:2021": 52,
         "fiscal_year:2022": 52,
         "fiscal_year:2023": 405,
-        "fiscal_year:2024": 695,
-        "fiscal_year:2025": 1308,
-        "fiscal_year:2026": 1443,
-        "fiscal_year:2027": 32,
-        "fiscal_year:2028": 32,
-        "fiscal_year:2029": 32,
-        "fiscal_year:2030": 28,
+        "fiscal_year:2024": 697,
+        "fiscal_year:2025": 1310,
+        "fiscal_year:2026": 1445,
+        "fiscal_year:2027": 34,
+        "fiscal_year:2028": 35,
+        "fiscal_year:2029": 35,
+        "fiscal_year:2030": 31,
         "month:2021-03": 1,
         "month:2021-04": 1,
         "month:2021-05": 1,
@@ -634,7 +634,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4262
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4279
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 497
     assert len(coverage["counts"]["by_geography"]) == 12536
     assert coverage["counts"]["by_entity"] == {
@@ -646,7 +646,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "household": 40513,
         "institutional_sector": 103,
         "pension_plan": 2,
-        "person": 60279,
+        "person": 60296,
         "social_protection_scheme": 27,
         "tax_unit": 40069,
     }
