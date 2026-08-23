@@ -1,0 +1,19 @@
+source_id: scotgov
+package_id: scotgov-slgfs-council-tax-2024-25
+dataset: scotgov_scotgov-slgfs-council-tax-2024-25
+source_page: https://www.gov.scot/publications/scottish-local-government-finance-statistics-2024-25/
+table: 'Scottish Local Government Finance Statistics (SLGFS) 2024-25: publication
+  tables, council tax tables 2.6, 2.8, 2.10, 2.11 and chart 2.7'
+files:
+  2026:
+    filename: SLGFS_2024-25_Publication_Tables_FINAL_2026-02-05.xlsx
+    source_url: https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2026/02/scottish-local-government-finance-statistics-2024-25/documents/publication-tables/publication-tables/govscot%3Adocument/SLGFS%2B2024-25%2B-%2BPublication%2BTables%2B-%2BFINAL%2B-%2B%2B2026-02-05%2B1444.xlsx
+    sha256: f8556da4a11963eb4992a67e38b3bddad1c7b0d2d50c93cfc4c76a1e533e1c58
+    size_bytes: 488900
+    fetched_at: '2026-08-23T07:43:57+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/scotgov/scotgov-slgfs-council-tax-2024-25/2026/f8556da4a11963eb4992a67e38b3bddad1c7b0d2d50c93cfc4c76a1e533e1c58/SLGFS_2024-25_Publication_Tables_FINAL_2026-02-05.xlsx
+        uri: r2://ledger-raw/raw/scotgov/scotgov-slgfs-council-tax-2024-25/2026/f8556da4a11963eb4992a67e38b3bddad1c7b0d2d50c93cfc4c76a1e533e1c58/SLGFS_2024-25_Publication_Tables_FINAL_2026-02-05.xlsx
