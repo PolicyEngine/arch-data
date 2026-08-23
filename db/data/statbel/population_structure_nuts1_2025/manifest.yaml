@@ -1,0 +1,37 @@
+source_id: belgium
+package_id: statbel-population-structure-2025
+source_name: Statbel population structure 2025
+publisher: Statbel
+source_page: https://data.gov.be/en/datasets/nodeid5468
+files:
+  2025:
+    filename: statbel_population_structure_nuts1_2025.csv
+    source_url: https://data.gov.be/en/datasets/nodeid5468
+    source_table: Population by place of residence, nationality, marital status, age
+      and sex, 2025
+    sha256: 2243aa1be7600535dba7e3d804ef482b6edac07c1e3813f4882c3bf4a34ff2ad
+    size_bytes: 5210
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-population-structure-2025/2025/2243aa1be7600535dba7e3d804ef482b6edac07c1e3813f4882c3bf4a34ff2ad/statbel_population_structure_nuts1_2025.csv
+        uri: r2://ledger-raw/raw/belgium/statbel-population-structure-2025/2025/2243aa1be7600535dba7e3d804ef482b6edac07c1e3813f4882c3bf4a34ff2ad/statbel_population_structure_nuts1_2025.csv
+    source_urls:
+    - https://data.gov.be/en/datasets/nodeid5468
+    - https://statbel.fgov.be/sites/default/files/files/opendata/bevolking%20naar%20woonplaats%2C%20nationaliteit%20burgelijke%20staat%20%2C%20leeftijd%20en%20geslacht/TF_SOC_POP_STRUCT_2025.zip
+    notes: Curated NUTS1 extract aggregated from the official Statbel 2025 population
+      structure text file over municipalities, nationality and marital status.
+  source_capture:
+    filename: TF_SOC_POP_STRUCT_2025.zip
+    source_url: https://statbel.fgov.be/sites/default/files/files/opendata/bevolking%20naar%20woonplaats%2C%20nationaliteit%20burgelijke%20staat%20%2C%20leeftijd%20en%20geslacht/TF_SOC_POP_STRUCT_2025.zip
+    sha256: 33910ea36437e39cfffd82ad82c759a2a8d1f2ab7662d45ce71c8ec9f336716c
+    size_bytes: 2551751
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/statbel-population-structure-2025/source_capture/33910ea36437e39cfffd82ad82c759a2a8d1f2ab7662d45ce71c8ec9f336716c/TF_SOC_POP_STRUCT_2025.zip
+        uri: r2://ledger-raw/raw/belgium/statbel-population-structure-2025/source_capture/33910ea36437e39cfffd82ad82c759a2a8d1f2ab7662d45ce71c8ec9f336716c/TF_SOC_POP_STRUCT_2025.zip
+    notes: Verbatim Statbel ZIP staged for Lane C5; the curated 2025 CSV is a
+      deterministic aggregation of its sole TF_SOC_POP_STRUCT_2025.txt member.

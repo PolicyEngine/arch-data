@@ -4,7 +4,8 @@
 
 - Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
 - Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
-- FPB implementation is complete and validated; Eurostat vintage packages are next.
+- FPB and Statbel 2025 implementations are complete and validated; Eurostat
+  vintage packages are prepared for the next commit.
 - The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
   to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
 
@@ -27,9 +28,12 @@
   2022–2025 and 594 `source_projection` facts for 2026–2031.
 - Passed FPB `validate-package` and `build-suite`: 990 facts, full cell lineage,
   zero acceptance errors, and pinned 2025 cells 320578 / 77771 / 5602 million euro.
+- Re-ran the Statbel 2026 curator logic on the 2025 ZIP and added the hash-pinned
+  raw capture plus its deterministic 18-row curated CSV.
+- Passed Statbel 2025 `validate-package` and `build-suite`: 18 facts totaling
+  11,825,551, 66 constraints, full lineage, and zero acceptance errors.
 
 ## Next
 
 - Add and validate the two Eurostat vintage packages without duplicating overlap facts.
-- Add and validate the Statbel 2025 curated package and raw ZIP capture.
 - Extend Belgium tests, run full requested validation, and write `LANE_C5_REPORT.md`.
