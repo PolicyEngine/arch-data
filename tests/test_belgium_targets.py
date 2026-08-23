@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import csv
+from decimal import Decimal
 from functools import lru_cache
+import hashlib
+import json
 from pathlib import Path
+
+import yaml
 
 from chronicle.core import validate_facts
 from chronicle.source_package import SOURCE_PACKAGE_ALIASES, load_source_package
@@ -63,6 +68,7 @@ BELGIUM_TARGET_STREAMS = (
     ),
 )
 EUROMOD_BE_COMPARATOR_ALIAS = "jrc-euromod-be-baseline-statistics-2025"
+FISCAL_DISTRIBUTION_ALIAS = "statbel-fiscal-income-distribution-2023"
 
 
 @lru_cache
@@ -80,6 +86,227 @@ def test_belgium_target_aliases_are_registered():
     aliases.add(EUROMOD_BE_COMPARATOR_ALIAS)
 
     assert aliases <= set(SOURCE_PACKAGE_ALIASES)
+
+
+def test_statbel_fiscal_distribution_alias_resolves():
+    assert SOURCE_PACKAGE_ALIASES[FISCAL_DISTRIBUTION_ALIAS] == Path(
+        "statbel/fiscal_income_distribution_2023"
+    )
+    assert (
+        load_source_package(FISCAL_DISTRIBUTION_ALIAS).package_id
+        == FISCAL_DISTRIBUTION_ALIAS
+    )
+
+
+def test_statbel_fiscal_distribution_artifact_pins_and_r2_keys():
+    data_dir = REPO_ROOT / "db" / "data" / "statbel" / "fiscal_income_distribution_2023"
+    manifest = yaml.safe_load((data_dir / "manifest.yaml").read_text())
+    expected = {
+        "A_1": (
+            "b51711ed09bc4339bd331785c533d7d728c36c7e4f2e3eb63f91537838932f96",
+            616745,
+        ),
+        "A_2": (
+            "b5e4fc0ad47101bdf3664237020286824a09025ae38021d010448623d57ef683",
+            411403,
+        ),
+        "A_3": (
+            "e2f10edd92c55c010a1ed0d2f0fd8757f39114ad2ef1da944b745cada9fc011a",
+            361545,
+        ),
+        "B_1": (
+            "b5dd48ed14cfadd2aa65addd49828387fc70d517da87847608f1cf66eb516c38",
+            326306,
+        ),
+        "B_2": (
+            "4a80321f8d40478d183c6950defde45709619f9842bca45cfc6be26354e70224",
+            451903,
+        ),
+        "B_3": (
+            "2ede83e4f813c7f7675281996ca2a1815e0dc1db1c219600370f2c26dfa57198",
+            82136,
+        ),
+        "B_4": (
+            "7b00e340c74c7de4d2cb1fa5ea2f86fe9bd15e9a259d98a4af92fc4fd322f660",
+            101224,
+        ),
+        "B_5": (
+            "ff84f65475e19037a82cd8f504ee1022372daa379abc8820cecbb4b1184ee3d4",
+            360249,
+        ),
+    }
+
+    assert manifest["source_id"] == "belgium"
+    for table, (expected_sha, expected_size) in expected.items():
+        spec = manifest["files"][table]
+        path = data_dir / spec["filename"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected_sha
+        assert path.stat().st_size == expected_size
+        assert spec["sha256"] == expected_sha
+        assert spec["size_bytes"] == expected_size
+        assert spec["storage"]["r2"]["key"] == (
+            "raw/belgium/statbel-fiscal-income-distribution-2023/2023/"
+            f"{expected_sha}/{spec['filename']}"
+        )
+
+
+def test_statbel_fiscal_distribution_curated_rows_retain_source_cells():
+    rows = _csv_rows(
+        REPO_ROOT
+        / "db"
+        / "data"
+        / "statbel"
+        / "fiscal_income_distribution_2023"
+        / "statbel_fiscal_income_distribution_2023.csv"
+    )
+    by_id = {row["row_id"]: row for row in rows}
+
+    income_class = by_id["a1.taxable_income.class_19_20"]
+    assert income_class["source_workbook"] == "fisc2023_A_1_NL.xlsx"
+    assert income_class["be_source_sheet"] == "België"
+    assert income_class["be_source_row"] == "29"
+    assert json.loads(income_class["be_source_cells"]) == {
+        "amount_eur": "D29",
+        "amount_share": "E29",
+        "declaration_share": "C29",
+        "declarations": "B29",
+    }
+    assert income_class["be_amount_eur"] == "3773400213.25"
+    assert json.loads(income_class["be_source_raw_values"])["amount_eur"] == (
+        "3773400213.2535701"
+    )
+    assert income_class["income_year"] == "2023"
+    assert income_class["assessment_year"] == "2024"
+    assert income_class["tax_return.net_taxable_income_class"] == "class_19_20"
+    assert income_class["tax_return.net_taxable_income_lower_bound"] == "19000"
+    assert income_class["tax_return.net_taxable_income_upper_bound"] == "20000"
+
+    low_decile = by_id["b1.decile_01"]
+    assert json.loads(low_decile["be_source_cells"])["total_tax_eur"] == "F9"
+    assert low_decile["be_total_tax_eur"] == "-29166612.99"
+
+    joint_age = by_id["b4.joint.age_25_29.decile_01"]
+    assert json.loads(joint_age["be_source_cells"])["declarations"] == "C27"
+    assert joint_age["be_declarations"] == "509"
+    assert joint_age["tax_return.declaration_type"] == "joint"
+    assert joint_age["tax_return.age_band"] == "age_25_29"
+    assert joint_age["tax_return.decile"] == "1"
+
+
+def test_statbel_fiscal_distribution_class_counts_and_commune_consistency():
+    distribution = _facts(FISCAL_DISTRIBUTION_ALIAS, 2023)
+    by_id = {fact.source_record_id: fact for fact in distribution}
+    prefix = (
+        "statbel.fiscal_income_distribution.income_year2023."
+        "taxable_income.by_income_class_eur1000"
+    )
+    total_income = Decimal(str(by_id[f"{prefix}.total.taxable_income_eur"].value))
+    detail_declarations = [
+        fact
+        for fact in distribution
+        if fact.geography.id == "BE"
+        and fact.source_record_id.startswith(f"{prefix}.class_")
+        and fact.layout.measure_id == "declarations"
+    ]
+
+    assert len(detail_declarations) == 101
+    assert sum(fact.value for fact in detail_declarations) == 6_846_186
+    assert by_id[f"{prefix}.total.declarations"].value == 6_846_186
+    assert total_income == Decimal("274707991587.37")
+    assert (
+        by_id[
+            "statbel.fiscal_income_distribution.income_year2023."
+            "zero_income_declarations.total.declarations"
+        ].value
+        == 523_770
+    )
+    assert (
+        by_id[
+            "statbel.fiscal_income_distribution.income_year2023.regions.be2."
+            "taxable_income.by_income_class_eur1000.total.taxable_income_eur"
+        ].value
+        == 170_249_544_832.83
+    )
+
+    # The existing commune package preserves 565 independently rounded
+    # publisher cells. Their sum is €0.45 above A.1's national cell; pin the
+    # residual instead of reconciling either publisher-backed value.
+    commune_total = sum(
+        Decimal(str(fact.value))
+        for fact in _facts("statbel-fiscal-income-2023-nis-2025", 2023)
+    )
+    assert commune_total == Decimal("274707991587.82")
+    assert commune_total - total_income == Decimal("0.45")
+    assert abs(commune_total - total_income) < Decimal("1")
+
+
+def test_statbel_fiscal_distribution_decile_amounts_and_tax_signs():
+    facts = _facts(FISCAL_DISTRIBUTION_ALIAS, 2023)
+    by_id = {fact.source_record_id: fact for fact in facts}
+    prefix = "statbel.fiscal_income_distribution.income_year2023.by_decile"
+
+    for measure, expected_total in {
+        "taxable_income_eur": Decimal("274707991587.39"),
+        "total_tax_eur": Decimal("62840116133.93"),
+        "payable_tax_eur": Decimal("5232698748.97"),
+        "tax_refund_eur": Decimal("5300763663.38"),
+    }.items():
+        decile_sum = sum(
+            Decimal(str(by_id[f"{prefix}.decile_{decile:02d}.{measure}"].value))
+            for decile in range(1, 11)
+        )
+        assert Decimal(str(by_id[f"{prefix}.total.{measure}"].value)) == expected_total
+        assert decile_sum == expected_total
+
+    assert by_id[f"{prefix}.decile_01.total_tax_eur"].value == -29_166_612.99
+    assert by_id[f"{prefix}.decile_02.total_tax_eur"].value == -60_702_856.71
+    assert by_id[f"{prefix}.decile_10.total_tax_eur"].layout.record_set_id.endswith(
+        ".decile_values"
+    )
+    assert by_id[
+        f"{prefix}.percentile_100.total_tax_eur"
+    ].layout.record_set_id.endswith(".top_decile_percentile_values")
+
+
+def test_statbel_fiscal_distribution_preserves_exact_age_bands():
+    facts = _facts(FISCAL_DISTRIBUTION_ALIAS, 2023)
+    by_id = {fact.source_record_id: fact for fact in facts}
+    prefix = (
+        "statbel.fiscal_income_distribution.income_year2023."
+        "declaration_type_age.by_decile"
+    )
+
+    assert by_id[f"{prefix}.joint.age_25_29.decile_01.declarations"].value == 509
+    assert by_id[f"{prefix}.joint.age_30_34.decile_01.declarations"].value == 973
+    assert not any("age_25_34" in fact.source_record_id for fact in facts)
+
+    age_total = by_id[f"{prefix}.joint.total.decile_01.declarations"]
+    assert age_total.filters["tax_return.age_band"] == "all"
+    assert age_total.layout.table_record_kind == "total"
+
+    # The workbook literally labels this category "Minder dan 24 jaar", but
+    # its values equal the publisher's through-age-24 Home bins. Keep the
+    # literal category and do not invent a numeric age boundary.
+    publisher_under_24 = by_id[f"{prefix}.individual.under_24.decile_01.declarations"]
+    assert publisher_under_24.filters["tax_return.age_band"] == "under_24"
+    assert all(
+        constraint.variable != "tax_return.age"
+        for constraint in publisher_under_24.constraints
+    )
+
+
+def test_statbel_fiscal_distribution_zero_income_ids_are_geography_neutral():
+    zero_income_facts = [
+        fact
+        for fact in _facts(FISCAL_DISTRIBUTION_ALIAS, 2023)
+        if ".zero_income_declarations." in fact.source_record_id
+    ]
+
+    assert len(zero_income_facts) == 4
+    assert all(
+        fact.source_record_id.endswith(".total.declarations")
+        for fact in zero_income_facts
+    )
 
 
 def test_belgium_target_packages_have_expected_fact_count():
@@ -151,9 +378,7 @@ def test_belgium_period_basis_is_preserved_by_source():
     }
     assert periods_by_alias["spf-finances-pit-2023"] == {("tax_year", 2023)}
     assert periods_by_alias["onss-contributions-2024"] == {("calendar_year", 2024)}
-    assert periods_by_alias["onem-rva-unemployment-2024"] == {
-        ("calendar_year", 2024)
-    }
+    assert periods_by_alias["onem-rva-unemployment-2024"] == {("calendar_year", 2024)}
     assert periods_by_alias[
         "nbb-national-accounts-household-disposable-income-2024"
     ] == {("calendar_year", 2024)}
@@ -299,9 +524,7 @@ def test_groeipakket_caseload_matches_published_component_cells():
 
 def test_bfp_economic_outlook_facts_are_typed_source_projection():
     facts = _facts(BFP_OUTLOOK_ALIAS, 2026)
-    by_key = {
-        (fact.period.value, fact.measure.concept): fact.value for fact in facts
-    }
+    by_key = {(fact.period.value, fact.measure.concept): fact.value for fact in facts}
 
     # Exact published headline figures from the BFP June 2026 outlook.
     assert by_key == {

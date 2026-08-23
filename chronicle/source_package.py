@@ -103,6 +103,9 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
     "statbel-fiscal-income-2023-nis-2025": Path("statbel/fiscal_income_2023_nis_2025"),
+    "statbel-fiscal-income-distribution-2023": Path(
+        "statbel/fiscal_income_distribution_2023"
+    ),
     "spf-finances-pit-2023": Path("spf_finances/pit_2023"),
     "onss-contributions-2024": Path("onss/contributions_2024"),
     "onem-rva-unemployment-2024": Path("onem_rva/unemployment_2024"),
