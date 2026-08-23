@@ -1,0 +1,26 @@
+source_id: eurostat-nasa-10-nf-tr
+source_name: Eurostat nasa_10_nf_tr non-financial transactions
+publisher: Eurostat
+source_page: https://ec.europa.eu/eurostat/databrowser/view/nasa_10_nf_tr/default/table?lang=en
+files:
+  2024:
+    filename: nasa_10_nf_tr.json
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nasa_10_nf_tr?format=JSON&lang=en&freq=A&unit=CP_MEUR&sector=S14_S15&na_item=B2G&na_item=B3G&na_item=B3N&na_item=B6G&na_item=D1&na_item=D11&na_item=D12&na_item=D4&na_item=D41&na_item=D42&na_item=D44&na_item=D45&na_item=D5&na_item=D61&na_item=D62&direct=RECV&direct=PAID&geo=BE&time=2022&time=2023&time=2024
+    source_table: Eurostat nasa_10_nf_tr Non-financial transactions - annual data for Belgian households and NPISH
+    sha256: 30d3f5bf3d1414c78633d13f505558b837b84e92c24b17050249ab19cec20a6d
+    size_bytes: 5098
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/eurostat/eurostat-nasa-10-nf-tr/2024/30d3f5bf3d1414c78633d13f505558b837b84e92c24b17050249ab19cec20a6d/nasa_10_nf_tr.json
+        uri: r2://ledger-raw/raw/eurostat/eurostat-nasa-10-nf-tr/2024/30d3f5bf3d1414c78633d13f505558b837b84e92c24b17050249ab19cec20a6d/nasa_10_nf_tr.json
+    source_urls:
+      - https://ec.europa.eu/eurostat/databrowser/view/nasa_10_nf_tr/default/table?lang=en
+      - https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nasa_10_nf_tr?format=JSON&lang=en&freq=A&unit=CP_MEUR&sector=S14_S15&na_item=B2G&na_item=B3G&na_item=B3N&na_item=B6G&na_item=D1&na_item=D11&na_item=D12&na_item=D4&na_item=D41&na_item=D42&na_item=D44&na_item=D45&na_item=D5&na_item=D61&na_item=D62&direct=RECV&direct=PAID&geo=BE&time=2022&time=2023&time=2024
+    notes: >-
+      Real Eurostat dissemination API bytes for the filtered request in
+      source_url; hash-pinned and content-addressed. Different bytes at
+      the mutable API endpoint are a new vintage, never a pin update. The
+      request includes B3N, but the returned cube contains no B3N category;
+      PAID D42 and RECV D5 are present as cube coordinates with null values.

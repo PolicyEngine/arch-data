@@ -266,6 +266,7 @@ SOURCE_PACKAGE_ALIASES = {
     ),
     "eurostat-gov-10a-taxag": Path("eurostat/gov_10a_taxag"),
     "eurostat-spr-exp-func": Path("eurostat/spr_exp_func"),
+    "eurostat-nasa-10-nf-tr": Path("eurostat/nasa_10_nf_tr"),
     "eurostat-ilc-li02": Path("eurostat/ilc_li02"),
     "eurostat-ilc-di01": Path("eurostat/ilc_di01"),
     "kff-marketplace-effectuated-enrollment": Path(

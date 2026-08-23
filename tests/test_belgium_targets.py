@@ -205,14 +205,26 @@ def test_belgium_euromod_comparator_has_source_urls_per_row():
     )
     facts = _facts(EUROMOD_BE_COMPARATOR_ALIAS, 2025)
 
-    assert len(comparator_rows) == 18
-    assert len(facts) == 18
+    assert len(comparator_rows) == 41
+    assert len(facts) == 41
     assert {row["source_url"] for row in comparator_rows} == {
         "https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf"
     }
     assert {fact.source.source_name for fact in facts} == {"jrc_euromod_be"}
     assert {fact.geography.id for fact in facts} == {"BE"}
-    assert {fact.measure.unit for fact in facts} == {"eur", "percent", "ratio"}
+    assert {fact.measure.unit for fact in facts} == {
+        "count",
+        "eur",
+        "percent",
+        "ratio",
+    }
+    assert sum(fact.provenance_class == "administrative" for fact in facts) == 25
+    assert sum(fact.provenance_class == "model_output" for fact in facts) == 14
+    assert sum(fact.provenance_class == "survey_aggregate" for fact in facts) == 2
+    survey_facts = [
+        fact for fact in facts if fact.provenance_class == "survey_aggregate"
+    ]
+    assert {fact.survey_instrument for fact in survey_facts} == {"EU-SILC"}
     assert validate_facts(facts).valid
 
 
