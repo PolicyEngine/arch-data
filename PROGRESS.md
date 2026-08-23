@@ -4,8 +4,8 @@
 
 - Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
 - Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
-- All four source-package additions are implemented and individually validated;
-  Belgium regression tests and the merged bundle are next.
+- All four source-package additions and regression tests are complete; the
+  source-backed handoff report and final audit are next.
 - The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
   to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
 
@@ -37,7 +37,12 @@
   prior artifact or prior package specification.
 - Passed both new Eurostat package validations and suite builds: 12 tax facts
   and 9 ESSPROS facts, full lineage, and zero acceptance errors.
+- Extended Belgium and Eurostat regressions for FPB table counts/cells and
+  assertion boundary, vintage non-overlap, prior-output digests, Statbel pins,
+  and the declared 0.25% Statbel/FPB population comparison tolerance.
+- Passed 43 focused tests and the full merged-bundle regression: 157,177 facts,
+  148 packages, zero aggregate-key duplicates, and expected goldens throughout.
 
 ## Next
 
-- Extend Belgium tests, run full requested validation, and write `LANE_C5_REPORT.md`.
+- Write `LANE_C5_REPORT.md`, run final formatting/status checks, and commit it.
