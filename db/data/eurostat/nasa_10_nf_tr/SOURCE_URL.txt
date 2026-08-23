@@ -1,0 +1,1 @@
+https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nasa_10_nf_tr?format=JSON&lang=en&freq=A&unit=CP_MEUR&sector=S14_S15&na_item=B2G&na_item=B3G&na_item=B3N&na_item=B6G&na_item=D1&na_item=D11&na_item=D12&na_item=D4&na_item=D41&na_item=D42&na_item=D44&na_item=D45&na_item=D5&na_item=D61&na_item=D62&direct=RECV&direct=PAID&geo=BE&time=2022&time=2023&time=2024

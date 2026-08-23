@@ -15,6 +15,12 @@
    "sha256": "24ad3c0115efef790ff8cb2ff8fb269d4ceb7de70ac3fad673ebd1340e4f650f"
   },
   {
+   "dataset_id": "nasa_10_nf_tr",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nasa_10_nf_tr?format=JSON&lang=en&freq=A&unit=CP_MEUR&sector=S14_S15&na_item=B2G&na_item=B3G&na_item=B3N&na_item=B6G&na_item=D1&na_item=D11&na_item=D12&na_item=D4&na_item=D41&na_item=D42&na_item=D44&na_item=D45&na_item=D5&na_item=D61&na_item=D62&direct=RECV&direct=PAID&geo=BE&time=2022&time=2023&time=2024",
+   "destination": "db/data/eurostat/nasa_10_nf_tr/nasa_10_nf_tr.json",
+   "sha256": "30d3f5bf3d1414c78633d13f505558b837b84e92c24b17050249ab19cec20a6d"
+  },
+  {
    "dataset_id": "ilc_li02",
    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_li02?format=JSON&lang=en&freq=A&statinfo=MED_EI&unit=PC&rskpovth=B_60&sex=T&age=TOTAL&geo=BE&geo=DE&geo=FR&time=2024",
    "destination": "db/data/eurostat/ilc_li02/ilc_li02.json",
