@@ -21,3 +21,24 @@ files:
       Real Eurostat dissemination API bytes for the filtered request in
       source_url; hash-pinned and content-addressed. Different bytes at
       the mutable API endpoint are a new vintage, never a pin update.
+  2025:
+    filename: gov_10a_taxag_2022_2025.json
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag?format=JSON&lang=en&freq=A&unit=MIO_EUR&sector=S13&na_item=D51&na_item=D51A_C1&na_item=D51B_C2&na_item=D5&na_item=D61&na_item=D2&geo=BE&time=2022&time=2023&time=2024&time=2025
+    source_table: Eurostat gov_10a_taxag Main national accounts tax aggregates for Belgium
+    sha256: da84f990bbf077162e4f43f64b94a28e376859075d831efdbadbe6aef3eda3ea
+    size_bytes: 3502
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/eurostat/eurostat-gov-10a-taxag/2025/da84f990bbf077162e4f43f64b94a28e376859075d831efdbadbe6aef3eda3ea/gov_10a_taxag_2022_2025.json
+        uri: r2://ledger-raw/raw/eurostat/eurostat-gov-10a-taxag/2025/da84f990bbf077162e4f43f64b94a28e376859075d831efdbadbe6aef3eda3ea/gov_10a_taxag_2022_2025.json
+    source_urls:
+      - https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=en
+      - https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag?format=JSON&lang=en&freq=A&unit=MIO_EUR&sector=S13&na_item=D51&na_item=D51A_C1&na_item=D51B_C2&na_item=D5&na_item=D61&na_item=D2&geo=BE&time=2022&time=2023&time=2024&time=2025
+    notes: >-
+      Real Eurostat dissemination API bytes for the filtered request in
+      source_url; hash-pinned and content-addressed. This 2025 vintage adds
+      the D51A_C1 and D51B_C2 taxpayer split and extends the cube through 2025.
+      Different bytes at the mutable API endpoint are a new vintage, never a
+      pin update.

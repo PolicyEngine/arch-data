@@ -275,7 +275,9 @@ SOURCE_PACKAGE_ALIASES = {
         "hmrc/vat_firm_sector_targets_2024_25"
     ),
     "eurostat-gov-10a-taxag": Path("eurostat/gov_10a_taxag"),
+    "eurostat-gov-10a-taxag-2025": Path("eurostat/gov_10a_taxag_2025"),
     "eurostat-spr-exp-func": Path("eurostat/spr_exp_func"),
+    "eurostat-spr-exp-func-2024": Path("eurostat/spr_exp_func_2024"),
     "eurostat-nasa-10-nf-tr": Path("eurostat/nasa_10_nf_tr"),
     "eurostat-ilc-li02": Path("eurostat/ilc_li02"),
     "eurostat-ilc-di01": Path("eurostat/ilc_di01"),

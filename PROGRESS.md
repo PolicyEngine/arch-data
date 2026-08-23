@@ -4,8 +4,8 @@
 
 - Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
 - Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
-- FPB and Statbel 2025 implementations are complete and validated; Eurostat
-  vintage packages are prepared for the next commit.
+- All four source-package additions are implemented and individually validated;
+  Belgium regression tests and the merged bundle are next.
 - The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
   to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
 
@@ -32,8 +32,12 @@
   raw capture plus its deterministic 18-row curated CSV.
 - Passed Statbel 2025 `validate-package` and `build-suite`: 18 facts totaling
   11,825,551, 66 constraints, full lineage, and zero acceptance errors.
+- Added the Eurostat `gov_10a_taxag` 2025 and `spr_exp_func` 2024 manifest
+  entries plus vintage-specific package aliases, without modifying either
+  prior artifact or prior package specification.
+- Passed both new Eurostat package validations and suite builds: 12 tax facts
+  and 9 ESSPROS facts, full lineage, and zero acceptance errors.
 
 ## Next
 
-- Add and validate the two Eurostat vintage packages without duplicating overlap facts.
 - Extend Belgium tests, run full requested validation, and write `LANE_C5_REPORT.md`.

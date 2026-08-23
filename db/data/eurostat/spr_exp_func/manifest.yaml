@@ -22,3 +22,23 @@ files:
       Real Eurostat dissemination API bytes for the filtered request in
       source_url; hash-pinned and content-addressed. Different bytes at
       the mutable API endpoint are a new vintage, never a pin update.
+  2024:
+    filename: spr_exp_func_2023_2024.json
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_func?format=JSON&lang=en&freq=A&spdeps=SPR&spfunc=TOTAL&spfunc=SICK&spfunc=DIS&spfunc=OLD&spfunc=SRV&spfunc=FAM&spfunc=UNE&spfunc=HOU&spfunc=EXCL&unit=MIO_EUR&geo=BE&time=2023&time=2024
+    source_table: Eurostat spr_exp_func Expenditure on social benefits by function for Belgium
+    sha256: 91ea617950583ca0704863125f6bbb4292b0f12da95bffae422c5d406bd3d81d
+    size_bytes: 3892
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/eurostat/eurostat-spr-exp-func/2024/91ea617950583ca0704863125f6bbb4292b0f12da95bffae422c5d406bd3d81d/spr_exp_func_2023_2024.json
+        uri: r2://ledger-raw/raw/eurostat/eurostat-spr-exp-func/2024/91ea617950583ca0704863125f6bbb4292b0f12da95bffae422c5d406bd3d81d/spr_exp_func_2023_2024.json
+    source_urls:
+      - https://ec.europa.eu/eurostat/databrowser/view/spr_exp_func/default/table?lang=en
+      - https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_func?format=JSON&lang=en&freq=A&spdeps=SPR&spfunc=TOTAL&spfunc=SICK&spfunc=DIS&spfunc=OLD&spfunc=SRV&spfunc=FAM&spfunc=UNE&spfunc=HOU&spfunc=EXCL&unit=MIO_EUR&geo=BE&time=2023&time=2024
+    notes: >-
+      Real Eurostat dissemination API bytes for the filtered request in
+      source_url; hash-pinned and content-addressed. This 2024 vintage extends
+      the Belgium cube through 2024. Different bytes at the mutable API
+      endpoint are a new vintage, never a pin update.

@@ -1,0 +1,175 @@
+schema_version: ledger.source_package.v1
+package_id: eurostat-spr-exp-func-2024
+label: Eurostat ESSPROS 2024 social protection expenditure by function for Belgium
+artifact:
+  source_name: eurostat
+  source_table: Eurostat spr_exp_func Expenditure on social benefits by function for Belgium
+  resource_package: db
+  resource_directory: data/eurostat/spr_exp_func
+  manifest: manifest.yaml
+  vintage: eurostat_spr_exp_func_2024
+  extracted_at: '2026-08-23'
+  extraction_method: >-
+    Eurostat dissemination API v1.0 JSON-stat 2.0 full-cube row parse of
+    the filtered request recorded in the manifest source_url
+  parser: json_stat_2_full_rows
+  artifact_year: 2024
+  sheet_name: spr_exp_func
+  # The prior package continues to own the 2023 observations. TOTAL is
+  # Eurostat's published aggregate; Chronicle does not sum the functions.
+  selected_rows:
+    - {freq: A, spdeps: SPR, spfunc: TOTAL, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: SICK, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: DIS, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: OLD, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: SRV, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: FAM, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: UNE, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: HOU, unit: MIO_EUR, geo: BE, time: '2024'}
+    - {freq: A, spdeps: SPR, spfunc: EXCL, unit: MIO_EUR, geo: BE, time: '2024'}
+record_sets:
+  - record_set_id: eurostat.spr_exp_func.cy2024.social_protection_expenditure_by_function.be
+    provenance_class: administrative
+    record_set_spec_id: eurostat.spr_exp_func.social_protection_expenditure_by_function.country.v1
+    source_record_id_prefix: eurostat.spr_exp_func.cy2024.social_protection_expenditure_by_function.be
+    sheet_name: spr_exp_func
+    period_type: calendar_year
+    period: 2024
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: social_protection_scheme
+    entity_role: social_protection_provider
+    domain: social_protection_expenditure
+    groupby_dimension: spfunc
+    shared_filters:
+      freq: A
+      spdeps: SPR
+      unit: MIO_EUR
+      geo: BE
+      time: '2024'
+    shared_constraints:
+      - {variable: freq, operator: '==', value: A, label: annual frequency}
+      - {variable: spdeps, operator: '==', value: SPR, label: social protection benefits}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: source unit}
+      - {variable: geo, operator: '==', value: BE, label: geography}
+      - {variable: time, operator: '==', value: '2024', label: source time}
+    rows:
+      - &total_row
+        value_id: total
+        label: Total social protection benefits
+        ordinal: 0
+        row_number: 2
+        expected_row_header_column: C
+        expected_row_header: TOTAL
+        filters: {spfunc: TOTAL}
+        constraints:
+          - {variable: spfunc, operator: '==', value: TOTAL, label: Total function}
+        guard_cells: &belgium_guards
+          - {column: A, expected_value: A, label: annual frequency}
+          - {column: B, expected_value: SPR, label: social protection benefits}
+          - {column: D, expected_value: MIO_EUR, label: source unit}
+          - {column: E, expected_value: BE, label: geography}
+      - value_id: sickness_health_care
+        label: Sickness and health care
+        ordinal: 1
+        row_number: 3
+        expected_row_header_column: C
+        expected_row_header: SICK
+        filters: {spfunc: SICK}
+        constraints:
+          - {variable: spfunc, operator: '==', value: SICK, label: Sickness and health care function}
+        guard_cells: *belgium_guards
+      - value_id: disability
+        label: Disability
+        ordinal: 2
+        row_number: 4
+        expected_row_header_column: C
+        expected_row_header: DIS
+        filters: {spfunc: DIS}
+        constraints:
+          - {variable: spfunc, operator: '==', value: DIS, label: Disability function}
+        guard_cells: *belgium_guards
+      - value_id: old_age
+        label: Old age
+        ordinal: 3
+        row_number: 5
+        expected_row_header_column: C
+        expected_row_header: OLD
+        filters: {spfunc: OLD}
+        constraints:
+          - {variable: spfunc, operator: '==', value: OLD, label: Old age function}
+        guard_cells: *belgium_guards
+      - value_id: survivors
+        label: Survivors
+        ordinal: 4
+        row_number: 6
+        expected_row_header_column: C
+        expected_row_header: SRV
+        filters: {spfunc: SRV}
+        constraints:
+          - {variable: spfunc, operator: '==', value: SRV, label: Survivors function}
+        guard_cells: *belgium_guards
+      - value_id: family_children
+        label: Family and children
+        ordinal: 5
+        row_number: 7
+        expected_row_header_column: C
+        expected_row_header: FAM
+        filters: {spfunc: FAM}
+        constraints:
+          - {variable: spfunc, operator: '==', value: FAM, label: Family and children function}
+        guard_cells: *belgium_guards
+      - value_id: unemployment
+        label: Unemployment
+        ordinal: 6
+        row_number: 8
+        expected_row_header_column: C
+        expected_row_header: UNE
+        filters: {spfunc: UNE}
+        constraints:
+          - {variable: spfunc, operator: '==', value: UNE, label: Unemployment function}
+        guard_cells: *belgium_guards
+      - value_id: housing
+        label: Housing
+        ordinal: 7
+        row_number: 9
+        expected_row_header_column: C
+        expected_row_header: HOU
+        filters: {spfunc: HOU}
+        constraints:
+          - {variable: spfunc, operator: '==', value: HOU, label: Housing function}
+        guard_cells: *belgium_guards
+      - value_id: social_exclusion_nec
+        label: Social exclusion not elsewhere classified
+        ordinal: 8
+        row_number: 10
+        expected_row_header_column: C
+        expected_row_header: EXCL
+        filters: {spfunc: EXCL}
+        constraints:
+          - {variable: spfunc, operator: '==', value: EXCL, label: Social exclusion not elsewhere classified function}
+        guard_cells: *belgium_guards
+    measures:
+      - measure_id: expenditure
+        label: Social protection expenditure
+        ordinal: 0
+        column: G
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: social_protection_expenditure
+        source_concept: eurostat.spr_exp_func.social_protection_expenditure_by_function
+        concept_relation: source_label
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/spr_exp_func/default/table?lang=en
+        concept_evidence_notes: >-
+          spr_exp_func publishes social protection benefits for TOTAL and the
+          eight ESSPROS functions in spfunc. ESSPROS counts interventions by
+          public and private social protection schemes; the scheme, not
+          general government, is the ESSPROS statistical unit.
+        unit: eur
+        aggregation: sum
+        value_scale: 1000000
+        expected_cell_type: number
