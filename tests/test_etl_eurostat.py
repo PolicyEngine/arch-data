@@ -33,10 +33,16 @@ EVALUATION_ONLY_COMMENT = (
 EUROSTAT_PACKAGES = {
     "eurostat-gov-10a-taxag": ("gov_10a_taxag", 2024, 24, 24),
     "eurostat-spr-exp-func": ("spr_exp_func", 2023, 27, 27),
+    "eurostat-nasa-10-nf-tr": ("nasa_10_nf_tr", 2024, 78, 84),
     "eurostat-ilc-li02": ("ilc_li02", 2024, 3, 3),
     "eurostat-ilc-di01": ("ilc_di01", 2024, 54, 54),
 }
 EUROSTAT_DATASET_IDS = {values[0] for values in EUROSTAT_PACKAGES.values()}
+NASA_10_NF_TR_ALIAS = "eurostat-nasa-10-nf-tr"
+NASA_10_NF_TR_YEAR = 2024
+NASA_10_NF_TR_SHA256 = (
+    "30d3f5bf3d1414c78633d13f505558b837b84e92c24b17050249ab19cec20a6d"
+)
 EXPECTED_QUERY_FILTERS = {
     "gov_10a_taxag": {
         "freq": ["A"],
@@ -63,6 +69,31 @@ EXPECTED_QUERY_FILTERS = {
         "unit": ["MIO_EUR"],
         "geo": ["BE", "DE", "FR"],
         "time": ["2023"],
+    },
+    "nasa_10_nf_tr": {
+        "freq": ["A"],
+        "unit": ["CP_MEUR"],
+        "sector": ["S14_S15"],
+        "na_item": [
+            "B2G",
+            "B3G",
+            "B3N",
+            "B6G",
+            "D1",
+            "D11",
+            "D12",
+            "D4",
+            "D41",
+            "D42",
+            "D44",
+            "D45",
+            "D5",
+            "D61",
+            "D62",
+        ],
+        "direct": ["RECV", "PAID"],
+        "geo": ["BE"],
+        "time": ["2022", "2023", "2024"],
     },
     "ilc_li02": {
         "freq": ["A"],
@@ -93,6 +124,130 @@ def _package_outputs(alias: str):
     cells = package.build_source_cells(year, source_rows=rows)
     facts = package.build_facts(year, cells=cells, source_rows=rows)
     return package, rows, cells, facts
+
+
+@lru_cache
+def _nasa_10_nf_tr_outputs():
+    return _package_outputs(NASA_10_NF_TR_ALIAS)
+
+
+def test_nasa_10_nf_tr_preserves_full_cube_and_selected_fact_lineage():
+    package, rows, cells, facts = _nasa_10_nf_tr_outputs()
+    package_report = validate_source_package(
+        NASA_10_NF_TR_ALIAS,
+        year=NASA_10_NF_TR_YEAR,
+    )
+    rows_by_key = {build_source_row_key(row): row for row in rows}
+
+    assert NASA_10_NF_TR_ALIAS in SOURCE_PACKAGE_ALIASES
+    assert package.artifact.parser == "json_stat_2_full_rows"
+    assert package_report.valid, package_report.to_dict()
+    assert package_report.counts == {
+        "record_set_count": 6,
+        "row_count": 78,
+        "measure_count": 6,
+        "source_record_count": 78,
+        "source_region_count": 6,
+    }
+    assert len(package.record_sets) == 6
+    assert len(rows) == 84
+    assert len(facts) == 78
+    assert validate_source_rows(rows).valid
+    assert validate_source_cells(cells).valid
+    assert validate_facts(facts).valid
+    contract_report = validate_consumer_fact_contract(facts)
+    assert contract_report.valid, contract_report.to_dict()
+
+    assert Counter((fact.period.type, fact.period.value) for fact in facts) == {
+        ("calendar_year", 2022): 26,
+        ("calendar_year", 2023): 26,
+        ("calendar_year", 2024): 26,
+    }
+    assert Counter(fact.filters["direct"] for fact in facts) == {
+        "PAID": 39,
+        "RECV": 39,
+    }
+    assert {fact.provenance_class for fact in facts} == {"administrative"}
+    assert {fact.survey_instrument for fact in facts} == {None}
+    assert {fact.entity.name for fact in facts} == {"household"}
+    assert {fact.entity.role for fact in facts} == {
+        "resident_households_and_npish"
+    }
+    assert {fact.measure.unit for fact in facts} == {"eur"}
+    assert {fact.measure.concept_relation for fact in facts} == {"exact"}
+    assert {fact.measure.concept_authority for fact in facts} == {"ledger-be"}
+    assert {fact.measure.concept for fact in facts} == {
+        "belgium_household_national_accounts_non_financial_transaction_amount"
+    }
+
+    groupby_value_ids = {fact.layout.groupby_value_id for fact in facts}
+    assert {
+        "belgium_household_mixed_income_gross",
+        "belgium_household_disposable_income_gross",
+        "belgium_household_interest_received",
+        "belgium_household_distributed_income_of_corporations_received",
+        "belgium_household_wages_and_salaries_received",
+        "belgium_household_current_taxes_on_income_paid",
+        "belgium_household_net_social_contributions_paid",
+        "belgium_household_social_benefits_received",
+    } <= groupby_value_ids
+
+    null_coordinates = {
+        (
+            row.values["direct"],
+            row.values["na_item"],
+            str(row.values["time"]),
+        )
+        for row in rows
+        if row.values["value"] is None
+    }
+    assert null_coordinates == {
+        (direction, item, str(year))
+        for direction, item in (("PAID", "D42"), ("RECV", "D5"))
+        for year in (2022, 2023, 2024)
+    }
+
+    assert len({fact.source_record_id for fact in facts}) == 78
+    for fact in facts:
+        assert len(fact.source_row_keys) == 1
+        assert len(fact.source_cell_keys) == 8
+        source_row = rows_by_key[fact.source_row_keys[0]]
+        assert source_row.values["value"] is not None
+        assert fact.value == source_row.values["value"] * 1_000_000
+        assert fact.filters["direct"] == source_row.values["direct"]
+        assert fact.filters["na_item"] == source_row.values["na_item"]
+        assert str(fact.period.value) == str(source_row.values["time"])
+        assert fact.source.source_sha256 == NASA_10_NF_TR_SHA256
+        assert NASA_10_NF_TR_SHA256 in fact.source.raw_r2_key
+        assert fact.source.raw_r2_uri == (
+            f"r2://{fact.source.raw_r2_bucket}/{fact.source.raw_r2_key}"
+        )
+
+    manifest_path = (
+        REPO_ROOT
+        / "db"
+        / "data"
+        / "eurostat"
+        / "nasa_10_nf_tr"
+        / "manifest.yaml"
+    )
+    manifest = yaml.safe_load(manifest_path.read_text())
+    file_spec = manifest["files"][NASA_10_NF_TR_YEAR]
+    artifact_path = manifest_path.parent / file_spec["filename"]
+    artifact_bytes = artifact_path.read_bytes()
+    expected_r2_key = (
+        "raw/eurostat/eurostat-nasa-10-nf-tr/2024/"
+        f"{NASA_10_NF_TR_SHA256}/nasa_10_nf_tr.json"
+    )
+
+    assert hashlib.sha256(artifact_bytes).hexdigest() == NASA_10_NF_TR_SHA256
+    assert len(artifact_bytes) == 5098
+    assert file_spec["sha256"] == NASA_10_NF_TR_SHA256
+    assert file_spec["size_bytes"] == 5098
+    assert file_spec["storage"]["r2"]["key"] == expected_r2_key
+    assert file_spec["storage"]["r2"]["uri"] == (
+        f"r2://ledger-raw/{expected_r2_key}"
+    )
 
 
 def test_eurostat_aliases_and_packages_validate_end_to_end():
@@ -133,6 +288,7 @@ def test_eurostat_packages_pass_full_agent_acceptance(alias, tmp_path):
 def test_eurostat_facts_preserve_raw_cube_dimensions_and_scaling():
     unit_mapping = {
         "MIO_EUR": ("eur", 1_000_000),
+        "CP_MEUR": ("eur", 1_000_000),
         "PC": ("percent", 1),
         "EUR": ("eur", 1),
     }
@@ -166,6 +322,7 @@ def test_eurostat_provenance_and_evaluation_only_boundary():
     administrative_aliases = {
         "eurostat-gov-10a-taxag",
         "eurostat-spr-exp-func",
+        "eurostat-nasa-10-nf-tr",
     }
     survey_aliases = {"eurostat-ilc-li02", "eurostat-ilc-di01"}
 
@@ -247,6 +404,10 @@ def test_eurostat_production_surfaces_carry_no_fixture_identity():
 
 def test_eurostat_artifacts_match_verified_live_dimension_shapes_and_labels():
     expected_shapes = {
+        "nasa_10_nf_tr": (
+            ["freq", "unit", "direct", "na_item", "sector", "geo", "time"],
+            [1, 1, 2, 14, 1, 1, 3],
+        ),
         "spr_exp_func": (
             ["freq", "spdeps", "spfunc", "unit", "geo", "time"],
             [1, 1, 9, 1, 3, 1],
