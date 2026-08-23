@@ -430,7 +430,7 @@ def test_statbel_2025_population_matches_fpb_annual_average_with_declared_tolera
     }
     assert fpb_population == 11_850_400
     assert fpb_population - statbel_total == 24_849
-    assert relative_gap == pytest.approx(0.0020968912433335584)
+    assert relative_gap == pytest.approx(0.002096891244177412)
     # Observed gap is 0.2097%: use a stated 0.25% ceiling for the January 1
     # Statbel stock versus FPB annual-average population, not a tuned equality.
     assert relative_gap < 0.0025
