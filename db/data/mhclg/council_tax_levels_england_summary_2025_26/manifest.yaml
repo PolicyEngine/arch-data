@@ -1,0 +1,19 @@
+source_id: mhclg
+package_id: mhclg-council-tax-levels-england-summary-2025-26
+dataset: mhclg_mhclg-council-tax-levels-england-summary-2025-26
+source_page: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+table: Council Tax levels set by local authorities in England 2025 to 2026, Tables
+  1 to 9 (revised), Table 1 England summary
+files:
+  2026:
+    filename: Tables_1-9_2025-26.ods
+    source_url: https://assets.publishing.service.gov.uk/media/69e88e1c9ca985145673b7f4/Tables_1-9_2025-26.ods
+    sha256: 7d9f98b6c152d276d7fb672db0a7cec866df24e175bb28ebb55cbe845a8afbc3
+    size_bytes: 96086
+    fetched_at: '2026-08-23T07:44:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/mhclg/mhclg-council-tax-levels-england-summary-2025-26/2026/7d9f98b6c152d276d7fb672db0a7cec866df24e175bb28ebb55cbe845a8afbc3/Tables_1-9_2025-26.ods
+        uri: r2://ledger-raw/raw/mhclg/mhclg-council-tax-levels-england-summary-2025-26/2026/7d9f98b6c152d276d7fb672db0a7cec866df24e175bb28ebb55cbe845a8afbc3/Tables_1-9_2025-26.ods

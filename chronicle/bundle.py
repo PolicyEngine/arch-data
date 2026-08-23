@@ -62,7 +62,9 @@ UK_BUNDLE_SOURCES = (
     "hmrc-vat-firm-targets-2024-25",
     "isc-annual-census-2023",
     "isc-annual-census-2024",
+    "mhclg-council-tax-collection-england-2025-26",
     "mhclg-council-tax-levels-england-2026-27",
+    "mhclg-council-tax-levels-england-summary-2025-26",
     "mhclg-ehs-weekly-housing-costs-2023-24",
     "nisra-census2021-households-lgd",
     "nisra-census2021-households-pcon24",
@@ -97,7 +99,10 @@ UK_BUNDLE_SOURCES = (
     "scotgov-band-d-council-tax-rates-2026-27",
     "scotgov-band-d-equivalents-2025",
     "scotgov-council-tax-bands-2025",
+    "scotgov-council-tax-collection-2024-25",
+    "scotgov-council-tax-collection-2025-26",
     "scotgov-scottish-budget-social-security-assistance-2026",
+    "scotgov-slgfs-council-tax-2024-25",
     "slc-student-loan-borrower-forecasts-england-2025",
     "slc-student-loan-repayments-england-2025",
     "slc-student-loan-repayments-northern-ireland-2025",
@@ -106,7 +111,11 @@ UK_BUNDLE_SOURCES = (
     "slc-student-support-england-2025",
     "voa-council-tax-bands-2025",
     "voa-council-tax-stock-by-lad-2025",
+    "welshgov-council-tax-collection-2024-25",
+    "welshgov-council-tax-collection-2025-26",
     "welshgov-council-tax-levels-2026-27",
+    "welshgov-ctrs-annual-report-2024-25",
+    "welshgov-ctrs-annual-report-2025-26",
 )
 
 
