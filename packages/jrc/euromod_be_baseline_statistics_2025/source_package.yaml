@@ -103,6 +103,96 @@ record_sets:
       operator: ==
       value: euromod
       label: Validation series
+  - value_id: a3_2_self_employment_income_euromod_2023
+    label: A3.2 self-employment income EUROMOD amount 2023
+    ordinal: 4
+    row_number: 64
+    expected_row_header_column: A
+    expected_row_header: a3_2_self_employment_income_euromod_2023
+    filters:
+      validation.metric: self_employment_income_yse
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: self_employment_income_yse
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_2_employment_income_euromod_2023
+    label: A3.2 employment income EUROMOD amount 2023
+    ordinal: 5
+    row_number: 65
+    expected_row_header_column: A
+    expected_row_header: a3_2_employment_income_euromod_2023
+    filters:
+      validation.metric: employment_income_yem
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: employment_income_yem
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_income_support_euromod_2023
+    label: A3.6 income support EUROMOD amount 2023
+    ordinal: 6
+    row_number: 66
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_euromod_2023
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_income_support_elderly_euromod_2023
+    label: A3.6 elderly income support EUROMOD amount 2023
+    ordinal: 7
+    row_number: 67
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_elderly_euromod_2023
+    filters:
+      validation.metric: income_support_elderly_bsaoa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_elderly_bsaoa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_old_age_survivor_pension_euromod_2023
+    label: A3.6 old-age and survivor pension EUROMOD amount 2023
+    ordinal: 8
+    row_number: 68
+    expected_row_header_column: A
+    expected_row_header: a3_6_old_age_survivor_pension_euromod_2023
+    filters:
+      validation.metric: old_age_survivor_pension_il_ext_poapsu
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: old_age_survivor_pension_il_ext_poapsu
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
   measures:
   - measure_id: value
     label: Validation table value
@@ -205,6 +295,78 @@ record_sets:
     - variable: validation.metric
       operator: ==
       value: unemployment_benefits
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_2_employment_income_ratio_2023
+    label: A3.2 employment income external ratio 2023
+    ordinal: 4
+    row_number: 88
+    expected_row_header_column: A
+    expected_row_header: a3_2_employment_income_ratio_2023
+    filters:
+      validation.metric: employment_income_yem
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: employment_income_yem
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_income_support_ratio_2023
+    label: A3.6 income support external ratio 2023
+    ordinal: 5
+    row_number: 89
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_ratio_2023
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_income_support_elderly_ratio_2023
+    label: A3.6 elderly income support external ratio 2023
+    ordinal: 6
+    row_number: 90
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_elderly_ratio_2023
+    filters:
+      validation.metric: income_support_elderly_bsaoa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_elderly_bsaoa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_old_age_survivor_pension_ratio_2023
+    label: A3.6 old-age and survivor pension external ratio 2023
+    ordinal: 7
+    row_number: 91
+    expected_row_header_column: A
+    expected_row_header: a3_6_old_age_survivor_pension_ratio_2023
+    filters:
+      validation.metric: old_age_survivor_pension_il_ext_poapsu
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: old_age_survivor_pension_il_ext_poapsu
       label: Validation metric
     - variable: validation.series
       operator: ==
@@ -1156,6 +1318,1006 @@ record_sets:
     concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
     concept_evidence_notes: JRC EUROMOD-BE country report Annex 3 publishes validation table
       EUROMOD, external-statistic, and ratio values.
+    unit: ratio
+    aggregation: sum
+    value_scale: 1
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2021.macrovalidation.euromod_recipient_counts
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.euromod_recipient_counts.cy2021.v1
+  source_record_id_prefix: jrc.euromod_be.cy2021.macrovalidation.euromod_recipient_counts
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2021
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: person
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_5_income_support_euromod_2021
+    label: A3.5 income support EUROMOD recipients 2021
+    ordinal: 0
+    row_number: 43
+    expected_row_header_column: A
+    expected_row_header: a3_5_income_support_euromod_2021
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_5_unemployment_benefits_euromod_2021
+    label: A3.5 unemployment benefits EUROMOD recipients 2021
+    ordinal: 1
+    row_number: 44
+    expected_row_header_column: A
+    expected_row_header: a3_5_unemployment_benefits_euromod_2021
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD recipient count
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_recipient_count
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Table A3.5, report page 120 (PDF page 122), publishes EUROMOD recipient counts in thousands. These are model outputs and validation-only.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2022.macrovalidation.euromod_recipient_counts
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.euromod_recipient_counts.cy2022.v1
+  source_record_id_prefix: jrc.euromod_be.cy2022.macrovalidation.euromod_recipient_counts
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2022
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: person
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_1_self_employment_income_euromod_2022
+    label: A3.1 self-employment income EUROMOD recipients 2022
+    ordinal: 0
+    row_number: 45
+    expected_row_header_column: A
+    expected_row_header: a3_1_self_employment_income_euromod_2022
+    filters:
+      validation.metric: self_employment_income_yse
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: self_employment_income_yse
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_5_income_support_euromod_2022
+    label: A3.5 income support EUROMOD recipients 2022
+    ordinal: 1
+    row_number: 46
+    expected_row_header_column: A
+    expected_row_header: a3_5_income_support_euromod_2022
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_5_unemployment_benefits_euromod_2022
+    label: A3.5 unemployment benefits EUROMOD recipients 2022
+    ordinal: 2
+    row_number: 47
+    expected_row_header_column: A
+    expected_row_header: a3_5_unemployment_benefits_euromod_2022
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_5_old_age_pension_euromod_2022
+    label: A3.5 old-age pension EUROMOD recipients 2022
+    ordinal: 3
+    row_number: 48
+    expected_row_header_column: A
+    expected_row_header: a3_5_old_age_pension_euromod_2022
+    filters:
+      validation.metric: old_age_pension_poa
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: old_age_pension_poa
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_5_survivor_pension_euromod_2022
+    label: A3.5 survivor pension EUROMOD recipients 2022
+    ordinal: 4
+    row_number: 49
+    expected_row_header_column: A
+    expected_row_header: a3_5_survivor_pension_euromod_2022
+    filters:
+      validation.metric: survivor_pension_psu
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: survivor_pension_psu
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD recipient count
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_recipient_count
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Tables A3.1 and A3.5, report pages 112 and 120 (PDF pages 114 and 122), publish EUROMOD recipient counts in thousands. These are model outputs and validation-only.
+    unit: count
+    aggregation: sum
+    value_scale: 1000
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2021.macrovalidation.recipient_count_ratios
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.recipient_count_ratios.cy2021.v1
+  source_record_id_prefix: jrc.euromod_be.cy2021.macrovalidation.recipient_count_ratios
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2021
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: person
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_5_income_support_ratio_2021
+    label: A3.5 income support External ratio 2021
+    ordinal: 0
+    row_number: 69
+    expected_row_header_column: A
+    expected_row_header: a3_5_income_support_ratio_2021
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_5_unemployment_benefits_ratio_2021
+    label: A3.5 unemployment benefits External ratio 2021
+    ordinal: 1
+    row_number: 70
+    expected_row_header_column: A
+    expected_row_header: a3_5_unemployment_benefits_ratio_2021
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD to External recipient-count ratio
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_recipient_count_ratio
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Table A3.5, report page 120 (PDF page 122), prints the EUROMOD-to-External recipient-count ratios. These are model outputs and validation-only.
+    unit: ratio
+    aggregation: sum
+    value_scale: 1
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2022.macrovalidation.recipient_count_ratios
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.recipient_count_ratios.cy2022.v1
+  source_record_id_prefix: jrc.euromod_be.cy2022.macrovalidation.recipient_count_ratios
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2022
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: person
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_1_self_employment_income_ratio_2022
+    label: A3.1 self-employment income External ratio 2022
+    ordinal: 0
+    row_number: 77
+    expected_row_header_column: A
+    expected_row_header: a3_1_self_employment_income_ratio_2022
+    filters:
+      validation.metric: self_employment_income_yse
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: self_employment_income_yse
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_5_income_support_ratio_2022
+    label: A3.5 income support External ratio 2022
+    ordinal: 1
+    row_number: 78
+    expected_row_header_column: A
+    expected_row_header: a3_5_income_support_ratio_2022
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_5_unemployment_benefits_ratio_2022
+    label: A3.5 unemployment benefits External ratio 2022
+    ordinal: 2
+    row_number: 79
+    expected_row_header_column: A
+    expected_row_header: a3_5_unemployment_benefits_ratio_2022
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_5_old_age_pension_ratio_2022
+    label: A3.5 old-age pension SILC ratio 2022
+    ordinal: 3
+    row_number: 80
+    expected_row_header_column: A
+    expected_row_header: a3_5_old_age_pension_ratio_2022
+    filters:
+      validation.metric: old_age_pension_poa
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: old_age_pension_poa
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_5_survivor_pension_ratio_2022
+    label: A3.5 survivor pension SILC ratio 2022
+    ordinal: 4
+    row_number: 81
+    expected_row_header_column: A
+    expected_row_header: a3_5_survivor_pension_ratio_2022
+    filters:
+      validation.metric: survivor_pension_psu
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: survivor_pension_psu
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD recipient-count comparator ratio
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_recipient_count_ratio
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Tables A3.1 and A3.5, report pages 112 and 120 (PDF pages 114 and 122), print EUROMOD-to-External ratios and, for poa and psu, EUROMOD-to-SILC ratios. These are model outputs and validation-only.
+    unit: ratio
+    aggregation: sum
+    value_scale: 1
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2021.macrovalidation.euromod_amounts
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.euromod_amounts.cy2021.v1
+  source_record_id_prefix: jrc.euromod_be.cy2021.macrovalidation.euromod_amounts
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2021
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: government
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_2_self_employment_income_euromod_2021
+    label: A3.2 self-employment income EUROMOD amount 2021
+    ordinal: 0
+    row_number: 50
+    expected_row_header_column: A
+    expected_row_header: a3_2_self_employment_income_euromod_2021
+    filters:
+      validation.metric: self_employment_income_yse
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: self_employment_income_yse
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_2_employment_income_euromod_2021
+    label: A3.2 employment income EUROMOD amount 2021
+    ordinal: 1
+    row_number: 51
+    expected_row_header_column: A
+    expected_row_header: a3_2_employment_income_euromod_2021
+    filters:
+      validation.metric: employment_income_yem
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: employment_income_yem
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_4_capital_income_tax_euromod_2021
+    label: A3.4 capital income tax EUROMOD amount 2021
+    ordinal: 2
+    row_number: 52
+    expected_row_header_column: A
+    expected_row_header: a3_4_capital_income_tax_euromod_2021
+    filters:
+      validation.metric: capital_income_tax_tinkt_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: capital_income_tax_tinkt_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_income_support_euromod_2021
+    label: A3.6 income support EUROMOD amount 2021
+    ordinal: 3
+    row_number: 53
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_euromod_2021
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_income_support_elderly_euromod_2021
+    label: A3.6 elderly income support EUROMOD amount 2021
+    ordinal: 4
+    row_number: 54
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_elderly_euromod_2021
+    filters:
+      validation.metric: income_support_elderly_bsaoa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_elderly_bsaoa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_child_benefits_euromod_2021
+    label: A3.6 child benefits EUROMOD amount 2021
+    ordinal: 5
+    row_number: 55
+    expected_row_header_column: A
+    expected_row_header: a3_6_child_benefits_euromod_2021
+    filters:
+      validation.metric: child_benefits_bch_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: child_benefits_bch_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_unemployment_benefits_euromod_2021
+    label: A3.6 unemployment benefits EUROMOD amount 2021
+    ordinal: 6
+    row_number: 56
+    expected_row_header_column: A
+    expected_row_header: a3_6_unemployment_benefits_euromod_2021
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD annual amount
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_amount
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Tables A3.2, A3.4, and A3.6, report pages 114, 118, and 125 (PDF pages 116, 120, and 127), publish EUROMOD annual amounts in EUR millions. These are model outputs and validation-only.
+    unit: eur
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2022.macrovalidation.euromod_amounts
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.euromod_amounts.cy2022.v1
+  source_record_id_prefix: jrc.euromod_be.cy2022.macrovalidation.euromod_amounts
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2022
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: government
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_2_self_employment_income_euromod_2022
+    label: A3.2 self-employment income EUROMOD amount 2022
+    ordinal: 0
+    row_number: 57
+    expected_row_header_column: A
+    expected_row_header: a3_2_self_employment_income_euromod_2022
+    filters:
+      validation.metric: self_employment_income_yse
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: self_employment_income_yse
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_2_employment_income_euromod_2022
+    label: A3.2 employment income EUROMOD amount 2022
+    ordinal: 1
+    row_number: 58
+    expected_row_header_column: A
+    expected_row_header: a3_2_employment_income_euromod_2022
+    filters:
+      validation.metric: employment_income_yem
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: employment_income_yem
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_4_capital_income_tax_euromod_2022
+    label: A3.4 capital income tax EUROMOD amount 2022
+    ordinal: 2
+    row_number: 59
+    expected_row_header_column: A
+    expected_row_header: a3_4_capital_income_tax_euromod_2022
+    filters:
+      validation.metric: capital_income_tax_tinkt_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: capital_income_tax_tinkt_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_income_support_euromod_2022
+    label: A3.6 income support EUROMOD amount 2022
+    ordinal: 3
+    row_number: 60
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_euromod_2022
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_income_support_elderly_euromod_2022
+    label: A3.6 elderly income support EUROMOD amount 2022
+    ordinal: 4
+    row_number: 61
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_elderly_euromod_2022
+    filters:
+      validation.metric: income_support_elderly_bsaoa_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_elderly_bsaoa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_child_benefits_euromod_2022
+    label: A3.6 child benefits EUROMOD amount 2022
+    ordinal: 5
+    row_number: 62
+    expected_row_header_column: A
+    expected_row_header: a3_6_child_benefits_euromod_2022
+    filters:
+      validation.metric: child_benefits_bch_s
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: child_benefits_bch_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  - value_id: a3_6_unemployment_benefits_euromod_2022
+    label: A3.6 unemployment benefits EUROMOD amount 2022
+    ordinal: 6
+    row_number: 63
+    expected_row_header_column: A
+    expected_row_header: a3_6_unemployment_benefits_euromod_2022
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: euromod
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: euromod
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD annual amount
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_amount
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Tables A3.2, A3.4, and A3.6, report pages 114, 118, and 125 (PDF pages 116, 120, and 127), publish EUROMOD annual amounts in EUR millions. These are model outputs and validation-only.
+    unit: eur
+    aggregation: sum
+    value_scale: 1000000
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2021.macrovalidation.amount_ratios
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.amount_ratios.cy2021.v1
+  source_record_id_prefix: jrc.euromod_be.cy2021.macrovalidation.amount_ratios
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2021
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: government
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_2_employment_income_ratio_2021
+    label: A3.2 employment income External ratio 2021
+    ordinal: 0
+    row_number: 71
+    expected_row_header_column: A
+    expected_row_header: a3_2_employment_income_ratio_2021
+    filters:
+      validation.metric: employment_income_yem
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: employment_income_yem
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_4_capital_income_tax_ratio_2021
+    label: A3.4 capital income tax External ratio 2021
+    ordinal: 1
+    row_number: 72
+    expected_row_header_column: A
+    expected_row_header: a3_4_capital_income_tax_ratio_2021
+    filters:
+      validation.metric: capital_income_tax_tinkt_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: capital_income_tax_tinkt_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_income_support_ratio_2021
+    label: A3.6 income support External ratio 2021
+    ordinal: 2
+    row_number: 73
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_ratio_2021
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_income_support_elderly_ratio_2021
+    label: A3.6 elderly income support External ratio 2021
+    ordinal: 3
+    row_number: 74
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_elderly_ratio_2021
+    filters:
+      validation.metric: income_support_elderly_bsaoa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_elderly_bsaoa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_child_benefits_ratio_2021
+    label: A3.6 child benefits External ratio 2021
+    ordinal: 4
+    row_number: 75
+    expected_row_header_column: A
+    expected_row_header: a3_6_child_benefits_ratio_2021
+    filters:
+      validation.metric: child_benefits_bch_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: child_benefits_bch_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_unemployment_benefits_ratio_2021
+    label: A3.6 unemployment benefits External ratio 2021
+    ordinal: 5
+    row_number: 76
+    expected_row_header_column: A
+    expected_row_header: a3_6_unemployment_benefits_ratio_2021
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD to External annual-amount ratio
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_ratio
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Tables A3.2, A3.4, and A3.6, report pages 114, 118, and 125 (PDF pages 116, 120, and 127), print EUROMOD-to-External annual-amount ratios. These are model outputs and validation-only.
+    unit: ratio
+    aggregation: sum
+    value_scale: 1
+    expected_cell_type: number
+- record_set_id: jrc.euromod_be.cy2022.macrovalidation.amount_ratios
+  provenance_class: model_output
+  record_set_spec_id: jrc.euromod_be.macrovalidation.amount_ratios.cy2022.v1
+  source_record_id_prefix: jrc.euromod_be.cy2022.macrovalidation.amount_ratios
+  sheet_name: jrc_euromod_be_baseline_statistics_2025
+  period_type: calendar_year
+  period: 2022
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: government
+  entity_role: validation_comparator
+  domain: euromod_be_macrovalidation
+  groupby_dimension: validation.metric_series
+  rows:
+  - value_id: a3_2_employment_income_ratio_2022
+    label: A3.2 employment income External ratio 2022
+    ordinal: 0
+    row_number: 82
+    expected_row_header_column: A
+    expected_row_header: a3_2_employment_income_ratio_2022
+    filters:
+      validation.metric: employment_income_yem
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: employment_income_yem
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_4_capital_income_tax_ratio_2022
+    label: A3.4 capital income tax External ratio 2022
+    ordinal: 1
+    row_number: 83
+    expected_row_header_column: A
+    expected_row_header: a3_4_capital_income_tax_ratio_2022
+    filters:
+      validation.metric: capital_income_tax_tinkt_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: capital_income_tax_tinkt_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_income_support_ratio_2022
+    label: A3.6 income support External ratio 2022
+    ordinal: 2
+    row_number: 84
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_ratio_2022
+    filters:
+      validation.metric: income_support_bsa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_bsa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_income_support_elderly_ratio_2022
+    label: A3.6 elderly income support External ratio 2022
+    ordinal: 3
+    row_number: 85
+    expected_row_header_column: A
+    expected_row_header: a3_6_income_support_elderly_ratio_2022
+    filters:
+      validation.metric: income_support_elderly_bsaoa_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: income_support_elderly_bsaoa_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_child_benefits_ratio_2022
+    label: A3.6 child benefits External ratio 2022
+    ordinal: 4
+    row_number: 86
+    expected_row_header_column: A
+    expected_row_header: a3_6_child_benefits_ratio_2022
+    filters:
+      validation.metric: child_benefits_bch_s
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: child_benefits_bch_s
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  - value_id: a3_6_unemployment_benefits_ratio_2022
+    label: A3.6 unemployment benefits External ratio 2022
+    ordinal: 5
+    row_number: 87
+    expected_row_header_column: A
+    expected_row_header: a3_6_unemployment_benefits_ratio_2022
+    filters:
+      validation.metric: unemployment_benefits_bun
+      validation.series: ratio
+    constraints:
+    - variable: validation.metric
+      operator: ==
+      value: unemployment_benefits_bun
+      label: Validation metric
+    - variable: validation.series
+      operator: ==
+      value: ratio
+      label: Validation series
+  measures:
+  - measure_id: value
+    label: EUROMOD to External annual-amount ratio
+    ordinal: 0
+    column: G
+    source_column_id: value
+    expected_column_header_row: 1
+    expected_column_header: value
+    concept: euromod_be.macrovalidation_ratio
+    source_concept: jrc.euromod_be.validation_table_value
+    concept_relation: source_label
+    concept_authority: jrc
+    concept_evidence_url: https://euromod-web.jrc.ec.europa.eu/sites/default/files/2025-02/Y15_CR_BE_final.pdf
+    concept_evidence_notes: >-
+      JRC Annex 3 Tables A3.2, A3.4, and A3.6, report pages 114, 118, and 125 (PDF pages 116, 120, and 127), print EUROMOD-to-External annual-amount ratios. These are model outputs and validation-only.
     unit: ratio
     aggregation: sum
     value_scale: 1

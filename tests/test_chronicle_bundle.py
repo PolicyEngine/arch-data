@@ -73,7 +73,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 11,
         "error_count": 0,
-        "fact_count": 156148,
+        "fact_count": 156197,
         "geography_count": 12536,
         "period_count": 191,
         "semantic_duplicate_key_count": 117,
@@ -82,7 +82,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "source_package_count": 144,
         "warning_count": 1,
     }
-    assert len(rows) == 156148
+    assert len(rows) == 156197
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 156148
+    assert coverage["fact_count"] == 156197
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -136,7 +136,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "ici": 12,
         "irs_soi": 40063,
         "isc": 2,
-        "jrc_euromod_be": 41,
+        "jrc_euromod_be": 90,
         "kff": 52,
         "mhclg": 2712,
         "nbb_national_accounts": 1,
@@ -391,7 +391,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         table_counts[
             "jrc_euromod_be:EUROMOD Country Report Belgium 2025 validation tables"
         ]
-        == 41
+        == 90
     )
     assert (
         table_counts[
@@ -477,9 +477,9 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2018": 86,
         "calendar_year:2019": 85,
         "calendar_year:2020": 85,
-        "calendar_year:2021": 4000,
-        "calendar_year:2022": 1950,
-        "calendar_year:2023": 6232,
+        "calendar_year:2021": 4017,
+        "calendar_year:2022": 1973,
+        "calendar_year:2023": 6241,
         "calendar_year:2024": 33825,
         "calendar_year:2025": 4446,
         "calendar_year:2026": 241,
@@ -622,7 +622,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2023": 48436,
         "tax_year:2024": 40,
     }
-    assert coverage["counts"]["by_geography"]["country:BE"] == 168
+    assert coverage["counts"]["by_geography"]["country:BE"] == 217
     assert coverage["counts"]["by_geography"]["country:DE"] == 36
     assert coverage["counts"]["by_geography"]["country:FR"] == 36
     assert coverage["counts"]["by_geography"]["nuts1:BE1"] == 6
@@ -642,11 +642,11 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dwelling": 12733,
         "family": 107,
         "firm": 1439,
-        "government": 626,
+        "government": 661,
         "household": 40513,
         "institutional_sector": 103,
         "pension_plan": 2,
-        "person": 60296,
+        "person": 60310,
         "social_protection_scheme": 27,
         "tax_unit": 40069,
     }
