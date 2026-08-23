@@ -88,6 +88,43 @@ cannot be obtained. Nothing in uk-data is absent from this table.
 | Constituency ASHE earnings ([`create_employment_incomes.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/datasets/local_areas/constituencies/targets/create_employment_incomes.py)) | `employment_income.csv` band distribution | **excluded (computed)** | — | — | The committed NOMIS ASHE workbook feeds an interpolated band distribution (`interp1d` + `quad` over earnings percentiles) that `loss.py` never reads — it is not a target input. The publisher percentiles could be ported if a target ever needs them. |
 | Devolved constituency rent anchors ([`devolved_housing.py`](https://github.com/PolicyEngine/policyengine-uk-data/blob/ebf733c/policyengine_uk_data/datasets/local_areas/constituencies/devolved_housing.py)) | Wales/Scotland `private_renter_households`, `annual_private_rent` at constituency | **excluded (computed); base facts ported** | `ons-pipr-rents-by-area-june-2026`, `ons-census2021-ts054-tenure-lad`, `nrs-census2022-uv404-tenure-council-area` | wave-3 branch | **Re-based, not blocked.** uk-data hardcodes country totals (200,700 households / £795pm Wales; 357,706 / £999pm Scotland) with no citation and allocates them across 2010 constituencies by population share — both the values and the allocation are **excluded (computed)**. The publisher facts that let a consumer rebuild them are now ported: PIPR carries an average private rent for Wales (`W92000004`) and Scotland (`S92000003`), and the census tenure legs carry private-rented household counts per local authority. An earlier revision of this checklist called this family blocked; that is no longer true. |
 
+## Beyond parity — council tax nation totals and CTR cost
+
+Publisher comparators for the council-tax diagnosis in
+[policyengine-uk-data#448](https://github.com/PolicyEngine/policyengine-uk-data/issues/448):
+nation-level billed or collectable council tax and the cost of council tax
+reduction, which uk-data never targeted (its nation rows come from OBR Table
+4.1, already in `obr-efo-expenditure-march-2026`). Each package ports the
+publisher's stored cells for the Scotland/Wales/England rows of the selected
+table; within that table the only exclusions are cells the publisher itself
+labels as arithmetic over other cells (Welsh columns `5=(1+2-3-4)`, `8=(7/6)`,
+`10=(6-7-9)`, `11=(10+5)`, `12=(11-1)`; MHCLG and SLGFS "percentage change"
+rows and columns). Out-of-scope rows and tables (per-authority rows,
+non-domestic rates, caseload and percentage tables) are named in each header
+comment.
+
+| publisher table | Chronicle package(s) | facts | notes |
+|---|---|---|---|
+| Scottish Government Council Tax Collection Statistics 2025-26 and 2024-25, publication tables, Figure 1 (CTRR: net amount billed after CTR, excluding water and sewerage; amount received; uncollected; percentage received, by year billed 1999-00 onwards) | `scotgov-council-tax-collection-2025-26` (108), `scotgov-council-tax-collection-2024-25` (104) | 212 | Two vintages of the same table: each year row is restated as at the later 31 March, so 1999-00 to 2024-25 appear in both with different values (`duplicate_semantic_fact_key` warnings by design); consumers pin `source_table`. Scotland row only; per-authority rows on the other worksheets are wave-3 scope. |
+| Scottish Local Government Finance Statistics 2024-25, publication tables: Table 2.11 (CTR funding from SG, final total reduction in liability), Table 2.8 (council tax income after CTR), Table 2.6 (the same income 2020-21 to 2023-24), Chart 2.7 (potential yield by band: billed estimate, CTR, single person discount, exemptions, other discounts, gross), Table 2.10 (average bill before/after CTR 2020-21 to 2024-25) | `scotgov-slgfs-council-tax-2024-25` | 71 | The GBP 389m Scottish CTR cost (Table 2.11, GBP 389,010 thousand) and the GBP 390.3m CTRR-based estimate (Chart 2.7) are both ported. The collection statistics' own page attributes its Figure 9 to this chart. Scotland rows only. |
+| Welsh Government Council tax collection rates 2025-26 and 2024-25, Table 2 (arrears brought forward, prior-year debits/credits, arrears collected and written off, in-year net collectable debit excluding CTRS, amount collected, written off) | `welshgov-council-tax-collection-2025-26` (7), `welshgov-council-tax-collection-2024-25` (7) | 14 | Total Wales row only; the 22 authority rows are wave-3 scope. Table 1 (percentage rates, including a revised previous-year rate and a memo assumed rate) is outside the amounts-only packages. gov.wales 403s plain fetches (browser headers). |
+| Welsh Government Council Tax Reduction Scheme annual reports 2025-26 and 2024-25 (PDF), Table 2 total value of CTRS awards in Wales, GBP thousand | `welshgov-ctrs-annual-report-2025-26` (2), `welshgov-ctrs-annual-report-2024-25` (2) | 4 | The Welsh CTRS cost: 2023-24 GBP 301,121 thousand, 2024-25 GBP 322,938 thousand (printed in both reports, so consumers selecting 2024-25 pin `source_table`), 2025-26 GBP 347,393 thousand. Publisher PDF parsed with `pdf_text_numbers` (LIHEAP/ISC/PIP precedent). The annex workbooks carry caseloads only. |
+| MHCLG Council Tax levels set by local authorities in England 2025-26, Tables 1-9 (re-issued 22 April 2026 with 2021-22 to 2025-26 revised), Table 1 England summary 2021-22 to 2025-26 (requirement excluding/including parish precepts, parish precepts, taxbase, average Band D) | `mhclg-council-tax-levels-england-summary-2025-26` | 30 | The GBP 44.1bn requirement and 19.3m Band D taxbase. England's LCTS is a taxbase deduction; no LCTS cost in GBP is printed in the workbook, so none is ported. |
+| MHCLG Collection rates for council tax and non-domestic rates in England 2025-26 (re-issued 31 July 2026 for Kensington & Chelsea), Table 5 (council tax net collectable debit and amount collected in year, 2021-22 to 2025-26) | `mhclg-council-tax-collection-england-2025-26` | 10 | The England counterpart of the Scottish net billed and Welsh net collectable debit. The 2024-25 release repeats these values for 2021-22 to 2024-25 and adds only 2020-21; Tables 1 (receipts irrespective of year) and 2 (rates by class) are not ported. |
+
+Not ported, no publisher measure found: an England LCTS cost in GBP (MHCLG
+publishes the taxbase deduction, not an amount; not found in the levels or
+taxbase releases checked). Scotland's and Wales's per-authority rows and the
+Welsh rate tables are cheap follow-ups inside the pinned artifacts.
+
+Activation in Microcosm is a separate change. The held ids
+`obr.council_tax_{england,scotland,wales}` and `obr.domestic_rates` select
+`source_name: obr`, and Chronicle already emits their facts from
+`obr-efo-expenditure-march-2026`; they are held because microcosm's geography
+pin (derived from the target id) is the nation while the OBR rows are stamped
+`K02000001`. Pointing those ids at these packages, or re-pinning them, is a
+microcosm-side decision recorded in the PR that added these packages.
+
 ## Remaining — not yet started
 
 | family | targets | plan |

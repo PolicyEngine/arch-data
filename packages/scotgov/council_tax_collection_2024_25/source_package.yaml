@@ -1,0 +1,3355 @@
+# Scottish Government Council Tax Collection Statistics, 2024-25 (an
+# accredited official statistics publication, source: Council Tax Receipts
+# Return, CTRR). Sheet 'Figure 1' prints, for every year billed from 1999-00
+# to 2024-25, the net amount billed, the amount received as at 31 March 2025,
+# the amount uncollected and the percentage received, for Scotland as a whole.
+# Each year is its own record set because a period is not a measure;
+# split-year labels store the opening year (2024-25 is fiscal_year 2024).
+#
+# Definition (publisher notes on the sheet and on the 'Data and Methodology'
+# page): the amounts are net of discounts, exemptions and surcharges, after
+# Council Tax Benefit/Reduction, exclude Water and Sewerage charges, are
+# before any amounts written off for bad or doubtful debt, reflect corrections
+# to liabilities made after billing, include any Cost of Living payments used
+# to meet liabilities, and from 2005-06 include amounts from reduced second
+# home and long-term empty property discounts and premiums. The 2024-25
+# figures are provisional in-year figures; the earlier years are restated as
+# at 31 March 2025, so this vintage's values for those years differ from the
+# same years in other CTRR publications. Consumers selecting a year carried by
+# more than one vintage pin the source_table.
+#
+# Ported: 26 years x net amount billed (column C), amount received (column D),
+# amount uncollected (column E) and percentage received (column F, stored by
+# the publisher as a fraction). Columns E and F are exact arithmetic over C
+# and D in the workbook (uncollected = billed - received; percentage =
+# received / billed) but the publisher prints them as values, not as labelled
+# formulas, so they are carried; consumers should treat them as dependent on C
+# and D. Values are the workbook's stored full-precision cells, not the
+# rounded display (C12 is 3,076,769.838 thousand behind a '#,##0' format).
+# Excluded: the two totals rows below the year rows ('Total for previous
+# years' and the all-years total), which are sums over the ported rows. The
+# other worksheets carry per-authority figures (wave-3 local-geography scope),
+# Scotland-level collection-rate percentages by year and an 'Archived data'
+# sheet for 1993-94 to 1998-99 as at 31 March 2019; only Figure 1's amounts
+# are ported here. The exclusion rule used across the council-tax collection
+# packages: within the selected table, only cells the publisher itself labels
+# as arithmetic over other cells are left out.
+#
+# The workbook was fetched with browser headers (gov.scot has intermittently
+# blocked non-browser fetches) and is pinned byte-for-byte (sha256 in
+# manifest.yaml).
+schema_version: ledger.source_package.v1
+package_id: scotgov-council-tax-collection-2024-25
+label: 'Scottish Government council tax collection statistics 2024-25: net amount billed,
+  amount received, amount uncollected and percentage received by year billed, Scotland (CTRR)'
+artifact:
+  source_name: scotgov
+  source_table: 'Council Tax Collection Statistics, 2024-25: publication tables (CTRR), Figure
+    1 Council Tax billed and received'
+  resource_package: db
+  resource_directory: data/scotgov/council_tax_collection_2024_25
+  manifest: manifest.yaml
+  vintage: ctrr_2024_25
+  extracted_at: '2026-08-23'
+  extraction_method: xlsx used-range cell parse restricted to the Figure 1 worksheet
+  parser: xlsx_used_range
+  sheets:
+  - Figure 1
+  artifact_year: 2025
+record_sets:
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2024
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2024.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2024
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 12
+    expected_row_header_column: B
+    expected_row_header: 2024-25
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 12
+      expected_value: "Latest Year to \n31 March 2025"
+      label: publisher row-group label in column A
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2024-25 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2024-25 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2024-25 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2024-25
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2023
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2023.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2023
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 13
+    expected_row_header_column: B
+    expected_row_header: 2023-24
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2023-24 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2023-24 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2023-24 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2023-24
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2022
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2022.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2022
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 14
+    expected_row_header_column: B
+    expected_row_header: 2022-23
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2022-23 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2022-23 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2022-23 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2022-23
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2021
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2021.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2021
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 15
+    expected_row_header_column: B
+    expected_row_header: 2021-22
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2021-22 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2021-22 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2021-22 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2021-22
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2020
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2020.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2020
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2020
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 16
+    expected_row_header_column: B
+    expected_row_header: 2020-21
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2020-21 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2020-21 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2020-21 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2020-21
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2019
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2019.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2019
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2019
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 17
+    expected_row_header_column: B
+    expected_row_header: 2019-20
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2019-20 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2019-20 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2019-20 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2019-20
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2018
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2018.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2018
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2018
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 18
+    expected_row_header_column: B
+    expected_row_header: 2018-19
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2018-19 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2018-19 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2018-19 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2018-19
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2017
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2017.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2017
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2017
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 19
+    expected_row_header_column: B
+    expected_row_header: 2017-18
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2017-18 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2017-18 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2017-18 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2017-18
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2016
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2016.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2016
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2016
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 20
+    expected_row_header_column: B
+    expected_row_header: 2016-17
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2016-17 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2016-17 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2016-17 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2016-17
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2015
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2015.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2015
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2015
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 21
+    expected_row_header_column: B
+    expected_row_header: 2015-16
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2015-16 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2015-16 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2015-16 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2015-16
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2014
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2014.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2014
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2014
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 22
+    expected_row_header_column: B
+    expected_row_header: 2014-15
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2014-15 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2014-15 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2014-15 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2014-15
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2013
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2013.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2013
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2013
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 23
+    expected_row_header_column: B
+    expected_row_header: 2013-14
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2013-14 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2013-14 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2013-14 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2013-14
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2012
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2012.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2012
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2012
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 24
+    expected_row_header_column: B
+    expected_row_header: 2012-13
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2012-13 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2012-13 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2012-13 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2012-13
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2011
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2011.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2011
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2011
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 25
+    expected_row_header_column: B
+    expected_row_header: 2011-12
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2011-12 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2011-12 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2011-12 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2011-12
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2010
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2010.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2010
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2010
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 26
+    expected_row_header_column: B
+    expected_row_header: 2010-11
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2010-11 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2010-11 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2010-11 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2010-11
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2009
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2009.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2009
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2009
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 27
+    expected_row_header_column: B
+    expected_row_header: 2009-10
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2009-10 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2009-10 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2009-10 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2009-10
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2008
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2008.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2008
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2008
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 28
+    expected_row_header_column: B
+    expected_row_header: 2008-09
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 28
+      expected_value: Previous
+      label: publisher row-group label in column A
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2008-09 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2008-09 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2008-09 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2008-09
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2007
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2007.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2007
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2007
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 29
+    expected_row_header_column: B
+    expected_row_header: 2007-08
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 29
+      expected_value: Years
+      label: publisher row-group label in column A
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2007-08 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2007-08 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2007-08 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2007-08
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2006
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2006.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2006
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2006
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 30
+    expected_row_header_column: B
+    expected_row_header: 2006-07
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2006-07 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2006-07 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2006-07 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2006-07
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2005
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2005.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2005
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2005
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 31
+    expected_row_header_column: B
+    expected_row_header: 2005-06
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2005-06 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2005-06 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2005-06 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2005-06
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2004
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2004.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2004
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2004
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 32
+    expected_row_header_column: B
+    expected_row_header: 2004-05
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2004-05 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2004-05 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2004-05 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2004-05
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2003
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2003.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2003
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2003
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 33
+    expected_row_header_column: B
+    expected_row_header: 2003-04
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2003-04 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2003-04 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2003-04 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2003-04
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2002
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2002.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2002
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2002
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 34
+    expected_row_header_column: B
+    expected_row_header: 2002-03
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2002-03 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2002-03 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2002-03 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2002-03
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2001
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2001.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2001
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2001
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 35
+    expected_row_header_column: B
+    expected_row_header: 2001-02
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2001-02 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2001-02 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2001-02 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2001-02
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy2000
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy2000.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy2000
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 2000
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 36
+    expected_row_header_column: B
+    expected_row_header: 2000-01
+    table_record_kind: total
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 2000-01 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 2000-01 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 2000-01 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 2000-01
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number
+- record_set_id: scotgov.ct_collection_2024_25.figure_1.fy1999
+  provenance_class: administrative
+  record_set_spec_id: scotgov.ct_collection_2024_25.figure_1.fy1999.v1
+  source_record_id_prefix: scotgov.ct_collection_2024_25.figure_1.fy1999
+  sheet_name: Figure 1
+  period_type: fiscal_year
+  period: 1999
+  geography_id: S92000003
+  geography_level: country
+  geography_name: Scotland
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: scotgov.geography_row
+  rows:
+  - value_id: scotland
+    label: Scotland
+    ordinal: 0
+    row_number: 37
+    expected_row_header_column: B
+    expected_row_header: 1999-00
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 38
+      expected_value: "Total for \nprevious years"
+      label: first totals row below the year rows (not ported)
+  measures:
+  - measure_id: net_amount_billed
+    label: Net amount billed, 1999-00 (GBP thousands)
+    ordinal: 0
+    column: C
+    source_column_id: net_amount_billed
+    expected_column_header_row: 11
+    expected_column_header: "Net amount \nbilled (\xA3000s)"
+    concept: scotgov.council_tax.net_amount_billed
+    source_concept: scotgov.council_tax.net_amount_billed
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ C 'Net amount billed (\xA3000s)'. Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_received
+    label: Amount received as at 31 March 2025, 1999-00 (GBP thousands)
+    ordinal: 1
+    column: D
+    source_column_id: amount_received
+    expected_column_header_row: 11
+    expected_column_header: "Amount recv'd \n(\xA3000s) as at\n31 March 2025"
+    concept: scotgov.council_tax.amount_received
+    source_concept: scotgov.council_tax.amount_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ D 'Amount recv'd (\xA3000s) as at 31 March 2025'. Published in GBP thousands (value_scale\
+      \ 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: amount_uncollected
+    label: Amount uncollected as at 31 March 2025, 1999-00 (GBP thousands)
+    ordinal: 2
+    column: E
+    source_column_id: amount_uncollected
+    expected_column_header_row: 11
+    expected_column_header: "Amount \nuncollected \n(\xA3000s) as at \n31 March 2025"
+    concept: scotgov.council_tax.amount_uncollected
+    source_concept: scotgov.council_tax.amount_uncollected
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: "Scottish Government Council Tax Collection Statistics, 2024-25,\
+      \ publication tables workbook, sheet 'Figure 1' (Council Tax billed and received), row\
+      \ for the year to which the bill refers. Publisher definition: all figures are net of\
+      \ discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude\
+      \ Water and Sewerage charges, are before any amounts written off for bad or doubtful\
+      \ debt, reflect corrections to liabilities made after billing, include any Cost of Living\
+      \ payments used to meet liabilities, and from 2005-06 include amounts from reduced second\
+      \ home and long-term empty property discounts and premiums; as at 31 March 2025. Column\
+      \ E 'Amount uncollected (\xA3000s) as at 31 March 2025' (the publisher prints billed\
+      \ minus received). Published in GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+  - measure_id: percentage_received
+    label: Percentage received as at 31 March 2025, 1999-00
+    ordinal: 3
+    column: F
+    source_column_id: percentage_received
+    expected_column_header_row: 11
+    expected_column_header: "Percentage \nreceived as at\n31 March 2025"
+    concept: scotgov.council_tax.percentage_received
+    source_concept: scotgov.council_tax.percentage_received
+    concept_relation: source_label
+    concept_authority: scotgov
+    concept_evidence_url: https://www.gov.scot/publications/council-tax-collection-statistics-2024-25/
+    concept_evidence_notes: 'Scottish Government Council Tax Collection Statistics, 2024-25,
+      publication tables workbook, sheet ''Figure 1'' (Council Tax billed and received), row
+      for the year to which the bill refers. Publisher definition: all figures are net of
+      discounts, exemptions and surcharges, after Council Tax Benefit/Reduction, exclude Water
+      and Sewerage charges, are before any amounts written off for bad or doubtful debt, reflect
+      corrections to liabilities made after billing, include any Cost of Living payments used
+      to meet liabilities, and from 2005-06 include amounts from reduced second home and long-term
+      empty property discounts and premiums; as at 31 March 2025. Column F ''Percentage received
+      as at 31 March 2025'', stored by the publisher as a fraction of the net amount billed
+      (received over billed).'
+    unit: share
+    aggregation: share
+    expected_cell_type: number

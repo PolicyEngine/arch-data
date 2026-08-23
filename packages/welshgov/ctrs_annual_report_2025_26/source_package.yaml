@@ -1,0 +1,166 @@
+# Welsh Government, Council Tax Reduction Scheme (CTRS): annual report 2025 to
+# 2026 (PDF, published August 2026). Table 2 'Total value of CTRS awards in
+# Wales' prints, for each of the 22 billing authorities and for Wales, the
+# estimated total value of reductions provided through the scheme in 2024-25
+# and 2025-26 in GBP thousand (source: Datatank Connect), with a '% change'
+# column. Paraphrasing the report: the value of reductions is the amount by
+# which the council tax liability of households receiving a council tax
+# reduction is reduced, and local authorities are funded to replace the
+# council tax income they would otherwise raise from those households. This is
+# the Welsh CTRS cost that the collection-rates release (net of CTRS) and the
+# report's caseload annex do not carry.
+#
+# The publisher PDF is the artifact and is parsed with the repo's
+# pdf_text_numbers parser (the LIHEAP, ISC and PIP precedents): every number
+# on every text line becomes a row of the 'document_numbers' sheet with its
+# page, line, line text, number text and context, and the package selects the
+# Wales row's two totals by their line text and number text, guarded by the
+# page and line numbers and the table-title line.
+#
+# Ported: the Wales row's 2024-25 and 2025-26 totals, one record set per year
+# because a period is not a measure; 2024-25 also appears in the previous
+# report, where the same value is printed, so a consumer selecting that year
+# pins the source_table. Excluded: the '% change' column (publisher-labelled
+# arithmetic over the two totals) and the 22 authority rows (wave-3
+# local-geography scope). The caseload tables (annex workbook) are counts and
+# out of scope. Split-year labels store the opening year: 2025-26 is
+# fiscal_year 2025.
+#
+# gov.wales 403s a plain fetch (a bare Mozilla user agent included); the PDF
+# was retrieved with a full browser user agent and Accept headers and is
+# pinned byte-for-byte (sha256 in manifest.yaml).
+schema_version: ledger.source_package.v1
+package_id: welshgov-ctrs-annual-report-2025-26
+label: 'Welsh Government Council Tax Reduction Scheme annual report 2025-26: total value of
+  CTRS awards, Wales, 2024-25 and 2025-26'
+artifact:
+  source_name: welshgov
+  source_table: 'Council Tax Reduction Scheme: annual report 2025 to 2026, Table 2 total value
+    of CTRS awards in Wales'
+  resource_package: db
+  resource_directory: data/welshgov/ctrs_annual_report_2025_26
+  manifest: manifest.yaml
+  vintage: ctrs_annual_report_2025_26
+  extracted_at: '2026-08-23'
+  extraction_method: pypdf text-line number extraction from the full publisher PDF
+  parser: pdf_text_numbers
+  artifact_year: 2026
+record_sets:
+- record_set_id: welshgov.ctrs_report_2025_26.table_2.total_value_of_awards.fy2024
+  provenance_class: administrative
+  record_set_spec_id: welshgov.ctrs_report_2025_26.table_2.total_value_of_awards.fy2024.v1
+  source_record_id_prefix: welshgov.ctrs_report_2025_26.table_2.total_value_of_awards.fy2024
+  sheet_name: document_numbers
+  period_type: fiscal_year
+  period: 2024
+  geography_id: W92000004
+  geography_level: country
+  geography_name: Wales
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax_reduction
+  groupby_dimension: welshgov.geography_row
+  rows:
+  - value_id: wales
+    label: Wales
+    ordinal: 0
+    row_number: 229
+    expected_row_header_column: C
+    expected_row_header: Wales 322,938 347,393 7.6
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      expected_value: 4
+      label: PDF page number
+    - column: B
+      expected_value: 44
+      label: PDF extracted line number
+    - column: D
+      expected_value: 322,938
+      label: source number text
+    - column: C
+      row: 158
+      expected_value: 'Table 2: Total value of CTRS awards in Wales'
+      label: table title line
+  measures:
+  - measure_id: total_value_of_awards
+    label: Total value of CTRS awards, Wales, 2024-25 (GBP thousands)
+    ordinal: 0
+    column: E
+    source_column_id: total_value_of_awards
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: welshgov.council_tax_reduction.total_value_of_awards
+    source_concept: welshgov.council_tax_reduction.total_value_of_awards
+    concept_relation: source_label
+    concept_authority: welshgov
+    concept_evidence_url: https://www.gov.wales/council-tax-reduction-scheme-annual-report-2025-2026
+    concept_evidence_notes: "Welsh Government, Council Tax Reduction Scheme: annual report\
+      \ 2025 to 2026 (PDF), page 4, 'Table 2: Total value of CTRS awards in Wales', Wales\
+      \ row ('Wales 322,938 347,393 7.6'), column 'Total 2024-25 (\xA3 thousand)', number\
+      \ text '322,938'. The report describes the figure as the estimated total value of reductions\
+      \ provided through the CTRS (source: Datatank Connect). GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+- record_set_id: welshgov.ctrs_report_2025_26.table_2.total_value_of_awards.fy2025
+  provenance_class: administrative
+  record_set_spec_id: welshgov.ctrs_report_2025_26.table_2.total_value_of_awards.fy2025.v1
+  source_record_id_prefix: welshgov.ctrs_report_2025_26.table_2.total_value_of_awards.fy2025
+  sheet_name: document_numbers
+  period_type: fiscal_year
+  period: 2025
+  geography_id: W92000004
+  geography_level: country
+  geography_name: Wales
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax_reduction
+  groupby_dimension: welshgov.geography_row
+  rows:
+  - value_id: wales
+    label: Wales
+    ordinal: 0
+    row_number: 230
+    expected_row_header_column: C
+    expected_row_header: Wales 322,938 347,393 7.6
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      expected_value: 4
+      label: PDF page number
+    - column: B
+      expected_value: 44
+      label: PDF extracted line number
+    - column: D
+      expected_value: 347,393
+      label: source number text
+    - column: C
+      row: 158
+      expected_value: 'Table 2: Total value of CTRS awards in Wales'
+      label: table title line
+  measures:
+  - measure_id: total_value_of_awards
+    label: Total value of CTRS awards, Wales, 2025-26 (GBP thousands)
+    ordinal: 0
+    column: E
+    source_column_id: total_value_of_awards
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: welshgov.council_tax_reduction.total_value_of_awards
+    source_concept: welshgov.council_tax_reduction.total_value_of_awards
+    concept_relation: source_label
+    concept_authority: welshgov
+    concept_evidence_url: https://www.gov.wales/council-tax-reduction-scheme-annual-report-2025-2026
+    concept_evidence_notes: "Welsh Government, Council Tax Reduction Scheme: annual report\
+      \ 2025 to 2026 (PDF), page 4, 'Table 2: Total value of CTRS awards in Wales', Wales\
+      \ row ('Wales 322,938 347,393 7.6'), column 'Total 2025-26 (\xA3 thousand)', number\
+      \ text '347,393'. The report describes the figure as the estimated total value of reductions\
+      \ provided through the CTRS (source: Datatank Connect). GBP thousands (value_scale 1000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000

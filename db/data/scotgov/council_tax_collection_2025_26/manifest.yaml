@@ -1,0 +1,19 @@
+source_id: scotgov
+package_id: scotgov-council-tax-collection-2025-26
+dataset: scotgov_scotgov-council-tax-collection-2025-26
+source_page: https://www.gov.scot/publications/council-tax-collection-statistics-2025-26/
+table: 'Council Tax Collection Statistics, 2025-26: publication tables (CTRR), Figure
+  1 Council Tax billed and received'
+files:
+  2026:
+    filename: council-tax-collection-statistics-2025-26-publication-tables.xlsx
+    source_url: https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2026/06/council-tax-collection-statistics-2025-26/documents/council-tax-collection-statistics-2025-26-publication-tables/council-tax-collection-statistics-2025-26-publication-tables/govscot%3Adocument/council-tax-collection-statistics-2025-26-publication-tables.xlsx
+    sha256: 3407ea125aad0781f951086b1f4daabe3019cd2b4d45ee4cdcf2b838073814cc
+    size_bytes: 154209
+    fetched_at: '2026-08-23T07:43:56+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/scotgov/scotgov-council-tax-collection-2025-26/2026/3407ea125aad0781f951086b1f4daabe3019cd2b4d45ee4cdcf2b838073814cc/council-tax-collection-statistics-2025-26-publication-tables.xlsx
+        uri: r2://ledger-raw/raw/scotgov/scotgov-council-tax-collection-2025-26/2026/3407ea125aad0781f951086b1f4daabe3019cd2b4d45ee4cdcf2b838073814cc/council-tax-collection-statistics-2025-26-publication-tables.xlsx

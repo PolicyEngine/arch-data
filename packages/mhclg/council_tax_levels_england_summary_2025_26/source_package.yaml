@@ -1,0 +1,1468 @@
+# MHCLG Council Tax levels set by local authorities in England 2025 to 2026,
+# Tables 1 to 9 (revised; first published 20 March 2025, revised 25 April 2025
+# and 22 April 2026, the last re-issue revising 2021-22 to 2025-26, so every
+# year column carries '[r]'). Table 1 'Calculating council tax levels: England
+# summary' prints, for 2021-22 to 2025-26, the council tax requirement
+# including the adult social care precept and excluding parish precepts,
+# parish precepts, the council tax requirement including both, the taxbase for
+# council tax-setting purposes (millions of Band D equivalents) and the
+# average Band D council tax with and without parish precepts.
+#
+# The requirement is the amount billing authorities budget to raise from
+# council tax; it is net of local council tax support, which in England is a
+# reduction of the taxbase rather than a published expenditure line, so no
+# LCTS cost is printed in this workbook. It is the budget-basis companion to
+# the billed and collectable totals; the England counterpart of the Scottish
+# net amount billed and the Welsh net collectable debit is the net collectable
+# debit in mhclg-council-tax-collection-england-2025-26.
+#
+# One record set per line and year, as in the OBR EFO packages: a period is
+# not a measure, and the lines carry different units (GBP millions, millions
+# of Band D equivalents, GBP per Band D dwelling). The
+# requirement-including-parish-precepts row is the publisher's headline figure
+# (GBP 44.1bn in 2025-26) and the two average Band D rows are the release's
+# headline levels; all six rows are ported as printed. The publisher labels
+# none of them as arithmetic, although the requirement row equals the two rows
+# above it and the Band D rows are the requirement over the taxbase rounded to
+# the penny. Split-year labels store the opening year: '2025 to 2026 [r]' is
+# fiscal_year 2025. Per-authority figures are the existing Table 10 package
+# family. The ods parser collapses whitespace and joins multi-paragraph cells
+# with a space, so the guards carry that form.
+schema_version: ledger.source_package.v1
+package_id: mhclg-council-tax-levels-england-summary-2025-26
+label: 'MHCLG council tax levels, England 2025-26 (revised tables): council tax requirement,
+  parish precepts, taxbase and average Band D, England summary 2021-22 to 2025-26'
+artifact:
+  source_name: mhclg
+  source_table: Council Tax levels set by local authorities in England 2025 to 2026, Tables
+    1 to 9 (revised), Table 1 England summary
+  resource_package: db
+  resource_directory: data/mhclg/council_tax_levels_england_summary_2025_26
+  manifest: manifest.yaml
+  vintage: council_tax_levels_2025_26_revised
+  extracted_at: '2026-08-23'
+  extraction_method: ods used-range cell parse of the Table_1 worksheet
+  parser: ods_used_range
+  sheet_name: Table_1
+  artifact_year: 2026
+record_sets:
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2021.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2021
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement_excluding_parish_precepts
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions)
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care precept, excluding\
+      \ parish precepts (\xA3 millions) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: 'Table 1: Calculating council tax levels: England summary, 2021 to 2022
+        to 2025 to 2026'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions), 2021 to 2022 [r]
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2021 to 2022 [r]
+    concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    source_concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care precept, excluding parish precepts (\xA3 millions) [note a]', column\
+      \ '2021 to 2022 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2021.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2021
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: parish_precepts
+    label: Parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Parish precepts (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Parish precepts (GBP millions), 2021 to 2022 [r]
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2021 to 2022 [r]
+    concept: mhclg.council_tax.parish_precepts
+    source_concept: mhclg.council_tax.parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Parish precepts (\xA3 millions)',\
+      \ column '2021 to 2022 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2021.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement.fy2021
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement
+    label: Council tax requirement including adult social care and parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care and parish precepts\
+      \ (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care and parish precepts (GBP millions),
+      2021 to 2022 [r]
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2021 to 2022 [r]
+    concept: mhclg.council_tax.requirement
+    source_concept: mhclg.council_tax.requirement
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care and parish precepts (\xA3 millions)', column '2021 to 2022 [r]';\
+      \ published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2021.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.taxbase.fy2021
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: taxbase
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings)
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Taxbase for council tax-setting purposes (millions)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings),
+      2021 to 2022 [r]
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2021 to 2022 [r]
+    concept: mhclg.council_tax.taxbase_band_d_equivalents
+    source_concept: mhclg.council_tax.taxbase_band_d_equivalents
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: 'MHCLG, Council Tax levels set by local authorities in England
+      2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:
+      England summary, 2021 to 2022 to 2025 to 2026), row ''Taxbase for council tax-setting
+      purposes (millions)'', column ''2021 to 2022 [r]''; published in millions (value_scale
+      1000000).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2021.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2021
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d_excluding_parish_precepts
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP)
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care, excluding\
+      \ parish precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP), 2021 to 2022 [r]
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2021 to 2022 [r]
+    concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    source_concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care, excluding parish precepts (\xA3)', column '2021 to 2022 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2021
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2021.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2021
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2021
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d
+    label: Average Band D council tax including adult social care and parish precepts (GBP)
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care and parish\
+      \ precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care and parish precepts (GBP),
+      2021 to 2022 [r]
+    ordinal: 0
+    column: B
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2021 to 2022 [r]
+    concept: mhclg.council_tax.average_band_d
+    source_concept: mhclg.council_tax.average_band_d
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care and parish precepts (\xA3)', column '2021 to 2022 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2022.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2022
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement_excluding_parish_precepts
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions)
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care precept, excluding\
+      \ parish precepts (\xA3 millions) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: 'Table 1: Calculating council tax levels: England summary, 2021 to 2022
+        to 2025 to 2026'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions), 2022 to 2023 [r]
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2022 to 2023 [r]
+    concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    source_concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care precept, excluding parish precepts (\xA3 millions) [note a]', column\
+      \ '2022 to 2023 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2022.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2022
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: parish_precepts
+    label: Parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Parish precepts (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Parish precepts (GBP millions), 2022 to 2023 [r]
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2022 to 2023 [r]
+    concept: mhclg.council_tax.parish_precepts
+    source_concept: mhclg.council_tax.parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Parish precepts (\xA3 millions)',\
+      \ column '2022 to 2023 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2022.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement.fy2022
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement
+    label: Council tax requirement including adult social care and parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care and parish precepts\
+      \ (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care and parish precepts (GBP millions),
+      2022 to 2023 [r]
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2022 to 2023 [r]
+    concept: mhclg.council_tax.requirement
+    source_concept: mhclg.council_tax.requirement
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care and parish precepts (\xA3 millions)', column '2022 to 2023 [r]';\
+      \ published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2022.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.taxbase.fy2022
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: taxbase
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings)
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Taxbase for council tax-setting purposes (millions)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings),
+      2022 to 2023 [r]
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2022 to 2023 [r]
+    concept: mhclg.council_tax.taxbase_band_d_equivalents
+    source_concept: mhclg.council_tax.taxbase_band_d_equivalents
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: 'MHCLG, Council Tax levels set by local authorities in England
+      2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:
+      England summary, 2021 to 2022 to 2025 to 2026), row ''Taxbase for council tax-setting
+      purposes (millions)'', column ''2022 to 2023 [r]''; published in millions (value_scale
+      1000000).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2022.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2022
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d_excluding_parish_precepts
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP)
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care, excluding\
+      \ parish precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP), 2022 to 2023 [r]
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2022 to 2023 [r]
+    concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    source_concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care, excluding parish precepts (\xA3)', column '2022 to 2023 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2022
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2022.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2022
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2022
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d
+    label: Average Band D council tax including adult social care and parish precepts (GBP)
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care and parish\
+      \ precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care and parish precepts (GBP),
+      2022 to 2023 [r]
+    ordinal: 0
+    column: C
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2022 to 2023 [r]
+    concept: mhclg.council_tax.average_band_d
+    source_concept: mhclg.council_tax.average_band_d
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care and parish precepts (\xA3)', column '2022 to 2023 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2023.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2023
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement_excluding_parish_precepts
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions)
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care precept, excluding\
+      \ parish precepts (\xA3 millions) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: 'Table 1: Calculating council tax levels: England summary, 2021 to 2022
+        to 2025 to 2026'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions), 2023 to 2024 [r]
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2023 to 2024 [r]
+    concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    source_concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care precept, excluding parish precepts (\xA3 millions) [note a]', column\
+      \ '2023 to 2024 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2023.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2023
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: parish_precepts
+    label: Parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Parish precepts (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Parish precepts (GBP millions), 2023 to 2024 [r]
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2023 to 2024 [r]
+    concept: mhclg.council_tax.parish_precepts
+    source_concept: mhclg.council_tax.parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Parish precepts (\xA3 millions)',\
+      \ column '2023 to 2024 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2023.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement.fy2023
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement
+    label: Council tax requirement including adult social care and parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care and parish precepts\
+      \ (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care and parish precepts (GBP millions),
+      2023 to 2024 [r]
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2023 to 2024 [r]
+    concept: mhclg.council_tax.requirement
+    source_concept: mhclg.council_tax.requirement
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care and parish precepts (\xA3 millions)', column '2023 to 2024 [r]';\
+      \ published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2023.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.taxbase.fy2023
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: taxbase
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings)
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Taxbase for council tax-setting purposes (millions)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings),
+      2023 to 2024 [r]
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2023 to 2024 [r]
+    concept: mhclg.council_tax.taxbase_band_d_equivalents
+    source_concept: mhclg.council_tax.taxbase_band_d_equivalents
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: 'MHCLG, Council Tax levels set by local authorities in England
+      2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:
+      England summary, 2021 to 2022 to 2025 to 2026), row ''Taxbase for council tax-setting
+      purposes (millions)'', column ''2023 to 2024 [r]''; published in millions (value_scale
+      1000000).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2023.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2023
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d_excluding_parish_precepts
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP)
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care, excluding\
+      \ parish precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP), 2023 to 2024 [r]
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2023 to 2024 [r]
+    concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    source_concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care, excluding parish precepts (\xA3)', column '2023 to 2024 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2023
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2023.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2023
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2023
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d
+    label: Average Band D council tax including adult social care and parish precepts (GBP)
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care and parish\
+      \ precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care and parish precepts (GBP),
+      2023 to 2024 [r]
+    ordinal: 0
+    column: D
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2023 to 2024 [r]
+    concept: mhclg.council_tax.average_band_d
+    source_concept: mhclg.council_tax.average_band_d
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care and parish precepts (\xA3)', column '2023 to 2024 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2024.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2024
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement_excluding_parish_precepts
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions)
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care precept, excluding\
+      \ parish precepts (\xA3 millions) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: 'Table 1: Calculating council tax levels: England summary, 2021 to 2022
+        to 2025 to 2026'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions), 2024 to 2025 [r]
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2024 to 2025 [r]
+    concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    source_concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care precept, excluding parish precepts (\xA3 millions) [note a]', column\
+      \ '2024 to 2025 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2024.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2024
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: parish_precepts
+    label: Parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Parish precepts (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Parish precepts (GBP millions), 2024 to 2025 [r]
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2024 to 2025 [r]
+    concept: mhclg.council_tax.parish_precepts
+    source_concept: mhclg.council_tax.parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Parish precepts (\xA3 millions)',\
+      \ column '2024 to 2025 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2024.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement.fy2024
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement
+    label: Council tax requirement including adult social care and parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care and parish precepts\
+      \ (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care and parish precepts (GBP millions),
+      2024 to 2025 [r]
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2024 to 2025 [r]
+    concept: mhclg.council_tax.requirement
+    source_concept: mhclg.council_tax.requirement
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care and parish precepts (\xA3 millions)', column '2024 to 2025 [r]';\
+      \ published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2024.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.taxbase.fy2024
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: taxbase
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings)
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Taxbase for council tax-setting purposes (millions)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings),
+      2024 to 2025 [r]
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2024 to 2025 [r]
+    concept: mhclg.council_tax.taxbase_band_d_equivalents
+    source_concept: mhclg.council_tax.taxbase_band_d_equivalents
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: 'MHCLG, Council Tax levels set by local authorities in England
+      2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:
+      England summary, 2021 to 2022 to 2025 to 2026), row ''Taxbase for council tax-setting
+      purposes (millions)'', column ''2024 to 2025 [r]''; published in millions (value_scale
+      1000000).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2024.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2024
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d_excluding_parish_precepts
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP)
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care, excluding\
+      \ parish precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP), 2024 to 2025 [r]
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2024 to 2025 [r]
+    concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    source_concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care, excluding parish precepts (\xA3)', column '2024 to 2025 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2024
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2024.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2024
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2024
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d
+    label: Average Band D council tax including adult social care and parish precepts (GBP)
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care and parish\
+      \ precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care and parish precepts (GBP),
+      2024 to 2025 [r]
+    ordinal: 0
+    column: E
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2024 to 2025 [r]
+    concept: mhclg.council_tax.average_band_d
+    source_concept: mhclg.council_tax.average_band_d
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care and parish precepts (\xA3)', column '2024 to 2025 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2025.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement_excluding_parish_precepts.fy2025
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement_excluding_parish_precepts
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions)
+    ordinal: 0
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care precept, excluding\
+      \ parish precepts (\xA3 millions) [note a]"
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      row: 1
+      expected_value: 'Table 1: Calculating council tax levels: England summary, 2021 to 2022
+        to 2025 to 2026'
+      label: table title
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care precept, excluding parish precepts
+      (GBP millions), 2025 to 2026 [r]
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    source_concept: mhclg.council_tax.requirement_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care precept, excluding parish precepts (\xA3 millions) [note a]', column\
+      \ '2025 to 2026 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2025.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.parish_precepts.fy2025
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: parish_precepts
+    label: Parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: "Parish precepts (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Parish precepts (GBP millions), 2025 to 2026 [r]
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.parish_precepts
+    source_concept: mhclg.council_tax.parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Parish precepts (\xA3 millions)',\
+      \ column '2025 to 2026 [r]'; published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.requirement.fy2025.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.requirement.fy2025
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: government
+  entity_role: billing_authority
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: requirement
+    label: Council tax requirement including adult social care and parish precepts (GBP millions)
+    ordinal: 0
+    row_number: 6
+    expected_row_header_column: A
+    expected_row_header: "Council tax requirement including adult social care and parish precepts\
+      \ (\xA3 millions)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Council tax requirement including adult social care and parish precepts (GBP millions),
+      2025 to 2026 [r]
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.requirement
+    source_concept: mhclg.council_tax.requirement
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Council tax requirement including\
+      \ adult social care and parish precepts (\xA3 millions)', column '2025 to 2026 [r]';\
+      \ published in millions (value_scale 1000000)."
+    unit: gbp
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.taxbase.fy2025.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.taxbase.fy2025
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: taxbase
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings)
+    ordinal: 0
+    row_number: 7
+    expected_row_header_column: A
+    expected_row_header: Taxbase for council tax-setting purposes (millions)
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Taxbase for council tax-setting purposes (millions of Band D equivalent dwellings),
+      2025 to 2026 [r]
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.taxbase_band_d_equivalents
+    source_concept: mhclg.council_tax.taxbase_band_d_equivalents
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: 'MHCLG, Council Tax levels set by local authorities in England
+      2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:
+      England summary, 2021 to 2022 to 2025 to 2026), row ''Taxbase for council tax-setting
+      purposes (millions)'', column ''2025 to 2026 [r]''; published in millions (value_scale
+      1000000).'
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000000
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2025.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d_excluding_parish_precepts.fy2025
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d_excluding_parish_precepts
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP)
+    ordinal: 0
+    row_number: 8
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care, excluding\
+      \ parish precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care precept, excluding parish
+      precepts (GBP), 2025 to 2026 [r]
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    source_concept: mhclg.council_tax.average_band_d_excluding_parish_precepts
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care, excluding parish precepts (\xA3)', column '2025 to 2026 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number
+- record_set_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2025
+  provenance_class: administrative
+  record_set_spec_id: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2025.v1
+  source_record_id_prefix: mhclg.ct_levels_2025_26.table_1.average_band_d.fy2025
+  sheet_name: Table_1
+  period_type: fiscal_year
+  period: 2025
+  geography_id: E92000001
+  geography_level: country
+  geography_name: England
+  geography_vintage: current
+  entity: dwelling
+  entity_role: chargeable_dwelling
+  domain: council_tax
+  groupby_dimension: mhclg.ct_levels_line
+  rows:
+  - value_id: average_band_d
+    label: Average Band D council tax including adult social care and parish precepts (GBP)
+    ordinal: 0
+    row_number: 9
+    expected_row_header_column: A
+    expected_row_header: "Average Band D council tax including adult social care and parish\
+      \ precepts (\xA3)"
+    table_record_kind: total
+  measures:
+  - measure_id: amount
+    label: Average Band D council tax including adult social care and parish precepts (GBP),
+      2025 to 2026 [r]
+    ordinal: 0
+    column: F
+    source_column_id: amount
+    expected_column_header_row: 3
+    expected_column_header: 2025 to 2026 [r]
+    concept: mhclg.council_tax.average_band_d
+    source_concept: mhclg.council_tax.average_band_d
+    concept_relation: source_label
+    concept_authority: mhclg
+    concept_evidence_url: https://www.gov.uk/government/statistics/council-tax-levels-set-by-local-authorities-in-england-2025-to-2026
+    concept_evidence_notes: "MHCLG, Council Tax levels set by local authorities in England\
+      \ 2025 to 2026, Tables 1 to 9 (revised), Table 1 (Table 1: Calculating council tax levels:\
+      \ England summary, 2021 to 2022 to 2025 to 2026), row 'Average Band D council tax including\
+      \ adult social care and parish precepts (\xA3)', column '2025 to 2026 [r]'; published\
+      \ in pounds."
+    unit: gbp
+    aggregation: mean
+    expected_cell_type: number

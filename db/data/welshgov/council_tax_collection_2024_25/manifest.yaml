@@ -1,0 +1,19 @@
+source_id: welshgov
+package_id: welshgov-council-tax-collection-2024-25
+dataset: welshgov_welshgov-council-tax-collection-2024-25
+source_page: https://www.gov.wales/council-tax-collection-rates-april-2024-march-2025
+table: Council tax collection rates in Wales, April 2024 to March 2025, Table 2 amounts
+  outstanding in respect of 2024-25 bills and arrears
+files:
+  2025:
+    filename: council-tax-collection-rates-april-2024-march-2025-511.xlsx
+    source_url: https://www.gov.wales/sites/default/files/statistics-and-research/2025-06/council-tax-collection-rates-april-2024-march-2025-511.xlsx
+    sha256: 16fec848ac73c2e4bcd3eed2220d8b5801ae6ea394dc9bda93debf9da49695c4
+    size_bytes: 22661
+    fetched_at: '2026-08-23T07:43:59+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/welshgov/welshgov-council-tax-collection-2024-25/2025/16fec848ac73c2e4bcd3eed2220d8b5801ae6ea394dc9bda93debf9da49695c4/council-tax-collection-rates-april-2024-march-2025-511.xlsx
+        uri: r2://ledger-raw/raw/welshgov/welshgov-council-tax-collection-2024-25/2025/16fec848ac73c2e4bcd3eed2220d8b5801ae6ea394dc9bda93debf9da49695c4/council-tax-collection-rates-april-2024-march-2025-511.xlsx

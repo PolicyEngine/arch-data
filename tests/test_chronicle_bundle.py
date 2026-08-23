@@ -73,16 +73,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 11,
         "error_count": 0,
-        "fact_count": 155790,
+        "fact_count": 156131,
         "geography_count": 12536,
         "period_count": 191,
-        "semantic_duplicate_key_count": 12,
+        "semantic_duplicate_key_count": 117,
         "skipped_source_count": 10,
         "source_count": 41,
-        "source_package_count": 135,
+        "source_package_count": 144,
         "warning_count": 1,
     }
-    assert len(rows) == 155790
+    assert len(rows) == 156131
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -100,7 +100,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 135
+    assert source_packages["source_package_count"] == 144
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 155790
+    assert coverage["fact_count"] == 156131
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -138,7 +138,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "isc": 2,
         "jrc_euromod_be": 41,
         "kff": 52,
-        "mhclg": 2672,
+        "mhclg": 2712,
         "nbb_national_accounts": 1,
         "nisra": 510,
         "nrs": 5589,
@@ -147,7 +147,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "ons": 65646,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
-        "scotgov": 2504,
+        "scotgov": 2787,
         "sfpd_pensions": 4,
         "slc": 199,
         "spf_finances_pit": 1,
@@ -156,10 +156,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "statbel_population_structure": 18,
         "usda_snap": 852,
         "voa": 3001,
-        "welshgov": 198,
+        "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 130
+    assert len(table_counts) == 139
     assert (
         table_counts[
             "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
@@ -201,6 +201,72 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         == 9
     )
     assert table_counts["usda_snap:SNAP FY2025 Monthly State Participation"] == 636
+    assert (
+        table_counts[
+            "welshgov:Council Tax Reduction Scheme: annual report 2024 to 2025, "
+            "Table 2 total value of CTRS awards in Wales"
+        ]
+        == 2
+    )
+    assert (
+        table_counts[
+            "welshgov:Council Tax Reduction Scheme: annual report 2025 to 2026, "
+            "Table 2 total value of CTRS awards in Wales"
+        ]
+        == 2
+    )
+    assert (
+        table_counts[
+            "mhclg:Collection rates for council tax and non-domestic rates in "
+            "England 2025 to 2026, Table 5 amount collected in year"
+        ]
+        == 10
+    )
+    assert (
+        table_counts[
+            "mhclg:Council Tax levels set by local authorities in England 2025 "
+            "to 2026, Tables 1 to 9 (revised), Table 1 England summary"
+        ]
+        == 30
+    )
+    assert (
+        table_counts[
+            "scotgov:Council Tax Collection Statistics, 2024-25: publication "
+            "tables (CTRR), Figure 1 Council Tax billed and received"
+        ]
+        == 104
+    )
+    assert (
+        table_counts[
+            "scotgov:Council Tax Collection Statistics, 2025-26: publication "
+            "tables (CTRR), Figure 1 Council Tax billed and received"
+        ]
+        == 108
+    )
+    assert (
+        table_counts[
+            "scotgov:Scottish Local Government Finance Statistics (SLGFS) "
+            "2024-25: publication tables, council tax tables 2.6, 2.8, 2.10, 2.11 "
+            "and chart 2.7"
+        ]
+        == 71
+    )
+    assert (
+        table_counts[
+            "welshgov:Council tax collection rates in Wales, April 2024 to March "
+            "2025, Table 2 amounts outstanding in respect of 2024-25 bills and "
+            "arrears"
+        ]
+        == 7
+    )
+    assert (
+        table_counts[
+            "welshgov:Council tax collection rates in Wales, April 2025 to March "
+            "2026, Table 2 amounts outstanding in respect of 2025-26 bills and "
+            "arrears"
+        ]
+        == 7
+    )
     assert table_counts["irs_soi:Congressional District Data 2022"] == 26880
     assert table_counts["irs_soi:IRS SOI County Data 2022"] == 6286
     assert table_counts["census_pep:Vintage 2024 County Population Totals"] == 3144
@@ -424,33 +490,33 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fiscal_year:1996": 33,
         "fiscal_year:1997": 33,
         "fiscal_year:1998": 33,
-        "fiscal_year:1999": 33,
-        "fiscal_year:2000": 33,
-        "fiscal_year:2001": 33,
-        "fiscal_year:2002": 33,
-        "fiscal_year:2003": 33,
-        "fiscal_year:2004": 33,
-        "fiscal_year:2005": 33,
-        "fiscal_year:2006": 33,
-        "fiscal_year:2007": 33,
-        "fiscal_year:2008": 33,
-        "fiscal_year:2009": 33,
-        "fiscal_year:2010": 33,
-        "fiscal_year:2011": 33,
-        "fiscal_year:2012": 33,
-        "fiscal_year:2013": 33,
-        "fiscal_year:2014": 33,
-        "fiscal_year:2015": 33,
-        "fiscal_year:2016": 33,
-        "fiscal_year:2017": 33,
-        "fiscal_year:2018": 33,
-        "fiscal_year:2019": 33,
-        "fiscal_year:2020": 33,
-        "fiscal_year:2021": 33,
-        "fiscal_year:2022": 33,
-        "fiscal_year:2023": 385,
-        "fiscal_year:2024": 611,
-        "fiscal_year:2025": 1288,
+        "fiscal_year:1999": 41,
+        "fiscal_year:2000": 41,
+        "fiscal_year:2001": 41,
+        "fiscal_year:2002": 41,
+        "fiscal_year:2003": 41,
+        "fiscal_year:2004": 41,
+        "fiscal_year:2005": 41,
+        "fiscal_year:2006": 41,
+        "fiscal_year:2007": 41,
+        "fiscal_year:2008": 41,
+        "fiscal_year:2009": 41,
+        "fiscal_year:2010": 41,
+        "fiscal_year:2011": 41,
+        "fiscal_year:2012": 41,
+        "fiscal_year:2013": 41,
+        "fiscal_year:2014": 41,
+        "fiscal_year:2015": 41,
+        "fiscal_year:2016": 41,
+        "fiscal_year:2017": 41,
+        "fiscal_year:2018": 41,
+        "fiscal_year:2019": 41,
+        "fiscal_year:2020": 44,
+        "fiscal_year:2021": 52,
+        "fiscal_year:2022": 52,
+        "fiscal_year:2023": 405,
+        "fiscal_year:2024": 695,
+        "fiscal_year:2025": 1308,
         "fiscal_year:2026": 1443,
         "fiscal_year:2027": 32,
         "fiscal_year:2028": 32,
@@ -573,10 +639,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert len(coverage["counts"]["by_geography"]) == 12536
     assert coverage["counts"]["by_entity"] == {
         "benefit_unit": 233,
-        "dwelling": 12708,
+        "dwelling": 12733,
         "family": 107,
         "firm": 1439,
-        "government": 310,
+        "government": 626,
         "household": 40513,
         "institutional_sector": 103,
         "pension_plan": 2,
@@ -585,7 +651,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_unit": 40069,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
-    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 12
+    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 117
     assert summary["warnings"] == [
         {
             "code": "duplicate_semantic_fact_key",
