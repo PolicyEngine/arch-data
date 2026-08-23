@@ -201,8 +201,8 @@ git diff --check
 | source-cell validator | valid; 637 cells; 0 errors, 0 warnings |
 | fact validator | valid; 90 facts; 25 administrative, 63 model-output, 2 survey-aggregate; 0 errors, 0 warnings |
 | Belgium tests | 13 passed; 12 warnings |
-| repository tests | pending final rerun against corrected bundle goldens |
-| `git diff --check` | pending final audit |
+| repository tests | 693 passed, 1 skipped, 14 warnings in 1,056.53s (0:17:36) |
+| `git diff --check` | clean |
 
 The build acceptance report has the expected single nonfatal
 `concept_alignment_validation_skipped` warning because no Axiom CLI command
@@ -214,9 +214,12 @@ selectors, lineage, and all other acceptance checks pass.
 | Commit | Purpose |
 |---|---|
 | `b12bfde` | Branch base: merge PR #190, including C2 |
-| this lane's single local commit, `Add JRC EUROMOD Belgium validation columns` | Append JRC model/ratio cells, extend selectors/tests, and record validation evidence |
+| `7a110c8` | Append JRC model/ratio cells, extend selectors/tests, and add the initial report |
+| local report-only follow-up, `Finalize Lane C4 validation report` | Record the final 693-test pass and clean-diff audit |
 
-No push, stash operation, R2 upload, or network access was performed.
+No push, stash operation, R2 upload, or network access was performed by this
+Codex session. During the final audit, both the local branch and the
+`origin/jrc-euromod-columns` remote-tracking ref already pointed to `7a110c8`;
+the report-only follow-up remains local.
 
 LANE C4 DONE
-
