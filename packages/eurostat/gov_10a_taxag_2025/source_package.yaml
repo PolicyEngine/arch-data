@@ -1,0 +1,239 @@
+schema_version: ledger.source_package.v1
+package_id: eurostat-gov-10a-taxag-2025
+label: Eurostat gov_10a_taxag 2025 tax revenue vintage for Belgium
+artifact:
+  source_name: eurostat
+  source_table: Eurostat gov_10a_taxag Main national accounts tax aggregates for Belgium
+  resource_package: db
+  resource_directory: data/eurostat/gov_10a_taxag
+  manifest: manifest.yaml
+  vintage: eurostat_gov_10a_taxag_2025
+  extracted_at: '2026-08-23'
+  extraction_method: >-
+    Eurostat dissemination API v1.0 JSON-stat 2.0 full-cube row parse of
+    the filtered request recorded in the manifest source_url
+  parser: json_stat_2_full_rows
+  artifact_year: 2025
+  sheet_name: gov_10a_taxag
+  # Existing D2/D5/D51/D61 observations for 2022-2024 remain owned by the
+  # prior vintage package. This package selects only the newly available
+  # taxpayer split for those years and all six published 2025 observations.
+  selected_rows:
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51A_C1, geo: BE, time: '2022'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51B_C2, geo: BE, time: '2022'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51A_C1, geo: BE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51B_C2, geo: BE, time: '2023'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51A_C1, geo: BE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51B_C2, geo: BE, time: '2024'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D2, geo: BE, time: '2025'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D5, geo: BE, time: '2025'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51, geo: BE, time: '2025'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D61, geo: BE, time: '2025'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51A_C1, geo: BE, time: '2025'}
+    - {freq: A, unit: MIO_EUR, sector: S13, na_item: D51B_C2, geo: BE, time: '2025'}
+record_sets:
+  - &split_record_set
+    record_set_id: eurostat.gov_10a_taxag.cy2022.income_tax_revenue_by_taxpayer.country
+    provenance_class: administrative
+    record_set_spec_id: eurostat.gov_10a_taxag.income_tax_revenue_by_taxpayer.country.v1
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2022.income_tax_revenue_by_taxpayer.country
+    sheet_name: gov_10a_taxag
+    period_type: calendar_year
+    period: 2022
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: government
+    entity_role: general_government
+    domain: taxes_and_social_contributions
+    groupby_dimension: na_item
+    shared_filters:
+      freq: A
+      unit: MIO_EUR
+      sector: S13
+      time: '2022'
+    shared_constraints:
+      - {variable: freq, operator: '==', value: A, label: Eurostat frequency}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: Eurostat source unit}
+      - {variable: sector, operator: '==', value: S13, label: Eurostat institutional sector}
+      - {variable: time, operator: '==', value: '2022', label: Eurostat time}
+    rows:
+      - &d51a_row
+        value_id: d51a_c1_be
+        label: Belgium taxes on individual or household income including holding gains
+        ordinal: 0
+        row_number: 2
+        expected_row_header_column: D
+        expected_row_header: D51A_C1
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells: &belgium_guards
+          - {column: A, expected_value: A, label: Eurostat freq dimension}
+          - {column: B, expected_value: MIO_EUR, label: Eurostat unit dimension}
+          - {column: C, expected_value: S13, label: Eurostat sector dimension}
+          - {column: E, expected_value: BE, label: Eurostat geo dimension}
+        filters: {na_item: D51A_C1, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51A_C1, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - &d51b_row
+        value_id: d51b_c2_be
+        label: Belgium taxes on corporate income or profits including holding gains
+        ordinal: 1
+        row_number: 3
+        expected_row_header_column: D
+        expected_row_header: D51B_C2
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells: *belgium_guards
+        filters: {na_item: D51B_C2, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51B_C2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+    measures: &revenue_measure
+      - measure_id: revenue
+        label: Tax or net social contribution revenue
+        ordinal: 0
+        column: G
+        source_column_id: value
+        expected_column_header_row: 1
+        expected_column_header: value
+        concept: eurostat.gov_10a_taxag.revenue
+        source_concept: eurostat.gov_10a_taxag.value
+        concept_relation: source_label
+        concept_authority: eurostat
+        concept_evidence_url: https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=en
+        concept_evidence_notes: >-
+          Source na_item codes identify the published tax and net
+          social contribution categories.
+        unit: eur
+        aggregation: sum
+        value_scale: 1000000
+        expected_cell_type: number
+  - <<: *split_record_set
+    provenance_class: administrative
+    record_set_id: eurostat.gov_10a_taxag.cy2023.income_tax_revenue_by_taxpayer.country
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2023.income_tax_revenue_by_taxpayer.country
+    period: 2023
+    shared_filters:
+      freq: A
+      unit: MIO_EUR
+      sector: S13
+      time: '2023'
+    shared_constraints:
+      - {variable: freq, operator: '==', value: A, label: Eurostat frequency}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: Eurostat source unit}
+      - {variable: sector, operator: '==', value: S13, label: Eurostat institutional sector}
+      - {variable: time, operator: '==', value: '2023', label: Eurostat time}
+    rows:
+      - {<<: *d51a_row, row_number: 4}
+      - {<<: *d51b_row, row_number: 5}
+  - <<: *split_record_set
+    provenance_class: administrative
+    record_set_id: eurostat.gov_10a_taxag.cy2024.income_tax_revenue_by_taxpayer.country
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2024.income_tax_revenue_by_taxpayer.country
+    period: 2024
+    shared_filters:
+      freq: A
+      unit: MIO_EUR
+      sector: S13
+      time: '2024'
+    shared_constraints:
+      - {variable: freq, operator: '==', value: A, label: Eurostat frequency}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: Eurostat source unit}
+      - {variable: sector, operator: '==', value: S13, label: Eurostat institutional sector}
+      - {variable: time, operator: '==', value: '2024', label: Eurostat time}
+    rows:
+      - {<<: *d51a_row, row_number: 6}
+      - {<<: *d51b_row, row_number: 7}
+  - &tax_record_set
+    record_set_id: eurostat.gov_10a_taxag.cy2025.tax_revenue.country
+    provenance_class: administrative
+    record_set_spec_id: eurostat.gov_10a_taxag.tax_revenue.country.v1
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2025.tax_revenue.country
+    sheet_name: gov_10a_taxag
+    period_type: calendar_year
+    period: 2025
+    geography_id: BE
+    geography_level: country
+    geography_name: Belgium
+    geography_vintage: current
+    entity: government
+    entity_role: general_government
+    domain: taxes_and_social_contributions
+    groupby_dimension: na_item
+    shared_filters: &filters_2025
+      freq: A
+      unit: MIO_EUR
+      sector: S13
+      time: '2025'
+    shared_constraints: &constraints_2025
+      - {variable: freq, operator: '==', value: A, label: Eurostat frequency}
+      - {variable: unit, operator: '==', value: MIO_EUR, label: Eurostat source unit}
+      - {variable: sector, operator: '==', value: S13, label: Eurostat institutional sector}
+      - {variable: time, operator: '==', value: '2025', label: Eurostat time}
+    rows:
+      - value_id: d2_be
+        label: Belgium taxes on production and imports
+        ordinal: 0
+        row_number: 8
+        expected_row_header_column: D
+        expected_row_header: D2
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells: *belgium_guards
+        filters: {na_item: D2, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D2, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d5_be
+        label: Belgium current taxes on income and wealth
+        ordinal: 1
+        row_number: 9
+        expected_row_header_column: D
+        expected_row_header: D5
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells: *belgium_guards
+        filters: {na_item: D5, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D5, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d51_be
+        label: Belgium taxes on income
+        ordinal: 2
+        row_number: 10
+        expected_row_header_column: D
+        expected_row_header: D51
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells: *belgium_guards
+        filters: {na_item: D51, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D51, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+      - value_id: d61_be
+        label: Belgium net social contributions
+        ordinal: 3
+        row_number: 11
+        expected_row_header_column: D
+        expected_row_header: D61
+        geography_id: BE
+        geography_name: Belgium
+        guard_cells: *belgium_guards
+        filters: {na_item: D61, geo: BE}
+        constraints:
+          - {variable: na_item, operator: '==', value: D61, label: Eurostat national accounts item}
+          - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
+    measures: *revenue_measure
+  - <<: *split_record_set
+    provenance_class: administrative
+    record_set_id: eurostat.gov_10a_taxag.cy2025.income_tax_revenue_by_taxpayer.country
+    source_record_id_prefix: eurostat.gov_10a_taxag.cy2025.income_tax_revenue_by_taxpayer.country
+    period: 2025
+    shared_filters: *filters_2025
+    shared_constraints: *constraints_2025
+    rows:
+      - {<<: *d51a_row, row_number: 12}
+      - {<<: *d51b_row, row_number: 13}

@@ -3,21 +3,35 @@
 from __future__ import annotations
 
 import csv
+from collections import Counter
 from decimal import Decimal
 from functools import lru_cache
 import hashlib
 import json
 from pathlib import Path
 
+import pytest
 import yaml
 
 from chronicle.core import validate_facts
-from chronicle.source_package import SOURCE_PACKAGE_ALIASES, load_source_package
+from chronicle.source_package import (
+    SOURCE_PACKAGE_ALIASES,
+    load_source_package,
+    validate_source_package,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 BELGIUM_TARGET_STREAMS = (
+    (
+        "statbel-population-structure-2025",
+        2025,
+        "statbel_population_structure",
+        "nuts1",
+        "people",
+        18,
+    ),
     (
         "statbel-population-structure-2026",
         2026,
@@ -324,7 +338,7 @@ def test_belgium_target_packages_have_expected_fact_count():
         for fact in _facts(alias, year)
     ]
 
-    assert len(facts) == 587
+    assert len(facts) == 605
     assert validate_facts(facts).valid
 
 
@@ -348,6 +362,7 @@ def test_belgium_microcosm_selectors_match_one_package_stream():
                 fact.source.source_name == source_name
                 and fact.geography.level == geography_level
                 and fact.measure.concept == concept
+                and fact.period.value == _year
                 for fact in facts
             )
         }
@@ -357,6 +372,7 @@ def test_belgium_microcosm_selectors_match_one_package_stream():
             if fact.source.source_name == source_name
             and fact.geography.level == geography_level
             and fact.measure.concept == concept
+            and fact.period.value == _year
         ]
 
         assert matching_aliases == {expected_alias}
@@ -364,9 +380,11 @@ def test_belgium_microcosm_selectors_match_one_package_stream():
 
 
 def test_belgium_subnational_facts_carry_current_vintages():
+    population_2025 = _facts("statbel-population-structure-2025", 2025)
     population = _facts("statbel-population-structure-2026", 2026)
     fiscal = _facts("statbel-fiscal-income-2023-nis-2025", 2023)
 
+    assert {fact.geography.vintage for fact in population_2025} == {"NUTS_2024"}
     assert {fact.geography.vintage for fact in population} == {"NUTS_2024"}
     assert {fact.geography.level for fact in fiscal} == {"commune"}
     assert {fact.geography.vintage for fact in fiscal} == {"nis_2025"}
@@ -380,6 +398,9 @@ def test_belgium_period_basis_is_preserved_by_source():
 
     assert periods_by_alias["statbel-population-structure-2026"] == {
         ("calendar_year", 2026)
+    }
+    assert periods_by_alias["statbel-population-structure-2025"] == {
+        ("calendar_year", 2025)
     }
     assert periods_by_alias["statbel-fiscal-income-2023-nis-2025"] == {
         ("tax_year", 2023)
@@ -522,12 +543,16 @@ def test_belgium_euromod_comparator_pairs_c2_rows_with_model_outputs():
 SFPD_PENSION_ALIAS = "sfpd-legal-pension-caseload-2025"
 GROEIPAKKET_ALIAS = "opgroeien-groeipakket-caseload-2025"
 BFP_OUTLOOK_ALIAS = "bfp-economic-outlook-2026-06"
+FPB_ANNEX_ALIAS = "fpb-economic-outlook-2026-2031-june-2026"
 
 
 def test_belgium_supplementary_publisher_aliases_are_registered():
-    assert {SFPD_PENSION_ALIAS, GROEIPAKKET_ALIAS, BFP_OUTLOOK_ALIAS} <= set(
-        SOURCE_PACKAGE_ALIASES
-    )
+    assert {
+        SFPD_PENSION_ALIAS,
+        GROEIPAKKET_ALIAS,
+        BFP_OUTLOOK_ALIAS,
+        FPB_ANNEX_ALIAS,
+    } <= set(SOURCE_PACKAGE_ALIASES)
 
 
 def test_sfpd_legal_pension_caseload_matches_published_cells():
@@ -605,3 +630,135 @@ def test_bfp_economic_outlook_facts_are_typed_source_projection():
     assert {fact.source.source_name for fact in facts} == {"bfp_economic_outlook"}
     assert {fact.geography.id for fact in facts} == {"BE"}
     assert validate_facts(facts).valid
+
+
+@lru_cache
+def _fpb_annex_outputs():
+    package = load_source_package(FPB_ANNEX_ALIAS)
+    cells = tuple(package.build_source_cells(2026))
+    facts = tuple(package.build_facts(2026, cells=list(cells)))
+    return cells, facts
+
+
+def test_fpb_annex_has_requested_table_counts_and_vintage_boundary():
+    _cells, facts = _fpb_annex_outputs()
+    package_report = validate_source_package(FPB_ANNEX_ALIAS, year=2026)
+
+    assert package_report.valid, package_report.to_dict()
+    assert package_report.counts == {
+        "record_set_count": 1000,
+        "row_count": 1000,
+        "measure_count": 1000,
+        "source_record_count": 1000,
+        "source_region_count": 1000,
+    }
+    assert Counter(fact.measure.source_concept for fact in facts) == {
+        "fpb.economic_outlook_2026_2031.t01.published_cell": 40,
+        "fpb.economic_outlook_2026_2031.t06.published_cell": 30,
+        "fpb.economic_outlook_2026_2031.t07.published_cell": 100,
+        "fpb.economic_outlook_2026_2031.t11.published_cell": 210,
+        "fpb.economic_outlook_2026_2031.t17.published_cell": 70,
+        "fpb.economic_outlook_2026_2031.t24.published_cell": 550,
+    }
+    assert Counter((fact.period.value, fact.assertion) for fact in facts) == {
+        **{(year, "observation"): 100 for year in range(2022, 2026)},
+        **{(year, "source_projection"): 100 for year in range(2026, 2032)},
+    }
+    assert {fact.provenance_class for fact in facts} == {"model_output"}
+    assert validate_facts(facts).valid
+
+
+def test_fpb_annex_pins_publisher_cells_and_compiled_values():
+    cells, facts = _fpb_annex_outputs()
+    cells_by_coordinate = {
+        (cell.sheet_name, cell.address): cell.raw_value for cell in cells
+    }
+    facts_by_record = {fact.source_record_id: fact for fact in facts}
+
+    assert cells_by_coordinate[("T11", "AE8")] == 320578
+    assert cells_by_coordinate[("T17", "AE8")] == 77771
+    assert cells_by_coordinate[("T24", "AE20")] == 5602
+
+    compensation = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2025.household_account."
+        "compensation_of_employees.amount_meur"
+    ]
+    direct_tax = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2025.general_government_account."
+        "direct_taxes_households.amount_meur"
+    ]
+    unemployment = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2025.social_benefits_detail."
+        "social_security_cash_unemployment.amount_meur"
+    ]
+
+    assert compensation.value == 320_578_000_000
+    assert compensation.layout.groupby_value_label == "3. Rémunération des salariés"
+    assert direct_tax.value == 77_771_000_000
+    assert direct_tax.layout.groupby_value_label == "- Ménages"
+    assert unemployment.value == 5_602_000_000
+    assert unemployment.layout.groupby_value_label == "a. Chômage"
+
+    resources_2023 = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2023.household_account."
+        "total_resources.amount_meur"
+    ]
+    resources_2025 = facts_by_record[
+        "fpb.economic_outlook_2026_2031.cy2025.household_account."
+        "total_resources.amount_meur"
+    ]
+    assert resources_2023.value == 518_286_000_000
+    assert resources_2025.value == 554_117_000_000
+    assert resources_2023.layout.groupby_value_label == "a. Ressources"
+    assert resources_2025.layout.groupby_value_label == "a. Ressources"
+
+
+def test_statbel_2025_population_matches_fpb_annual_average_with_declared_tolerance():
+    statbel_facts = _facts("statbel-population-structure-2025", 2025)
+    statbel_total = sum(fact.value for fact in statbel_facts)
+    _cells, fpb_facts = _fpb_annex_outputs()
+    fpb_population = next(
+        fact.value
+        for fact in fpb_facts
+        if fact.source_record_id
+        == "fpb.economic_outlook_2026_2031.cy2025.labour_market.levels."
+        "total_population.level_thousand"
+    )
+    relative_gap = abs(fpb_population - statbel_total) / fpb_population
+
+    assert statbel_total == 11_825_551
+    assert Counter(fact.geography.id for fact in statbel_facts) == {
+        "BE1": 6,
+        "BE2": 6,
+        "BE3": 6,
+    }
+    assert fpb_population == 11_850_400
+    assert fpb_population - statbel_total == 24_849
+    assert relative_gap == pytest.approx(0.002096891244177412)
+    # Observed gap is 0.2097%: use a stated 0.25% ceiling for the January 1
+    # Statbel stock versus FPB annual-average population, not a tuned equality.
+    assert relative_gap < 0.0025
+
+
+def test_statbel_2025_artifacts_are_hash_pinned():
+    data_dir = REPO_ROOT / "db" / "data" / "statbel" / "population_structure_nuts1_2025"
+    curated = data_dir / "statbel_population_structure_nuts1_2025.csv"
+    raw_zip = data_dir / "TF_SOC_POP_STRUCT_2025.zip"
+    package_report = validate_source_package(
+        "statbel-population-structure-2025", year=2025
+    )
+
+    assert package_report.valid, package_report.to_dict()
+    assert package_report.counts == {
+        "record_set_count": 1,
+        "row_count": 18,
+        "measure_count": 1,
+        "source_record_count": 18,
+        "source_region_count": 1,
+    }
+    assert hashlib.sha256(curated.read_bytes()).hexdigest() == (
+        "2243aa1be7600535dba7e3d804ef482b6edac07c1e3813f4882c3bf4a34ff2ad"
+    )
+    assert hashlib.sha256(raw_zip.read_bytes()).hexdigest() == (
+        "33910ea36437e39cfffd82ad82c759a2a8d1f2ab7662d45ce71c8ec9f336716c"
+    )

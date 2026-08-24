@@ -15,6 +15,18 @@
    "sha256": "24ad3c0115efef790ff8cb2ff8fb269d4ceb7de70ac3fad673ebd1340e4f650f"
   },
   {
+   "dataset_id": "gov_10a_taxag",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag?format=JSON&lang=en&freq=A&unit=MIO_EUR&sector=S13&na_item=D51&na_item=D51A_C1&na_item=D51B_C2&na_item=D5&na_item=D61&na_item=D2&geo=BE&time=2022&time=2023&time=2024&time=2025",
+   "destination": "db/data/eurostat/gov_10a_taxag/gov_10a_taxag_2022_2025.json",
+   "sha256": "da84f990bbf077162e4f43f64b94a28e376859075d831efdbadbe6aef3eda3ea"
+  },
+  {
+   "dataset_id": "spr_exp_func",
+   "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_func?format=JSON&lang=en&freq=A&spdeps=SPR&spfunc=TOTAL&spfunc=SICK&spfunc=DIS&spfunc=OLD&spfunc=SRV&spfunc=FAM&spfunc=UNE&spfunc=HOU&spfunc=EXCL&unit=MIO_EUR&geo=BE&time=2023&time=2024",
+   "destination": "db/data/eurostat/spr_exp_func/spr_exp_func_2023_2024.json",
+   "sha256": "91ea617950583ca0704863125f6bbb4292b0f12da95bffae422c5d406bd3d81d"
+  },
+  {
    "dataset_id": "nasa_10_nf_tr",
    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nasa_10_nf_tr?format=JSON&lang=en&freq=A&unit=CP_MEUR&sector=S14_S15&na_item=B2G&na_item=B3G&na_item=B3N&na_item=B6G&na_item=D1&na_item=D11&na_item=D12&na_item=D4&na_item=D41&na_item=D42&na_item=D44&na_item=D45&na_item=D5&na_item=D61&na_item=D62&direct=RECV&direct=PAID&geo=BE&time=2022&time=2023&time=2024",
    "destination": "db/data/eurostat/nasa_10_nf_tr/nasa_10_nf_tr.json",

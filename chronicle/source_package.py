@@ -107,6 +107,7 @@ SOURCE_PACKAGE_ALIASES = {
     "mhclg-ehs-weekly-housing-costs-2023-24": Path(
         "mhclg/ehs_weekly_housing_costs_2023_24"
     ),
+    "statbel-population-structure-2025": Path("statbel/population_structure_2025"),
     "statbel-population-structure-2026": Path("statbel/population_structure_2026"),
     "statbel-fiscal-income-2023-nis-2025": Path("statbel/fiscal_income_2023_nis_2025"),
     "statbel-fiscal-income-distribution-2023": Path(
@@ -124,6 +125,9 @@ SOURCE_PACKAGE_ALIASES = {
     "sfpd-legal-pension-caseload-2025": Path("sfpd/legal_pension_caseload_2025"),
     "opgroeien-groeipakket-caseload-2025": Path("opgroeien/groeipakket_caseload_2025"),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
+    "fpb-economic-outlook-2026-2031-june-2026": Path(
+        "fpb/economic_outlook_2026_2031_june_2026"
+    ),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
@@ -274,7 +278,9 @@ SOURCE_PACKAGE_ALIASES = {
         "hmrc/vat_firm_sector_targets_2024_25"
     ),
     "eurostat-gov-10a-taxag": Path("eurostat/gov_10a_taxag"),
+    "eurostat-gov-10a-taxag-2025": Path("eurostat/gov_10a_taxag_2025"),
     "eurostat-spr-exp-func": Path("eurostat/spr_exp_func"),
+    "eurostat-spr-exp-func-2024": Path("eurostat/spr_exp_func_2024"),
     "eurostat-nasa-10-nf-tr": Path("eurostat/nasa_10_nf_tr"),
     "eurostat-ilc-li02": Path("eurostat/ilc_li02"),
     "eurostat-ilc-di01": Path("eurostat/ilc_di01"),

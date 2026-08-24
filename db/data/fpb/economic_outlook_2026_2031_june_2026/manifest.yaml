@@ -1,0 +1,39 @@
+source_id: fpb
+package_id: fpb-economic-outlook-2026-2031-june-2026
+source_name: Federal Planning Bureau economic outlook
+publisher: Federal Planning Bureau / Bureau fédéral du Plan
+source_page: https://www.plan.be/en/data/economic-outlook-2026-2031-june-2026-statistical
+files:
+  2026:
+    filename: DATA_FOR_MLT_FR.xlsx
+    source_url: https://www.plan.be/sites/default/files/documents/DATA_FOR_MLT_FR.xlsx
+    source_table: Economic Outlook 2026-2031, June 2026 statistical annex
+    sha256: b51b41fbe6a3bd797a2fc9de648af66ec318e872b4d90200e2e8edbe9d26e56e
+    size_bytes: 238644
+    fetched_at: '2026-08-23'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/fpb/fpb-economic-outlook-2026-2031-june-2026/2026/b51b41fbe6a3bd797a2fc9de648af66ec318e872b4d90200e2e8edbe9d26e56e/DATA_FOR_MLT_FR.xlsx
+        uri: r2://ledger-raw/raw/fpb/fpb-economic-outlook-2026-2031-june-2026/2026/b51b41fbe6a3bd797a2fc9de648af66ec318e872b4d90200e2e8edbe9d26e56e/DATA_FOR_MLT_FR.xlsx
+    notes: >-
+      Hash-pinned publisher workbook. Chronicle parses only the requested cells
+      in T01, T06, T07, T11, T17, and T24 and preserves every value as printed.
+  publication_pdf:
+    filename: FOR_MIDTERM_2631_13322_FR.pdf
+    source_url: https://www.plan.be/sites/default/files/documents/FOR_MIDTERM_2631_13322_FR.pdf
+    source_table: Perspectives économiques 2026-2031, juin 2026
+    sha256: 3e4af4a5e6de8e24beab59a4e9d1c564bed8e429c887c45ca6fce99397754587
+    size_bytes: 4363762
+    fetched_at: '2026-08-23'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/fpb/fpb-economic-outlook-2026-2031-june-2026/publication_pdf/3e4af4a5e6de8e24beab59a4e9d1c564bed8e429c887c45ca6fce99397754587/FOR_MIDTERM_2631_13322_FR.pdf
+        uri: r2://ledger-raw/raw/fpb/fpb-economic-outlook-2026-2031-june-2026/publication_pdf/3e4af4a5e6de8e24beab59a4e9d1c564bed8e429c887c45ca6fce99397754587/FOR_MIDTERM_2631_13322_FR.pdf
+    notes: >-
+      Hash-pinned publication used only to establish the publisher's
+      observation/projection boundary and the annex units. Fact values come
+      exclusively from the XLSX entry.

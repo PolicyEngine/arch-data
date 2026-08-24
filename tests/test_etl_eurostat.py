@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import asdict
 from functools import lru_cache
 import hashlib
 import json
@@ -32,7 +33,9 @@ EVALUATION_ONLY_COMMENT = (
 )
 EUROSTAT_PACKAGES = {
     "eurostat-gov-10a-taxag": ("gov_10a_taxag", 2024, 24, 24),
+    "eurostat-gov-10a-taxag-2025": ("gov_10a_taxag", 2025, 12, 24),
     "eurostat-spr-exp-func": ("spr_exp_func", 2023, 27, 27),
+    "eurostat-spr-exp-func-2024": ("spr_exp_func", 2024, 9, 18),
     "eurostat-nasa-10-nf-tr": ("nasa_10_nf_tr", 2024, 78, 84),
     "eurostat-ilc-li02": ("ilc_li02", 2024, 3, 3),
     "eurostat-ilc-di01": ("ilc_di01", 2024, 54, 54),
@@ -43,6 +46,23 @@ NASA_10_NF_TR_YEAR = 2024
 NASA_10_NF_TR_SHA256 = (
     "30d3f5bf3d1414c78633d13f505558b837b84e92c24b17050249ab19cec20a6d"
 )
+EUROSTAT_ARTIFACT_FILENAMES = {
+    "eurostat-gov-10a-taxag": "gov_10a_taxag.json",
+    "eurostat-gov-10a-taxag-2025": "gov_10a_taxag_2022_2025.json",
+    "eurostat-spr-exp-func": "spr_exp_func.json",
+    "eurostat-spr-exp-func-2024": "spr_exp_func_2023_2024.json",
+    "eurostat-nasa-10-nf-tr": "nasa_10_nf_tr.json",
+    "eurostat-ilc-li02": "ilc_li02.json",
+    "eurostat-ilc-di01": "ilc_di01.json",
+}
+PRIOR_VINTAGE_FACT_DIGESTS = {
+    "eurostat-gov-10a-taxag": (
+        "9db298bc05f4c7c1987367d4c31feb3b91d9ed70320f5d808898b978e85dd1a9"
+    ),
+    "eurostat-spr-exp-func": (
+        "51768608362aaf40a16ee5be00c0ce849c5b37918975cc647bfde3fde1048266"
+    ),
+}
 EXPECTED_QUERY_FILTERS = {
     "gov_10a_taxag": {
         "freq": ["A"],
@@ -114,6 +134,21 @@ EXPECTED_QUERY_FILTERS = {
         "time": ["2024"],
     },
 }
+EXPECTED_VINTAGE_QUERY_FILTERS = {
+    ("gov_10a_taxag", "gov_10a_taxag_2022_2025.json"): {
+        "freq": ["A"],
+        "unit": ["MIO_EUR"],
+        "sector": ["S13"],
+        "na_item": ["D51", "D51A_C1", "D51B_C2", "D5", "D61", "D2"],
+        "geo": ["BE"],
+        "time": ["2022", "2023", "2024", "2025"],
+    },
+    ("spr_exp_func", "spr_exp_func_2023_2024.json"): {
+        **EXPECTED_QUERY_FILTERS["spr_exp_func"],
+        "geo": ["BE"],
+        "time": ["2023", "2024"],
+    },
+}
 
 
 @lru_cache
@@ -170,9 +205,7 @@ def test_nasa_10_nf_tr_preserves_full_cube_and_selected_fact_lineage():
     assert {fact.provenance_class for fact in facts} == {"administrative"}
     assert {fact.survey_instrument for fact in facts} == {None}
     assert {fact.entity.name for fact in facts} == {"household"}
-    assert {fact.entity.role for fact in facts} == {
-        "resident_households_and_npish"
-    }
+    assert {fact.entity.role for fact in facts} == {"resident_households_and_npish"}
     assert {fact.measure.unit for fact in facts} == {"eur"}
     assert {fact.measure.concept_relation for fact in facts} == {"exact"}
     assert {fact.measure.concept_authority for fact in facts} == {"ledger-be"}
@@ -224,12 +257,7 @@ def test_nasa_10_nf_tr_preserves_full_cube_and_selected_fact_lineage():
         )
 
     manifest_path = (
-        REPO_ROOT
-        / "db"
-        / "data"
-        / "eurostat"
-        / "nasa_10_nf_tr"
-        / "manifest.yaml"
+        REPO_ROOT / "db" / "data" / "eurostat" / "nasa_10_nf_tr" / "manifest.yaml"
     )
     manifest = yaml.safe_load(manifest_path.read_text())
     file_spec = manifest["files"][NASA_10_NF_TR_YEAR]
@@ -245,9 +273,7 @@ def test_nasa_10_nf_tr_preserves_full_cube_and_selected_fact_lineage():
     assert file_spec["sha256"] == NASA_10_NF_TR_SHA256
     assert file_spec["size_bytes"] == 5098
     assert file_spec["storage"]["r2"]["key"] == expected_r2_key
-    assert file_spec["storage"]["r2"]["uri"] == (
-        f"r2://ledger-raw/{expected_r2_key}"
-    )
+    assert file_spec["storage"]["r2"]["uri"] == (f"r2://ledger-raw/{expected_r2_key}")
 
 
 def test_eurostat_aliases_and_packages_validate_end_to_end():
@@ -321,7 +347,9 @@ def test_eurostat_facts_preserve_raw_cube_dimensions_and_scaling():
 def test_eurostat_provenance_and_evaluation_only_boundary():
     administrative_aliases = {
         "eurostat-gov-10a-taxag",
+        "eurostat-gov-10a-taxag-2025",
         "eurostat-spr-exp-func",
+        "eurostat-spr-exp-func-2024",
         "eurostat-nasa-10-nf-tr",
     }
     survey_aliases = {"eurostat-ilc-li02", "eurostat-ilc-di01"}
@@ -386,6 +414,132 @@ def test_eurostat_production_values_match_publisher_bytes():
     assert isinstance(be_disability[0].value, int)
 
 
+@pytest.mark.parametrize("alias", PRIOR_VINTAGE_FACT_DIGESTS)
+def test_eurostat_prior_vintage_facts_remain_byte_stable(alias):
+    facts = _package_outputs(alias)[3]
+    canonical = json.dumps(
+        [asdict(fact) for fact in facts],
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+
+    assert hashlib.sha256(canonical).hexdigest() == PRIOR_VINTAGE_FACT_DIGESTS[alias]
+
+
+def test_eurostat_2025_tax_vintage_adds_only_new_coordinates():
+    old_package, old_rows, _old_cells, old_facts = _package_outputs(
+        "eurostat-gov-10a-taxag"
+    )
+    new_package, new_rows, _new_cells, new_facts = _package_outputs(
+        "eurostat-gov-10a-taxag-2025"
+    )
+    old_rows_by_key = {build_source_row_key(row): row for row in old_rows}
+    new_rows_by_key = {build_source_row_key(row): row for row in new_rows}
+
+    def coordinates(facts, rows_by_key):
+        return {
+            (
+                str(rows_by_key[fact.source_row_keys[0]].values["time"]),
+                str(rows_by_key[fact.source_row_keys[0]].values["na_item"]),
+                str(rows_by_key[fact.source_row_keys[0]].values["geo"]),
+            )
+            for fact in facts
+        }
+
+    old_coordinates = coordinates(old_facts, old_rows_by_key)
+    new_coordinates = coordinates(new_facts, new_rows_by_key)
+    expected_values = {
+        ("2022", "D51A_C1"): 65_901_300_000,
+        ("2022", "D51B_C2"): 21_681_500_000,
+        ("2023", "D51A_C1"): 69_524_900_000,
+        ("2023", "D51B_C2"): 23_264_100_000,
+        ("2024", "D51A_C1"): 73_712_500_000,
+        ("2024", "D51B_C2"): 27_026_800_000,
+        ("2025", "D2"): 75_518_700_000,
+        ("2025", "D5"): 106_046_800_000,
+        ("2025", "D51"): 103_324_300_000,
+        ("2025", "D51A_C1"): 75_791_100_000,
+        ("2025", "D51B_C2"): 26_308_000_000,
+        ("2025", "D61"): 97_512_600_000,
+    }
+    compiled_values = {
+        (
+            str(new_rows_by_key[fact.source_row_keys[0]].values["time"]),
+            str(new_rows_by_key[fact.source_row_keys[0]].values["na_item"]),
+        ): fact.value
+        for fact in new_facts
+    }
+    linked_statuses = {
+        str(new_rows_by_key[fact.source_row_keys[0]].values["time"]): new_rows_by_key[
+            fact.source_row_keys[0]
+        ].values["status"]
+        for fact in new_facts
+    }
+
+    assert old_package.package_id == "eurostat-gov-10a-taxag"
+    assert new_package.package_id == "eurostat-gov-10a-taxag-2025"
+    assert old_coordinates.isdisjoint(new_coordinates)
+    assert new_coordinates == {(year, item, "BE") for year, item in expected_values}
+    assert compiled_values == expected_values
+    assert linked_statuses == {
+        "2022": None,
+        "2023": None,
+        "2024": None,
+        "2025": "p",
+    }
+    assert {fact.assertion for fact in new_facts} == {"observation"}
+
+
+def test_eurostat_2024_esspros_vintage_excludes_overlapping_2023_facts():
+    _old_package, old_rows, _old_cells, old_facts = _package_outputs(
+        "eurostat-spr-exp-func"
+    )
+    _new_package, new_rows, _new_cells, new_facts = _package_outputs(
+        "eurostat-spr-exp-func-2024"
+    )
+    old_rows_by_key = {build_source_row_key(row): row for row in old_rows}
+    new_rows_by_key = {build_source_row_key(row): row for row in new_rows}
+
+    def coordinates(facts, rows_by_key):
+        return {
+            (
+                str(rows_by_key[fact.source_row_keys[0]].values["time"]),
+                str(rows_by_key[fact.source_row_keys[0]].values["spfunc"]),
+                str(rows_by_key[fact.source_row_keys[0]].values["geo"]),
+            )
+            for fact in facts
+        }
+
+    expected_values = {
+        "TOTAL": 177_883_870_000,
+        "SICK": 50_457_080_000,
+        "DIS": 17_863_640_000,
+        "OLD": 74_545_990_000,
+        "SRV": 9_262_130_000,
+        "FAM": 13_162_100_000,
+        "UNE": 5_734_360_000,
+        "HOU": 1_306_850_000,
+        "EXCL": 5_551_710_000,
+    }
+    compiled_values = {
+        str(new_rows_by_key[fact.source_row_keys[0]].values["spfunc"]): fact.value
+        for fact in new_facts
+    }
+    linked_statuses = {
+        new_rows_by_key[fact.source_row_keys[0]].values["status"] for fact in new_facts
+    }
+
+    assert coordinates(old_facts, old_rows_by_key).isdisjoint(
+        coordinates(new_facts, new_rows_by_key)
+    )
+    assert coordinates(new_facts, new_rows_by_key) == {
+        ("2024", function, "BE") for function in expected_values
+    }
+    assert compiled_values == expected_values
+    assert linked_statuses == {"e"}
+    assert {fact.assertion for fact in new_facts} == {"observation"}
+
+
 def test_eurostat_production_surfaces_carry_no_fixture_identity():
     # Fixture identity must be absent everywhere it could reach a fact:
     # package specs (vintage, sheet names, notes), db manifests, and the
@@ -405,28 +559,32 @@ def test_eurostat_production_surfaces_carry_no_fixture_identity():
 def test_eurostat_artifacts_match_verified_live_dimension_shapes_and_labels():
     expected_shapes = {
         "nasa_10_nf_tr": (
+            2024,
             ["freq", "unit", "direct", "na_item", "sector", "geo", "time"],
             [1, 1, 2, 14, 1, 1, 3],
         ),
         "spr_exp_func": (
+            2023,
             ["freq", "spdeps", "spfunc", "unit", "geo", "time"],
             [1, 1, 9, 1, 3, 1],
         ),
         "ilc_li02": (
+            2024,
             ["freq", "statinfo", "unit", "rskpovth", "sex", "age", "geo", "time"],
             [1, 1, 1, 1, 1, 1, 3, 1],
         ),
         "ilc_di01": (
+            2024,
             ["freq", "quant_inc", "statinfo", "unit", "geo", "time"],
             [1, 9, 2, 1, 3, 1],
         ),
     }
 
     fixtures = {}
-    for dataset_id, (expected_id, expected_size) in expected_shapes.items():
+    for dataset_id, (year, expected_id, expected_size) in expected_shapes.items():
         package_dir = REPO_ROOT / "db" / "data" / "eurostat" / dataset_id
         manifest = yaml.safe_load((package_dir / "manifest.yaml").read_text())
-        filename = next(iter(manifest["files"].values()))["filename"]
+        filename = manifest["files"][year]["filename"]
         fixture = json.loads((package_dir / filename).read_text())
         fixtures[dataset_id] = fixture
 
@@ -466,15 +624,15 @@ def test_eurostat_artifacts_match_verified_live_dimension_shapes_and_labels():
 
 
 def test_eurostat_manifests_pin_real_publisher_artifacts():
-    for (
+    for alias, (
         dataset_id,
-        _year,
+        year,
         _expected_count,
         _expected_row_count,
-    ) in EUROSTAT_PACKAGES.values():
+    ) in EUROSTAT_PACKAGES.items():
         package_dir = REPO_ROOT / "db" / "data" / "eurostat" / dataset_id
         manifest = yaml.safe_load((package_dir / "manifest.yaml").read_text())
-        file_spec = next(iter(manifest["files"].values()))
+        file_spec = manifest["files"][year]
         artifact_path = package_dir / file_spec["filename"]
         artifact = json.loads(artifact_path.read_text())
         content = artifact_path.read_bytes()
@@ -488,7 +646,7 @@ def test_eurostat_manifests_pin_real_publisher_artifacts():
             + str(file_spec.get("source_table", ""))
         )
 
-        assert file_spec["filename"] == f"{dataset_id}.json"
+        assert file_spec["filename"] == EUROSTAT_ARTIFACT_FILENAMES[alias]
         assert file_spec["sha256"] == hashlib.sha256(content).hexdigest()
         assert file_spec["size_bytes"] == len(content)
         assert file_spec["storage"]["r2"]["uri"].startswith("r2://ledger-raw/")
@@ -506,25 +664,35 @@ def test_fetch_manifest_has_exact_filtered_eurostat_requests():
 
     assert fetch_manifest["schema_version"] == "ledger.fetch_manifest.v1"
     assert {fetch["dataset_id"] for fetch in fetches} == EUROSTAT_DATASET_IDS
+    assert len(fetches) == 7
     for fetch in fetches:
         dataset_id = fetch["dataset_id"]
         parsed = urlsplit(fetch["source_url"])
         query = parse_qs(parsed.query)
+        filename = Path(fetch["destination"]).name
         package_manifest = yaml.safe_load(
             (
                 REPO_ROOT / "db" / "data" / "eurostat" / dataset_id / "manifest.yaml"
             ).read_text()
         )
-        artifact_spec = next(iter(package_manifest["files"].values()))
+        matching_specs = [
+            spec
+            for spec in package_manifest["files"].values()
+            if spec["filename"] == filename
+        ]
+        assert len(matching_specs) == 1
+        artifact_spec = matching_specs[0]
 
         assert parsed.scheme == "https"
         assert parsed.netloc == "ec.europa.eu"
         assert parsed.path.endswith(f"/data/{dataset_id}")
         assert query.pop("format") == ["JSON"]
         assert query.pop("lang") == ["en"]
-        assert query == EXPECTED_QUERY_FILTERS[dataset_id]
+        assert query == EXPECTED_VINTAGE_QUERY_FILTERS.get(
+            (dataset_id, filename), EXPECTED_QUERY_FILTERS[dataset_id]
+        )
         assert fetch["destination"] == (
-            f"db/data/eurostat/{dataset_id}/{dataset_id}.json"
+            f"db/data/eurostat/{dataset_id}/{artifact_spec['filename']}"
         )
         sha = fetch["sha256"]
         dest = REPO_ROOT / fetch["destination"]
