@@ -112,6 +112,7 @@ record_sets:
         value_scale: 1000000
         expected_cell_type: number
   - <<: *split_record_set
+    provenance_class: administrative
     record_set_id: eurostat.gov_10a_taxag.cy2023.income_tax_revenue_by_taxpayer.country
     source_record_id_prefix: eurostat.gov_10a_taxag.cy2023.income_tax_revenue_by_taxpayer.country
     period: 2023
@@ -129,6 +130,7 @@ record_sets:
       - {<<: *d51a_row, row_number: 4}
       - {<<: *d51b_row, row_number: 5}
   - <<: *split_record_set
+    provenance_class: administrative
     record_set_id: eurostat.gov_10a_taxag.cy2024.income_tax_revenue_by_taxpayer.country
     source_record_id_prefix: eurostat.gov_10a_taxag.cy2024.income_tax_revenue_by_taxpayer.country
     period: 2024
@@ -226,6 +228,7 @@ record_sets:
           - {variable: geo, operator: '==', value: BE, label: Eurostat geography}
     measures: *revenue_measure
   - <<: *split_record_set
+    provenance_class: administrative
     record_set_id: eurostat.gov_10a_taxag.cy2025.income_tax_revenue_by_taxpayer.country
     source_record_id_prefix: eurostat.gov_10a_taxag.cy2025.income_tax_revenue_by_taxpayer.country
     period: 2025
