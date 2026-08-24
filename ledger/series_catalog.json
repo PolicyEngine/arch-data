@@ -1,9 +1,9 @@
 {
   "comment": "Canonical series catalog. One row per (concept, geography level/id/vintage, entity) identity. UUID authority is the append-only ledger/series_uuid_registry.jsonl (digest below): a uuid is minted once, inherited from the registry on every regeneration, and changes only through explicit, chained supersede/retire/revive/succeeds events recorded there (live bindings and rows stay in bijection). Consumers reference series by uuid or concept only. Regenerate with scripts/build_series_catalog.py; verify with --check. Aliases are curated identity statements (plus observed spellings of the same identity) and inherit only within one (geography, entity) slice; aliases listed in ambiguous_aliases match multiple rows and never drive inheritance. source_concepts are publisher labels — provenance, never identity. Cross-spelling and cross-vintage merges are manual curation: delete the absorbed row, alias its concept on the survivor, regenerate with --allow-remint.",
   "generator_version": 3,
-  "observations_sha256": "d388a2a159b006c5cb732db5ac769a51a0566986c5e4e29f361fdbd559e94004",
-  "observation_rows": 211,
-  "current_assertion_rows": 211,
+  "observations_sha256": "8469662c93057ee572dab3323a069f0142d443beb341d7be6447087f2ae48ebc",
+  "observation_rows": 212,
+  "current_assertion_rows": 212,
   "docket_seed_sha256": "5914192517350e0166045afd9064a515ea312acbea1844d9cb594cc9f525dbb9",
   "uuid_registry_sha256": "d49127b51e3b7d21ed491957d4e8704483bc10af4f64c141fe20af98569eefd5",
   "suspect_segments": [
@@ -231,6 +231,9 @@
     ],
     "week_2026-08-08": [
       "dol.eta.continued_claims.sa",
+      "us.dol.initial_claims.sa"
+    ],
+    "week_2026-08-15": [
       "us.dol.initial_claims.sa"
     ],
     "week_2026_06_13": [
@@ -7110,8 +7113,8 @@
         "us.dol.initial_claims.sa.{P}"
       ],
       "first_observed_period": "2026-06-20",
-      "last_observed_period": "2026-08-08",
-      "observation_count": 7
+      "last_observed_period": "2026-08-15",
+      "observation_count": 8
     },
     {
       "uuid": "830e68bb-9ed6-493c-a8a4-440ba8e53f76",
