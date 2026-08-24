@@ -637,6 +637,53 @@ def test_uk_firms_cross_tab_targets_resolve_through_dimensions_selector(tmp_path
     )
 
 
+def test_dimensions_selector_mapping_matches_dimension_values():
+    profile = target_profile_from_mapping(
+        {
+            "schema_version": "policyengine_ledger.target_profile.v1",
+            "profile_id": "uk_firms_dimension_value_smoke",
+            "country": "uk",
+            "label": "UK firms dimension value smoke profile",
+            "defaults": {
+                "base_period_policy": "latest_not_after_build_base_period",
+                "operation": "sum",
+            },
+            "targets": [
+                {
+                    "target_id": "ons.uk_business.enterprise_count.sic_a_turnover_0_99k",
+                    "family": "uk_firms",
+                    "geography_levels": ["country"],
+                    "chronicle_selector": {
+                        "record_set_id": (
+                            "ons.uk_business.cy2025.enterprise_count."
+                            "by_sic_turnover_band"
+                        ),
+                        "dimensions": {
+                            "uk.firm.sic_code": "A",
+                            "uk.firm.turnover_band": "0_99k",
+                        },
+                    },
+                    "measurement": {"unit": "count"},
+                    "bindings": {
+                        "microcosm": {
+                            "metric_name": "ons.uk_business.enterprise_count"
+                        },
+                    },
+                },
+            ],
+        }
+    )
+
+    report = resolve_profile_targets(
+        profile,
+        _uk_firms_crosstab_rows(),
+        {"type": "calendar_year", "value": 2025},
+    )
+
+    assert report.valid
+    assert [row.value for row in report.resolved] == [1200]
+
+
 def _rewrite_facts_file(out_dir, rows):
     facts_file = out_dir / "consumer_facts.jsonl"
     facts_file.write_text(
@@ -651,7 +698,9 @@ def _rewrite_facts_file(out_dir, rows):
 def test_artifact_load_rejects_row_missing_required_field(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
 
     rows = _rows()
     del rows[0]["observed_measure"]["unit"]
@@ -664,7 +713,9 @@ def test_artifact_load_rejects_row_missing_required_field(tmp_path):
 def test_artifact_load_rejects_unknown_extra_field(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
 
     rows = _rows()
     rows[0]["unexpected_field"] = "surprise"
@@ -677,7 +728,9 @@ def test_artifact_load_rejects_unknown_extra_field(tmp_path):
 def test_artifact_load_rejects_unknown_schema_sha256(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
 
     manifest_path = out_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
@@ -691,7 +744,9 @@ def test_artifact_load_rejects_unknown_schema_sha256(tmp_path):
 def test_artifact_load_rejects_tampered_profile(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
 
     profile_file = out_dir / "profiles" / "test_profile.json"
     tampered = profile_file.read_bytes().replace(b"Test profile", b"Xest profile", 1)
@@ -705,7 +760,9 @@ def test_artifact_load_rejects_tampered_profile(tmp_path):
 def test_artifact_load_accepts_legacy_profile_hash_only_via_explicit_path(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
 
     profile_file = out_dir / "profiles" / "test_profile.json"
     profile_bytes = profile_file.read_bytes()
@@ -746,14 +803,14 @@ def test_artifact_build_rejects_duplicate_aggregate_fact_key(tmp_path):
 def _build_and_load_with_row_mutation(tmp_path, mutate):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
     facts_file = out_dir / "consumer_facts.jsonl"
     lines = [ln for ln in facts_file.read_text().splitlines() if ln.strip()]
     rows = [json.loads(ln) for ln in lines]
     mutate(rows)
-    facts_file.write_text(
-        "".join(json.dumps(r, sort_keys=True) + "\n" for r in rows)
-    )
+    facts_file.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows))
     # Re-point the manifest facts hash so the row checks (not the file hash) fire.
     import hashlib as _hashlib
 
@@ -786,7 +843,9 @@ def test_load_rejects_a_forged_all_zero_identity_key(tmp_path):
 def test_load_rejects_a_non_finite_number(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
     facts_file = out_dir / "consumer_facts.jsonl"
     lines = [ln for ln in facts_file.read_text().splitlines() if ln.strip()]
     # Inject a raw NaN token that json.loads would otherwise accept.
@@ -807,7 +866,9 @@ def test_load_rejects_a_non_finite_number(tmp_path):
 def test_load_rejects_a_false_manifest_row_count(tmp_path):
     facts_path, profile_path = _write_artifact_inputs(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(out_dir, facts_path=facts_path, profile_paths=[profile_path])
+    build_consumer_artifact(
+        out_dir, facts_path=facts_path, profile_paths=[profile_path]
+    )
     manifest_path = out_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     manifest["fact_row_count"] = 999
@@ -965,9 +1026,7 @@ def test_allow_source_projection_resolves_the_observation_on_a_period_tie():
     (row,) = report.resolved
     assert row.assertion == "observation"
     assert row.value == 130
-    (issue,) = [
-        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
-    ]
+    (issue,) = [i for i in report.issues if i.code == "ambiguous_assertion_at_period"]
     assert issue.severity == "warning"
     assert not [i for i in report.issues if i.code == "resolved_from_projection"]
 
@@ -991,9 +1050,7 @@ def test_explicit_assertion_selector_reaches_the_projection_despite_a_tie():
     assert row.assertion == "source_projection"
     assert row.value == 120
     assert [i for i in report.issues if i.code == "resolved_from_projection"]
-    assert not [
-        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
-    ]
+    assert not [i for i in report.issues if i.code == "ambiguous_assertion_at_period"]
 
 
 def test_assertion_tie_break_is_scoped_to_the_series():

@@ -1,0 +1,19 @@
+source_id: ons
+package_id: ons-households-by-type-country-2025
+dataset: ons_ons-households-by-type-country-2025
+source_page: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/householdsbytypeofhouseholdandfamilyregionsofenglandandgbconstituentcountries
+table: 'Households by type of household and family, regions of England and GB
+  constituent countries: Scotland worksheet'
+files:
+  2025:
+    filename: householdsbyregionscountries2025.xlsx
+    source_url: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/householdsbytypeofhouseholdandfamilyregionsofenglandandgbconstituentcountries/current/householdsbyregionscountries2025.xlsx
+    sha256: 42073679190e7e93f56b1cd9b03d53125060c017e795a07d2c8fbb4887b96a10
+    size_bytes: 249435
+    fetched_at: '2026-08-24T00:00:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/ons/ons-households-by-type-country-2025/2025/42073679190e7e93f56b1cd9b03d53125060c017e795a07d2c8fbb4887b96a10/householdsbyregionscountries2025.xlsx
+        uri: r2://ledger-raw/raw/ons/ons-households-by-type-country-2025/2025/42073679190e7e93f56b1cd9b03d53125060c017e795a07d2c8fbb4887b96a10/householdsbyregionscountries2025.xlsx

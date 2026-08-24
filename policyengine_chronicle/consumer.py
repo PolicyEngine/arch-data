@@ -297,16 +297,12 @@ def resolve_profile_targets(
             )
             continue
 
-        assertion_policy = (
-            target.assertion_policy or profile.default_assertion_policy
-        )
+        assertion_policy = target.assertion_policy or profile.default_assertion_policy
         if "assertion" in target.chronicle_selector:
             # An explicit assertion selector is maximal author intent; the
             # policy governs only targets that do not select on assertion.
             assertion_policy = "allow_source_projection"
-        observed = [
-            row for row in candidates if row["assertion"] == "observation"
-        ]
+        observed = [row for row in candidates if row["assertion"] == "observation"]
         if assertion_policy == "observed_only":
             if not observed:
                 issues.append(
@@ -548,14 +544,23 @@ def _select_rows(
         row
         for row in rows
         if row.get("geography", {}).get("level") == geography_level
-        and all(
-            _selector_matches(row, key, value) for key, value in selector.items()
-        )
+        and all(_selector_matches(row, key, value) for key, value in selector.items())
     ]
     return matched, issues
 
 
 def _selector_matches(row: Mapping[str, Any], key: str, value: Any) -> bool:
+    if key == "dimensions":
+        dimensions = dict(row.get("dimensions", {}))
+        if isinstance(value, Mapping):
+            return all(
+                dimensions.get(name) == expected for name, expected in value.items()
+            )
+        if isinstance(value, list):
+            # Dimension-identity selectors match order-insensitively on the
+            # exact set of dimension variable names the row carries.
+            return sorted(dimensions) == sorted(value)
+        return False
     actual = _selector_value(row, key)
     if isinstance(actual, list):
         # Dimension-identity selectors match order-insensitively on the exact
@@ -606,18 +611,14 @@ def _choose_period(
     candidates: Sequence[Mapping[str, Any]],
     requested: dict[str, Any],
 ) -> tuple[dict[str, Any], None] | tuple[None, ResolutionIssue]:
-    periods = {
-        (row["period"]["type"], row["period"]["value"]) for row in candidates
-    }
+    periods = {(row["period"]["type"], row["period"]["value"]) for row in candidates}
     if (requested["type"], requested["value"]) in periods:
         return requested, None
 
     same_type = {
         value for period_type, value in periods if period_type == requested["type"]
     }
-    eligible = [
-        value for value in same_type if _not_after(value, requested["value"])
-    ]
+    eligible = [value for value in same_type if _not_after(value, requested["value"])]
     if eligible:
         return {"type": requested["type"], "value": _latest(eligible)}, None
 
@@ -754,9 +755,7 @@ class ConsumerArtifact:
         requested_period: Mapping[str, Any],
         *,
         alignments: (
-            Mapping[str, PeriodAlignmentDeclaration]
-            | PeriodAlignmentDeclaration
-            | None
+            Mapping[str, PeriodAlignmentDeclaration] | PeriodAlignmentDeclaration | None
         ) = None,
         geography_level: str = "country",
         strict: bool = True,
