@@ -84,6 +84,7 @@ SOURCE_PACKAGE_ALIASES = {
         "bea/regional_personal_income_state"
     ),
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
+    "hmrc-cgt-size-of-gain-2025": Path("hmrc/cgt_size_of_gain_2025"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
     "hmrc-salary-sacrifice-relief-2024-25": Path(
@@ -348,6 +349,7 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-public-sector-employment-2026": Path("ons/public_sector_employment_2026"),
     "ons-savings-interest-income": Path("ons/savings_interest_income"),
     "ons-families-households-2025": Path("ons/families_households_2025"),
+    "ons-households-by-type-country-2025": Path("ons/households_by_type_country_2025"),
     "ons-pipr-private-rent-march-2026": Path("ons/pipr_private_rent_march_2026"),
     "ons-uk-business-firm-targets-2025": Path("ons/uk_business_firm_targets_2025"),
     "ons-uk-business-firm-sector-targets-2025": Path(
