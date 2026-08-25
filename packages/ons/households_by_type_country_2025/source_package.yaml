@@ -59,7 +59,7 @@ record_sets:
     expected_column_header_row: 12
     expected_column_header: 2025 Estimate
     concept: ons.households_by_type
-    source_concept: ons.families_households_table7
+    source_concept: ons.households_by_type_regions_countries_table7
     concept_relation: source_label
     concept_authority: ons
     concept_evidence_url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/householdsbytypeofhouseholdandfamilyregionsofenglandandgbconstituentcountries

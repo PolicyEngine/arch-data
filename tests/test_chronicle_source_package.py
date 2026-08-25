@@ -3880,7 +3880,9 @@ def test_ons_households_by_type_country_package_builds_scotland_microcosm_target
     assert fact.geography.id == "S92000003"
     assert fact.geography.name == "Scotland"
     assert fact.measure.concept == "ons.households_by_type"
-    assert fact.measure.source_concept == "ons.families_households_table7"
+    assert (
+        fact.measure.source_concept == "ons.households_by_type_regions_countries_table7"
+    )
     assert fact.filters == {"household_type": "couple_3_plus_children_households"}
 
     profile = target_profile_from_mapping(
@@ -3906,7 +3908,9 @@ def test_ons_households_by_type_country_package_builds_scotland_microcosm_target
                             "ons.households_by_type_country_2025."
                             "scotland.table7.cy2025.v1"
                         ),
-                        "concept": "ons.households_by_type",
+                        "source_concept": (
+                            "ons.households_by_type_regions_countries_table7"
+                        ),
                         "dimensions": {
                             "household_type": ("couple_3_plus_children_households")
                         },

@@ -637,7 +637,7 @@ def test_uk_firms_cross_tab_targets_resolve_through_dimensions_selector(tmp_path
     )
 
 
-def test_dimensions_selector_mapping_matches_dimension_values():
+def _uk_firms_dimension_value_profile(dimensions_selector):
     profile = target_profile_from_mapping(
         {
             "schema_version": "policyengine_ledger.target_profile.v1",
@@ -658,10 +658,7 @@ def test_dimensions_selector_mapping_matches_dimension_values():
                             "ons.uk_business.cy2025.enterprise_count."
                             "by_sic_turnover_band"
                         ),
-                        "dimensions": {
-                            "uk.firm.sic_code": "A",
-                            "uk.firm.turnover_band": "0_99k",
-                        },
+                        "dimensions": dimensions_selector,
                     },
                     "measurement": {"unit": "count"},
                     "bindings": {
@@ -673,6 +670,16 @@ def test_dimensions_selector_mapping_matches_dimension_values():
             ],
         }
     )
+    return profile
+
+
+def test_dimensions_selector_mapping_matches_dimension_values():
+    profile = _uk_firms_dimension_value_profile(
+        {
+            "uk.firm.sic_code": "A",
+            "uk.firm.turnover_band": "0_99k",
+        }
+    )
 
     report = resolve_profile_targets(
         profile,
@@ -682,6 +689,80 @@ def test_dimensions_selector_mapping_matches_dimension_values():
 
     assert report.valid
     assert [row.value for row in report.resolved] == [1200]
+
+
+def test_dimensions_selector_mapping_requires_exact_dimension_values():
+    profile = _uk_firms_dimension_value_profile({"uk.firm.sic_code": "A"})
+
+    with pytest.raises(ValueError, match="matched no consumer fact rows"):
+        resolve_profile_targets(
+            profile,
+            _uk_firms_crosstab_rows(),
+            {"type": "calendar_year", "value": 2025},
+        )
+
+    report = resolve_profile_targets(
+        profile,
+        _uk_firms_crosstab_rows(),
+        {"type": "calendar_year", "value": 2025},
+        strict=False,
+    )
+
+    assert not report.valid
+    assert [issue.code for issue in report.issues] == ["no_matching_facts"]
+
+
+def test_dimensions_selector_mapping_rejects_empty_mapping():
+    profile = _uk_firms_dimension_value_profile({})
+
+    with pytest.raises(ValueError, match="empty 'dimensions' mapping"):
+        resolve_profile_targets(
+            profile,
+            _uk_firms_crosstab_rows(),
+            {"type": "calendar_year", "value": 2025},
+        )
+
+    report = resolve_profile_targets(
+        profile,
+        _uk_firms_crosstab_rows(),
+        {"type": "calendar_year", "value": 2025},
+        strict=False,
+    )
+
+    assert not report.valid
+    assert [issue.code for issue in report.issues] == [
+        "empty_dimensions_selector",
+        "no_matching_facts",
+    ]
+
+
+def test_dimensions_selector_mapping_rejects_unknown_dimension_names():
+    profile = _uk_firms_dimension_value_profile(
+        {
+            "uk.firm.sic_cod": "A",
+            "uk.firm.turnover_band": "0_99k",
+        }
+    )
+
+    with pytest.raises(ValueError, match="unknown dimensions"):
+        resolve_profile_targets(
+            profile,
+            _uk_firms_crosstab_rows(),
+            {"type": "calendar_year", "value": 2025},
+        )
+
+    report = resolve_profile_targets(
+        profile,
+        _uk_firms_crosstab_rows(),
+        {"type": "calendar_year", "value": 2025},
+        strict=False,
+    )
+
+    assert not report.valid
+    assert [issue.code for issue in report.issues] == [
+        "unknown_dimension_selector",
+        "no_matching_facts",
+    ]
 
 
 def _rewrite_facts_file(out_dir, rows):

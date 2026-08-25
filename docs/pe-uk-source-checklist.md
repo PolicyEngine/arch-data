@@ -97,8 +97,10 @@ Microcosm can select the new rows by `record_set_spec_id`, `source_concept` or
 
 - `hmrc-cgt-size-of-gain-2025`: `hmrc.cgt_gains_individuals` for
   `cgt_gain_band = gain_12300_to_24999`, TY2023.
-- `ons-households-by-type-country-2025`: `ons.households_by_type` for
-  `household_type = couple_3_plus_children_households`, Scotland, CY2025.
+- `ons-households-by-type-country-2025`: `source_concept`
+  `ons.households_by_type_regions_countries_table7` and canonical `concept`
+  `ons.households_by_type` for `household_type` =
+  `couple_3_plus_children_households`, Scotland, CY2025.
 
 The #196 benefit-cap annual reduction, salary-sacrifice contribution base, and
 housing aggregate totals are not Chronicle facts unless a publisher emits those

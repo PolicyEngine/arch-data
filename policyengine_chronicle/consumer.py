@@ -540,27 +540,70 @@ def _select_rows(
             )
         )
         return [], issues
+    geography_matched = [
+        row for row in rows if row.get("geography", {}).get("level") == geography_level
+    ]
+    non_dimension_selector = {
+        key: value for key, value in selector.items() if key != "dimensions"
+    }
     matched = [
         row
-        for row in rows
-        if row.get("geography", {}).get("level") == geography_level
-        and all(_selector_matches(row, key, value) for key, value in selector.items())
+        for row in geography_matched
+        if all(
+            _selector_matches(row, key, value)
+            for key, value in non_dimension_selector.items()
+        )
     ]
-    return matched, issues
+    if "dimensions" not in selector:
+        return matched, issues
+
+    dimension_selector = selector["dimensions"]
+    if isinstance(dimension_selector, Mapping):
+        if not dimension_selector:
+            issues.append(
+                ResolutionIssue(
+                    code="empty_dimensions_selector",
+                    message=(
+                        f"Target {target.target_id!r} selector has an empty "
+                        "'dimensions' mapping; dimension-value selectors must "
+                        "name at least one dimension."
+                    ),
+                    profile_id=profile_id,
+                    target_id=target.target_id,
+                )
+            )
+            return [], issues
+        if matched:
+            available = sorted(
+                {name for row in matched for name in dict(row.get("dimensions", {}))}
+            )
+            unknown_dimensions = sorted(set(dimension_selector) - set(available))
+            if unknown_dimensions:
+                issues.append(
+                    ResolutionIssue(
+                        code="unknown_dimension_selector",
+                        message=(
+                            f"Target {target.target_id!r} selector has unknown "
+                            f"dimensions {unknown_dimensions}; available "
+                            f"dimensions after other selectors: {available}."
+                        ),
+                        profile_id=profile_id,
+                        target_id=target.target_id,
+                    )
+                )
+                return [], issues
+
+    return [
+        row
+        for row in matched
+        if _selector_matches(row, "dimensions", dimension_selector)
+    ], issues
 
 
 def _selector_matches(row: Mapping[str, Any], key: str, value: Any) -> bool:
-    if key == "dimensions":
+    if key == "dimensions" and isinstance(value, Mapping):
         dimensions = dict(row.get("dimensions", {}))
-        if isinstance(value, Mapping):
-            return all(
-                dimensions.get(name) == expected for name, expected in value.items()
-            )
-        if isinstance(value, list):
-            # Dimension-identity selectors match order-insensitively on the
-            # exact set of dimension variable names the row carries.
-            return sorted(dimensions) == sorted(value)
-        return False
+        return dimensions == dict(value)
     actual = _selector_value(row, key)
     if isinstance(actual, list):
         # Dimension-identity selectors match order-insensitively on the exact
