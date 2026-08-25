@@ -1,11 +1,11 @@
 {
   "comment": "Canonical series catalog. One row per (concept, geography level/id/vintage, entity) identity. UUID authority is the append-only ledger/series_uuid_registry.jsonl (digest below): a uuid is minted once, inherited from the registry on every regeneration, and changes only through explicit, chained supersede/retire/revive/succeeds events recorded there (live bindings and rows stay in bijection). Consumers reference series by uuid or concept only. Regenerate with scripts/build_series_catalog.py; verify with --check. Aliases are curated identity statements (plus observed spellings of the same identity) and inherit only within one (geography, entity) slice; aliases listed in ambiguous_aliases match multiple rows and never drive inheritance. source_concepts are publisher labels — provenance, never identity. Cross-spelling and cross-vintage merges are manual curation: delete the absorbed row, alias its concept on the survivor, regenerate with --allow-remint.",
   "generator_version": 3,
-  "observations_sha256": "8469662c93057ee572dab3323a069f0142d443beb341d7be6447087f2ae48ebc",
-  "observation_rows": 212,
-  "current_assertion_rows": 212,
+  "observations_sha256": "73aa8f6ff16858ddd518d3fb1eae01d0fdc63dba15f00cfce49d16b4684b013d",
+  "observation_rows": 213,
+  "current_assertion_rows": 213,
   "docket_seed_sha256": "5914192517350e0166045afd9064a515ea312acbea1844d9cb594cc9f525dbb9",
-  "uuid_registry_sha256": "d49127b51e3b7d21ed491957d4e8704483bc10af4f64c141fe20af98569eefd5",
+  "uuid_registry_sha256": "0d9d893f4fc922650b897a5b250fbbb291e9db89ec23bb6246ca8e69ebb48fea",
   "suspect_segments": [
     "LNU02374597"
   ],
@@ -80,6 +80,7 @@
       "bls.export_prices.all_commodities_mom",
       "census.housing.completions_saar",
       "census.housing.permits_saar",
+      "census.new_residential_sales.new_single_family_houses_sold_saar",
       "fed.g17.capacity_utilization.manufacturing",
       "fed.g17.manufacturing_production_mom"
     ],
@@ -2830,20 +2831,36 @@
       "uuid": "5654403e-f6c5-412e-94e0-feeda778ad81",
       "concept": "census.new_residential_sales.new_single_family_houses_sold_saar",
       "family_patterns": [
-        "census.new_residential_sales.new_single_family_houses_sold_saar"
+        "census.new_residential_sales.new_single_family_houses_sold_saar.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "thousands",
       "cadence": "month",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "census_new_home_sales"
+      ],
+      "aliases": [
+        "census.new_residential_sales.new_single_family_houses_sold_saar.2026_07"
+      ],
+      "source_concepts": [
+        "HSN1F"
+      ],
+      "rid_patterns": [
+        "census.new_residential_sales.new_single_family_houses_sold_saar.{P}.first_print"
+      ],
+      "first_observed_period": "2026-07",
+      "last_observed_period": "2026-07",
+      "observation_count": 1
     },
     {
       "uuid": "37841d30-5bd6-42a0-aea7-fc7b6d32dbcc",
