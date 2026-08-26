@@ -1,0 +1,19 @@
+source_id: hmrc
+package_id: hmrc-cgt-gain-by-income-2025
+dataset: hmrc_hmrc-cgt-gain-by-income-2025
+source_page: https://www.gov.uk/government/statistics/capital-gains-tax-statistics
+table: 'Capital Gains Tax statistics Table 3.1: individual taxpayers and gains by size of gain and taxable
+  income, 2023-24'
+files:
+  2025:
+    filename: Table_3_2025_Size_of_gain_by_income.ods
+    source_url: https://assets.publishing.service.gov.uk/media/6878ac62760bf6cedaf5bd93/Table_3_2025_Size_of_gain_by_income.ods
+    sha256: 8e75c00bab949348a7238fea6d995f626c85e5d02813b46606dd7fea85e9d0c3
+    size_bytes: 11996
+    fetched_at: '2026-08-26T00:00:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/hmrc/hmrc-cgt-gain-by-income-2025/2025/8e75c00bab949348a7238fea6d995f626c85e5d02813b46606dd7fea85e9d0c3/Table_3_2025_Size_of_gain_by_income.ods
+        uri: r2://ledger-raw/raw/hmrc/hmrc-cgt-gain-by-income-2025/2025/8e75c00bab949348a7238fea6d995f626c85e5d02813b46606dd7fea85e9d0c3/Table_3_2025_Size_of_gain_by_income.ods

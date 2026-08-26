@@ -38,7 +38,10 @@ UK_BUNDLE_SOURCE_PREFIXES = (
 )
 UK_BUNDLE_SOURCES = (
     "dfc-ni-uc-statistics-may-2025",
+    "dft-bus0415-fares-index-2026",
+    "dft-bus05i-revenue-support-2025",
     "dft-nts-vehicle-ownership-2024",
+    "dft-nts0705-local-bus-trips-2024",
     "dwp-benefit-cap-november-2025",
     "dwp-benefit-statistics-february-2026",
     "dwp-pip-daily-living-foi-2025",
@@ -55,6 +58,9 @@ UK_BUNDLE_SOURCES = (
     "dwp-uc-payment-distribution-may-2025",
     "dwp-uc-scotland-youngest-child-may-2025",
     "dwp-uc-two-child-limit-2025",
+    "hmrc-cgt-age-2025",
+    "hmrc-cgt-country-region-2025",
+    "hmrc-cgt-gain-by-income-2025",
     "hmrc-cgt-size-of-gain-2025",
     "hmrc-cgt-statistics-2025",
     "hmrc-salary-sacrifice-reform-2029-headcounts",

@@ -1,0 +1,19 @@
+source_id: hmrc
+package_id: hmrc-cgt-country-region-2025
+dataset: hmrc_hmrc-cgt-country-region-2025
+source_page: https://www.gov.uk/government/statistics/capital-gains-tax-statistics
+table: 'Capital Gains Tax statistics Table 5.1: taxpayers, gains and liabilities by UK country and region,
+  2023-24'
+files:
+  2025:
+    filename: Table_5_2025_Regional_and_country_statistics.ods
+    source_url: https://assets.publishing.service.gov.uk/media/6878ac7c760bf6cedaf5bd95/Table_5_2025_Regional_and_country_statistics.ods
+    sha256: 4e9a064ac51e0e88f7608fea3a62ed7293c4089bf948fef043784331c7187b05
+    size_bytes: 7439
+    fetched_at: '2026-08-26T00:00:00+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/hmrc/hmrc-cgt-country-region-2025/2025/4e9a064ac51e0e88f7608fea3a62ed7293c4089bf948fef043784331c7187b05/Table_5_2025_Regional_and_country_statistics.ods
+        uri: r2://ledger-raw/raw/hmrc/hmrc-cgt-country-region-2025/2025/4e9a064ac51e0e88f7608fea3a62ed7293c4089bf948fef043784331c7187b05/Table_5_2025_Regional_and_country_statistics.ods
