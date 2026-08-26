@@ -1,9 +1,9 @@
 {
   "comment": "Canonical series catalog. One row per (concept, geography level/id/vintage, entity) identity. UUID authority is the append-only ledger/series_uuid_registry.jsonl (digest below): a uuid is minted once, inherited from the registry on every regeneration, and changes only through explicit, chained supersede/retire/revive/succeeds events recorded there (live bindings and rows stay in bijection). Consumers reference series by uuid or concept only. Regenerate with scripts/build_series_catalog.py; verify with --check. Aliases are curated identity statements (plus observed spellings of the same identity) and inherit only within one (geography, entity) slice; aliases listed in ambiguous_aliases match multiple rows and never drive inheritance. source_concepts are publisher labels — provenance, never identity. Cross-spelling and cross-vintage merges are manual curation: delete the absorbed row, alias its concept on the survivor, regenerate with --allow-remint.",
   "generator_version": 3,
-  "observations_sha256": "73aa8f6ff16858ddd518d3fb1eae01d0fdc63dba15f00cfce49d16b4684b013d",
-  "observation_rows": 213,
-  "current_assertion_rows": 213,
+  "observations_sha256": "f30824fd17f604b5f010fe0055b183fe01be8aca8783d6744c3d981f215e884c",
+  "observation_rows": 215,
+  "current_assertion_rows": 215,
   "docket_seed_sha256": "5914192517350e0166045afd9064a515ea312acbea1844d9cb594cc9f525dbb9",
   "uuid_registry_sha256": "0d9d893f4fc922650b897a5b250fbbb291e9db89ec23bb6246ca8e69ebb48fea",
   "suspect_segments": [
@@ -80,6 +80,8 @@
       "bls.export_prices.all_commodities_mom",
       "census.housing.completions_saar",
       "census.housing.permits_saar",
+      "census.m3.durable_goods_new_orders_mom",
+      "census.m3.durable_goods_shipments_mom",
       "census.new_residential_sales.new_single_family_houses_sold_saar",
       "fed.g17.capacity_utilization.manufacturing",
       "fed.g17.manufacturing_production_mom"
@@ -2710,7 +2712,8 @@
         "census_m3"
       ],
       "aliases": [
-        "census.m3.durable_goods_new_orders_mom.2026_06"
+        "census.m3.durable_goods_new_orders_mom.2026_06",
+        "census.m3.durable_goods_new_orders_mom.2026_07"
       ],
       "source_concepts": [
         "DGORDER"
@@ -2719,8 +2722,8 @@
         "census.m3.durable_goods_new_orders_mom.{P}.first_print"
       ],
       "first_observed_period": "2026-06",
-      "last_observed_period": "2026-06",
-      "observation_count": 1
+      "last_observed_period": "2026-07",
+      "observation_count": 2
     },
     {
       "uuid": "5cbc4c1a-e387-4b64-bb56-67ef349fbd51",
@@ -2745,7 +2748,8 @@
         "census_m3"
       ],
       "aliases": [
-        "census.m3.durable_goods_shipments_mom.2026_06"
+        "census.m3.durable_goods_shipments_mom.2026_06",
+        "census.m3.durable_goods_shipments_mom.2026_07"
       ],
       "source_concepts": [
         "AMDMVS"
@@ -2754,8 +2758,8 @@
         "census.m3.durable_goods_shipments_mom.{P}.first_print"
       ],
       "first_observed_period": "2026-06",
-      "last_observed_period": "2026-06",
-      "observation_count": 1
+      "last_observed_period": "2026-07",
+      "observation_count": 2
     },
     {
       "uuid": "ed3215ed-43ec-44dc-b11c-f72a098fc008",
