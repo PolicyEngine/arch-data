@@ -469,6 +469,60 @@ def test_dwp_uc_childcare_element_package_preserves_monthly_publisher_series():
     assert len(consumer_fact_rows(facts)) == len(facts)
 
 
+def test_dfc_ni_uc_statistics_package_ports_may_2025_area_totals():
+    package = load_source_package("dfc-ni-uc-statistics-may-2025")
+    facts = package.build_facts(2025)
+    values = {fact.geography.id: fact.value for fact in facts}
+
+    assert len(facts) == 29
+    assert values["N05000001"] == 11_850
+    assert values["N05000018"] == 12_140
+    assert values["N09000003"] == 53_450
+    assert values["N09000011"] == 15_320
+    assert {
+        fact.layout.record_set_spec_id
+        for fact in facts
+    } == {
+        "uk.local_geography.uc_households.by_constituency.v1",
+        "uk.local_geography.uc_households.by_local_authority.v1",
+    }
+    assert all(fact.source.source_name == "dfc_ni" for fact in facts)
+    assert all(fact.measure.concept == "dwp.uc_households" for fact in facts)
+    assert all(fact.measure.source_concept == "dfc_ni.uc_claimants" for fact in facts)
+    assert all(fact.measure.concept_relation == "approximate" for fact in facts)
+    assert all(fact.period.value == "2025-05" for fact in facts)
+    assert all(fact.measure.unit == "count" for fact in facts)
+    assert all(fact.provenance_class == "administrative" for fact in facts)
+    assert validate_consumer_fact_contract(facts).valid
+
+
+def test_ons_pipr_area_package_emits_2025_local_authority_months():
+    package = load_source_package("ons-pipr-rents-by-area-june-2026")
+    facts = package.build_facts(2026)
+    counts_by_period = {}
+    for fact in facts:
+        counts_by_period[fact.period.value] = counts_by_period.get(
+            fact.period.value,
+            0,
+        ) + 1
+
+    assert len(facts) == 4_140
+    assert counts_by_period["2026-06"] == 348
+    assert {
+        counts_by_period[f"2025-{month:02d}"] for month in range(1, 13)
+    } == {316}
+    assert {
+        fact.geography.level
+        for fact in facts
+        if str(fact.period.value).startswith("2025-")
+    } == {"local_authority"}
+    assert all(
+        fact.measure.concept == "ons.pipr_average_monthly_rent"
+        for fact in facts
+    )
+    assert validate_consumer_fact_contract(facts).valid
+
+
 @pytest.mark.parametrize(
     ("alias", "concept", "april_value", "december_value"),
     [

@@ -1,0 +1,1354 @@
+# Department for Communities Northern Ireland Universal Credit Statistics,
+# May 2025 supplementary tables. Sheets 5b and 5c are labelled
+# "Claimants" by the publisher; policyengine-uk-data uses these area
+# series as the Northern Ireland leg of its UC household targets, and
+# Chronicle records that approximation at measure-concept level.
+schema_version: ledger.source_package.v1
+package_id: dfc-ni-uc-statistics-may-2025
+label: DfC Northern Ireland Universal Credit claimants by local area, May 2025
+artifact:
+  source_name: dfc_ni
+  source_table: Universal Credit Statistics supplementary tables, May 2025
+  resource_package: db
+  resource_directory: data/dfc_ni/uc_statistics_may_2025
+  manifest: manifest.yaml
+  vintage: uc_statistics_may_2025
+  extracted_at: '2026-08-26'
+  extraction_method: ODS workbook used-range parse of supplementary tables
+  parser: ods_used_range
+  artifact_year: 2025
+record_sets:
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000001
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000001
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: B
+    source_column_id: Belfast East
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Belfast East
+  rows:
+  - value_id: n05000001
+    label: Belfast East
+    ordinal: 0
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000001
+    geography_level: constituency
+    geography_name: Belfast East
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000002
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000002
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: C
+    source_column_id: Belfast North
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Belfast North
+  rows:
+  - value_id: n05000002
+    label: Belfast North
+    ordinal: 1
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000002
+    geography_level: constituency
+    geography_name: Belfast North
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000003
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000003
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: D
+    source_column_id: Belfast South and Mid Down
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Belfast South and Mid Down
+  rows:
+  - value_id: n05000003
+    label: Belfast South and Mid Down
+    ordinal: 2
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000003
+    geography_level: constituency
+    geography_name: Belfast South and Mid Down
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000004
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000004
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: E
+    source_column_id: Belfast West
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Belfast West
+  rows:
+  - value_id: n05000004
+    label: Belfast West
+    ordinal: 3
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000004
+    geography_level: constituency
+    geography_name: Belfast West
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000005
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000005
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: F
+    source_column_id: East Antrim
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: East Antrim
+  rows:
+  - value_id: n05000005
+    label: East Antrim
+    ordinal: 4
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000005
+    geography_level: constituency
+    geography_name: East Antrim
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000006
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000006
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: G
+    source_column_id: East Londonderry
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: East Londonderry
+  rows:
+  - value_id: n05000006
+    label: East Londonderry
+    ordinal: 5
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000006
+    geography_level: constituency
+    geography_name: East Londonderry
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000007
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000007
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: H
+    source_column_id: Fermanagh and South Tyrone
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Fermanagh and South Tyrone
+  rows:
+  - value_id: n05000007
+    label: Fermanagh and South Tyrone
+    ordinal: 6
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000007
+    geography_level: constituency
+    geography_name: Fermanagh and South Tyrone
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000008
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000008
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: I
+    source_column_id: Foyle
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Foyle
+  rows:
+  - value_id: n05000008
+    label: Foyle
+    ordinal: 7
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000008
+    geography_level: constituency
+    geography_name: Foyle
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000009
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000009
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: J
+    source_column_id: Lagan Valley
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Lagan Valley
+  rows:
+  - value_id: n05000009
+    label: Lagan Valley
+    ordinal: 8
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000009
+    geography_level: constituency
+    geography_name: Lagan Valley
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000010
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000010
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: K
+    source_column_id: Mid Ulster
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Mid Ulster
+  rows:
+  - value_id: n05000010
+    label: Mid Ulster
+    ordinal: 9
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000010
+    geography_level: constituency
+    geography_name: Mid Ulster
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000011
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000011
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: L
+    source_column_id: Newry and Armagh
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Newry and Armagh
+  rows:
+  - value_id: n05000011
+    label: Newry and Armagh
+    ordinal: 10
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000011
+    geography_level: constituency
+    geography_name: Newry and Armagh
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000012
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000012
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: M
+    source_column_id: North Antrim
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: North Antrim
+  rows:
+  - value_id: n05000012
+    label: North Antrim
+    ordinal: 11
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000012
+    geography_level: constituency
+    geography_name: North Antrim
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000013
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000013
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: N
+    source_column_id: North Down
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: North Down
+  rows:
+  - value_id: n05000013
+    label: North Down
+    ordinal: 12
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000013
+    geography_level: constituency
+    geography_name: North Down
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000014
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000014
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: O
+    source_column_id: South Antrim
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: South Antrim
+  rows:
+  - value_id: n05000014
+    label: South Antrim
+    ordinal: 13
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000014
+    geography_level: constituency
+    geography_name: South Antrim
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000015
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000015
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: P
+    source_column_id: South Down
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: South Down
+  rows:
+  - value_id: n05000015
+    label: South Down
+    ordinal: 14
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000015
+    geography_level: constituency
+    geography_name: South Down
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000016
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000016
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: Q
+    source_column_id: Strangford
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Strangford
+  rows:
+  - value_id: n05000016
+    label: Strangford
+    ordinal: 15
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000016
+    geography_level: constituency
+    geography_name: Strangford
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000017
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000017
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: R
+    source_column_id: Upper Bann
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Upper Bann
+  rows:
+  - value_id: n05000017
+    label: Upper Bann
+    ordinal: 16
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000017
+    geography_level: constituency
+    geography_name: Upper Bann
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_constituency.n05000018
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_constituency.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_constituency.n05000018
+  sheet_name: 5b
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: S
+    source_column_id: West Tyrone
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: West Tyrone
+  rows:
+  - value_id: n05000018
+    label: West Tyrone
+    ordinal: 17
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N05000018
+    geography_level: constituency
+    geography_name: West Tyrone
+    geography_vintage: pcon_2024
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000001
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000001
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: B
+    source_column_id: Antrim and Newtownabbey
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Antrim and Newtownabbey
+  rows:
+  - value_id: n09000001
+    label: Antrim and Newtownabbey
+    ordinal: 0
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000001
+    geography_level: local_authority
+    geography_name: Antrim and Newtownabbey
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000002
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000002
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: C
+    source_column_id: Armagh City, Banbridge and Craigavon
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Armagh City, Banbridge and Craigavon
+  rows:
+  - value_id: n09000002
+    label: Armagh City, Banbridge and Craigavon
+    ordinal: 1
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000002
+    geography_level: local_authority
+    geography_name: Armagh City, Banbridge and Craigavon
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000011
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000011
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: D
+    source_column_id: Ards and North Down
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Ards and North Down
+  rows:
+  - value_id: n09000011
+    label: Ards and North Down
+    ordinal: 2
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000011
+    geography_level: local_authority
+    geography_name: Ards and North Down
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000003
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000003
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: E
+    source_column_id: Belfast
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Belfast
+  rows:
+  - value_id: n09000003
+    label: Belfast
+    ordinal: 3
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000003
+    geography_level: local_authority
+    geography_name: Belfast
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000004
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000004
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: F
+    source_column_id: Causeway Coast and Glens
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Causeway Coast and Glens
+  rows:
+  - value_id: n09000004
+    label: Causeway Coast and Glens
+    ordinal: 4
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000004
+    geography_level: local_authority
+    geography_name: Causeway Coast and Glens
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000005
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000005
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: G
+    source_column_id: Derry City and Strabane
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Derry City and Strabane
+  rows:
+  - value_id: n09000005
+    label: Derry City and Strabane
+    ordinal: 5
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000005
+    geography_level: local_authority
+    geography_name: Derry City and Strabane
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000006
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000006
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: H
+    source_column_id: Fermanagh and Omagh
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Fermanagh and Omagh
+  rows:
+  - value_id: n09000006
+    label: Fermanagh and Omagh
+    ordinal: 6
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000006
+    geography_level: local_authority
+    geography_name: Fermanagh and Omagh
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000007
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000007
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: I
+    source_column_id: Lisburn and Castlereagh
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Lisburn and Castlereagh
+  rows:
+  - value_id: n09000007
+    label: Lisburn and Castlereagh
+    ordinal: 7
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000007
+    geography_level: local_authority
+    geography_name: Lisburn and Castlereagh
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000008
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000008
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: J
+    source_column_id: Mid and East Antrim
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Mid and East Antrim
+  rows:
+  - value_id: n09000008
+    label: Mid and East Antrim
+    ordinal: 8
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000008
+    geography_level: local_authority
+    geography_name: Mid and East Antrim
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000009
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000009
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: K
+    source_column_id: Mid Ulster
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Mid Ulster
+  rows:
+  - value_id: n09000009
+    label: Mid Ulster
+    ordinal: 9
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000009
+    geography_level: local_authority
+    geography_name: Mid Ulster
+    geography_vintage: lgd_2014
+    table_record_kind: total
+- record_set_id: dfc_ni.uc_claimants.may2025.by_local_authority.n09000010
+  provenance_class: administrative
+  record_set_spec_id: uk.local_geography.uc_households.by_local_authority.v1
+  source_record_id_prefix: dfc_ni.uc_claimants.may2025.by_local_authority.n09000010
+  sheet_name: 5c
+  period_type: month
+  period: 2025-05
+  geography_id: N92000002
+  geography_level: country
+  geography_name: Northern Ireland
+  geography_vintage: gss_2021
+  entity: household
+  entity_role: uc_household
+  domain: universal_credit
+  groupby_dimension: geography
+  measures:
+  - measure_id: universal_credit_households
+    label: Universal Credit households
+    ordinal: 0
+    column: L
+    source_column_id: Newry, Mourne and Down
+    concept: dwp.uc_households
+    source_concept: dfc_ni.uc_claimants
+    concept_relation: approximate
+    concept_authority: dfc_ni
+    concept_evidence_url: https://www.communities-ni.gov.uk/publications/universal-credit-statistics-may-2025
+    concept_evidence_notes: DfC supplementary tables 5b and 5c label these area series as
+      claimants. Chronicle uses them for the NI Universal Credit household target to match
+      the incumbent policyengine-uk-data local_uc binding and PolicyEngine/chronicle#200.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    expected_column_header_row: 3
+    expected_column_header: Newry, Mourne and Down
+  rows:
+  - value_id: n09000010
+    label: Newry, Mourne and Down
+    ordinal: 10
+    row_number: 95
+    expected_row_header_column: A
+    expected_row_header: May 2025
+    geography_id: N09000010
+    geography_level: local_authority
+    geography_name: Newry, Mourne and Down
+    geography_vintage: lgd_2014
+    table_record_kind: total

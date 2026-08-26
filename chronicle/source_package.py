@@ -130,6 +130,7 @@ SOURCE_PACKAGE_ALIASES = {
         "fpb/economic_outlook_2026_2031_june_2026"
     ),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
+    "dfc-ni-uc-statistics-may-2025": Path("dfc_ni/uc_statistics_may_2025"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"

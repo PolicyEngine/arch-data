@@ -21,6 +21,7 @@ BUNDLE_COVERAGE_SCHEMA_VERSION = "ledger.bundle_coverage.v1"
 BUNDLE_SOURCES_SCHEMA_VERSION = "ledger.bundle_sources.v1"
 DEFAULT_BUNDLE_SOURCES = tuple(sorted(SOURCE_PACKAGE_ALIASES))
 UK_BUNDLE_SOURCE_PREFIXES = (
+    "dfc_ni",
     "dft",
     "dwp",
     "hmrc",
@@ -36,6 +37,7 @@ UK_BUNDLE_SOURCE_PREFIXES = (
     "welshgov",
 )
 UK_BUNDLE_SOURCES = (
+    "dfc-ni-uc-statistics-may-2025",
     "dft-nts-vehicle-ownership-2024",
     "dwp-benefit-cap-november-2025",
     "dwp-benefit-statistics-february-2026",
