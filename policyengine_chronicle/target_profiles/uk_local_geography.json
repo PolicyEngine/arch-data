@@ -239,7 +239,7 @@
       "target_id": "dwp.universal_credit.households",
       "family": "dwp_universal_credit",
       "geography_levels": ["constituency", "local_authority"],
-      "chronicle_selector": {"source_measure_id": "universal_credit_households"},
+      "chronicle_selector": {"source_name": "dwp", "source_measure_id": "universal_credit_households"},
       "measurement": {"entity": "benunit", "map_to": "household", "concept": "uk.benefit_unit.count", "filters": [{"concept": "uk.benefits.universal_credit.amount", "operator": ">", "value": 0}]},
       "bindings": {
         "policyengine": {"metric_name": "uc_households", "value_variable": "benunit_count", "from_entity": "benunit", "map_to": "household", "filters": [{"variable": "universal_credit", "operator": ">", "value": 0}]},
