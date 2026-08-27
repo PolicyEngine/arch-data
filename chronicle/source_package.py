@@ -137,6 +137,7 @@ SOURCE_PACKAGE_ALIASES = {
     "dft-nts0705-local-bus-trips-2024": Path("dft/nts0705_local_bus_trips_2024"),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
     "dfc-ni-uc-statistics-may-2025": Path("dfc_ni/uc_statistics_may_2025"),
+    "dfc-ni-uc-statistics-may-2026": Path("dfc_ni/uc_statistics_may_2026"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"

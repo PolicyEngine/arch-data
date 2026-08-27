@@ -160,7 +160,7 @@ record_sets:
     divisor_column: D
     round_to: 10000
     concept: dwp.uc_benefit_units
-    source_concept: dwp.uc_households
+    source_concept: dwp.uc_benefit_units
     concept_relation: source_label
     concept_authority: dwp
     concept_evidence_url: https://www.gov.uk/government/statistics/universal-credit-quarterly-statistics-29-april-2013-to-12-february-2026/universal-credit-deductions-statistics-march-2025-to-february-2026

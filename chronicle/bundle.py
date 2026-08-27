@@ -38,6 +38,7 @@ UK_BUNDLE_SOURCE_PREFIXES = (
 )
 UK_BUNDLE_SOURCES = (
     "dfc-ni-uc-statistics-may-2025",
+    "dfc-ni-uc-statistics-may-2026",
     "dft-bus0415-fares-index-2026",
     "dft-bus05i-revenue-support-2025",
     "dft-nts-vehicle-ownership-2024",

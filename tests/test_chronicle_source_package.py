@@ -641,7 +641,17 @@ def test_dwp_uc_deductions_package_preserves_rows_and_derives_uc_units():
         derived_regions["dwp.uc_deductions.month2025_04.total_units"].right_column == 4
     )
     assert validate_consumer_fact_contract(facts).valid
-    assert len(consumer_fact_rows(facts)) == len(facts)
+    consumer_rows = consumer_fact_rows(facts)
+    assert len(consumer_rows) == len(facts)
+    total_unit_rows = [
+        row
+        for row in consumer_rows
+        if row["observed_measure"]["source_measure_id"] == "total_units"
+    ]
+    assert len(total_unit_rows) == 11
+    assert {
+        row["observed_measure"]["source_concept"] for row in total_unit_rows
+    } == {"dwp.uc_benefit_units"}
 
 
 def test_dwp_uc_childcare_element_package_preserves_monthly_publisher_series():
@@ -668,9 +678,9 @@ def test_dwp_uc_childcare_element_package_preserves_monthly_publisher_series():
     assert len(consumer_fact_rows(facts)) == len(facts)
 
 
-def test_dfc_ni_uc_statistics_package_ports_2023_to_may_2025_claimants():
-    package = load_source_package("dfc-ni-uc-statistics-may-2025")
-    facts = package.build_facts(2025)
+def test_dfc_ni_uc_statistics_latest_package_ports_2023_to_may_2026_claimants():
+    package = load_source_package("dfc-ni-uc-statistics-may-2026")
+    facts = package.build_facts(2026)
     values = {(fact.period.value, fact.geography.id): fact.value for fact in facts}
     counts_by_period = {}
     for fact in facts:
@@ -682,18 +692,18 @@ def test_dfc_ni_uc_statistics_package_ports_2023_to_may_2025_claimants():
             + 1
         )
 
-    assert len(facts) == 841
+    assert len(facts) == 1_189
     assert set(counts_by_period.values()) == {29}
     assert min(counts_by_period) == "2023-01"
-    assert max(counts_by_period) == "2025-05"
-    assert len(counts_by_period) == 29
-    assert sum(fact.geography.level == "constituency" for fact in facts) == 522
-    assert sum(fact.geography.level == "local_authority" for fact in facts) == 319
+    assert max(counts_by_period) == "2026-05"
+    assert len(counts_by_period) == 41
+    assert sum(fact.geography.level == "constituency" for fact in facts) == 738
+    assert sum(fact.geography.level == "local_authority" for fact in facts) == 451
     assert values[("2023-01", "N05000001")] == 8_190
-    assert values[("2025-05", "N05000001")] == 11_850
-    assert values[("2025-05", "N05000018")] == 12_140
-    assert values[("2025-05", "N09000003")] == 53_450
-    assert values[("2025-05", "N09000011")] == 15_320
+    assert values[("2026-05", "N05000001")] == 14_560
+    assert values[("2026-05", "N05000018")] == 15_030
+    assert values[("2026-05", "N09000003")] == 67_460
+    assert values[("2026-05", "N09000011")] == 18_120
     assert {fact.layout.record_set_spec_id for fact in facts} == {
         "dfc_ni.uc_claimants.by_constituency.v1",
         "dfc_ni.uc_claimants.by_local_authority.v1",
@@ -824,6 +834,7 @@ def test_dwp_uc_composition_packages_cover_the_caseload_months(
     facts_per_month,
 ):
     facts = load_source_package(alias).build_facts(2025)
+    consumer_rows = consumer_fact_rows(facts)
     periods = [f"2025-{month:02d}" for month in range(4, 13)]
 
     assert len(facts) == facts_per_month * len(periods)
@@ -836,6 +847,12 @@ def test_dwp_uc_composition_packages_cover_the_caseload_months(
     assert all(fact.provenance_class == "administrative" for fact in facts)
     assert all(fact.source_row_keys for fact in facts)
     assert validate_consumer_fact_contract(facts).valid
+    assert {
+        row["observed_measure"]["source_concept"] for row in consumer_rows
+    } == {"dwp.uc_households"}
+    assert {
+        row["observed_measure"]["source_measure_id"] for row in consumer_rows
+    } == {"benefit_units"}
 
 
 def test_source_package_alias_compiles_soi_table_1_1_specs():
