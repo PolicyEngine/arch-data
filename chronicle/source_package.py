@@ -84,6 +84,9 @@ SOURCE_PACKAGE_ALIASES = {
         "bea/regional_personal_income_state"
     ),
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
+    "hmrc-cgt-age-2025": Path("hmrc/cgt_age_2025"),
+    "hmrc-cgt-country-region-2025": Path("hmrc/cgt_country_region_2025"),
+    "hmrc-cgt-gain-by-income-2025": Path("hmrc/cgt_gain_by_income_2025"),
     "hmrc-cgt-size-of-gain-2025": Path("hmrc/cgt_size_of_gain_2025"),
     "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
     "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
@@ -129,7 +132,11 @@ SOURCE_PACKAGE_ALIASES = {
     "fpb-economic-outlook-2026-2031-june-2026": Path(
         "fpb/economic_outlook_2026_2031_june_2026"
     ),
+    "dft-bus0415-fares-index-2026": Path("dft/bus0415_fares_index_2026"),
+    "dft-bus05i-revenue-support-2025": Path("dft/bus05i_revenue_support_2025"),
+    "dft-nts0705-local-bus-trips-2024": Path("dft/nts0705_local_bus_trips_2024"),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
+    "dfc-ni-uc-statistics-may-2026": Path("dfc_ni/uc_statistics_may_2026"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"

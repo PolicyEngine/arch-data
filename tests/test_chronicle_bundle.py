@@ -32,6 +32,8 @@ def test_build_bundle_dir_uk_suite_uses_curated_sources(tmp_path, monkeypatch):
     report = build_bundle_dir(tmp_path / "bundle", year=2023, suite="uk")
 
     assert report.valid
+    assert "dfc-ni-uc-statistics-may-2026" in UK_BUNDLE_SOURCES
+    assert "dfc-ni-uc-statistics-may-2025" not in UK_BUNDLE_SOURCES
     assert tuple(captured["sources"]) == UK_BUNDLE_SOURCES
     assert captured["output_dir"] == tmp_path / "bundle"
 
@@ -73,16 +75,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 171855,
-        "geography_count": 12536,
-        "period_count": 192,
-        "semantic_duplicate_key_count": 121,
+        "fact_count": 187718,
+        "geography_count": 12539,
+        "period_count": 195,
+        "semantic_duplicate_key_count": 143,
         "skipped_source_count": 10,
-        "source_count": 43,
-        "source_package_count": 151,
+        "source_count": 44,
+        "source_package_count": 158,
         "warning_count": 1,
     }
-    assert len(rows) == 171855
+    assert len(rows) == 187718
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -100,7 +102,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 151
+    assert source_packages["source_package_count"] == 158
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -114,7 +116,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 171855
+    assert coverage["fact_count"] == 187718
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -126,14 +128,15 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "cms_medicaid": 515,
         "cms_medicare": 1,
         "cms_nhe": 3,
-        "dft": 81,
+        "dfc_ni": 1189,
+        "dft": 233,
         "dwp": 6547,
         "eurostat": 207,
         "federal_reserve": 1,
         "fpb_economic_outlook": 1000,
         "hhs_acf_liheap": 2,
         "hhs_acf_tanf": 110,
-        "hmrc": 20551,
+        "hmrc": 20765,
         "ici": 12,
         "irs_soi": 40063,
         "isc": 2,
@@ -145,7 +148,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "nrs": 5589,
         "obr": 270,
         "onem_rva_unemployment": 1,
-        "ons": 65647,
+        "ons": 79955,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
         "scotgov": 2787,
@@ -161,7 +164,59 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 146
+    assert len(table_counts) == 153
+    assert (
+        table_counts[
+            "dft:BUS05i estimated operating revenue and net support for local bus services"
+        ]
+        == 24
+    )
+    assert (
+        table_counts[
+            "dft:NTS0705a average trips by household income quintile and main mode"
+        ]
+        == 24
+    )
+    assert (
+        table_counts[
+            "dft:BUS0415a local bus fares index by metropolitan area status and country"
+        ]
+        == 104
+    )
+    assert (
+        table_counts[
+            "hmrc:Capital Gains Tax statistics Table 3.1: individual taxpayers and "
+            "gains by size of gain and taxable income, 2023-24"
+        ]
+        == 142
+    )
+    assert (
+        table_counts[
+            "hmrc:Capital Gains Tax statistics Table 5.1: taxpayers, gains and "
+            "liabilities by UK country and region, 2023-24"
+        ]
+        == 42
+    )
+    assert (
+        table_counts[
+            "hmrc:Capital Gains Tax statistics Table 6.1: individual taxpayers, gains "
+            "and liabilities by age, 2023-24"
+        ]
+        == 30
+    )
+    assert (
+        table_counts[
+            "dfc_ni:Universal Credit Statistics supplementary tables, May 2026"
+        ]
+        == 1189
+    )
+    assert (
+        table_counts[
+            "ons:Price Index of Private Rents, UK: monthly price statistics, "
+            "July 2026 edition (data to June 2026)"
+        ]
+        == 14656
+    )
     assert (
         table_counts[
             "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
@@ -531,8 +586,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2020": 85,
         "calendar_year:2021": 4017,
         "calendar_year:2022": 2075,
-        "calendar_year:2023": 6343,
-        "calendar_year:2024": 33936,
+        "calendar_year:2023": 6355,
+        "calendar_year:2024": 33948,
         "calendar_year:2025": 4571,
         "calendar_year:2026": 341,
         "calendar_year:2027": 320,
@@ -567,9 +622,9 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fiscal_year:2020": 44,
         "fiscal_year:2021": 52,
         "fiscal_year:2022": 52,
-        "fiscal_year:2023": 405,
-        "fiscal_year:2024": 697,
-        "fiscal_year:2025": 1310,
+        "fiscal_year:2023": 413,
+        "fiscal_year:2024": 705,
+        "fiscal_year:2025": 1318,
         "fiscal_year:2026": 1445,
         "fiscal_year:2027": 34,
         "fiscal_year:2028": 35,
@@ -597,44 +652,47 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2022-10": 1,
         "month:2022-11": 1,
         "month:2022-12": 1,
-        "month:2023-01": 2,
-        "month:2023-02": 1,
-        "month:2023-03": 1,
-        "month:2023-04": 1,
-        "month:2023-05": 1,
-        "month:2023-06": 1,
-        "month:2023-07": 1,
-        "month:2023-08": 1,
-        "month:2023-09": 1,
-        "month:2023-10": 1,
-        "month:2023-11": 1,
-        "month:2023-12": 7,
-        "month:2024-01": 2,
-        "month:2024-02": 1,
-        "month:2024-03": 1,
-        "month:2024-04": 1,
-        "month:2024-05": 1,
-        "month:2024-06": 1,
-        "month:2024-07": 1,
-        "month:2024-08": 1,
-        "month:2024-09": 1,
-        "month:2024-10": 107,
-        "month:2024-11": 107,
-        "month:2024-12": 377,
-        "month:2025-01": 109,
-        "month:2025-02": 107,
-        "month:2025-03": 229,
-        "month:2025-04": 112,
-        "month:2025-05": 6221,
-        "month:2025-06": 20,
-        "month:2025-07": 20,
-        "month:2025-08": 24,
-        "month:2025-09": 28,
-        "month:2025-10": 19,
-        "month:2025-11": 34,
-        "month:2025-12": 275,
-        "month:2026-01": 3,
-        "month:2026-02": 7,
+        "month:2023-01": 380,
+        "month:2023-02": 379,
+        "month:2023-03": 387,
+        "month:2023-04": 379,
+        "month:2023-05": 379,
+        "month:2023-06": 387,
+        "month:2023-07": 379,
+        "month:2023-08": 379,
+        "month:2023-09": 387,
+        "month:2023-10": 379,
+        "month:2023-11": 379,
+        "month:2023-12": 393,
+        "month:2024-01": 380,
+        "month:2024-02": 379,
+        "month:2024-03": 387,
+        "month:2024-04": 379,
+        "month:2024-05": 379,
+        "month:2024-06": 387,
+        "month:2024-07": 379,
+        "month:2024-08": 379,
+        "month:2024-09": 387,
+        "month:2024-10": 485,
+        "month:2024-11": 485,
+        "month:2024-12": 763,
+        "month:2025-01": 487,
+        "month:2025-02": 485,
+        "month:2025-03": 615,
+        "month:2025-04": 490,
+        "month:2025-05": 6599,
+        "month:2025-06": 406,
+        "month:2025-07": 398,
+        "month:2025-08": 402,
+        "month:2025-09": 414,
+        "month:2025-10": 397,
+        "month:2025-11": 412,
+        "month:2025-12": 661,
+        "month:2026-01": 381,
+        "month:2026-02": 385,
+        "month:2026-03": 386,
+        "month:2026-04": 378,
+        "month:2026-05": 377,
         "month:2026-06": 348,
         "tax_year:1987": 9,
         "tax_year:1988": 9,
@@ -672,7 +730,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2020": 9,
         "tax_year:2021": 9,
         "tax_year:2022": 41237,
-        "tax_year:2023": 63054,
+        "tax_year:2023": 63268,
         "tax_year:2024": 40,
     }
     assert coverage["counts"]["by_geography"]["country:BE"] == 4888
@@ -687,25 +745,25 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4297
-    assert coverage["counts"]["by_geography"]["country:K03000001"] == 497
-    assert len(coverage["counts"]["by_geography"]) == 12536
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4513
+    assert coverage["counts"]["by_geography"]["country:K03000001"] == 551
+    assert len(coverage["counts"]["by_geography"]) == 12539
     assert coverage["counts"]["by_entity"] == {
         "benefit_unit": 233,
-        "dwelling": 12733,
+        "dwelling": 27041,
         "family": 107,
         "firm": 1439,
         "government": 1313,
         "household": 40724,
-        "institutional_sector": 133,
+        "institutional_sector": 261,
         "pension_plan": 2,
-        "person": 60466,
+        "person": 61893,
         "return": 14600,
         "social_protection_scheme": 36,
         "tax_unit": 40069,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
-    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 121
+    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 143
     assert summary["warnings"] == [
         {
             "code": "duplicate_semantic_fact_key",
@@ -716,12 +774,19 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         }
     ]
     for source in (
+        "dft-bus0415-fares-index-2026",
+        "dft-bus05i-revenue-support-2025",
+        "dft-nts0705-local-bus-trips-2024",
         "dwp-uc-childcare-element-march-2021-august-2025",
         "dwp-uc-households-carer-entitlement-april-december-2025",
         "dwp-uc-households-children-april-december-2025",
         "dwp-uc-households-family-type-april-december-2025",
         "dwp-uc-households-housing-entitlement-april-december-2025",
         "dwp-uc-households-lcwra-entitlement-april-december-2025",
+        "dfc-ni-uc-statistics-may-2026",
+        "hmrc-cgt-age-2025",
+        "hmrc-cgt-country-region-2025",
+        "hmrc-cgt-gain-by-income-2025",
     ):
         assert (output_dir / "sources" / source / "consumer_facts.jsonl").exists()
     for source in (
