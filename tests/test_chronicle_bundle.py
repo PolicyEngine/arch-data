@@ -32,10 +32,8 @@ def test_build_bundle_dir_uk_suite_uses_curated_sources(tmp_path, monkeypatch):
     report = build_bundle_dir(tmp_path / "bundle", year=2023, suite="uk")
 
     assert report.valid
-    assert {
-        "dfc-ni-uc-statistics-may-2025",
-        "dfc-ni-uc-statistics-may-2026",
-    } <= set(UK_BUNDLE_SOURCES)
+    assert "dfc-ni-uc-statistics-may-2026" in UK_BUNDLE_SOURCES
+    assert "dfc-ni-uc-statistics-may-2025" not in UK_BUNDLE_SOURCES
     assert tuple(captured["sources"]) == UK_BUNDLE_SOURCES
     assert captured["output_dir"] == tmp_path / "bundle"
 
@@ -77,16 +75,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 188559,
+        "fact_count": 187718,
         "geography_count": 12539,
         "period_count": 195,
-        "semantic_duplicate_key_count": 984,
+        "semantic_duplicate_key_count": 143,
         "skipped_source_count": 10,
         "source_count": 44,
-        "source_package_count": 159,
+        "source_package_count": 158,
         "warning_count": 1,
     }
-    assert len(rows) == 188559
+    assert len(rows) == 187718
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -104,7 +102,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 159
+    assert source_packages["source_package_count"] == 158
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -118,7 +116,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 188559
+    assert coverage["fact_count"] == 187718
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -130,7 +128,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "cms_medicaid": 515,
         "cms_medicare": 1,
         "cms_nhe": 3,
-        "dfc_ni": 2030,
+        "dfc_ni": 1189,
         "dft": 233,
         "dwp": 6547,
         "eurostat": 207,
@@ -166,7 +164,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 154
+    assert len(table_counts) == 153
     assert (
         table_counts[
             "dft:BUS05i estimated operating revenue and net support for local bus services"
@@ -205,12 +203,6 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
             "and liabilities by age, 2023-24"
         ]
         == 30
-    )
-    assert (
-        table_counts[
-            "dfc_ni:Universal Credit Statistics supplementary tables, May 2025"
-        ]
-        == 841
     )
     assert (
         table_counts[
@@ -660,35 +652,35 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2022-10": 1,
         "month:2022-11": 1,
         "month:2022-12": 1,
-        "month:2023-01": 409,
-        "month:2023-02": 408,
-        "month:2023-03": 416,
-        "month:2023-04": 408,
-        "month:2023-05": 408,
-        "month:2023-06": 416,
-        "month:2023-07": 408,
-        "month:2023-08": 408,
-        "month:2023-09": 416,
-        "month:2023-10": 408,
-        "month:2023-11": 408,
-        "month:2023-12": 422,
-        "month:2024-01": 409,
-        "month:2024-02": 408,
-        "month:2024-03": 416,
-        "month:2024-04": 408,
-        "month:2024-05": 408,
-        "month:2024-06": 416,
-        "month:2024-07": 408,
-        "month:2024-08": 408,
-        "month:2024-09": 416,
-        "month:2024-10": 514,
-        "month:2024-11": 514,
-        "month:2024-12": 792,
-        "month:2025-01": 516,
-        "month:2025-02": 514,
-        "month:2025-03": 644,
-        "month:2025-04": 519,
-        "month:2025-05": 6628,
+        "month:2023-01": 380,
+        "month:2023-02": 379,
+        "month:2023-03": 387,
+        "month:2023-04": 379,
+        "month:2023-05": 379,
+        "month:2023-06": 387,
+        "month:2023-07": 379,
+        "month:2023-08": 379,
+        "month:2023-09": 387,
+        "month:2023-10": 379,
+        "month:2023-11": 379,
+        "month:2023-12": 393,
+        "month:2024-01": 380,
+        "month:2024-02": 379,
+        "month:2024-03": 387,
+        "month:2024-04": 379,
+        "month:2024-05": 379,
+        "month:2024-06": 387,
+        "month:2024-07": 379,
+        "month:2024-08": 379,
+        "month:2024-09": 387,
+        "month:2024-10": 485,
+        "month:2024-11": 485,
+        "month:2024-12": 763,
+        "month:2025-01": 487,
+        "month:2025-02": 485,
+        "month:2025-03": 615,
+        "month:2025-04": 490,
+        "month:2025-05": 6599,
         "month:2025-06": 406,
         "month:2025-07": 398,
         "month:2025-08": 402,
@@ -765,13 +757,13 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "household": 40724,
         "institutional_sector": 261,
         "pension_plan": 2,
-        "person": 62734,
+        "person": 61893,
         "return": 14600,
         "social_protection_scheme": 36,
         "tax_unit": 40069,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
-    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 984
+    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 143
     assert summary["warnings"] == [
         {
             "code": "duplicate_semantic_fact_key",
@@ -791,7 +783,6 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dwp-uc-households-family-type-april-december-2025",
         "dwp-uc-households-housing-entitlement-april-december-2025",
         "dwp-uc-households-lcwra-entitlement-april-december-2025",
-        "dfc-ni-uc-statistics-may-2025",
         "dfc-ni-uc-statistics-may-2026",
         "hmrc-cgt-age-2025",
         "hmrc-cgt-country-region-2025",
