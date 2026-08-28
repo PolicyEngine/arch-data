@@ -28,11 +28,6 @@ Chronicle may:
   needs disambiguation
 - normalize representation, such as units, scales, dates, geography IDs, and
   same-source total/share arithmetic when the publisher defines that relation
-- declare target profiles that select source-backed facts and measurement
-  contracts without target values
-- enforce the period contract at resolution: consuming a fact at a period
-  other than its reference period requires the consumer's explicit
-  `PeriodAlignmentDeclaration`, which Chronicle records and passes through
 
 Chronicle must not:
 
@@ -40,10 +35,10 @@ Chronicle must not:
 - age facts to a build year
 - store PolicyEngine-computed values (aged, uprated, forecast, or reconciled
   levels) as facts or in any other store object
-- compute an aligned value during resolution; it returns the published level
-  and the consumer's declaration only
+- compute aligned values; it publishes the source period and value unchanged
 - impute missing values
 - store raw survey or administrative microdata
+- own selection, measurement, period-alignment, or model-binding contracts
 - choose a support-aware active target subset
 - build solver-ready calibration targets
 - invent derived facts whose source is Chronicle itself
@@ -55,7 +50,7 @@ The repository uses `.github/CODEOWNERS` to route all changes through
 review.
 
 Approved agent roles live in `.github/chronicle-agents.yml`. Contributions that
-touch source packages, target profiles, or consumer contracts should name the
+touch source packages or consumer contracts should name the
 agent role used and attach the required deterministic checks and judge verdicts.
 
 ## Judge Model
@@ -65,7 +60,6 @@ reviewers judge the source-data boundary with that evidence. The required judge
 types are:
 
 - `ledger-source-fidelity`
-- `ledger-target-profile`
 - `ledger-contract`
 - `ledger-boundary`
 

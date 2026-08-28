@@ -20,22 +20,16 @@ the value**, not level versus projection:
    aging), implemented as named, versioned models that consume growth-factor
    facts from Chronicle and emit their own lineage.
 
-Instead of projection objects, Chronicle contributes three guarantees:
+Instead of projection objects, Chronicle contributes two guarantees:
 
 - **Reference-period semantics.** `PeriodDimension` identifies the period a
   value refers to; `PeriodCoverage` records non-identity provenance (start
   and end dates, basis, the publisher's period label, accounting basis) for
   cases like BE-SILC incomes that reference the year before the survey
   label.
-- **Period-contract enforcement.** Resolving a profile target at a period
-  other than the fact's reference period raises `PeriodContractError`
-  unless the consumer passes an explicit `PeriodAlignmentDeclaration`
-  (model id, version, parameters — never values). Chronicle records the
-  declaration in resolved rows and returns the published level untouched.
-- **Basis-aware diagnostics.** Resolved rows carry `basis` (`fact` or
-  `declared_alignment`), `fact_period`, `requested_period`, and the
-  declaration, so downstream diagnostics distinguish "missed a published
-  fact" from "missed an aged level."
+- **Facts-only consumer artifacts.** Chronicle publishes schema-validated fact
+  rows with manifest hashes. Consumers own the selection, measurement,
+  period-alignment, and model-binding contracts that interpret those rows.
 
 ## Why not facts plus projections in one schema
 
@@ -67,9 +61,13 @@ Instead of projection objects, Chronicle contributes three guarantees:
   values other than `observation` and `source_projection` fail validation
   with an error explaining that PolicyEngine-computed values are not facts.
 - Consumer-contract rows always carry `assertion` explicitly, and the
-  consumer artifact (`chronicle build-consumer-artifact`) embeds profiles,
-  fact rows, coverage diagnostics, and manifest hashes so Microcosm can
-  build a target registry without database access or copied values
-  (issue #61).
+  consumer artifact (`chronicle build-consumer-artifact`) contains only fact
+  rows and the manifest hashes needed to verify them. Microcosm packages its
+  own selection contracts and builds its target registry without Chronicle
+  profiles (issues #166 and #172).
+- The retired `policyengine_ledger.target_profile.v1` and
+  `policyengine_ledger.resolved_target.v1` schema IDs have no v2 successor in
+  issue #143. The Chronicle-side Belgian profile plan in issue #70 is
+  superseded; Belgian contracts also live consumer-side.
 - Geography vintage translation (microcosm#205) follows the same pattern: a
   declared consumer-side transform over facts, never an edit to them.

@@ -754,29 +754,14 @@ def main(argv: list[str] | None = None) -> int:
 
     consumer_artifact_parser = subparsers.add_parser(
         "build-consumer-artifact",
-        help=(
-            "Build a versioned consumer artifact from consumer-contract facts "
-            "and Chronicle target profiles"
-        ),
+        help="Build a versioned facts-only consumer artifact",
+        description="Build a versioned facts-only consumer artifact.",
     )
     consumer_artifact_parser.add_argument(
         "--facts",
         type=Path,
         required=True,
         help="Path to a consumer_facts.jsonl file or a bundle directory",
-    )
-    consumer_artifact_parser.add_argument(
-        "--profile",
-        action="append",
-        default=[],
-        help="Packaged target profile id (may be repeated)",
-    )
-    consumer_artifact_parser.add_argument(
-        "--profile-path",
-        action="append",
-        type=Path,
-        default=[],
-        help="Path to a target profile JSON file (may be repeated)",
     )
     consumer_artifact_parser.add_argument(
         "--out",
@@ -1285,8 +1270,6 @@ def main(argv: list[str] | None = None) -> int:
         artifact_report = build_consumer_artifact(
             args.out,
             facts_path=args.facts,
-            profile_ids=args.profile,
-            profile_paths=args.profile_path,
             replace=args.replace,
         )
         print(json.dumps(artifact_report.to_dict(), indent=2, sort_keys=True))

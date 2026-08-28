@@ -1,7 +1,7 @@
 [project]
 name = "policyengine-chronicle"
 version = "0.1.0"
-description = "PolicyEngine Chronicle source-data foundation: source facts and target profiles"
+description = "PolicyEngine Chronicle source-data foundation: source-backed facts"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"

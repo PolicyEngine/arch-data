@@ -689,26 +689,22 @@ Acceptance:
 - Chronicle also exposes source records for non-targeted Table 1.4 columns/rows.
 - Source records have concept/statistic/universe metadata and no simulator model variable IDs.
 
-### Phase 3: Chronicle Target Profile Handoff
+### Phase 3: Microcosm Target Contract Handoff
 
 Tasks:
 
-- Declare target profiles that select source-backed facts and define
-  model-measurement contracts.
-- Store stable selectors, source-record IDs, source periods, units, geography,
-  value definitions, and profile metadata.
-- Add validation that target profiles contain no target values, source
-  reconciliation, aging, active support decisions, or simulator execution
-  logic.
+- Publish stable source-record IDs, periods, units, geography, and value
+  definitions in Chronicle facts.
+- Declare selectors and model-measurement contracts in Microcosm.
+- Validate consumer contracts against a hash-pinned Chronicle facts artifact.
 
 Acceptance:
 
-- Downstream systems can resolve every profile row back to Chronicle source records
-  and source artifacts.
-- Profile validation fails closed when a row includes active target values,
-  model-runtime code, or unsupported operations.
-- Microcosm can consume the profile as a contract, but owns all active target
-  values, aging, model-measure compilation, scoring, and differential tests.
+- Microcosm can resolve every contract row back to Chronicle source records and
+  source artifacts.
+- Chronicle remains unaware of model variables and active calibration decisions.
+- Microcosm owns target contracts, active values, aging, model-measure
+  compilation, scoring, and differential tests.
 
 ### Phase 4: Expand SOI National Family
 
@@ -728,12 +724,10 @@ Tasks:
 
 - Add CI job for source manifest smoke tests.
 - Add selector/source-record spec validation tests.
-- Add target profile validation tests.
 - Surface Chronicle-owned results in the source observatory:
   - source coverage
   - parsed-cell coverage
   - source-record coverage
-  - target profile selector coverage
   - known source coverage gaps
 
 Acceptance:
@@ -741,8 +735,8 @@ Acceptance:
 - A developer can see whether a source-package version preserves more official
   statistics release content, regresses source fidelity, or intentionally omits
   source rows.
-- CI catches accidental source omission, selector breakage, target profile
-  schema violations, and source coverage regressions.
+- CI catches accidental source omission, selector breakage, and source coverage
+  regressions. Microcosm CI covers its target-contract schema and fact resolution.
 
 ### Phase 8: State And Local Expansion
 
@@ -761,7 +755,7 @@ Acceptance:
 ## Open Design Answers
 
 1. Source-record specs should live in Chronicle as YAML source of truth plus compiled DB rows.
-2. Active target specs should start in Microcosm. Split later only when multiple adapters/profiles need independent versioning.
+2. Selection contracts and active target specs live in Microcosm.
 3. Count targets should be sums of count-valued measures, never a separate count aggregation.
 4. PE parity should be required enough to classify differences, not enough to force exact reproduction of PE omissions or legacy shortcuts.
 5. Chronicle should preserve every parsed source cell, then layer semantic source records on top. Do not automatically turn every cell into a semantic record.
@@ -794,8 +788,6 @@ First-slice acceptance criteria:
 - Parsed cells preserve raw/displayed/formula/missingness distinctions.
 - Selector specs cover all PE-used cells and adjacent omitted source columns.
 - Source records are simulator-neutral and contain concept/statistic/universe metadata.
-- Target profiles select source records without storing target values, runtime
-  code, active support decisions, or model compiler configuration.
-- Downstream Microcosm recipes can reference the source records and target
-  profiles, but their values, model measures, fixtures, and differential checks
-  remain outside Chronicle.
+- Downstream Microcosm contracts select Chronicle source records without moving
+  model measures, runtime code, active support decisions, or compiler
+  configuration into Chronicle.

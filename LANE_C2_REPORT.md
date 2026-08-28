@@ -13,8 +13,8 @@ The cached PDF resolves three material ambiguities in the task shorthand:
 
 - The Annex columns put most requested External series in publisher periods
   2021–2023, not 2022–2024. Chronicle preserves the printed periods. A consumer
-  that needs another period must supply an explicit `PeriodAlignmentDeclaration`;
-  Chronicle returns the published level and never an aligned number.
+  that needs another period owns the contract for aligning it; Chronicle
+  returns the published level and never an aligned number.
 - The `poa=2,273k` and `psu=79k` observations are in the SILC column. Their
   External cells are `NaN`, so they are stored as `survey_aggregate` and are
   validation-only.
@@ -439,8 +439,8 @@ acceptance, and both required Chronicle judge reviews pass.
   `Add Belgium national accounts and JRC external facts`.
 - No push and no R2 upload were performed. The two manifests merely declare the
   required content-addressed R2 keys.
-- A consumer using a fact outside its publisher period must supply an explicit
-  `PeriodAlignmentDeclaration`; Chronicle returns the published value and does
-  not compute an aligned value.
+- A consumer using a fact outside its publisher period owns the alignment
+  contract; Chronicle returns the published value and does not compute an
+  aligned value.
 
 LANE C2 DONE

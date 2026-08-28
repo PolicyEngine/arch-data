@@ -1,8 +1,8 @@
 """Chronicle target-input helpers.
 
 Chronicle owns source-backed facts, target-eligible source inputs, and target
-profiles. Consumers such as Microcosm decide which profile rows their support
-universe can activate and how to calibrate outside Chronicle.
+source coverage. Consumers such as Microcosm own selection contracts, decide
+which rows their support universe can activate, and calibrate outside Chronicle.
 """
 
 __all__ = [
