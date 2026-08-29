@@ -60,7 +60,7 @@ tests, and record a verified `raw/nz/...` R2 URI.
 | `stats_nz/census_2023_ethnicity_age_region` | [ ] | [ ] | [ ] | |
 | `ird/taxable_income_distribution_2025` | [ ] | [ ] | [ ] | |
 | `ird/wage_salary_distribution_2025` | [ ] | [ ] | [ ] | |
-| `ird/working_for_families_statistics_sept_2025` | [ ] | [ ] | [ ] | |
+| `ird/working_for_families_statistics_sept_2025` | [x] | [x] | [ ] | TY2024: 330 administrative facts; count/entitlement, children, family size, and full published income table. |
 | `ird/student_loan_statistics_march_2026` | [ ] | [ ] | [ ] | |
 | `msd/benefit_fact_sheets_national_march_2026` | [ ] | [ ] | [ ] | |
 | `msd/benefit_fact_sheets_supplementary_march_2026` | [ ] | [ ] | [ ] | |
