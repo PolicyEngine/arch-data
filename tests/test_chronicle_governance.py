@@ -27,17 +27,17 @@ def test_chronicle_governance_files_define_required_review_surface():
     role_ids = {agent["id"] for agent in agents["approved_agents"]}
     assert {
         "ledger-source-ingestor",
-        "ledger-target-profile-author",
         "ledger-contract-maintainer",
     } <= role_ids
+    assert "ledger-target-profile-author" not in role_ids
 
     required_judges = set(agents["required_judges"])
     assert {
         "ledger-source-fidelity",
-        "ledger-target-profile",
         "ledger-contract",
         "ledger-boundary",
     } <= required_judges
+    assert "ledger-target-profile" not in required_judges
     for agent in agents["approved_agents"]:
         assert set(agent["required_judges"]) <= required_judges
         assert agent["allowed_paths"]

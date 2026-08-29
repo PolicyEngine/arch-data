@@ -1,7 +1,8 @@
 # Chronicle Agent Rules
 
 Chronicle is a source-backed fact store. It may parse publisher artifacts, normalize
-representation, preserve provenance, and declare target-profile contracts.
+representation, and preserve provenance. Selection and measurement contracts live
+in consumers such as Microcosm.
 
 Every fact value must trace to a publisher. The boundary is who asserted the
 value, not level versus projection: a publisher's own projection (CBO baseline,
@@ -16,13 +17,13 @@ Do not put Microcosm work in Chronicle:
 - no imputation
 - no support-aware target activation
 - no solver-ready target construction
-- no target values in target profiles
+- no target profiles or model-measurement bindings
 - no PolicyEngine-computed values stored as facts
 
-Resolving profile targets at a period other than a fact's reference period
-requires the consumer's explicit `PeriodAlignmentDeclaration`; Chronicle records
-the declaration and returns the published level, never the aligned number.
+Chronicle records every fact's publisher reference period. Consumers own and
+enforce any declaration that aligns those facts to another period; Chronicle
+returns the published level and never an aligned number.
 
 Only approved Chronicle agent roles in `.github/chronicle-agents.yml` should add or
-modify source packages, target profiles, or contract schemas. Source-data PRs
+modify source packages or contract schemas. Source-data PRs
 need deterministic validation plus the listed Chronicle judge reviews before merge.

@@ -31,8 +31,6 @@ from chronicle.source_package import (
 from chronicle.sources.cells import build_source_cell_key, validate_source_cells
 from chronicle.sources.rows import validate_source_rows
 from chronicle.suite import build_source_suite
-from policyengine_chronicle.consumer import resolve_profile_targets
-from policyengine_chronicle.target_profiles import target_profile_from_mapping
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_PROVENANCE_CLASSES = {
@@ -290,48 +288,6 @@ def test_hmrc_cgt_size_of_gain_package_builds_microcosm_visible_band_facts():
     )
     assert row["dimensions"] == {"cgt_gain_band": "gain_12300_to_24999"}
     assert row["observed_measure"]["source_concept"] == ("hmrc.cgt_gains_individuals")
-
-    profile = target_profile_from_mapping(
-        {
-            "schema_version": "policyengine_ledger.target_profile.v1",
-            "profile_id": "uk_national_cgt_size_smoke",
-            "country": "uk",
-            "label": "UK national CGT size smoke profile",
-            "defaults": {
-                "base_period_policy": "latest_not_after_build_base_period",
-                "operation": "sum",
-            },
-            "targets": [
-                {
-                    "target_id": "hmrc.cgt.gains.gain_12300_to_24999",
-                    "family": "capital_gains_tax",
-                    "geography_levels": ["country"],
-                    "chronicle_selector": {
-                        "source_name": "hmrc",
-                        "record_set_spec_id": (
-                            "hmrc.cgt_size_of_gain_2025.table2_1a."
-                            "individuals.by_gain_band.ty2023.v1"
-                        ),
-                        "source_concept": "hmrc.cgt_gains_individuals",
-                        "dimensions": {"cgt_gain_band": "gain_12300_to_24999"},
-                    },
-                    "measurement": {"unit": "gbp"},
-                    "bindings": {
-                        "microcosm": {"metric_name": "hmrc.cgt.gains_by_gain_band"}
-                    },
-                }
-            ],
-        }
-    )
-    resolution = resolve_profile_targets(
-        profile,
-        consumer_rows,
-        {"type": "tax_year", "value": 2023},
-    )
-
-    assert resolution.valid
-    assert len(resolution.resolved) == 1
-    assert resolution.resolved[0].value == 1_418_000_000
 
 
 def test_every_source_package_record_set_declares_provenance_class():
@@ -3864,7 +3820,6 @@ def test_ons_households_by_type_country_package_builds_scotland_microcosm_target
     package = load_source_package("ons-households-by-type-country-2025")
     cells = package.build_source_cells(2025)
     facts = package.build_facts(2025, cells=cells)
-    consumer_rows = consumer_fact_rows(facts)
 
     assert validate_source_cells(cells).valid
     assert validate_facts(facts).valid
@@ -3884,61 +3839,6 @@ def test_ons_households_by_type_country_package_builds_scotland_microcosm_target
         fact.measure.source_concept == "ons.households_by_type_regions_countries_table7"
     )
     assert fact.filters == {"household_type": "couple_3_plus_children_households"}
-
-    profile = target_profile_from_mapping(
-        {
-            "schema_version": "policyengine_ledger.target_profile.v1",
-            "profile_id": "uk_national_scotland_households_smoke",
-            "country": "uk",
-            "label": "UK national Scotland household-composition smoke profile",
-            "defaults": {
-                "base_period_policy": "latest_not_after_build_base_period",
-                "operation": "sum",
-            },
-            "targets": [
-                {
-                    "target_id": (
-                        "ons.scotland.households.couple_3_plus_children_households"
-                    ),
-                    "family": "household_composition",
-                    "geography_levels": ["country"],
-                    "chronicle_selector": {
-                        "source_name": "ons",
-                        "record_set_spec_id": (
-                            "ons.households_by_type_country_2025."
-                            "scotland.table7.cy2025.v1"
-                        ),
-                        "source_concept": (
-                            "ons.households_by_type_regions_countries_table7"
-                        ),
-                        "dimensions": {
-                            "household_type": ("couple_3_plus_children_households")
-                        },
-                    },
-                    "measurement": {"unit": "count"},
-                    "bindings": {
-                        "microcosm": {
-                            "metric_name": (
-                                "ons.scotland.households.couple_3_plus_children"
-                            )
-                        }
-                    },
-                }
-            ],
-        }
-    )
-    resolution = resolve_profile_targets(
-        profile,
-        consumer_rows,
-        {"type": "calendar_year", "value": 2025},
-    )
-
-    assert resolution.valid
-    assert len(resolution.resolved) == 1
-    assert resolution.resolved[0].value == 57_000
-    assert resolution.resolved[0].dimensions == {
-        "household_type": "couple_3_plus_children_households"
-    }
 
 
 def test_render_string_templates_integer_year_with_filing_year():

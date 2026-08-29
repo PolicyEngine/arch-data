@@ -1,24 +1,14 @@
-"""Tests for consumer artifacts and period-contract resolution.
-
-The load-bearing behavior: consuming a fact at a period other than its
-reference period is a hard error unless the consumer declares a named,
-versioned alignment. This is the schema-level guard against the
-PolicyEngine/populace#212 failure, where SOI tax-year dollar levels were
-calibrated un-aged at a later build year and nothing complained.
-"""
+"""Tests for facts-only Chronicle consumer artifacts."""
 
 from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
 
 import pytest
 
-import policyengine_chronicle.target_profiles as target_profiles_pkg
 from chronicle.consumer_contract import consumer_fact_rows
 from chronicle.core import (
-    AggregateConstraint,
     AggregateFact,
     Aggregation,
     EntityDimension,
@@ -28,382 +18,162 @@ from chronicle.core import (
     SourceProvenance,
     SourceRecordLayout,
 )
+from chronicle.harness import main
 from policyengine_chronicle.consumer import (
-    PeriodAlignmentDeclaration,
-    PeriodContractError,
     build_consumer_artifact,
     load_consumer_artifact,
-    resolve_profile_targets,
 )
 from policyengine_chronicle.schema import CONSUMER_FACT_SCHEMA_SHA256
-from policyengine_chronicle.target_profiles import target_profile_from_mapping
 
 SHA = "ab" * 32
 
 
-def _fact(
-    *,
-    value,
-    period_value,
-    period_type="tax_year",
-    source_name="irs_soi",
-    measure_id="agi",
-    concept="irs_soi.adjusted_gross_income",
-    assertion="observation",
-    provenance_class="administrative",
-    survey_instrument=None,
-    geography_id="0100000US",
-):
+def _fact(*, value, period_value):
     return AggregateFact(
         value=value,
-        period=PeriodDimension(type=period_type, value=period_value),
+        period=PeriodDimension(type="tax_year", value=period_value),
         geography=GeographyDimension(
             level="country",
-            id=geography_id,
+            id="0100000US",
             vintage="2020_census",
         ),
         entity=EntityDimension(name="tax_unit", role="filing_unit"),
-        measure=Measure(concept=concept, unit="usd"),
+        measure=Measure(concept="irs_soi.adjusted_gross_income", unit="usd"),
         aggregation=Aggregation(method="sum"),
-        provenance_class=provenance_class,
-        survey_instrument=survey_instrument,
+        provenance_class="administrative",
         source=SourceProvenance(
-            source_name=source_name,
+            source_name="irs_soi",
             source_table="Table T",
             source_file="t.xls",
             url="https://example.gov/t.xls",
-            vintage=f"{period_type}_{period_value}",
+            vintage=f"tax_year_{period_value}",
             extracted_at="2026-05-01",
             extraction_method="test",
             source_sha256=SHA,
             source_size_bytes=10,
             raw_r2_bucket="ledger-raw",
-            raw_r2_key=f"raw/{source_name}/t/{period_value}/{SHA}/t.xls",
-            raw_r2_uri=f"r2://ledger-raw/raw/{source_name}/t/{period_value}/{SHA}/t.xls",
+            raw_r2_key=f"raw/irs_soi/t/{period_value}/{SHA}/t.xls",
+            raw_r2_uri=f"r2://ledger-raw/raw/irs_soi/t/{period_value}/{SHA}/t.xls",
         ),
         domain="all_returns",
-        source_record_id=f"{source_name}.{period_value}.t.all.{measure_id}",
-        source_cell_keys=(f"ledger.source_cell.v1:{period_value}{measure_id}",),
+        source_record_id=f"irs_soi.{period_value}.t.all.agi",
+        source_cell_keys=(f"ledger.source_cell.v1:{period_value}agi",),
         layout=SourceRecordLayout(
-            record_set_id=f"{source_name}.{period_value}.t",
-            record_set_spec_id=f"{source_name}.t.v1",
-            measure_id=measure_id,
+            record_set_id=f"irs_soi.{period_value}.t",
+            record_set_spec_id="irs_soi.t.v1",
+            measure_id="agi",
             groupby_dimension="us.agi",
         ),
-        assertion=assertion,
     )
 
 
 def _rows():
     return consumer_fact_rows(
-        [
-            _fact(value=100, period_value=2021),
-            _fact(value=110, period_value=2022),
-            _fact(
-                value=250,
-                period_value=2027,
-                period_type="calendar_year",
-                source_name="cbo",
-                measure_id="receipts",
-                concept="cbo.individual_income_tax_receipts",
-                assertion="source_projection",
-            ),
-        ]
+        [_fact(value=100, period_value=2021), _fact(value=110, period_value=2022)]
     )
 
 
-def _profile(selector=None, target_id="soi.agi.total"):
-    return target_profile_from_mapping(
-        {
-            "schema_version": "policyengine_ledger.target_profile.v1",
-            "profile_id": "test_profile",
-            "country": "us",
-            "label": "Test profile",
-            "defaults": {
-                "base_period_policy": "latest_not_after_build_base_period",
-                "operation": "sum",
-            },
-            "targets": [
-                {
-                    "target_id": target_id,
-                    "family": "irs_soi",
-                    "geography_levels": ["country"],
-                    "chronicle_selector": selector
-                    or {"source_name": "irs_soi", "source_measure_id": "agi"},
-                    "measurement": {
-                        "entity": "tax_unit",
-                        "concept": "us.agi",
-                    },
-                    "bindings": {
-                        "microcosm": {"metric_name": "irs_soi/agi/total"},
-                    },
-                }
-            ],
-        }
-    )
-
-
-def test_resolving_at_the_fact_period_is_fact_basis():
-    report = resolve_profile_targets(
-        _profile(),
-        _rows(),
-        {"type": "tax_year", "value": 2022},
-    )
-    assert report.valid
-    assert len(report.resolved) == 1
-    row = report.resolved[0]
-    assert row.basis == "fact"
-    assert row.value == 110
-    assert row.assertion == "observation"
-    assert row.fact_period == {"type": "tax_year", "value": 2022}
-    assert row.requested_period == {"type": "tax_year", "value": 2022}
-    assert row.alignment is None
-
-
-def test_un_aged_consumption_hard_fails():
-    with pytest.raises(PeriodContractError) as excinfo:
-        resolve_profile_targets(
-            _profile(),
-            _rows(),
-            {"type": "tax_year", "value": 2025},
-        )
-    message = str(excinfo.value)
-    assert "PeriodAlignmentDeclaration" in message
-    (violation,) = excinfo.value.violations
-    assert violation.fact_period == {"type": "tax_year", "value": 2022}
-    assert violation.requested_period == {"type": "tax_year", "value": 2025}
-
-
-def test_declared_alignment_resolves_and_is_recorded():
-    declaration = PeriodAlignmentDeclaration(
-        model_id="cbo_growth_factor_aging",
-        model_version="2026.1",
-        parameters={"factor_series": "cbo.baseline_2026_01.agi_growth"},
-    )
-    report = resolve_profile_targets(
-        _profile(),
-        _rows(),
-        {"type": "tax_year", "value": 2025},
-        alignments={"soi.agi.total": declaration},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.basis == "declared_alignment"
-    # Chronicle returns the published level; the consumer applies the model.
-    assert row.value == 110
-    assert row.fact_period == {"type": "tax_year", "value": 2022}
-    assert row.requested_period == {"type": "tax_year", "value": 2025}
-    assert row.alignment["model_id"] == "cbo_growth_factor_aging"
-    assert row.alignment["model_version"] == "2026.1"
-
-
-def test_latest_not_after_selects_the_newest_covered_period():
-    report = resolve_profile_targets(
-        _profile(),
-        _rows(),
-        {"type": "tax_year", "value": 2021},
-    )
-    (row,) = report.resolved
-    assert row.basis == "fact"
-    assert row.value == 100
-
-
-def test_wildcard_alignment_covers_all_targets():
-    declaration = PeriodAlignmentDeclaration(
-        model_id="cbo_growth_factor_aging",
-        model_version="2026.1",
-    )
-    report = resolve_profile_targets(
-        _profile(),
-        _rows(),
-        {"type": "tax_year", "value": 2025},
-        alignments=declaration,
-    )
-    assert report.valid
-    assert report.resolved[0].basis == "declared_alignment"
-
-
-def test_source_projections_resolve_at_their_own_period_as_facts():
-    profile = _profile(
-        selector={
-            "source_name": "cbo",
-            "source_measure_id": "receipts",
-            "assertion": "source_projection",
-        },
-        target_id="cbo.receipts.2027",
-    )
-    report = resolve_profile_targets(
-        profile,
-        _rows(),
-        {"type": "calendar_year", "value": 2027},
-    )
-    (row,) = report.resolved
-    assert row.basis == "fact"
-    assert row.assertion == "source_projection"
-    assert row.value == 250
-
-
-def test_alignment_declarations_reject_values_and_runtime_hooks():
-    with pytest.raises(ValueError, match="never"):
-        PeriodAlignmentDeclaration(
-            model_id="m",
-            model_version="1",
-            parameters={"target_value": 130e9},
-        )
-    with pytest.raises(ValueError, match="model_version"):
-        PeriodAlignmentDeclaration(model_id="m", model_version=" ")
-    with pytest.raises(ValueError, match="non-scalar"):
-        PeriodAlignmentDeclaration(
-            model_id="m",
-            model_version="1",
-            parameters={"factors": [1.02, 1.03]},
-        )
-
-
-def test_unknown_selector_keys_fail_loudly():
-    profile = _profile(selector={"source_name": "irs_soi", "spreadsheet": "t.xls"})
-    with pytest.raises(ValueError, match="unknown keys"):
-        resolve_profile_targets(
-            profile,
-            _rows(),
-            {"type": "tax_year", "value": 2022},
-        )
-
-
-def test_no_matching_facts_fails_strict_and_reports_lenient():
-    profile = _profile(selector={"source_name": "nonexistent"})
-    with pytest.raises(ValueError, match="matched no consumer fact rows"):
-        resolve_profile_targets(
-            profile,
-            _rows(),
-            {"type": "tax_year", "value": 2022},
-        )
-    report = resolve_profile_targets(
-        profile,
-        _rows(),
-        {"type": "tax_year", "value": 2022},
-        strict=False,
-    )
-    assert not report.valid
-    assert report.issues[0].code == "no_matching_facts"
-
-
-def _write_artifact_inputs(tmp_path):
+def _write_facts(tmp_path):
     facts_path = tmp_path / "consumer_facts.jsonl"
     with facts_path.open("w") as file:
         for row in _rows():
             file.write(json.dumps(row, sort_keys=True) + "\n")
-    profile_path = tmp_path / "test_profile.json"
-    profile_path.write_text(
-        json.dumps(
-            {
-                "schema_version": "policyengine_ledger.target_profile.v1",
-                "profile_id": "test_profile",
-                "country": "us",
-                "label": "Test profile",
-                "defaults": {
-                    "base_period_policy": "latest_not_after_build_base_period",
-                    "operation": "sum",
-                },
-                "targets": [
-                    {
-                        "target_id": "soi.agi.total",
-                        "family": "irs_soi",
-                        "geography_levels": ["country"],
-                        "chronicle_selector": {
-                            "source_name": "irs_soi",
-                            "source_measure_id": "agi",
-                            "provenance_class": "administrative",
-                        },
-                        "measurement": {"entity": "tax_unit", "concept": "us.agi"},
-                        "bindings": {
-                            "microcosm": {"metric_name": "irs_soi/agi/total"},
-                        },
-                    }
-                ],
-            }
-        )
-    )
-    return facts_path, profile_path
+    return facts_path
 
 
-def test_artifact_build_load_resolve_round_trip(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+def _rewrite_manifest_hash(out_dir):
+    facts_file = out_dir / "consumer_facts.jsonl"
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["facts_sha256"] = hashlib.sha256(facts_file.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+
+def test_artifact_build_load_round_trip_is_facts_only(tmp_path):
+    facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
-    report = build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-        profile_paths=[profile_path],
-    )
-    assert report.fact_row_count == 3
-    assert report.profile_ids == ("test_profile",)
 
+    report = build_consumer_artifact(out_dir, facts_path=facts_path)
     artifact = load_consumer_artifact(out_dir)
-    assert artifact.manifest["fact_row_count"] == 3
-    resolution = artifact.resolve(
-        "test_profile",
-        {"type": "tax_year", "value": 2022},
-    )
-    assert resolution.resolved[0].value == 110
-    assert resolution.resolved[0].provenance_class == "administrative"
-    assert resolution.resolved[0].survey_instrument is None
-    assert resolution.resolved[0].to_dict()["provenance_class"] == "administrative"
-    assert "survey_instrument" not in resolution.resolved[0].to_dict()
+    manifest = json.loads((out_dir / "manifest.json").read_text())
 
-    with pytest.raises(PeriodContractError):
-        artifact.resolve("test_profile", {"type": "tax_year", "value": 2025})
+    assert report.to_dict() == {
+        "schema_version": "policyengine_ledger.consumer_artifact.v2",
+        "output_dir": str(out_dir),
+        "fact_row_count": 2,
+    }
+    assert manifest == {
+        "schema_version": "policyengine_ledger.consumer_artifact.v2",
+        "consumer_fact_schema_versions": ["ledger.consumer_fact.v1"],
+        "consumer_fact_schema_sha256": CONSUMER_FACT_SCHEMA_SHA256,
+        "fact_row_count": 2,
+        "facts_sha256": hashlib.sha256(
+            (out_dir / "consumer_facts.jsonl").read_bytes()
+        ).hexdigest(),
+    }
+    assert {path.name for path in out_dir.iterdir()} == {
+        "consumer_facts.jsonl",
+        "manifest.json",
+    }
+    assert artifact.path == out_dir
+    assert len(artifact.rows) == 2
 
 
-def test_artifact_coverage_reports_periods_and_assertions(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-    report = build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-        profile_paths=[profile_path],
-    )
-    target_coverage = report.coverage["test_profile"]["soi.agi.total"]["country"]
-    assert target_coverage["matched_row_count"] == 2
-    assert target_coverage["fact_periods"] == ["tax_year:2021", "tax_year:2022"]
-    assert target_coverage["assertions"] == ["observation"]
-    coverage_on_disk = json.loads((out_dir / "coverage.json").read_text())
-    assert coverage_on_disk == report.coverage
+def test_artifact_is_reproducible(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+
+    build_consumer_artifact(first, facts_path=facts_path)
+    build_consumer_artifact(second, facts_path=facts_path)
+
+    for name in ("manifest.json", "consumer_facts.jsonl"):
+        assert (first / name).read_bytes() == (second / name).read_bytes()
 
 
 def test_artifact_load_rejects_tampered_facts(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+    facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-        profile_paths=[profile_path],
-    )
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+
     facts_file = out_dir / "consumer_facts.jsonl"
     rows = facts_file.read_text().splitlines()
     tampered = json.loads(rows[0])
     tampered["value"] = 999
     rows[0] = json.dumps(tampered, sort_keys=True)
     facts_file.write_text("\n".join(rows) + "\n")
+
     with pytest.raises(ValueError, match="manifest hash"):
         load_consumer_artifact(out_dir)
 
 
-def _apply_provenance_case(row, case):
-    if case == "missing":
-        row.pop("provenance_class")
-    elif case == "unknown":
-        row["provenance_class"] = "unknown"
-    elif case == "wrong_type":
-        row["provenance_class"] = 1
-    elif case == "survey_missing_instrument":
-        row["provenance_class"] = "survey_aggregate"
-    elif case == "survey_blank_instrument":
-        row["provenance_class"] = "survey_aggregate"
-        row["survey_instrument"] = "  "
-    elif case == "misplaced_instrument":
-        row["survey_instrument"] = "ACS 1-year"
-    else:  # pragma: no cover - test authoring guard
-        raise AssertionError(case)
+def test_artifact_load_rejects_profile_metadata(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["profiles"] = {"legacy": {"sha256": "00" * 32, "target_count": 1}}
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(ValueError, match="target profiles are consumer-owned"):
+        load_consumer_artifact(out_dir)
+
+
+def test_artifact_load_rejects_legacy_v1_schema(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["schema_version"] = "policyengine_ledger.consumer_artifact.v1"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(
+        ValueError,
+        match="Unsupported consumer artifact schema_version",
+    ):
+        load_consumer_artifact(out_dir)
 
 
 @pytest.mark.parametrize(
@@ -413,871 +183,102 @@ def _apply_provenance_case(row, case):
         ("unknown", "provenance_class"),
         ("wrong_type", "provenance_class"),
         ("survey_missing_instrument", "survey_instrument"),
-        ("survey_blank_instrument", "survey_instrument"),
         ("misplaced_instrument", "survey_instrument"),
     ],
 )
 def test_artifact_build_rejects_malformed_provenance(tmp_path, case, message):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+    facts_path = _write_facts(tmp_path)
     rows = facts_path.read_text().splitlines()
     first = json.loads(rows[0])
-    _apply_provenance_case(first, case)
+    if case == "missing":
+        first.pop("provenance_class")
+    elif case == "unknown":
+        first["provenance_class"] = "unknown"
+    elif case == "wrong_type":
+        first["provenance_class"] = 1
+    elif case == "survey_missing_instrument":
+        first["provenance_class"] = "survey_aggregate"
+    elif case == "misplaced_instrument":
+        first["survey_instrument"] = "ACS 1-year"
     rows[0] = json.dumps(first, sort_keys=True)
     facts_path.write_text("\n".join(rows) + "\n")
 
     with pytest.raises(ValueError, match=message):
-        build_consumer_artifact(
-            tmp_path / "artifact",
-            facts_path=facts_path,
-            profile_paths=[profile_path],
-        )
-
-
-@pytest.mark.parametrize(
-    ("case", "message"),
-    [
-        ("missing", "provenance_class"),
-        ("unknown", "provenance_class"),
-        ("misplaced_instrument", "survey_instrument"),
-    ],
-)
-def test_artifact_load_rejects_malformed_provenance(tmp_path, case, message):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-        profile_paths=[profile_path],
-    )
-    facts_file = out_dir / "consumer_facts.jsonl"
-    rows = facts_file.read_text().splitlines()
-    first = json.loads(rows[0])
-    _apply_provenance_case(first, case)
-    rows[0] = json.dumps(first, sort_keys=True)
-    facts_file.write_text("\n".join(rows) + "\n")
-    manifest_path = out_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    manifest["facts_sha256"] = hashlib.sha256(facts_file.read_bytes()).hexdigest()
-    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
-
-    with pytest.raises(ValueError, match=message):
-        load_consumer_artifact(out_dir)
-
-
-def test_artifact_facts_only_round_trips(tmp_path):
-    facts_path, _ = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-
-    report = build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-    )
-    artifact = load_consumer_artifact(out_dir)
-    manifest = json.loads((out_dir / "manifest.json").read_text())
-
-    assert report.fact_row_count == 3
-    assert report.profile_ids == ()
-    assert report.coverage == {}
-    assert manifest["profiles"] == {}
-    assert (out_dir / "profiles").is_dir()
-    assert list((out_dir / "profiles").iterdir()) == []
-    assert len(artifact.rows) == 3
-    assert artifact.profiles == {}
-
-
-def test_artifact_is_reproducible(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    first = tmp_path / "first"
-    second = tmp_path / "second"
-    for out_dir in (first, second):
-        build_consumer_artifact(
-            out_dir,
-            facts_path=facts_path,
-            profile_paths=[profile_path],
-        )
-    for name in ("manifest.json", "coverage.json", "consumer_facts.jsonl"):
-        assert (first / name).read_bytes() == (second / name).read_bytes()
-
-
-def _ons_firm_crosstab_fact(*, record_set_id, dimensions, value, cell):
-    constraints = tuple(
-        AggregateConstraint(variable=key, operator="==", value=band)
-        for key, band in sorted(dimensions.items())
-    )
-    return AggregateFact(
-        value=value,
-        provenance_class="administrative",
-        period=PeriodDimension(type="calendar_year", value=2025),
-        geography=GeographyDimension(level="country", id="K02000001", vintage="2025"),
-        entity=EntityDimension(name="firm"),
-        measure=Measure(concept="uk.firm.count", unit="count"),
-        aggregation=Aggregation(method="sum"),
-        source=SourceProvenance(
-            source_name="ons",
-            source_table="UK Business Counts 2025",
-            source_file="ukbusinesscounts2025.xlsx",
-            url="https://www.ons.gov.uk/ukbusinesscounts2025.xlsx",
-            vintage="cy2025",
-            extracted_at="2026-06-01",
-            extraction_method="test",
-            source_sha256=SHA,
-            source_size_bytes=100,
-            raw_r2_bucket="ledger-raw",
-            raw_r2_key=f"raw/ons/ukbc/{cell}/{SHA}/x.xlsx",
-            raw_r2_uri=f"r2://ledger-raw/raw/ons/ukbc/{cell}/{SHA}/x.xlsx",
-        ),
-        domain="uk_enterprises",
-        source_record_id=f"ons.uk_business.cy2025.{cell}",
-        source_cell_keys=(f"ledger.source_cell.v1:{cell}",),
-        filters=dict(dimensions),
-        constraints=constraints,
-        layout=SourceRecordLayout(
-            record_set_id=record_set_id,
-            record_set_spec_id="ons.uk_business.v1",
-            measure_id="enterprise_count",
-        ),
-    )
-
-
-def _uk_firms_crosstab_rows():
-    by_sic_turnover = "ons.uk_business.cy2025.enterprise_count.by_sic_turnover_band"
-    by_sic_employment = "ons.uk_business.cy2025.enterprise_count.by_sic_employment_band"
-    return consumer_fact_rows(
-        [
-            _ons_firm_crosstab_fact(
-                record_set_id=by_sic_turnover,
-                dimensions={
-                    "uk.firm.sic_code": "A",
-                    "uk.firm.turnover_band": "0_99k",
-                },
-                value=1200,
-                cell="sic_turnover.A.0_99k",
-            ),
-            _ons_firm_crosstab_fact(
-                record_set_id=by_sic_turnover,
-                dimensions={
-                    "uk.firm.sic_code": "C",
-                    "uk.firm.turnover_band": "100_249k",
-                },
-                value=800,
-                cell="sic_turnover.C.100_249k",
-            ),
-            _ons_firm_crosstab_fact(
-                record_set_id=by_sic_employment,
-                dimensions={
-                    "uk.firm.sic_code": "A",
-                    "uk.firm.employment_band": "0_9",
-                },
-                value=1500,
-                cell="sic_employment.A.0_9",
-            ),
-            _ons_firm_crosstab_fact(
-                record_set_id=by_sic_employment,
-                dimensions={
-                    "uk.firm.sic_code": "C",
-                    "uk.firm.employment_band": "10_49",
-                },
-                value=430,
-                cell="sic_employment.C.10_49",
-            ),
-        ]
-    )
-
-
-def _uk_firms_crosstab_profile_payload():
-    payload = json.loads(
-        (Path(target_profiles_pkg.__file__).parent / "uk_firms.json").read_text()
-    )
-    crosstab_ids = {
-        "ons.uk_business.enterprise_count.sic_turnover_bands",
-        "ons.uk_business.enterprise_count.sic_employment_bands",
-    }
-    payload["targets"] = [
-        target for target in payload["targets"] if target["target_id"] in crosstab_ids
-    ]
-    return payload
-
-
-def test_uk_firms_cross_tab_targets_resolve_through_dimensions_selector(tmp_path):
-    facts_path = tmp_path / "consumer_facts.jsonl"
-    with facts_path.open("w") as file:
-        for row in _uk_firms_crosstab_rows():
-            file.write(json.dumps(row, sort_keys=True) + "\n")
-    profile_path = tmp_path / "uk_firms.json"
-    profile_path.write_text(json.dumps(_uk_firms_crosstab_profile_payload()))
-
-    out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-        profile_paths=[profile_path],
-    )
-    artifact = load_consumer_artifact(out_dir)
-
-    report = artifact.resolve("uk_firms", {"type": "calendar_year", "value": 2025})
-
-    assert report.valid
-    assert artifact.profile_hash_semantics == {"uk_firms": "exact"}
-    by_target: dict[str, list] = {}
-    for row in report.resolved:
-        assert row.basis == "fact"
-        by_target.setdefault(row.target_id, []).append(row)
-
-    sic_turnover = by_target["ons.uk_business.enterprise_count.sic_turnover_bands"]
-    sic_employment = by_target["ons.uk_business.enterprise_count.sic_employment_bands"]
-    assert sorted(row.value for row in sic_turnover) == [800, 1200]
-    assert sorted(row.value for row in sic_employment) == [430, 1500]
-    assert all(
-        sorted(row.dimensions) == ["uk.firm.sic_code", "uk.firm.turnover_band"]
-        for row in sic_turnover
-    )
-    assert all(
-        sorted(row.dimensions) == ["uk.firm.employment_band", "uk.firm.sic_code"]
-        for row in sic_employment
-    )
-
-
-def _uk_firms_dimension_value_profile(dimensions_selector):
-    profile = target_profile_from_mapping(
-        {
-            "schema_version": "policyengine_ledger.target_profile.v1",
-            "profile_id": "uk_firms_dimension_value_smoke",
-            "country": "uk",
-            "label": "UK firms dimension value smoke profile",
-            "defaults": {
-                "base_period_policy": "latest_not_after_build_base_period",
-                "operation": "sum",
-            },
-            "targets": [
-                {
-                    "target_id": "ons.uk_business.enterprise_count.sic_a_turnover_0_99k",
-                    "family": "uk_firms",
-                    "geography_levels": ["country"],
-                    "chronicle_selector": {
-                        "record_set_id": (
-                            "ons.uk_business.cy2025.enterprise_count."
-                            "by_sic_turnover_band"
-                        ),
-                        "dimensions": dimensions_selector,
-                    },
-                    "measurement": {"unit": "count"},
-                    "bindings": {
-                        "microcosm": {
-                            "metric_name": "ons.uk_business.enterprise_count"
-                        },
-                    },
-                },
-            ],
-        }
-    )
-    return profile
-
-
-def test_dimensions_selector_mapping_matches_dimension_values():
-    profile = _uk_firms_dimension_value_profile(
-        {
-            "uk.firm.sic_code": "A",
-            "uk.firm.turnover_band": "0_99k",
-        }
-    )
-
-    report = resolve_profile_targets(
-        profile,
-        _uk_firms_crosstab_rows(),
-        {"type": "calendar_year", "value": 2025},
-    )
-
-    assert report.valid
-    assert [row.value for row in report.resolved] == [1200]
-
-
-def test_dimensions_selector_mapping_requires_exact_dimension_values():
-    profile = _uk_firms_dimension_value_profile({"uk.firm.sic_code": "A"})
-
-    with pytest.raises(ValueError, match="matched no consumer fact rows"):
-        resolve_profile_targets(
-            profile,
-            _uk_firms_crosstab_rows(),
-            {"type": "calendar_year", "value": 2025},
-        )
-
-    report = resolve_profile_targets(
-        profile,
-        _uk_firms_crosstab_rows(),
-        {"type": "calendar_year", "value": 2025},
-        strict=False,
-    )
-
-    assert not report.valid
-    assert [issue.code for issue in report.issues] == ["no_matching_facts"]
-
-
-def test_dimensions_selector_mapping_rejects_empty_mapping():
-    profile = _uk_firms_dimension_value_profile({})
-
-    with pytest.raises(ValueError, match="empty 'dimensions' mapping"):
-        resolve_profile_targets(
-            profile,
-            _uk_firms_crosstab_rows(),
-            {"type": "calendar_year", "value": 2025},
-        )
-
-    report = resolve_profile_targets(
-        profile,
-        _uk_firms_crosstab_rows(),
-        {"type": "calendar_year", "value": 2025},
-        strict=False,
-    )
-
-    assert not report.valid
-    assert [issue.code for issue in report.issues] == [
-        "empty_dimensions_selector",
-        "no_matching_facts",
-    ]
-
-
-def test_dimensions_selector_mapping_rejects_unknown_dimension_names():
-    profile = _uk_firms_dimension_value_profile(
-        {
-            "uk.firm.sic_cod": "A",
-            "uk.firm.turnover_band": "0_99k",
-        }
-    )
-
-    with pytest.raises(ValueError, match="unknown dimensions"):
-        resolve_profile_targets(
-            profile,
-            _uk_firms_crosstab_rows(),
-            {"type": "calendar_year", "value": 2025},
-        )
-
-    report = resolve_profile_targets(
-        profile,
-        _uk_firms_crosstab_rows(),
-        {"type": "calendar_year", "value": 2025},
-        strict=False,
-    )
-
-    assert not report.valid
-    assert [issue.code for issue in report.issues] == [
-        "unknown_dimension_selector",
-        "no_matching_facts",
-    ]
-
-
-def _rewrite_facts_file(out_dir, rows):
-    facts_file = out_dir / "consumer_facts.jsonl"
-    facts_file.write_text(
-        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows)
-    )
-    manifest_path = out_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    manifest["facts_sha256"] = hashlib.sha256(facts_file.read_bytes()).hexdigest()
-    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+        build_consumer_artifact(tmp_path / "artifact", facts_path=facts_path)
 
 
 def test_artifact_load_rejects_row_missing_required_field(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+    facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    facts_file = out_dir / "consumer_facts.jsonl"
+    rows = facts_file.read_text().splitlines()
+    first = json.loads(rows[0])
+    first.pop("entity")
+    rows[0] = json.dumps(first, sort_keys=True)
+    facts_file.write_text("\n".join(rows) + "\n")
+    _rewrite_manifest_hash(out_dir)
 
-    rows = _rows()
-    del rows[0]["observed_measure"]["unit"]
-    _rewrite_facts_file(out_dir, rows)
-
-    with pytest.raises(ValueError, match="unit"):
-        load_consumer_artifact(out_dir)
-
-
-def test_artifact_load_rejects_unknown_extra_field(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
-
-    rows = _rows()
-    rows[0]["unexpected_field"] = "surprise"
-    _rewrite_facts_file(out_dir, rows)
-
-    with pytest.raises(ValueError, match="unexpected_field"):
+    with pytest.raises(ValueError, match="schema validation"):
         load_consumer_artifact(out_dir)
 
 
 def test_artifact_load_rejects_unknown_schema_sha256(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+    facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
-
+    build_consumer_artifact(out_dir, facts_path=facts_path)
     manifest_path = out_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
-    manifest["consumer_fact_schema_sha256"] = "0" * 64
+    manifest["consumer_fact_schema_sha256"] = "00" * 32
     manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
-    with pytest.raises(ValueError, match="consumer_fact_schema_sha256"):
-        load_consumer_artifact(out_dir)
-
-
-def test_artifact_load_rejects_tampered_profile(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
-
-    profile_file = out_dir / "profiles" / "test_profile.json"
-    tampered = profile_file.read_bytes().replace(b"Test profile", b"Xest profile", 1)
-    assert tampered != profile_file.read_bytes()
-    profile_file.write_bytes(tampered)
-
-    with pytest.raises(ValueError, match="does not match the manifest"):
-        load_consumer_artifact(out_dir)
-
-
-def test_artifact_load_accepts_legacy_profile_hash_only_via_explicit_path(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
-
-    profile_file = out_dir / "profiles" / "test_profile.json"
-    profile_bytes = profile_file.read_bytes()
-    assert profile_bytes.endswith(b"\n")
-    legacy_hash = hashlib.sha256(profile_bytes[:-1]).hexdigest()
-
-    manifest_path = out_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    # A pre-fix manifest carries no schema sha and hashed the profile without
-    # its trailing newline.
-    del manifest["consumer_fact_schema_sha256"]
-    manifest["profiles"]["test_profile"]["sha256"] = legacy_hash
-    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
-
-    artifact = load_consumer_artifact(out_dir)
-    assert artifact.profile_hash_semantics == {"test_profile": "legacy_profile_hash"}
-
-    # The same legacy hash is rejected once the manifest is post-fix.
-    manifest["consumer_fact_schema_sha256"] = CONSUMER_FACT_SCHEMA_SHA256
-    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
-    with pytest.raises(ValueError, match="does not match the manifest"):
+    with pytest.raises(ValueError, match="does not match the packaged"):
         load_consumer_artifact(out_dir)
 
 
 def test_artifact_build_rejects_duplicate_aggregate_fact_key(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    with facts_path.open("a") as file:
-        file.write(json.dumps(_rows()[0], sort_keys=True) + "\n")
+    facts_path = _write_facts(tmp_path)
+    first = facts_path.read_text().splitlines()[0]
+    facts_path.write_text(first + "\n" + first + "\n")
 
-    with pytest.raises(ValueError, match="aggregate_fact_key"):
-        build_consumer_artifact(
-            tmp_path / "artifact",
-            facts_path=facts_path,
-            profile_paths=[profile_path],
-        )
+    with pytest.raises(ValueError, match="must be unique"):
+        build_consumer_artifact(tmp_path / "artifact", facts_path=facts_path)
 
 
-def _build_and_load_with_row_mutation(tmp_path, mutate):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+def test_load_rejects_a_forged_identity_key(tmp_path):
+    facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
+    build_consumer_artifact(out_dir, facts_path=facts_path)
     facts_file = out_dir / "consumer_facts.jsonl"
-    lines = [ln for ln in facts_file.read_text().splitlines() if ln.strip()]
-    rows = [json.loads(ln) for ln in lines]
-    mutate(rows)
-    facts_file.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows))
-    # Re-point the manifest facts hash so the row checks (not the file hash) fire.
-    import hashlib as _hashlib
+    rows = facts_file.read_text().splitlines()
+    first = json.loads(rows[0])
+    first["aggregate_fact_key"] = "ledger.aggregate_fact.v2:" + "0" * 24
+    rows[0] = json.dumps(first, sort_keys=True)
+    facts_file.write_text("\n".join(rows) + "\n")
+    _rewrite_manifest_hash(out_dir)
 
-    manifest_path = out_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    manifest["facts_sha256"] = _hashlib.sha256(facts_file.read_bytes()).hexdigest()
-    manifest_path.write_text(json.dumps(manifest))
-    return out_dir
-
-
-def test_load_rejects_a_forged_all_zero_identity_key(tmp_path):
-    # Sol finding 7: schema validates key SYNTAX; a syntactically valid but
-    # forged identity key that does not hash the row's content must be rejected.
-    def zero_keys(rows):
-        zero = "0" * 24
-        rows[0]["aggregate_fact_key"] = f"ledger.aggregate_fact.v2:{zero}"
-        rows[0]["source_release_key"] = f"ledger.source_release.v2:{zero}"
-        rows[0]["source_series_key"] = f"ledger.source_series.v2:{zero}"
-        rows[0]["observed_measure_key"] = f"ledger.observed_measure.v2:{zero}"
-        rows[0]["dimension_set_key"] = f"ledger.dimension_set.v2:{zero}"
-        rows[0]["universe_constraint_set_key"] = (
-            f"ledger.universe_constraint_set.v2:{zero}"
-        )
-
-    out_dir = _build_and_load_with_row_mutation(tmp_path, zero_keys)
-    with pytest.raises(ValueError, match="does not match the row"):
-        load_consumer_artifact(out_dir)
-
-
-def test_load_rejects_a_non_finite_number(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
-    out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
-    facts_file = out_dir / "consumer_facts.jsonl"
-    lines = [ln for ln in facts_file.read_text().splitlines() if ln.strip()]
-    # Inject a raw NaN token that json.loads would otherwise accept.
-    lines[0] = lines[0].replace('"value":110', '"value":NaN', 1)
-    if "NaN" not in lines[0]:
-        lines[0] = lines[0][:-1] + ',"rogue":NaN}'
-    facts_file.write_text("\n".join(lines) + "\n")
-    import hashlib as _hashlib
-
-    manifest_path = out_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    manifest["facts_sha256"] = _hashlib.sha256(facts_file.read_bytes()).hexdigest()
-    manifest_path.write_text(json.dumps(manifest))
-    with pytest.raises(ValueError, match="non-finite"):
+    with pytest.raises(ValueError, match="identity key does not match the row"):
         load_consumer_artifact(out_dir)
 
 
 def test_load_rejects_a_false_manifest_row_count(tmp_path):
-    facts_path, profile_path = _write_artifact_inputs(tmp_path)
+    facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        out_dir, facts_path=facts_path, profile_paths=[profile_path]
-    )
+    build_consumer_artifact(out_dir, facts_path=facts_path)
     manifest_path = out_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     manifest["fact_row_count"] = 999
-    manifest_path.write_text(json.dumps(manifest))
-    with pytest.raises(ValueError, match="fact_row_count"):
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(ValueError, match="declares fact_row_count"):
         load_consumer_artifact(out_dir)
 
 
-def _mixed_assertion_rows():
-    """Observed 2021/2022 plus a 2023 projection of the same soi series."""
-    return consumer_fact_rows(
-        [
-            _fact(value=100, period_value=2021),
-            _fact(value=110, period_value=2022),
-            _fact(value=120, period_value=2023, assertion="source_projection"),
-        ]
-    )
+def test_build_consumer_artifact_help_has_no_profile_options(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["build-consumer-artifact", "--help"])
 
-
-def _policy_profile(
-    *,
-    defaults_policy=None,
-    target_policy=None,
-    selector=None,
-    target_id="soi.agi.total",
-):
-    mapping = {
-        "schema_version": "policyengine_ledger.target_profile.v1",
-        "profile_id": "test_profile",
-        "country": "us",
-        "label": "Test profile",
-        "defaults": {
-            "base_period_policy": "latest_not_after_build_base_period",
-            "operation": "sum",
-        },
-        "targets": [
-            {
-                "target_id": target_id,
-                "family": "irs_soi",
-                "geography_levels": ["country"],
-                "chronicle_selector": selector
-                or {"source_name": "irs_soi", "source_measure_id": "agi"},
-                "measurement": {"entity": "tax_unit", "concept": "us.agi"},
-                "bindings": {
-                    "microcosm": {"metric_name": "irs_soi/agi/total"},
-                },
-            }
-        ],
-    }
-    if defaults_policy is not None:
-        mapping["defaults"]["assertion_policy"] = defaults_policy
-    if target_policy is not None:
-        mapping["targets"][0]["assertion_policy"] = target_policy
-    return target_profile_from_mapping(mapping)
-
-
-def test_observed_only_default_never_resolves_a_projection():
-    # The 2023 projection is invisible; the newest observed fact is 2022, and
-    # taking it at a requested 2023 base period correctly demands an explicit
-    # alignment instead of resolving anything silently.
-    report = resolve_profile_targets(
-        _policy_profile(),
-        _mixed_assertion_rows(),
-        {"type": "tax_year", "value": 2023},
-        strict=False,
-    )
-    assert not report.resolved
-    (violation,) = report.violations
-    assert violation.fact_period == {"type": "tax_year", "value": 2022}
-    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
-
-
-def test_observed_only_fails_loudly_on_projection_only_families():
-    report = resolve_profile_targets(
-        _policy_profile(
-            selector={"source_name": "cbo", "source_measure_id": "receipts"},
-            target_id="cbo.receipts",
-        ),
-        _rows(),
-        {"type": "calendar_year", "value": 2027},
-        strict=False,
-    )
-    assert not report.resolved
-    (issue,) = [i for i in report.issues if i.code == "only_projection_facts"]
-    assert issue.severity == "error"
-    assert not report.valid
-
-
-def test_prefer_observed_takes_the_observation_over_a_newer_projection():
-    # Observations win even when a projection sits exactly at the requested
-    # period; the observed 2022 fact is chosen and the period contract then
-    # asks for an alignment rather than silently substituting the projection.
-    report = resolve_profile_targets(
-        _policy_profile(defaults_policy="prefer_observed"),
-        _mixed_assertion_rows(),
-        {"type": "tax_year", "value": 2023},
-        strict=False,
-    )
-    assert not report.resolved
-    (violation,) = report.violations
-    assert violation.fact_period == {"type": "tax_year", "value": 2022}
-
-
-def test_prefer_observed_falls_back_to_projections_with_a_warning():
-    report = resolve_profile_targets(
-        _policy_profile(
-            defaults_policy="prefer_observed",
-            selector={"source_name": "cbo", "source_measure_id": "receipts"},
-            target_id="cbo.receipts",
-        ),
-        _rows(),
-        {"type": "calendar_year", "value": 2027},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.assertion == "source_projection"
-    assert row.value == 250
-    (issue,) = [i for i in report.issues if i.code == "resolved_from_projection"]
-    assert issue.severity == "warning"
-
-
-def test_allow_source_projection_resolves_the_latest_projection():
-    report = resolve_profile_targets(
-        _policy_profile(target_policy="allow_source_projection"),
-        _mixed_assertion_rows(),
-        {"type": "tax_year", "value": 2023},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.assertion == "source_projection"
-    assert row.value == 120
-    assert [i for i in report.issues if i.code == "resolved_from_projection"]
-
-
-def _tied_assertion_rows():
-    """An observation and a projection colliding at the same 2023 period."""
-    return consumer_fact_rows(
-        [
-            _fact(value=110, period_value=2022),
-            _fact(value=130, period_value=2023),
-            _fact(value=120, period_value=2023, assertion="source_projection"),
-        ]
-    )
-
-
-def test_allow_source_projection_resolves_the_observation_on_a_period_tie():
-    # Emitting both rows would double-count the series; the realized value
-    # wins the tie and the overlap is flagged instead of passing silently.
-    report = resolve_profile_targets(
-        _policy_profile(target_policy="allow_source_projection"),
-        _tied_assertion_rows(),
-        {"type": "tax_year", "value": 2023},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.assertion == "observation"
-    assert row.value == 130
-    (issue,) = [i for i in report.issues if i.code == "ambiguous_assertion_at_period"]
-    assert issue.severity == "warning"
-    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
-
-
-def test_explicit_assertion_selector_reaches_the_projection_despite_a_tie():
-    # Selecting on assertion is maximal intent: the selector filters the tie
-    # away before resolution, so the projection resolves without ambiguity.
-    report = resolve_profile_targets(
-        _policy_profile(
-            selector={
-                "source_name": "irs_soi",
-                "source_measure_id": "agi",
-                "assertion": "source_projection",
-            }
-        ),
-        _tied_assertion_rows(),
-        {"type": "tax_year", "value": 2023},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.assertion == "source_projection"
-    assert row.value == 120
-    assert [i for i in report.issues if i.code == "resolved_from_projection"]
-    assert not [i for i in report.issues if i.code == "ambiguous_assertion_at_period"]
-
-
-def test_assertion_tie_break_is_scoped_to_the_series():
-    # Geography A carries a genuine tie (observation + projection at the
-    # chosen period); geography B has only a projection. The tie-break must
-    # drop A's projection, keep A's observation — and leave B's projection
-    # alone: B was never in a tie with anything.
-    rows = consumer_fact_rows(
-        [
-            _fact(value=130, period_value=2023),
-            _fact(value=120, period_value=2023, assertion="source_projection"),
-            _fact(
-                value=99,
-                period_value=2023,
-                assertion="source_projection",
-                geography_id="0100000GB",
-            ),
-        ]
-    )
-    report = resolve_profile_targets(
-        _policy_profile(target_policy="allow_source_projection"),
-        rows,
-        {"type": "tax_year", "value": 2023},
-    )
-    assert report.valid
-    resolved = {row.geography["id"]: row for row in report.resolved}
-    assert set(resolved) == {"0100000US", "0100000GB"}
-    assert resolved["0100000US"].assertion == "observation"
-    assert resolved["0100000US"].value == 130
-    assert resolved["0100000GB"].assertion == "source_projection"
-    assert resolved["0100000GB"].value == 99
-    (ambiguous,) = [
-        i for i in report.issues if i.code == "ambiguous_assertion_at_period"
-    ]
-    assert "0100000US" in ambiguous.message
-    assert "0100000GB" not in ambiguous.message
-    assert [i for i in report.issues if i.code == "resolved_from_projection"]
-
-
-def test_prefer_observed_lets_a_projection_only_series_resolve():
-    # The Northern-Ireland shape: one geography observed, another carrying
-    # only a projection at the same period. Per-series preference resolves
-    # both instead of starving the projection-only series.
-    rows = consumer_fact_rows(
-        [
-            _fact(value=130, period_value=2023),
-            _fact(
-                value=99,
-                period_value=2023,
-                assertion="source_projection",
-                geography_id="0100000GB",
-            ),
-        ]
-    )
-    report = resolve_profile_targets(
-        _policy_profile(defaults_policy="prefer_observed"),
-        rows,
-        {"type": "tax_year", "value": 2023},
-    )
-    assert report.valid
-    resolved = {row.geography["id"]: row for row in report.resolved}
-    assert resolved["0100000US"].assertion == "observation"
-    assert resolved["0100000GB"].assertion == "source_projection"
-    assert [i for i in report.issues if i.code == "resolved_from_projection"]
-
-
-def test_prefer_observed_still_never_mixes_bases_within_one_series():
-    # Within a single series the family rule survives the per-series change:
-    # an observed 2022 fact still beats a projection sitting at the
-    # requested 2023 period, ending in a period-contract violation rather
-    # than a silent base mix.
-    report = resolve_profile_targets(
-        _policy_profile(defaults_policy="prefer_observed"),
-        _mixed_assertion_rows(),
-        {"type": "tax_year", "value": 2023},
-        strict=False,
-    )
-    assert not report.resolved
-    (violation,) = report.violations
-    assert violation.fact_period == {"type": "tax_year", "value": 2022}
-
-
-def test_target_assertion_policy_overrides_the_profile_default():
-    report = resolve_profile_targets(
-        _policy_profile(
-            defaults_policy="allow_source_projection",
-            target_policy="observed_only",
-        ),
-        _mixed_assertion_rows(),
-        {"type": "tax_year", "value": 2022},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.assertion == "observation"
-    assert row.value == 110
-    assert not [i for i in report.issues if i.code == "resolved_from_projection"]
-
-
-def test_invalid_assertion_policy_values_are_rejected():
-    with pytest.raises(ValueError, match="assertion_policy"):
-        _policy_profile(defaults_policy="projections_welcome")
-    with pytest.raises(ValueError, match="assertion_policy"):
-        _policy_profile(target_policy="observed")
-
-
-def test_unknown_assertion_values_fail_resolution_loudly():
-    # A typo'd assertion must not quietly vanish from every policy's
-    # candidate set; the resolver polices the enum like the file loader does.
-    rows = _mixed_assertion_rows()
-    rows[-1] = dict(rows[-1], assertion="projection")
-    with pytest.raises(ValueError, match="unsupported assertion"):
-        resolve_profile_targets(
-            _policy_profile(),
-            rows,
-            {"type": "tax_year", "value": 2022},
-        )
-
-
-def test_missing_assertion_defaults_to_observation_at_resolve():
-    # Back-compat parity with the file loader: rows that predate the axis
-    # resolve as observations.
-    rows = _mixed_assertion_rows()
-    legacy = dict(rows[1])
-    del legacy["assertion"]
-    rows[1] = legacy
-    report = resolve_profile_targets(
-        _policy_profile(),
-        rows,
-        {"type": "tax_year", "value": 2022},
-    )
-    assert report.valid
-    (row,) = report.resolved
-    assert row.assertion == "observation"
-    assert row.value == 110
-
-
-def test_assertion_selector_and_target_policy_together_are_rejected():
-    # The selector already pins the axis; a per-target policy alongside it is
-    # a contradiction the author should hear about at load, not have
-    # silently resolved.
-    with pytest.raises(ValueError, match="declares both assertion_policy"):
-        _policy_profile(
-            target_policy="observed_only",
-            selector={
-                "source_name": "irs_soi",
-                "source_measure_id": "agi",
-                "assertion": "source_projection",
-            },
-        )
+    assert excinfo.value.code == 0
+    help_text = capsys.readouterr().out
+    assert "--profile" not in help_text
+    assert "facts-only" in help_text

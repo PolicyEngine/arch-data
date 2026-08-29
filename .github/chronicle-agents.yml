@@ -19,20 +19,6 @@ approved_agents:
     required_judges:
       - ledger-source-fidelity
       - ledger-boundary
-  - id: ledger-target-profile-author
-    purpose: Add source-backed target profiles and model measurement contracts without target values.
-    allowed_paths:
-      - policyengine_chronicle/target_profiles/**
-      - chronicle/targets/**
-      - tests/test_policyengine_chronicle_target_profiles.py
-      - tests/test_us_poverty_target_coverage.py
-    required_deterministic_checks:
-      - no embedded target values
-      - sum-only operation
-      - selector references raw Chronicle facts
-    required_judges:
-      - ledger-target-profile
-      - ledger-boundary
   - id: ledger-contract-maintainer
     purpose: Change Chronicle schemas, identity, provenance, or consumer contracts.
     allowed_paths:
@@ -54,8 +40,6 @@ approved_agents:
 required_judges:
   ledger-source-fidelity:
     verdict: PASS if every new fact is directly traceable to publisher bytes/cells and no source values are invented.
-  ledger-target-profile:
-    verdict: PASS if profiles contain selectors and measurement contracts only, with no target values or active calibration decisions.
   ledger-contract:
     verdict: PASS if schema or identity changes preserve source provenance and do not move Microcosm responsibilities into Chronicle.
   ledger-boundary:

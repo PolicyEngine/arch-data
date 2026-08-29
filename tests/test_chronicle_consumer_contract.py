@@ -34,12 +34,9 @@ from chronicle.harness import main
 from chronicle.jurisdictions.us.soi import build_soi_table_1_1_facts
 from chronicle.store import save_facts_jsonl
 from policyengine_chronicle.consumer import (
-    PeriodContractError,
     build_consumer_artifact,
     load_consumer_artifact,
-    resolve_profile_targets,
 )
-from policyengine_chronicle.target_profiles import target_profile_from_mapping
 
 CONSUMER_FACT_SCHEMA_PATH = (
     Path(__file__).parents[1] / "docs" / "schemas" / "consumer_fact.v1.schema.json"
@@ -507,67 +504,15 @@ def test_academic_year_rows_round_trip_through_consumer_artifact(tmp_path):
         {"type": "academic_year", "value": 2024},
     ]
 
-    profile_mapping = {
-        "schema_version": "policyengine_ledger.target_profile.v1",
-        "profile_id": "academic_year_round_trip",
-        "country": "uk",
-        "label": "Academic-year period round trip",
-        "defaults": {
-            "base_period_policy": "latest_not_after_build_base_period",
-            "operation": "sum",
-        },
-        "targets": [
-            {
-                "target_id": "slc.maintenance_loan_recipients",
-                "family": "slc",
-                "geography_levels": ["country"],
-                "chronicle_selector": {
-                    "source_name": rows[0]["source"]["source_name"],
-                    "source_measure_id": rows[0]["observed_measure"][
-                        "source_measure_id"
-                    ],
-                },
-                "measurement": {
-                    "entity": "person",
-                    "concept": "uk.education.maintenance_loan_recipients",
-                },
-                "bindings": {
-                    "policyengine": {
-                        "metric_name": "slc/maintenance_loan/recipients",
-                    }
-                },
-            }
-        ],
-    }
-    target_profile_from_mapping(profile_mapping)
-    profile_path = tmp_path / "academic_year_round_trip.json"
-    profile_path.write_text(json.dumps(profile_mapping, indent=2) + "\n")
-
     artifact_dir = tmp_path / "artifact"
-    build_consumer_artifact(
-        artifact_dir,
-        facts_path=facts_path,
-        profile_paths=[profile_path],
-    )
+    build_consumer_artifact(artifact_dir, facts_path=facts_path)
     artifact = load_consumer_artifact(artifact_dir)
 
-    report = resolve_profile_targets(
-        artifact.profiles["academic_year_round_trip"],
-        artifact.rows,
+    assert [row["period"] for row in artifact.rows] == [
+        {"type": "academic_year", "value": 2023},
         {"type": "academic_year", "value": 2024},
-    )
-    assert report.valid
-    (resolved,) = report.resolved
-    assert resolved.basis == "fact"
-    assert resolved.value == 100.0
-    assert resolved.fact_period == {"type": "academic_year", "value": 2024}
-
-    with pytest.raises(PeriodContractError):
-        resolve_profile_targets(
-            artifact.profiles["academic_year_round_trip"],
-            artifact.rows,
-            {"type": "fiscal_year", "value": 2024},
-        )
+    ]
+    assert [row["value"] for row in artifact.rows] == [90.0, 100.0]
 
 
 def test_consumer_fact_row_marks_decimal_values_as_decimal_strings():

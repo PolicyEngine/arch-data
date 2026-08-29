@@ -355,7 +355,7 @@ a within-source pair ending in 2025 in this lane.
 Any choice of proxy family, ratio calculation, aging, cross-source mapping,
 period alignment, target activation, or solver construction belongs to the
 consumer. When a target period differs from a fact reference period, the
-consumer must provide its explicit `PeriodAlignmentDeclaration`; Chronicle
-returns the published levels, never the aligned number.
+consumer-owned contract must declare the alignment; Chronicle returns the
+published levels, never the aligned number.
 
 LANE C5 DONE

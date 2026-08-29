@@ -10,15 +10,13 @@ values as structured, queryable facts.
 
 Chronicle may normalize structure: parse files, type values, declare units and
 scales, assign geography and period identifiers, preserve lineage back to
-source artifacts, and publish target profiles that identify source-backed facts
-and measurement contracts. Chronicle does not reconcile inconsistent sources,
-impute missing data, store raw survey microdata, or execute simulator-specific
-calibration.
+source artifacts, and publish source-backed facts. Chronicle does not own
+selection or measurement contracts, reconcile inconsistent sources, impute
+missing data, store raw survey microdata, or execute simulator-specific calibration.
 
-Microcosm consumes Chronicle facts and target profiles, selects the subset its
-current support universe can target, applies minimal period alignment when
-declared, and runs calibration. Thesis can consume the same facts and
-measurement contracts as official observations.
+Microcosm consumes Chronicle facts, owns the contracts that select and bind
+them, applies declared period alignment, and runs calibration. Thesis can
+consume the same facts as official observations.
 
 ## Purpose
 
@@ -35,11 +33,8 @@ This repository provides:
   their `survey_instrument`.
 - **Normalization**: Low-assumption representation changes such as unit/scale
   conversion and source-published total/share arithmetic.
-- **Target profiles**: Source-backed target contracts and model-measurement
-  bindings that Microcosm, Thesis, and future rule engines can consume.
 - **Consumer artifacts**: Versioned, reproducible bundles of consumer-contract
-  fact rows plus profiles (`chronicle build-consumer-artifact`) with a resolution
-  API that enforces the period contract.
+  fact rows plus manifest hashes (`chronicle build-consumer-artifact`).
 - **Jurisdiction loaders**: Source-specific ETL that emits the shared Chronicle
   schema.
 
@@ -50,27 +45,24 @@ They are source-backed claims with provenance.
 
 The load-bearing rule:
 
-> Chronicle may re-express a published value and declare target contracts, but may
-> not reconcile, impute, or transform published values in ways that change their
-> meaning.
+> Chronicle may re-express a published value, but may not select it for a
+> consumer or transform it in ways that change its meaning.
 
 The store is facts-only, and the line is who asserted the value. Everything a
 publisher asserted — including the publisher's own projections — is a fact.
 Everything PolicyEngine computes (aged, uprated, forecast, or reconciled
 levels) is a downstream build artifact and never enters the store; Microcosm
 owns aging as a named, versioned model over Chronicle growth-factor facts. A
-fact's `period` is the period its value refers to, and resolving a target at
-any other period hard-fails without an explicit consumer
-`PeriodAlignmentDeclaration` — the guard against silent un-aged calibration
-(see [`docs/adr-chronicle-facts-only.md`](docs/adr-chronicle-facts-only.md)).
+fact's `period` is the period its value refers to. Consumers must enforce any
+contract that aligns it to another period (see
+[`docs/adr-chronicle-facts-only.md`](docs/adr-chronicle-facts-only.md)).
 
 | Layer | Owns | Examples |
 |-------|------|----------|
 | Chronicle Sources | Source artifacts and provenance | URLs, checksums, source files, parsed tables/cells |
 | Chronicle Facts | Structured source claims | SOI cells, ACS estimates, CPI values, CBO-published projections |
 | Chronicle Normalization | Representation changes | Unit scales, typed values, geography/date identifiers |
-| Chronicle Target Profiles | Source-backed calibration contracts | SOI EITC totals, CBO baselines, source-published growth factors, measurement bindings |
-| Microcosm Targets | Build-ready active subset | Support-aware activation, solver inputs, diagnostics |
+| Microcosm Target Contracts | Selection, measurement bindings, and active subset | Period alignment, support-aware activation, solver inputs, diagnostics |
 
 The storage split is documented in
 [`docs/storage-architecture.md`](docs/storage-architecture.md): `ledger-raw`
@@ -126,8 +118,8 @@ chronicle/
 └── docs/                    # Architecture and source documentation
 ```
 
-New code should prefer `policyengine_chronicle` for source-backed fact and target
-profile consumers. Existing in-repo implementation code may continue using
+New code should prefer `policyengine_chronicle` for source-backed fact
+consumers. Existing in-repo implementation code may continue using
 legacy implementation modules while the namespace migration is completed.
 Solver execution and calibrated dataset construction belong in Microcosm.
 
@@ -303,6 +295,11 @@ consumer artifact:
 uv run chronicle build-bundle --suite uk --out /tmp/chronicle-uk --replace
 uv run chronicle build-consumer-artifact --facts /tmp/chronicle-uk --out /tmp/chronicle-uk-artifact --replace
 ```
+
+The command writes a `policyengine_ledger.consumer_artifact.v2` artifact containing
+only `consumer_facts.jsonl` and `manifest.json`. Version 2 is incompatible with the
+retired v1 profile-bearing contract: loaders reject v1 manifests so downstreams must
+adopt the facts-only surface explicitly.
 
 `--year` is inert for `--suite uk` because the UK packages are year-pinned.
 The US off-year bundle behavior is unchanged and out of scope here.
@@ -493,10 +490,8 @@ LEDGER_EXPLORER_DATA_DIRS=/tmp/chronicle-build-a,/tmp/chronicle-build-b npm run 
 
 ```python
 from policyengine_chronicle.targets import DataSource, Target, TargetType, query_targets
-from policyengine_chronicle.target_profiles import load_target_profile
 
 target_rows = query_targets(jurisdiction="us", year=2024)
-profile = load_target_profile("us_fiscal")
 ```
 
 ## Target Input Schema
@@ -508,8 +503,8 @@ Target inputs use a three-table schema:
 - **stratum_constraints**: Rules defining each stratum.
 - **targets**: Source-published aggregate values linked to strata.
 
-These are inputs to Chronicle target profiles. Microcosm owns the active
-support-aware subset and calibrated solver execution.
+These are source-backed inputs. Microcosm owns the contracts that select them,
+the active support-aware subset, and calibrated solver execution.
 
 ## Chronicle Facts And Microcosm Targets
 
@@ -521,8 +516,8 @@ publishes the total/share relationship.
 
 Inflation, cross-source reconciliation, and support-aware activation belong in
 Microcosm unless the source itself publishes the adjusted or projected series.
-Target profiles in Chronicle may declare the source-backed rows and measurement
-bindings Microcosm is allowed to activate.
+Microcosm contracts declare which source-backed rows and measurement bindings a
+build may activate.
 
 ```python
 from policyengine_chronicle.facts import SourceFact
@@ -558,10 +553,10 @@ normalized_fact = convert_units(fact, 1000, "count")
 ## Boundaries
 
 - **Chronicle** owns government-statistics release artifacts, provenance, source
-  facts, aggregate facts, target profiles, and measurement contracts.
-- **Microcosm** owns support-aware target activation, minimal period alignment,
-  raw microdata access, simulation interfaces, entity modeling, weights,
-  diagnostics, and calibration execution.
+  facts, and aggregate facts.
+- **Microcosm** owns selection and measurement contracts, support-aware target
+  activation, period alignment, raw microdata access, simulation interfaces,
+  entity modeling, weights, diagnostics, and calibration execution.
 - **Jurisdiction source packages** such as `ledger-us` and `chronicle-uk` own
   source-specific parsers and specs that emit shared Chronicle records.
 - **Jurisdiction simulation packages** own simulation-specific variable

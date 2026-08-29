@@ -1,3 +1,7 @@
+import importlib
+
+import pytest
+
 from policyengine_chronicle import (
     AggregateFact,
     Aggregation,
@@ -12,10 +16,11 @@ from policyengine_chronicle import (
 import policyengine_chronicle.normalization as chronicle_normalization
 from policyengine_chronicle.cli import main as chronicle_main
 from policyengine_chronicle.targets.us_poverty import hard_target_package_aliases
-import pytest
 
 
-def test__given_chronicle_import_path__then_it_reexports_chronicle_fact_schema() -> None:
+def test__given_chronicle_import_path__then_it_reexports_chronicle_fact_schema() -> (
+    None
+):
     # Given
     fact = AggregateFact(
         value=1,
@@ -43,7 +48,9 @@ def test__given_chronicle_import_path__then_it_reexports_chronicle_fact_schema()
     assert key.startswith("ledger.fact.v1:")
 
 
-def test__given_chronicle_facts_import_path__then_it_reexports_chronicle_facts() -> None:
+def test__given_chronicle_facts_import_path__then_it_reexports_chronicle_facts() -> (
+    None
+):
     # When
     from chronicle.facts import AggregateFact as ChronicleCoreAggregateFact
     from policyengine_chronicle.facts import AggregateFact as ChronicleAggregateFact
@@ -52,7 +59,9 @@ def test__given_chronicle_facts_import_path__then_it_reexports_chronicle_facts()
     assert ChronicleAggregateFact is ChronicleCoreAggregateFact
 
 
-def test__given_chronicle_target_import_path__then_it_reexports_target_contracts() -> None:
+def test__given_chronicle_target_import_path__then_it_reexports_target_contracts() -> (
+    None
+):
     # When
     aliases = hard_target_package_aliases()
 
@@ -64,12 +73,15 @@ def test__given_chronicle_target_import_path__then_it_reexports_target_contracts
 def test__given_public_chronicle_namespaces__then_core_helpers_are_importable() -> None:
     from policyengine_chronicle.normalization import convert_units
     from policyengine_chronicle.sources import SourceFile, query_sources
-    from policyengine_chronicle.target_profiles import load_target_profile
 
     assert SourceFile is not None
     assert query_sources is not None
     assert convert_units is not None
-    assert load_target_profile is not None
+
+
+def test__given_retired_profile_namespace__then_it_is_not_importable() -> None:
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("policyengine_chronicle.target_profiles")
 
 
 def test__given_public_chronicle_normalization__then_target_construction_is_hidden() -> (

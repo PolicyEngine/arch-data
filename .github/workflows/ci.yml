@@ -58,7 +58,6 @@ jobs:
           import policyengine_chronicle
           import policyengine_chronicle.normalization
           import policyengine_chronicle.sources
-          import policyengine_chronicle.target_profiles
           import policyengine_chronicle.targets
           from policyengine_chronicle.schema import (
               CONSUMER_FACT_SCHEMA_SHA256,

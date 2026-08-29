@@ -8,7 +8,7 @@ structured, queryable facts. Microcosm consumes Chronicle facts to produce final
 calibrated simulation inputs.
 
 This document describes the source-publication pipeline from government
-statistics releases to source-backed facts and target profiles. Chronicle is global at the schema,
+statistics releases to source-backed facts. Chronicle is global at the schema,
 validation, and build-harness layer. Jurisdiction source packages such as
 `ledger-us` and `chronicle-uk` emit records into that shared contract.
 
@@ -16,8 +16,8 @@ validation, and build-harness layer. Jurisdiction source packages such as
 
 | Layer | Owns | Does not own |
 |-------|------|--------------|
-| Chronicle | Source artifacts, provenance, aggregate facts, constraints, target profiles | Raw microdata storage, source reconciliation, aging, imputation, active target selection |
-| Microcosm Targets | Source selection, reconciliation, aging, imputation, active target sets | Source artifact storage and provenance |
+| Chronicle | Source artifacts, provenance, aggregate facts, constraints | Selection and measurement contracts, raw microdata storage, source reconciliation, aging, imputation, active target selection |
+| Microcosm Targets | Selection and measurement contracts, reconciliation, aging, imputation, active target sets | Source artifact storage and provenance |
 | Microcosm | Entity model, weights, calibration interfaces, calibrated output | Source ETL and source provenance |
 | Jurisdiction source packages | Source-specific parsers and specs that emit Chronicle records | Forked fact or constraint schemas |
 | Jurisdiction simulation packages | Model-specific adapters, variable mappings, target recipes | Source facts |
@@ -98,11 +98,9 @@ policyengine_chronicle.aggregate_facts
 (published aggregate facts)
       |
       v
-policyengine_chronicle.target_profiles
-      |
-      v
         Microcosm Targets
-   (selected, reconciled,
+   (consumer-owned contracts;
+    selected, reconciled,
     aged active target sets)
                   |
                   v

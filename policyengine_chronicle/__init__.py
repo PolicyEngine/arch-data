@@ -28,13 +28,8 @@ from chronicle.core import (
 )
 from policyengine_chronicle.consumer import (
     ConsumerArtifact,
-    PeriodAlignmentDeclaration,
-    PeriodContractError,
-    ResolutionReport,
-    ResolvedTarget,
     build_consumer_artifact,
     load_consumer_artifact,
-    resolve_profile_targets,
 )
 
 __all__ = [
@@ -48,12 +43,8 @@ __all__ = [
     "EntityDimension",
     "GeographyDimension",
     "Measure",
-    "PeriodAlignmentDeclaration",
-    "PeriodContractError",
     "PeriodCoverage",
     "PeriodDimension",
-    "ResolutionReport",
-    "ResolvedTarget",
     "SourceProvenance",
     "SourceRecordLayout",
     "ValidationIssue",
@@ -63,7 +54,6 @@ __all__ = [
     "build_fact_key",
     "build_label",
     "load_consumer_artifact",
-    "resolve_profile_targets",
     "validate_fact",
     "validate_facts",
 ]
