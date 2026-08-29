@@ -826,14 +826,15 @@ def infer_r2_country(
     publisher = None
     if package_path is not None:
         path_parts = tuple(part.lower() for part in Path(package_path).parts)
-        # Match the innermost canonical package root, not arbitrary ancestor
-        # directory names such as /work/ons/chronicle/db/data/irs_soi/....
+        # Match the innermost canonical root with both publisher and package
+        # directories. A package itself may be named "packages"; the following
+        # manifest filename must not then be mistaken for a publisher.
         for index in range(len(path_parts) - 1, -1, -1):
             if path_parts[index : index + 2] == ("db", "data"):
-                if index + 2 < len(path_parts):
+                if index + 3 < len(path_parts):
                     publisher = path_parts[index + 2]
                     break
-            elif path_parts[index] == "packages" and index + 1 < len(path_parts):
+            elif path_parts[index] == "packages" and index + 2 < len(path_parts):
                 publisher = path_parts[index + 1]
                 break
     path_country = next(

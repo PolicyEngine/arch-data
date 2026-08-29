@@ -61,6 +61,10 @@ def test_build_derived_r2_key_is_build_scoped():
         ("ird", "/work/ons/chronicle/db/data/ird/wff", "nz"),
         ("ird", "/work/packages/ons/chronicle/db/data/ird/wff", "nz"),
         ("ird", "/work/ons/chronicle/packages/ird/wff", "nz"),
+        ("ird", "/repo/db/data/ird/packages", "nz"),
+        ("ird", "/repo/db/data/ird/packages/manifest.yaml", "nz"),
+        ("ird", "/repo/packages/ird/packages/source_package.yaml", "nz"),
+        ("irs_soi", "/repo/db/data/irs_soi/packages/manifest.yaml", None),
     ],
 )
 def test_infer_r2_country_uses_publisher_directory(
@@ -320,6 +324,32 @@ def test_publish_source_artifacts_refuses_stale_country_key(tmp_path):
         .startswith("recorded_r2_key_disagrees_with_country_prefix:")
     )
     assert not log.exists()
+
+
+def test_publish_source_artifacts_accepts_package_named_packages(tmp_path):
+    output_dir = tmp_path / "db" / "data" / "ird" / "packages"
+    source = tmp_path / "wff.xlsx"
+    source.write_bytes(b"official WFF workbook")
+    fetched = fetch_source_artifact(
+        str(source),
+        source_id="ird",
+        package_id="packages",
+        year=2024,
+        output_dir=output_dir,
+    )
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text("#!/bin/sh\necho ok\n")
+    wrangler.chmod(0o755)
+
+    published = publish_source_artifacts(output_dir, wrangler_command=str(wrangler))
+
+    assert fetched.valid
+    assert published.valid
+    assert published.counts["uploaded_count"] == 1
+    manifest = yaml.safe_load((output_dir / "manifest.yaml").read_text())
+    assert manifest["files"][2024]["storage"]["r2"]["key"].startswith(
+        "raw/nz/ird/packages/2024/"
+    )
 
 
 def test_inventory_source_artifacts_catches_checksum_mismatch(tmp_path):
