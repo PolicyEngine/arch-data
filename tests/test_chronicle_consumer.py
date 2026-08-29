@@ -98,12 +98,12 @@ def test_artifact_build_load_round_trip_is_facts_only(tmp_path):
     manifest = json.loads((out_dir / "manifest.json").read_text())
 
     assert report.to_dict() == {
-        "schema_version": "policyengine_ledger.consumer_artifact.v1",
+        "schema_version": "policyengine_ledger.consumer_artifact.v2",
         "output_dir": str(out_dir),
         "fact_row_count": 2,
     }
     assert manifest == {
-        "schema_version": "policyengine_ledger.consumer_artifact.v1",
+        "schema_version": "policyengine_ledger.consumer_artifact.v2",
         "consumer_fact_schema_versions": ["ledger.consumer_fact.v1"],
         "consumer_fact_schema_sha256": CONSUMER_FACT_SCHEMA_SHA256,
         "fact_row_count": 2,
@@ -157,6 +157,22 @@ def test_artifact_load_rejects_profile_metadata(tmp_path):
     manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
     with pytest.raises(ValueError, match="target profiles are consumer-owned"):
+        load_consumer_artifact(out_dir)
+
+
+def test_artifact_load_rejects_legacy_v1_schema(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["schema_version"] = "policyengine_ledger.consumer_artifact.v1"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(
+        ValueError,
+        match="Unsupported consumer artifact schema_version",
+    ):
         load_consumer_artifact(out_dir)
 
 

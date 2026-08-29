@@ -29,7 +29,10 @@ Instead of projection objects, Chronicle contributes two guarantees:
   label.
 - **Facts-only consumer artifacts.** Chronicle publishes schema-validated fact
   rows with manifest hashes. Consumers own the selection, measurement,
-  period-alignment, and model-binding contracts that interpret those rows.
+  period-alignment, and model-binding contracts that interpret those rows. The
+  facts-only artifact is `policyengine_ledger.consumer_artifact.v2`; the version
+  bump makes the removal of v1's embedded profiles and resolution surface an
+  explicit incompatible transition.
 
 ## Why not facts plus projections in one schema
 

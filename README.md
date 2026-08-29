@@ -296,6 +296,11 @@ uv run chronicle build-bundle --suite uk --out /tmp/chronicle-uk --replace
 uv run chronicle build-consumer-artifact --facts /tmp/chronicle-uk --out /tmp/chronicle-uk-artifact --replace
 ```
 
+The command writes a `policyengine_ledger.consumer_artifact.v2` artifact containing
+only `consumer_facts.jsonl` and `manifest.json`. Version 2 is incompatible with the
+retired v1 profile-bearing contract: loaders reject v1 manifests so downstreams must
+adopt the facts-only surface explicitly.
+
 `--year` is inert for `--suite uk` because the UK packages are year-pinned.
 The US off-year bundle behavior is unchanged and out of scope here.
 

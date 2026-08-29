@@ -27,7 +27,7 @@ from policyengine_chronicle.schema import (
     validate_consumer_fact_row,
 )
 
-CONSUMER_ARTIFACT_SCHEMA_VERSION = "policyengine_ledger.consumer_artifact.v1"
+CONSUMER_ARTIFACT_SCHEMA_VERSION = "policyengine_ledger.consumer_artifact.v2"
 
 
 @dataclass(frozen=True)
