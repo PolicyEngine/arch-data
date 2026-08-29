@@ -395,13 +395,19 @@ def fetch_source_artifact(
     wrangler_command: str = "npx wrangler",
 ) -> ArtifactFetchReport:
     """Fetch/register a source artifact and optionally upload it to R2."""
+    output = Path(output_dir)
+    resolved_r2_prefix = resolve_r2_prefix(
+        prefix=r2_prefix,
+        default_prefix=DEFAULT_R2_PREFIX,
+        source_id=source_id,
+        package_path=output,
+    )
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
     content, inferred_filename = _read_artifact(source_url)
     artifact_filename = filename or inferred_filename
     if not artifact_filename:
         raise ValueError("Could not infer artifact filename; pass --filename.")
 
-    output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     local_path = output / artifact_filename
     local_path.write_bytes(content)
@@ -410,12 +416,6 @@ def fetch_source_artifact(
     size_bytes = len(content)
     manifest_path = output / "manifest.yaml"
 
-    resolved_r2_prefix = resolve_r2_prefix(
-        prefix=r2_prefix,
-        default_prefix=DEFAULT_R2_PREFIX,
-        source_id=source_id,
-        package_path=output,
-    )
     r2_location = ArtifactStorageLocation(
         provider="r2",
         bucket=r2_bucket,
@@ -426,6 +426,7 @@ def fetch_source_artifact(
             sha256=sha256,
             filename=artifact_filename,
             prefix=resolved_r2_prefix,
+            package_path=output,
         ),
     )
     r2_upload = None
@@ -822,19 +823,27 @@ def infer_r2_country(
     fallback for low-level callers that do not have a package path, including
     derived-artifact publication.
     """
-    path_countries: set[str] = set()
+    publisher = None
     if package_path is not None:
-        path_parts = {part.lower() for part in Path(package_path).parts}
-        path_countries = {
+        path_parts = tuple(part.lower() for part in Path(package_path).parts)
+        # Match the innermost canonical package root, not arbitrary ancestor
+        # directory names such as /work/ons/chronicle/db/data/irs_soi/....
+        for index in range(len(path_parts) - 1, -1, -1):
+            if path_parts[index : index + 2] == ("db", "data"):
+                if index + 2 < len(path_parts):
+                    publisher = path_parts[index + 2]
+                    break
+            elif path_parts[index] == "packages" and index + 1 < len(path_parts):
+                publisher = path_parts[index + 1]
+                break
+    path_country = next(
+        (
             country
             for country, publishers in R2_COUNTRY_PUBLISHERS.items()
-            if path_parts.intersection(publishers)
-        }
-        if len(path_countries) > 1:
-            raise ValueError(
-                "package path contains publishers from multiple countries: "
-                f"{package_path}"
-            )
+            if publisher in publishers
+        ),
+        None,
+    )
 
     source_countries: set[str] = set()
     normalized_source_id = (source_id or "").lower()
@@ -852,14 +861,13 @@ def infer_r2_country(
         if len(source_countries) > 1:
             raise ValueError(f"source_id maps to multiple R2 countries: {source_id}")
 
-    if path_countries and source_countries and path_countries != source_countries:
+    source_country = next(iter(source_countries)) if source_countries else None
+    if publisher is not None and source_country and source_country != path_country:
         raise ValueError(
             "package publisher directory and source_id map to different "
-            f"countries: path={sorted(path_countries)}, "
-            f"source_id={sorted(source_countries)}"
+            f"countries: publisher={publisher!r}, source_id={source_id!r}"
         )
-    countries = path_countries or source_countries
-    return next(iter(countries)) if countries else None
+    return path_country if publisher is not None else source_country
 
 
 def resolve_r2_prefix(
@@ -894,6 +902,7 @@ def build_r2_key(
     sha256: str,
     filename: str,
     prefix: str | None = None,
+    package_path: str | Path | None = None,
 ) -> str:
     """Build the canonical immutable R2 key for a raw source artifact.
 
@@ -904,6 +913,7 @@ def build_r2_key(
         prefix=prefix,
         default_prefix=DEFAULT_R2_PREFIX,
         source_id=source_id,
+        package_path=package_path,
     )
     return posixpath.join(
         resolved_prefix,
@@ -1132,6 +1142,7 @@ def _publish_raw_manifest_entry(
             sha256=sha256_actual or "",
             filename=filename,
             prefix=r2_prefix,
+            package_path=manifest_path,
         ),
     )
     storage = spec.get("storage") if isinstance(spec.get("storage"), dict) else {}

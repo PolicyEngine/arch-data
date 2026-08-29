@@ -35,11 +35,14 @@ These decisions implement the rulings recorded in
   `geography_vintage: msd_wi_region`, and stable `nz-wi-...` slug IDs.
 - SA2 is deferred to wave 3, issue #178. When admitted, it will be a
   first-class `sa2` geography rather than `statistical_scope`.
-- Rent quartiles are not representable by Chronicle's current aggregation
-  vocabulary. Wave 1 records publisher medians as `aggregation: median` and
-  geometric means as `aggregation: mean`, `concept_relation: approximate`,
-  with evidence notes that explicitly identify the geometric mean. Quartiles
-  wait for a deliberate parameterized-percentile contract change.
+- The original rent-quartile blocker in #175 predates Eurostat #168.
+  Chronicle now supports `aggregation: quantile`; publisher quartile cut-points
+  can use it with the percentile label or code carried in explicit constraints
+  and source evidence, following `eurostat/ilc_di01`. No new aggregation name is
+  needed. This removes a vocabulary blocker without expanding #176's package
+  scope. Publisher medians use `aggregation: median`; geometric means use
+  `aggregation: mean`, `concept_relation: approximate`, and evidence notes that
+  explicitly identify the geometric mean.
 
 ## Wave-1 ingestion ledger
 

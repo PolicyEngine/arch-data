@@ -57,6 +57,10 @@ def test_build_derived_r2_key_is_build_scoped():
         ("ird", "db/data/ird/wff", "nz"),
         ("ons", "db/data/ons/mye", "uk"),
         ("irs_soi", "db/data/irs_soi/table_1_1", None),
+        ("irs_soi", "/work/ons/chronicle/db/data/irs_soi/table_1_1", None),
+        ("ird", "/work/ons/chronicle/db/data/ird/wff", "nz"),
+        ("ird", "/work/packages/ons/chronicle/db/data/ird/wff", "nz"),
+        ("ird", "/work/ons/chronicle/packages/ird/wff", "nz"),
     ],
 )
 def test_infer_r2_country_uses_publisher_directory(
@@ -137,6 +141,42 @@ def test_fetch_source_artifact_writes_manifest_and_inventory(tmp_path):
     }
 
 
+def test_fetch_rejects_wrong_country_before_reading_or_overwriting_cache(
+    tmp_path, monkeypatch
+):
+    source = tmp_path / "source.xlsx"
+    source.write_bytes(b"original official artifact")
+    output_dir = tmp_path / "db" / "data" / "ird" / "wff"
+    fetch_source_artifact(
+        str(source),
+        source_id="ird",
+        package_id="ird-wff",
+        year=2024,
+        output_dir=output_dir,
+    )
+    artifact_path = output_dir / source.name
+    manifest_path = output_dir / "manifest.yaml"
+    original_artifact = artifact_path.read_bytes()
+    original_manifest = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("A rejected route must not read the source artifact")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+    with pytest.raises(ValueError, match="disagrees with publisher country"):
+        fetch_source_artifact(
+            str(source),
+            source_id="ird",
+            package_id="ird-wff",
+            year=2024,
+            output_dir=output_dir,
+            r2_prefix="raw/uk",
+        )
+
+    assert artifact_path.read_bytes() == original_artifact
+    assert manifest_path.read_bytes() == original_manifest
+
+
 def test_publish_source_artifacts_uploads_manifest_entries(tmp_path):
     output_dir = tmp_path / "data" / "irs_soi" / "table_1_2"
     source = tmp_path / "source.xls"
@@ -211,6 +251,7 @@ def test_publish_source_artifacts_handles_label_year_entries(tmp_path):
 
 
 def test_publish_source_artifacts_uses_country_for_each_manifest(tmp_path):
+    data_root = tmp_path / "ons" / "chronicle" / "db" / "data"
     log = tmp_path / "wrangler.log"
     wrangler = tmp_path / "wrangler"
     wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
@@ -220,7 +261,7 @@ def test_publish_source_artifacts_uses_country_for_each_manifest(tmp_path):
         ("ons", "ons-mye", 2024),
         ("irs_soi", "soi-table", 2023),
     ):
-        output_dir = tmp_path / "data" / publisher / package_id
+        output_dir = data_root / publisher / package_id
         source = tmp_path / f"{publisher}.csv"
         source.write_bytes(publisher.encode())
         fetch_source_artifact(
@@ -231,7 +272,7 @@ def test_publish_source_artifacts_uses_country_for_each_manifest(tmp_path):
             output_dir=output_dir,
         )
 
-    report = publish_source_artifacts(tmp_path / "data", wrangler_command=str(wrangler))
+    report = publish_source_artifacts(data_root, wrangler_command=str(wrangler))
 
     assert report.valid
     commands = log.read_text()
