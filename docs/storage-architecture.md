@@ -46,34 +46,40 @@ Hosted tables mirror accepted build outputs and provide a shared query surface.
 
 ## Object Key Conventions
 
-Raw source artifacts use the implemented content-addressed key shape:
+New UK and New Zealand source artifacts use country-organized,
+content-addressed keys:
 
 ```text
-raw/{source_id}/{package_id}/{year}/{sha256}/{filename}
+raw/{country}/{source_id}/{package_id}/{year}/{sha256}/{filename}
 ```
 
-For example:
+For example, an IRD artifact uses:
 
 ```text
-raw/irs_soi/soi-table-1-1/2023/842da11...aca17/23in11si.xls
+raw/nz/ird/ird-working-for-families-statistics-sept-2025/2024/{sha256}/working-for-families-statistics---sept-2025.xlsx
 ```
 
-Derived build artifacts should use build-scoped keys so different builds can
-coexist and be audited:
+The implemented country segments are `nz` and `uk`. US objects deliberately
+retain the legacy shape `raw/{source_id}/...`; migrating those keys requires a
+separate consumer audit. The fetch and raw-publish commands infer the country
+from the package publisher directory. Raw publication refuses to replace a
+manifest-recorded key that disagrees with the inferred country path.
+
+New UK and New Zealand derived build artifacts use the same country segment
+and build-scoped keys so different builds can coexist and be audited:
 
 ```text
-derived/{source_id}/{package_id}/{year}/{build_id}/{artifact_name}
+derived/{country}/{source_id}/{package_id}/{year}/{build_id}/{artifact_name}
 ```
 
 Examples:
 
 ```text
-derived/irs_soi/soi-table-1-1/2023/{build_id}/source_cells.jsonl
-derived/bea/bea-nipa-pension-contributions/2022/{build_id}/source_rows.jsonl
-derived/irs_soi/soi-table-1-1/2023/{build_id}/ledger.db
-derived/irs_soi/soi-table-1-1/2023/{build_id}/reports/build_summary.json
-derived/irs_soi/soi-table-1-1/2023/{build_id}/mirror/aggregate_facts.jsonl
+derived/uk/ons/ons-mye-2024-uk/2024/{build_id}/source_cells.jsonl
+derived/nz/ird/ird-working-for-families-statistics-sept-2025/2024/{build_id}/ledger.db
 ```
+
+Legacy US derived keys likewise remain `derived/{source_id}/...`.
 
 Derived artifacts are reproducible and may be replaced by a new build, but a
 specific `{build_id}` path should be immutable once published.

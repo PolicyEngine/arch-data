@@ -21,8 +21,12 @@ Scalar = str | int | float | bool | None
 # (packages/hmrc/vat_firm_targets_2024_25) and academic year AY 2024/25 is
 # academic_year 2024 (#131). Publishers that label a fiscal year with a single
 # year keep that label year (US federal FY2024 -> 2024,
-# packages/cbo/individual_income_tax_receipts_2026_02). Caution: the EES
-# helper _academic_year_end (chronicle/sources/rows.py) names value COLUMNS
+# packages/cbo/individual_income_tax_receipts_2026_02).
+# New Zealand labels its April-March income tax year by the ending year, so the
+# publisher's "2024 tax year" is tax_year 2024 with PeriodCoverage 2023-04-01
+# through 2024-03-31 and the publisher label recorded in source_period_label.
+# Caution: the EES helper _academic_year_end (chronicle/sources/rows.py) names
+# value COLUMNS
 # by the academic year's END year ("2024/25" -> 2025); that is source-layout
 # naming only and must not leak into fact periods.
 ALLOWED_PERIOD_TYPES = {
