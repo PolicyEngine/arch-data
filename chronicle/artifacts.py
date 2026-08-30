@@ -24,6 +24,31 @@ DEFAULT_R2_DERIVED_BUCKET = "ledger-derived"
 DEFAULT_R2_PREFIX = "raw"
 DEFAULT_R2_DERIVED_PREFIX = "derived"
 
+# New UK and New Zealand uploads are namespaced by country. US objects predate
+# the country segment and deliberately keep their legacy ``raw/{source_id}``
+# and ``derived/{source_id}`` shapes. Publisher directories are the stable
+# routing input because they are shared by packages/ and db/data/.
+R2_COUNTRY_PUBLISHERS = {
+    "nz": frozenset({"ird", "mbie", "msd", "stats_nz"}),
+    "uk": frozenset(
+        {
+            "dft",
+            "dwp",
+            "hmrc",
+            "isc",
+            "mhclg",
+            "nisra",
+            "nrs",
+            "obr",
+            "ons",
+            "scotgov",
+            "slc",
+            "voa",
+            "welshgov",
+        }
+    ),
+}
+
 
 @dataclass(frozen=True)
 class ArtifactStorageLocation:
@@ -366,17 +391,23 @@ def fetch_source_artifact(
     filename: str | None = None,
     upload_r2: bool = False,
     r2_bucket: str = DEFAULT_R2_RAW_BUCKET,
-    r2_prefix: str = DEFAULT_R2_PREFIX,
+    r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
 ) -> ArtifactFetchReport:
     """Fetch/register a source artifact and optionally upload it to R2."""
+    output = Path(output_dir)
+    resolved_r2_prefix = resolve_r2_prefix(
+        prefix=r2_prefix,
+        default_prefix=DEFAULT_R2_PREFIX,
+        source_id=source_id,
+        package_path=output,
+    )
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
     content, inferred_filename = _read_artifact(source_url)
     artifact_filename = filename or inferred_filename
     if not artifact_filename:
         raise ValueError("Could not infer artifact filename; pass --filename.")
 
-    output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     local_path = output / artifact_filename
     local_path.write_bytes(content)
@@ -394,7 +425,8 @@ def fetch_source_artifact(
             year=year,
             sha256=sha256,
             filename=artifact_filename,
-            prefix=r2_prefix,
+            prefix=resolved_r2_prefix,
+            package_path=output,
         ),
     )
     r2_upload = None
@@ -449,7 +481,7 @@ def publish_derived_artifacts(
     year: int,
     build_id: str | None = None,
     r2_bucket: str = DEFAULT_R2_DERIVED_BUCKET,
-    r2_prefix: str = DEFAULT_R2_DERIVED_PREFIX,
+    r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
     build_artifacts_output: str | Path | None = None,
 ) -> DerivedArtifactPublishReport:
@@ -497,6 +529,11 @@ def publish_derived_artifacts(
             errors=("missing_build_id",),
         )
 
+    resolved_r2_prefix = resolve_r2_prefix(
+        prefix=r2_prefix,
+        default_prefix=DEFAULT_R2_DERIVED_PREFIX,
+        source_id=source_id,
+    )
     entries: list[DerivedArtifactUploadEntry] = []
     errors: list[str] = []
     artifact_paths = sorted(path for path in input_path.rglob("*") if path.is_file())
@@ -515,7 +552,7 @@ def publish_derived_artifacts(
                 year=year,
                 build_id=resolved_build_id,
                 artifact_name=relative_path,
-                prefix=r2_prefix,
+                prefix=resolved_r2_prefix,
             ),
         )
         upload = _upload_r2_object(
@@ -560,7 +597,7 @@ def publish_source_artifacts(
     source_id: str | None = None,
     package_id: str | None = None,
     r2_bucket: str = DEFAULT_R2_RAW_BUCKET,
-    r2_prefix: str = DEFAULT_R2_PREFIX,
+    r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
 ) -> RawArtifactPublishReport:
     """Upload manifest-declared raw source artifacts and record R2 locations."""
@@ -594,6 +631,17 @@ def publish_source_artifacts(
             errors.append(f"Manifest files must be a mapping: {manifest_path}")
             continue
 
+        try:
+            resolved_r2_prefix = resolve_r2_prefix(
+                prefix=r2_prefix,
+                default_prefix=DEFAULT_R2_PREFIX,
+                source_id=str(manifest_source_id),
+                package_path=manifest_path,
+            )
+        except ValueError as exc:
+            errors.append(f"Could not resolve R2 prefix for {manifest_path}: {exc}")
+            continue
+
         updated = False
         for year, spec in files.items():
             entry, updated_spec = _publish_raw_manifest_entry(
@@ -603,7 +651,7 @@ def publish_source_artifacts(
                 year,
                 spec,
                 r2_bucket=r2_bucket,
-                r2_prefix=r2_prefix,
+                r2_prefix=resolved_r2_prefix,
                 wrangler_command=wrangler_command,
             )
             entries.append(entry)
@@ -764,6 +812,89 @@ def bootstrap_r2_buckets(
     )
 
 
+def infer_r2_country(
+    *,
+    source_id: str | None = None,
+    package_path: str | Path | None = None,
+) -> str | None:
+    """Infer an R2 country segment from a package publisher directory.
+
+    ``package_path`` is authoritative when supplied. ``source_id`` is a
+    fallback for low-level callers that do not have a package path, including
+    derived-artifact publication.
+    """
+    publisher = None
+    if package_path is not None:
+        path_parts = tuple(part.lower() for part in Path(package_path).parts)
+        # Match the innermost canonical root with both publisher and package
+        # directories. A package itself may be named "packages"; the following
+        # manifest filename must not then be mistaken for a publisher.
+        for index in range(len(path_parts) - 1, -1, -1):
+            if path_parts[index : index + 2] == ("db", "data"):
+                if index + 3 < len(path_parts):
+                    publisher = path_parts[index + 2]
+                    break
+            elif path_parts[index] == "packages" and index + 2 < len(path_parts):
+                publisher = path_parts[index + 1]
+                break
+    path_country = next(
+        (
+            country
+            for country, publishers in R2_COUNTRY_PUBLISHERS.items()
+            if publisher in publishers
+        ),
+        None,
+    )
+
+    source_countries: set[str] = set()
+    normalized_source_id = (source_id or "").lower()
+    if normalized_source_id:
+        source_countries = {
+            country
+            for country, publishers in R2_COUNTRY_PUBLISHERS.items()
+            if any(
+                normalized_source_id == publisher
+                or normalized_source_id.startswith(f"{publisher}_")
+                or normalized_source_id.startswith(f"{publisher}-")
+                for publisher in publishers
+            )
+        }
+        if len(source_countries) > 1:
+            raise ValueError(f"source_id maps to multiple R2 countries: {source_id}")
+
+    source_country = next(iter(source_countries)) if source_countries else None
+    if publisher is not None and source_country and source_country != path_country:
+        raise ValueError(
+            "package publisher directory and source_id map to different "
+            f"countries: publisher={publisher!r}, source_id={source_id!r}"
+        )
+    return path_country if publisher is not None else source_country
+
+
+def resolve_r2_prefix(
+    *,
+    prefix: str | None,
+    default_prefix: str,
+    source_id: str | None = None,
+    package_path: str | Path | None = None,
+) -> str:
+    """Return the country-aware R2 prefix for one source package."""
+    resolved = _clean_key_part(prefix or default_prefix)
+    country = infer_r2_country(source_id=source_id, package_path=package_path)
+    if country is None:
+        return resolved
+
+    suffix = resolved.rsplit("/", maxsplit=1)[-1]
+    if suffix in R2_COUNTRY_PUBLISHERS:
+        if suffix != country:
+            raise ValueError(
+                f"R2 prefix country {suffix!r} disagrees with publisher "
+                f"country {country!r}"
+            )
+        return resolved
+    return posixpath.join(resolved, country)
+
+
 def build_r2_key(
     *,
     source_id: str,
@@ -771,15 +902,22 @@ def build_r2_key(
     year: int | str,
     sha256: str,
     filename: str,
-    prefix: str = DEFAULT_R2_PREFIX,
+    prefix: str | None = None,
+    package_path: str | Path | None = None,
 ) -> str:
     """Build the canonical immutable R2 key for a raw source artifact.
 
     ``year`` is usually a calendar year but may be a label such as
     ``source_capture`` for non-year manifest file entries.
     """
+    resolved_prefix = resolve_r2_prefix(
+        prefix=prefix,
+        default_prefix=DEFAULT_R2_PREFIX,
+        source_id=source_id,
+        package_path=package_path,
+    )
     return posixpath.join(
-        _clean_key_part(prefix),
+        resolved_prefix,
         _clean_key_part(source_id),
         _clean_key_part(package_id),
         str(year),
@@ -795,11 +933,16 @@ def build_derived_r2_key(
     year: int,
     build_id: str,
     artifact_name: str,
-    prefix: str = DEFAULT_R2_DERIVED_PREFIX,
+    prefix: str | None = None,
 ) -> str:
     """Build the canonical R2 key for a derived build artifact."""
+    resolved_prefix = resolve_r2_prefix(
+        prefix=prefix,
+        default_prefix=DEFAULT_R2_DERIVED_PREFIX,
+        source_id=source_id,
+    )
     return posixpath.join(
-        _clean_key_part(prefix),
+        resolved_prefix,
         _clean_key_part(source_id),
         _clean_key_part(package_id),
         str(year),
@@ -1000,8 +1143,33 @@ def _publish_raw_manifest_entry(
             sha256=sha256_actual or "",
             filename=filename,
             prefix=r2_prefix,
+            package_path=manifest_path,
         ),
     )
+    storage = spec.get("storage") if isinstance(spec.get("storage"), dict) else {}
+    recorded_r2 = storage.get("r2") if isinstance(storage.get("r2"), dict) else {}
+    recorded_key = recorded_r2.get("key")
+    if recorded_key and recorded_key != location.key:
+        errors.append(
+            "recorded_r2_key_disagrees_with_country_prefix:"
+            f"recorded={recorded_key}:expected={location.key}"
+        )
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(artifact_path),
+                sha256=sha256_actual,
+                size_bytes=size_bytes,
+                r2_location=None,
+                upload=None,
+                errors=tuple(errors),
+            ),
+            None,
+        )
     upload = _upload_r2_object(
         location,
         artifact_path,

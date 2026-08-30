@@ -336,7 +336,7 @@ def fetch_artifact_file(
     filename: str | None = None,
     upload_r2: bool = False,
     r2_bucket: str = "ledger-raw",
-    r2_prefix: str = "raw",
+    r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
 ) -> ArtifactFetchReport:
     """Fetch/register a raw source artifact and optionally upload it to R2."""
@@ -373,7 +373,7 @@ def publish_raw_artifact_files(
     source_id: str | None = None,
     package_id: str | None = None,
     r2_bucket: str = "ledger-raw",
-    r2_prefix: str = "raw",
+    r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
 ) -> RawArtifactPublishReport:
     """Publish manifest-declared raw source artifacts to R2."""
@@ -410,7 +410,7 @@ def publish_derived_artifact_files(
     year: int,
     build_id: str | None = None,
     r2_bucket: str = "ledger-derived",
-    r2_prefix: str = "derived",
+    r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
     build_artifacts_output: str | Path | None = None,
 ) -> DerivedArtifactPublishReport:
@@ -893,8 +893,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     artifact_parser.add_argument(
         "--r2-prefix",
-        default="raw",
-        help="R2 key prefix for raw artifacts.",
+        help=(
+            "R2 key-prefix root for raw artifacts. Defaults to country-aware "
+            "raw/nz or raw/uk for known publisher directories, and raw for "
+            "legacy US packages."
+        ),
     )
     artifact_parser.add_argument(
         "--wrangler-command",
@@ -948,8 +951,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     raw_publish_parser.add_argument(
         "--r2-prefix",
-        default="raw",
-        help="R2 key prefix for raw artifacts.",
+        help=(
+            "R2 key-prefix root for raw artifacts. Defaults to country-aware "
+            "raw/nz or raw/uk for known publisher directories, and raw for "
+            "legacy US packages."
+        ),
     )
     raw_publish_parser.add_argument(
         "--wrangler-command",
@@ -1014,8 +1020,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     derived_publish_parser.add_argument(
         "--r2-prefix",
-        default="derived",
-        help="R2 key prefix for derived build artifacts.",
+        help=(
+            "R2 key-prefix root for derived artifacts. Defaults to "
+            "country-aware derived/nz or derived/uk for known publishers, "
+            "and derived for legacy US packages."
+        ),
     )
     derived_publish_parser.add_argument(
         "--wrangler-command",

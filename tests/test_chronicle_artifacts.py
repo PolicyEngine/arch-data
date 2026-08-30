@@ -15,6 +15,7 @@ from chronicle.artifacts import (
     bootstrap_r2_buckets,
     build_r2_key,
     fetch_source_artifact,
+    infer_r2_country,
     infer_build_id,
     inventory_source_artifacts,
     publish_derived_artifacts,
@@ -48,6 +49,63 @@ def test_build_derived_r2_key_is_build_scoped():
         "derived/irs_soi/soi-table-1-1/2023/"
         "ledger.build.v1:abc123/reports/build_summary.json"
     )
+
+
+@pytest.mark.parametrize(
+    ("source_id", "package_path", "expected_country"),
+    [
+        ("ird", "db/data/ird/wff", "nz"),
+        ("ons", "db/data/ons/mye", "uk"),
+        ("irs_soi", "db/data/irs_soi/table_1_1", None),
+        ("irs_soi", "/work/ons/chronicle/db/data/irs_soi/table_1_1", None),
+        ("ird", "/work/ons/chronicle/db/data/ird/wff", "nz"),
+        ("ird", "/work/packages/ons/chronicle/db/data/ird/wff", "nz"),
+        ("ird", "/work/ons/chronicle/packages/ird/wff", "nz"),
+        ("ird", "/repo/db/data/ird/packages", "nz"),
+        ("ird", "/repo/db/data/ird/packages/manifest.yaml", "nz"),
+        ("ird", "/repo/packages/ird/packages/source_package.yaml", "nz"),
+        ("irs_soi", "/repo/db/data/irs_soi/packages/manifest.yaml", None),
+    ],
+)
+def test_infer_r2_country_uses_publisher_directory(
+    source_id, package_path, expected_country
+):
+    assert (
+        infer_r2_country(source_id=source_id, package_path=package_path)
+        == expected_country
+    )
+
+
+def test_country_aware_r2_keys_preserve_legacy_us_layout():
+    nz_key = build_r2_key(
+        source_id="ird",
+        package_id="ird-working-for-families-statistics-sept-2025",
+        year=2024,
+        sha256="abc123",
+        filename="wff.xlsx",
+    )
+    uk_key = build_derived_r2_key(
+        source_id="ons",
+        package_id="ons-mye-2024-uk",
+        year=2024,
+        build_id="ledger.build.v1:abc123",
+        artifact_name="facts.jsonl",
+    )
+
+    assert nz_key.startswith("raw/nz/ird/")
+    assert uk_key.startswith("derived/uk/ons/")
+
+
+def test_country_aware_r2_prefix_rejects_wrong_country():
+    with pytest.raises(ValueError, match="disagrees with publisher country"):
+        build_r2_key(
+            source_id="ird",
+            package_id="wff",
+            year=2024,
+            sha256="abc123",
+            filename="wff.xlsx",
+            prefix="raw/uk",
+        )
 
 
 def test_fetch_source_artifact_writes_manifest_and_inventory(tmp_path):
@@ -85,6 +143,42 @@ def test_fetch_source_artifact_writes_manifest_and_inventory(tmp_path):
         "missing_count": 0,
         "r2_link_count": 0,
     }
+
+
+def test_fetch_rejects_wrong_country_before_reading_or_overwriting_cache(
+    tmp_path, monkeypatch
+):
+    source = tmp_path / "source.xlsx"
+    source.write_bytes(b"original official artifact")
+    output_dir = tmp_path / "db" / "data" / "ird" / "wff"
+    fetch_source_artifact(
+        str(source),
+        source_id="ird",
+        package_id="ird-wff",
+        year=2024,
+        output_dir=output_dir,
+    )
+    artifact_path = output_dir / source.name
+    manifest_path = output_dir / "manifest.yaml"
+    original_artifact = artifact_path.read_bytes()
+    original_manifest = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("A rejected route must not read the source artifact")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+    with pytest.raises(ValueError, match="disagrees with publisher country"):
+        fetch_source_artifact(
+            str(source),
+            source_id="ird",
+            package_id="ird-wff",
+            year=2024,
+            output_dir=output_dir,
+            r2_prefix="raw/uk",
+        )
+
+    assert artifact_path.read_bytes() == original_artifact
+    assert manifest_path.read_bytes() == original_manifest
 
 
 def test_publish_source_artifacts_uploads_manifest_entries(tmp_path):
@@ -157,6 +251,104 @@ def test_publish_source_artifacts_handles_label_year_entries(tmp_path):
     assert storage["key"] == (
         "raw/ssa/ssa-ssi-monthly-statistics-2024-12/source_capture/"
         f"{hashlib.sha256(capture_bytes).hexdigest()}/table01.html"
+    )
+
+
+def test_publish_source_artifacts_uses_country_for_each_manifest(tmp_path):
+    data_root = tmp_path / "ons" / "chronicle" / "db" / "data"
+    log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
+    wrangler.chmod(0o755)
+    for publisher, package_id, year in (
+        ("ird", "ird-wff", 2024),
+        ("ons", "ons-mye", 2024),
+        ("irs_soi", "soi-table", 2023),
+    ):
+        output_dir = data_root / publisher / package_id
+        source = tmp_path / f"{publisher}.csv"
+        source.write_bytes(publisher.encode())
+        fetch_source_artifact(
+            str(source),
+            source_id=publisher,
+            package_id=package_id,
+            year=year,
+            output_dir=output_dir,
+        )
+
+    report = publish_source_artifacts(data_root, wrangler_command=str(wrangler))
+
+    assert report.valid
+    commands = log.read_text()
+    assert "ledger-raw/raw/nz/ird/ird-wff/2024/" in commands
+    assert "ledger-raw/raw/uk/ons/ons-mye/2024/" in commands
+    assert "ledger-raw/raw/irs_soi/soi-table/2023/" in commands
+
+
+def test_publish_source_artifacts_refuses_stale_country_key(tmp_path):
+    output_dir = tmp_path / "data" / "ird" / "wff"
+    source = tmp_path / "wff.xlsx"
+    source.write_bytes(b"official WFF workbook")
+    fetch_source_artifact(
+        str(source),
+        source_id="ird",
+        package_id="ird-wff",
+        year=2024,
+        output_dir=output_dir,
+    )
+    manifest_path = output_dir / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    artifact = manifest["files"][2024]
+    artifact["storage"] = {
+        "r2": {
+            "provider": "r2",
+            "bucket": "ledger-raw",
+            "key": (
+                f"raw/ird/ird-wff/2024/{artifact['sha256']}/{artifact['filename']}"
+            ),
+        }
+    }
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
+    wrangler.chmod(0o755)
+
+    report = publish_source_artifacts(output_dir, wrangler_command=str(wrangler))
+
+    assert not report.valid
+    assert report.entries[0].upload is None
+    assert (
+        report.entries[0]
+        .errors[0]
+        .startswith("recorded_r2_key_disagrees_with_country_prefix:")
+    )
+    assert not log.exists()
+
+
+def test_publish_source_artifacts_accepts_package_named_packages(tmp_path):
+    output_dir = tmp_path / "db" / "data" / "ird" / "packages"
+    source = tmp_path / "wff.xlsx"
+    source.write_bytes(b"official WFF workbook")
+    fetched = fetch_source_artifact(
+        str(source),
+        source_id="ird",
+        package_id="packages",
+        year=2024,
+        output_dir=output_dir,
+    )
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text("#!/bin/sh\necho ok\n")
+    wrangler.chmod(0o755)
+
+    published = publish_source_artifacts(output_dir, wrangler_command=str(wrangler))
+
+    assert fetched.valid
+    assert published.valid
+    assert published.counts["uploaded_count"] == 1
+    manifest = yaml.safe_load((output_dir / "manifest.yaml").read_text())
+    assert manifest["files"][2024]["storage"]["r2"]["key"].startswith(
+        "raw/nz/ird/packages/2024/"
     )
 
 
