@@ -12,6 +12,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+from chronicle.bundle import build_bundle_coverage
+from chronicle.consumer_contract import (
+    consumer_fact_rows,
+    validate_consumer_fact_contract,
+)
 from chronicle.core import validate_facts
 from chronicle.source_package import (
     SOURCE_PACKAGE_ALIASES,
@@ -19,6 +24,7 @@ from chronicle.source_package import (
     validate_source_package,
 )
 from chronicle.sources import build_source_cell_key, validate_source_cells
+from chronicle.suite import build_source_suite
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +32,7 @@ WFF_ALIAS = "ird-working-for-families-statistics-sept-2025"
 WFF_DIRECTORY = Path("ird/working_for_families_statistics_sept_2025")
 WFF_FILENAME = "working-for-families-statistics---sept-2025.xlsx"
 WFF_SHA256 = "95ae66f4d44f3f47ea3daa006328b22f061a163cf7e31b487342cde649390833"
+WFF_R2_KEY = f"raw/nz/ird/{WFF_ALIAS}/2024/{WFF_SHA256}/{WFF_FILENAME}"
 WFF_SOURCE_URL = (
     "https://www.ird.govt.nz/-/media/project/ir/home/documents/about-us/"
     "tax-statistics---current/social-policy/wff-stats/"
@@ -89,6 +96,50 @@ def test_wff_official_artifact_is_pinned():
     assert artifact["sha256"] == WFF_SHA256
     assert hashlib.sha256(path.read_bytes()).hexdigest() == WFF_SHA256
     assert path.stat().st_size == artifact["size_bytes"] == 71_211
+
+
+def test_wff_r2_provenance_and_consumer_contract():
+    data_dir = REPO_ROOT / "db" / "data" / WFF_DIRECTORY
+    manifest = yaml.safe_load((data_dir / "manifest.yaml").read_text())
+    storage = manifest["files"][2024]["storage"]["r2"]
+    assert storage == {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key": WFF_R2_KEY,
+        "uri": f"r2://ledger-raw/{WFF_R2_KEY}",
+    }
+    assert {fact.source.raw_r2_uri for fact in _facts()} == {storage["uri"]}
+    assert validate_consumer_fact_contract(_facts()).valid
+
+
+def test_wff_build_suite_passes_all_source_acceptance_gates(tmp_path):
+    report = build_source_suite(WFF_ALIAS, tmp_path / "suite", year=2024)
+    assert report.valid
+    assert report.agent_acceptance.valid
+    assert all(report.agent_acceptance.checks.values())
+    assert not report.agent_acceptance.errors
+    assert report.source_records.resolved_count == 330
+    assert report.source_records.lineage_coverage == 1
+    assert report.source_cells.cell_count == 4910
+    assert report.consumer_facts.fact_count == 330
+    assert report.agent_acceptance.counts["raw_artifact_count"] == 1
+    assert report.agent_acceptance.counts["raw_r2_link_count"] == 1
+
+
+def test_wff_bundle_coverage_delta_has_no_duplicate_keys():
+    coverage = build_bundle_coverage(consumer_fact_rows(_facts()))
+    assert coverage["fact_count"] == 330
+    assert coverage["counts"]["by_source"] == {"ird": 330}
+    assert coverage["counts"]["by_period"] == {"tax_year:2024": 330}
+    assert coverage["counts"]["by_geography"] == {"country:NZ": 330}
+    assert coverage["counts"]["by_entity"] == {"family": 329, "person": 1}
+    assert coverage["counts"]["by_source_table"] == {
+        "ird:Working for Families statistics - September 2025": 330
+    }
+    assert coverage["duplicates"] == {
+        "aggregate_fact_keys": [],
+        "semantic_fact_keys": [],
+    }
 
 
 def test_wff_source_cells_and_fact_lineage_are_complete():
