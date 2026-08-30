@@ -10,3 +10,9 @@ files:
     sha256: 95ae66f4d44f3f47ea3daa006328b22f061a163cf7e31b487342cde649390833
     size_bytes: 71211
     fetched_at: '2026-08-29T22:46:45+00:00'
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/nz/ird/ird-working-for-families-statistics-sept-2025/2024/95ae66f4d44f3f47ea3daa006328b22f061a163cf7e31b487342cde649390833/working-for-families-statistics---sept-2025.xlsx
+        uri: r2://ledger-raw/raw/nz/ird/ird-working-for-families-statistics-sept-2025/2024/95ae66f4d44f3f47ea3daa006328b22f061a163cf7e31b487342cde649390833/working-for-families-statistics---sept-2025.xlsx
