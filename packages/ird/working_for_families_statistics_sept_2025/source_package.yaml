@@ -1154,6 +1154,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: nzd
     aggregation: sum
     value_scale: 1000000
@@ -1178,6 +1182,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: nzd
     aggregation: sum
     value_scale: 1000000
@@ -1202,6 +1210,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: nzd
     aggregation: sum
     value_scale: 1000000
@@ -1226,6 +1238,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: nzd
     aggregation: sum
     value_scale: 1000000
@@ -1250,6 +1266,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: count
     aggregation: sum
     value_scale: 1
@@ -1274,6 +1294,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: count
     aggregation: sum
     value_scale: 1
@@ -1298,6 +1322,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: count
     aggregation: sum
     value_scale: 1
@@ -1322,6 +1350,10 @@ record_sets:
       Family-income labels are preserved exactly, including Unknown and All;
       numeric labels are not recoded to inferred interval boundaries.
       The total includes credit components not separately shown in this table.
+      The workbook Explanatory notes define assessed family scheme income as an
+      entitlement-time-weighted average. For Work and Income recipients who did
+      not file a WFF return, IRD uses individual tax-return income, which
+      excludes partner income.
     unit: count
     aggregation: sum
     value_scale: 1

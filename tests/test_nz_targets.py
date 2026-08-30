@@ -252,7 +252,7 @@ def test_wff_supported_children_and_family_sizes_remain_distinct():
     )
 
 
-def test_wff_complete_joint_income_table_preserves_source_labels():
+def test_wff_complete_published_income_table_preserves_source_labels():
     facts = [
         fact
         for fact in _facts()
@@ -284,6 +284,21 @@ def test_wff_complete_joint_income_table_preserves_source_labels():
         assert fact.layout.table_record_kind == (
             "total" if fact.layout.groupby_value_id == "all_income_bands" else "detail"
         )
+
+
+def test_wff_income_definition_preserves_publisher_qualifications():
+    facts = [
+        fact
+        for fact in _facts()
+        if fact.layout.record_set_id == f"{RECORD_PREFIX}.income_distribution"
+    ]
+    checklist = (REPO_ROOT / "docs" / "pe-nz-source-checklist.md").read_text()
+    for notes in [checklist, *(fact.measure.concept_evidence_notes for fact in facts)]:
+        normalized = " ".join(notes.lower().split())
+        assert "entitlement-time-weighted" in normalized
+        assert "work and income" in normalized
+        assert "individual tax-return income" in normalized
+        assert "excludes partner income" in normalized
 
 
 @pytest.mark.parametrize(

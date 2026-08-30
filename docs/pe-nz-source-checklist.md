@@ -74,8 +74,11 @@ tests, and record a verified `raw/nz/...` R2 URI.
 The September 2025 IRD workbook contributes 330 facts for the 2024 tax year.
 The national recipient totals describe administrative claims with non-zero
 entitlement, not every eligible family or cash paid during the financial year.
-The income table describes joint family income among WFF families, not the
-individual taxable-income universe in the other IRD packages. Its numeric band
+The income table uses an entitlement-time-weighted average of assessed family
+scheme income. For Work and Income recipients who did not file a WFF return,
+IRD uses individual tax-return income, which excludes partner income. These
+workbook Explanatory notes qualify the published income bands; this is not the
+individual taxable-income universe in the other IRD packages. Numeric band
 labels remain source labels until a consumer supplies an evidenced mapping.
 Unknown income and the published total remain distinct source rows; the
 publisher's rounding-adjustment row is parsed and tested but is not a population
