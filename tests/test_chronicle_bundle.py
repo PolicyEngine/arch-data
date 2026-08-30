@@ -69,6 +69,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
 
     assert report.valid
     assert summary["valid"]
+    # NZ WFF adds 330 TY2024 facts: 329 families and 1 person, in one new
+    # publisher/package/country. Its measured source-only delta has no duplicates.
     assert summary["counts"] == {
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,

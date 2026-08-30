@@ -3,9 +3,9 @@
 # package keeps the non-derived 2024 WFF/IWTC statistics in the
 # workbook: recipient families and aggregate entitlement by current credit,
 # supported children and family size, and the full published family-income
-# distribution. The publisher's average-entitlement table is algebraically
-# derivable from the count and amount tables, so it is parsed but not emitted as
-# duplicate facts. CTC/PTC are obsolete and blank in 2024. The income table's
+# distribution. The publisher's average-entitlement table is parsed but is
+# outside this package's emitted count-and-total-amount scope. CTC/PTC are
+# obsolete and blank in 2024. The income table's
 # explicit "Rounding adjustment" row is not a population stratum; it is parsed,
 # excluded from facts, and pinned in package tests. Numeric income-band labels
 # are preserved as labels, not silently interpreted as interval boundaries.
