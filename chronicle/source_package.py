@@ -94,6 +94,9 @@ SOURCE_PACKAGE_ALIASES = {
         "hmrc/salary_sacrifice_reform_2029_headcounts"
     ),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
+    "ird-working-for-families-statistics-sept-2025": Path(
+        "ird/working_for_families_statistics_sept_2025"
+    ),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
     "mhclg-council-tax-levels-england-2026-27": Path(
