@@ -124,7 +124,22 @@ SOURCE_PACKAGE_ALIASES = {
         "jrc/euromod_be_baseline_statistics_2025"
     ),
     "sfpd-legal-pension-caseload-2025": Path("sfpd/legal_pension_caseload_2025"),
+    "sfpd-grapa-monthly-statistics-2025-02": Path(
+        "sfpd/grapa_monthly_statistics_2025_02"
+    ),
     "opgroeien-groeipakket-caseload-2025": Path("opgroeien/groeipakket_caseload_2025"),
+    "opgroeien-groeipakket-basic-caseload-2025-12": Path(
+        "opgroeien/groeipakket_basic_caseload_2025_12"
+    ),
+    "iriscare-child-benefit-caseload-2025-12": Path(
+        "iriscare/child_benefit_caseload_2025_12"
+    ),
+    "ostbelgien-child-benefit-caseload-2025-12": Path(
+        "ostbelgien/child_benefit_caseload_2025_12"
+    ),
+    "parlement-wallonie-child-benefit-partitions-2023-12": Path(
+        "parlement_wallonie/child_benefit_partitions_2023_12"
+    ),
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
     "fpb-economic-outlook-2026-2031-june-2026": Path(
         "fpb/economic_outlook_2026_2031_june_2026"

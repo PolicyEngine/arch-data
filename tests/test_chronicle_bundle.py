@@ -73,16 +73,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 171855,
-        "geography_count": 12536,
+        "fact_count": 171874,
+        "geography_count": 12540,
         "period_count": 192,
         "semantic_duplicate_key_count": 121,
         "skipped_source_count": 10,
-        "source_count": 43,
-        "source_package_count": 151,
+        "source_count": 48,
+        "source_package_count": 156,
         "warning_count": 1,
     }
-    assert len(rows) == 171855
+    assert len(rows) == 171874
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -100,7 +100,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 151
+    assert source_packages["source_package_count"] == 156
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 171855
+    assert coverage["fact_count"] == 171874
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -135,6 +135,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "hhs_acf_tanf": 110,
         "hmrc": 20551,
         "ici": 12,
+        "iriscare_child_benefit_dashboard": 2,
         "irs_soi": 40063,
         "isc": 2,
         "jrc_euromod_be": 90,
@@ -148,8 +149,12 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "ons": 65647,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
+        "opgroeien_groeipakket_dashboard": 1,
+        "ostbelgien_child_benefit_statistics": 2,
+        "parlement_wallonie_child_benefit_response": 8,
         "scotgov": 2787,
         "sfpd_pensions": 4,
+        "sfpd_grapa": 6,
         "slc": 199,
         "spf_finances_pit": 1,
         "ssa": 426,
@@ -161,7 +166,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 146
+    assert len(table_counts) == 151
     assert (
         table_counts[
             "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
@@ -608,7 +613,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2023-09": 1,
         "month:2023-10": 1,
         "month:2023-11": 1,
-        "month:2023-12": 7,
+        "month:2023-12": 15,
         "month:2024-01": 2,
         "month:2024-02": 1,
         "month:2024-03": 1,
@@ -621,7 +626,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2024-10": 107,
         "month:2024-11": 107,
         "month:2024-12": 377,
-        "month:2025-01": 109,
+        "month:2025-01": 115,
         "month:2025-02": 107,
         "month:2025-03": 229,
         "month:2025-04": 112,
@@ -632,7 +637,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2025-09": 28,
         "month:2025-10": 19,
         "month:2025-11": 34,
-        "month:2025-12": 275,
+        "month:2025-12": 280,
         "month:2026-01": 3,
         "month:2026-02": 7,
         "month:2026-06": 348,
@@ -675,11 +680,11 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2023": 63054,
         "tax_year:2024": 40,
     }
-    assert coverage["counts"]["by_geography"]["country:BE"] == 4888
+    assert coverage["counts"]["by_geography"]["country:BE"] == 4894
     assert coverage["counts"]["by_geography"]["country:DE"] == 36
     assert coverage["counts"]["by_geography"]["country:FR"] == 36
     assert coverage["counts"]["by_geography"]["nuts1:BE1"] == 3662
-    assert coverage["counts"]["by_geography"]["nuts1:BE2"] == 3673
+    assert coverage["counts"]["by_geography"]["nuts1:BE2"] == 3662
     assert coverage["counts"]["by_geography"]["nuts1:BE3"] == 3662
     assert coverage["counts"]["by_geography"]["commune:11002"] == 1
     assert coverage["counts"]["by_geography"]["country:0100000US"] == 2109
@@ -689,17 +694,31 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert coverage["counts"]["by_geography"]["country:K02000001"] == 4297
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 497
-    assert len(coverage["counts"]["by_geography"]) == 12536
+    assert (
+        coverage["counts"]["by_geography"]["statistical_scope:BE-GROEIPAKKET-SCHEME"]
+        == 12
+    )
+    assert (
+        coverage["counts"]["by_geography"][
+            "statistical_scope:BE-IRISCARE-CHILD-BENEFIT-SCHEME"
+        ]
+        == 2
+    )
+    assert coverage["counts"]["by_geography"]["statistical_scope:BE-DG"] == 2
+    assert (
+        coverage["counts"]["by_geography"]["statistical_scope:BE-WALLOON-FRENCH"] == 8
+    )
+    assert len(coverage["counts"]["by_geography"]) == 12540
     assert coverage["counts"]["by_entity"] == {
         "benefit_unit": 233,
         "dwelling": 12733,
         "family": 107,
         "firm": 1439,
         "government": 1313,
-        "household": 40724,
+        "household": 40728,
         "institutional_sector": 133,
         "pension_plan": 2,
-        "person": 60466,
+        "person": 60481,
         "return": 14600,
         "social_protection_scheme": 36,
         "tax_unit": 40069,

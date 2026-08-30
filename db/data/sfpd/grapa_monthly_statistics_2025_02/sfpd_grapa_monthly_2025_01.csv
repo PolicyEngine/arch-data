@@ -1,0 +1,4 @@
+sex,period,reference_basis,beneficiaries,monthly_amount_eur,source_url
+all,2025-01,regular_payment_snapshot,118262,85039735.46,https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+male,2025-01,regular_payment_snapshot,42346,28338945.37,https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+female,2025-01,regular_payment_snapshot,75916,56700790.09,https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf

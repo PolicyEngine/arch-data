@@ -1,0 +1,48 @@
+source_id: opgroeien
+package_id: opgroeien-groeipakket-basic-caseload-2025-12
+dataset: opgroeien_groeipakket_basic_caseload_2025_12
+publisher: Opgroeien (Agentschap Opgroeien regie), Flemish Community
+source_page: https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+table: Groeipakket basic-amount child caseload, rights period 2025/12
+files:
+  2025:
+    filename: opgroeien_groeipakket_basic_caseload_2025_12.csv
+    source_url: https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+    sha256: 508c49236221b0bd246f46cab25f36cdc6f61222dbbe9a64a88c67fe37f3de20
+    size_bytes: 442
+    fetched_at: '2026-08-30T12:26:22+00:00'
+    source_table: Official Groeipakket dashboard query result for basic-amount children
+    source_urls:
+    - https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+    - https://www.opgroeien.be/kennis/cijfers-en-onderzoek/vlaams-groeipakket
+    notes: Curated one-row capture of the official interactive dashboard result retrieved
+      on 2026-08-30. Separate guarded columns preserve the authored entity, period,
+      provisional-figure, Groeipakket, and basic-amount views. Opgroeien does not
+      expose this exact child count in a static download. The table includes bilateral
+      agreement and difference-payment categories, so the result is retained as a
+      scheme-wide statistical scope rather than resident NUTS1 BE2.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/opgroeien/opgroeien-groeipakket-basic-caseload-2025-12/2025/508c49236221b0bd246f46cab25f36cdc6f61222dbbe9a64a88c67fe37f3de20/opgroeien_groeipakket_basic_caseload_2025_12.csv
+        uri: r2://ledger-raw/raw/belgium/opgroeien/opgroeien-groeipakket-basic-caseload-2025-12/2025/508c49236221b0bd246f46cab25f36cdc6f61222dbbe9a64a88c67fe37f3de20/opgroeien_groeipakket_basic_caseload_2025_12.csv
+  source_capture:
+    filename: opgroeien-groeipakket-2025-12-dashboard-capture.zip
+    source_url: https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+    source_urls:
+    - https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+    - https://app.powerbi.com/view?r=eyJrIjoiZTFiMzllMTUtNmUxNy00MWVkLWJiOGEtNGE3ZmVlZTY3NjZhIiwidCI6IjEzY2ZlMTgyLTY0MmEtNDgwZS1iYzhhLTVlY2Y2NWRiMGFhMCIsImMiOjh9
+    sha256: aa3a6158006e05db0d326ed1e00836d623607a4d5108a9aa96a5323c1c124bd0
+    size_bytes: 12089
+    fetched_at: '2026-08-30T13:06:00+00:00'
+    notes: Browser capture of the official embedded Power BI Data view. The archive
+      contains a screenshot and its accessibility-tree text. The text preserves the
+      selected 2025/12 column, every published basic-amount category, the bilateral-agreement
+      and difference-payment rows, and the exact Total 1,629,980 value.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/opgroeien/opgroeien-groeipakket-basic-caseload-2025-12/source_capture/aa3a6158006e05db0d326ed1e00836d623607a4d5108a9aa96a5323c1c124bd0/opgroeien-groeipakket-2025-12-dashboard-capture.zip
+        uri: r2://ledger-raw/raw/belgium/opgroeien/opgroeien-groeipakket-basic-caseload-2025-12/source_capture/aa3a6158006e05db0d326ed1e00836d623607a4d5108a9aa96a5323c1c124bd0/opgroeien-groeipakket-2025-12-dashboard-capture.zip

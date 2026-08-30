@@ -1,0 +1,50 @@
+source_id: iriscare
+package_id: iriscare-child-benefit-caseload-2025-12
+dataset: iriscare_child_benefit_caseload_2025_12
+publisher: Iriscare, Common Community Commission of Brussels-Capital
+source_page: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+table: General child-benefit statistics, rights period December 2025
+files:
+  2025:
+    filename: iriscare_child_benefit_caseload_2025_12.csv
+    source_url: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+    sha256: 7666027bdc5d793a05184bf766148966b717049d8e07044ef645ed049fe11e20
+    size_bytes: 617
+    fetched_at: '2026-08-30T12:26:22+00:00'
+    source_table: Official Iriscare dashboard query for LegalPeriod 202512
+    source_urls:
+    - https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+    - https://www.iriscare.brussels/nl/2026/07/22/kinderbijslag-128-222-brusselse-kinderen-kregen-in-2025-een-sociale-toeslag-bovenop-hun-kinderbijslag/
+    notes: Curated two-row capture of the official embedded dashboard result for LegalPeriod=202512,
+      retrieved on 2026-08-30. The observed Children and Beneficiaries views and the
+      publisher labels children and allocataires are guarded separately. Iriscare
+      defines allocataires as associated payment recipients, not households. The municipality
+      table includes Flemish Region, Walloon Region, outside Belgium, and unknown
+      rows, so the totals retain an Iriscare scheme scope rather than resident NUTS1
+      BE1. No stable static query identifier was exposed.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/iriscare/iriscare-child-benefit-caseload-2025-12/2025/7666027bdc5d793a05184bf766148966b717049d8e07044ef645ed049fe11e20/iriscare_child_benefit_caseload_2025_12.csv
+        uri: r2://ledger-raw/raw/belgium/iriscare/iriscare-child-benefit-caseload-2025-12/2025/7666027bdc5d793a05184bf766148966b717049d8e07044ef645ed049fe11e20/iriscare_child_benefit_caseload_2025_12.csv
+  source_capture:
+    filename: iriscare-child-benefit-2025-12-dashboard-capture.zip
+    source_url: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+    source_urls:
+    - https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+    - https://app.fabric.microsoft.com/view?r=eyJrIjoiZTQ2OWQzMDItNTNkYy00Y2IyLWFmYjAtZDhlNWMxODhlYTJhIiwidCI6Ijk0YzA3MjAwLWU5MjEtNDBjNS04MzE5LTZkMjE2ZDkyZGZmMSIsImMiOjl9
+    sha256: a254455cd9bc0e872a5f47a5c3f0fa07dff2fbfe7c1b5a1e0c22b4c65036a934
+    size_bytes: 174132
+    fetched_at: '2026-08-30T13:08:00+00:00'
+    notes: Browser capture of both official embedded Power BI views with period 202512,
+      all communes, all acquired-right statuses, and provisional data selected. The
+      archive contains screenshots plus accessibility-tree text preserving the exact
+      304,966 entitled-child total, the exact 162,745 allocataire total, and the non-Brussels
+      and outside-Belgium rows that define the scheme-wide scope.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/iriscare/iriscare-child-benefit-caseload-2025-12/source_capture/a254455cd9bc0e872a5f47a5c3f0fa07dff2fbfe7c1b5a1e0c22b4c65036a934/iriscare-child-benefit-2025-12-dashboard-capture.zip
+        uri: r2://ledger-raw/raw/belgium/iriscare/iriscare-child-benefit-caseload-2025-12/source_capture/a254455cd9bc0e872a5f47a5c3f0fa07dff2fbfe7c1b5a1e0c22b4c65036a934/iriscare-child-benefit-2025-12-dashboard-capture.zip

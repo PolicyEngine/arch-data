@@ -19,10 +19,11 @@ files:
     source_urls:
     - https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket
     - https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
-    notes: Curated per-component Groeipakket caseload counts published by Opgroeien
-      (the Flemish government agency administering the Groeipakket) on its statistics
-      page. Each component carries its own published reference basis (end 2025, December
-      2025, or school year 2025-2026). The basisbedrag child count is published only
-      as "more than 1.6 million" (a rounded lower bound), so it is omitted from the
-      child record set and recorded as a gap; the exact basisbedrag family count (930,010)
+    notes: Curated per-component Groeipakket administrative scheme caseload counts
+      published by Opgroeien (the Flemish government agency administering the
+      Groeipakket) on its statistics page. These are not resident BE2 counts. Each
+      component carries its own published reference basis (end 2025, December 2025,
+      or school year 2025-2026). The basisbedrag child count is published only as
+      "more than 1.6 million" (a rounded lower bound), so it is omitted from the child
+      record set and recorded as a gap; the exact basisbedrag family count (930,010)
       is published and retained.

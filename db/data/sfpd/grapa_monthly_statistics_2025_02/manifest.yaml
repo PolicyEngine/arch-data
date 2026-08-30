@@ -1,0 +1,39 @@
+source_id: sfpd
+package_id: sfpd-grapa-monthly-statistics-2025-02
+dataset: sfpd_grapa_monthly_statistics_2025_02
+source_page: https://www.sfpd.fgov.be/fr/centre-de-connaissances/statistiques
+table: "Statistique mensuelle des prestations sociales - F\xE9vrier 2025, table 2.4.1"
+files:
+  2025:
+    filename: sfpd_grapa_monthly_2025_01.csv
+    source_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    sha256: 6ff9d5d99881b48be68343cb259fb86d29761e020b39afed5df217bb6fc5ce01
+    size_bytes: 400
+    fetched_at: '2026-08-30T12:08:46+00:00'
+    source_table: "Statistique mensuelle des prestations sociales - F\xE9vrier 2025,\
+      \ table 2.4.1"
+    notes: Long-form transcription of the January 2025 total, men, and women rows
+      from SFPD table 2.4.1. Counts and euro amounts reconcile exactly across the
+      two published sex partitions. The exact publisher PDF is retained as source_capture
+      below.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/sfpd/sfpd-grapa-monthly-statistics-2025-02/2025/6ff9d5d99881b48be68343cb259fb86d29761e020b39afed5df217bb6fc5ce01/sfpd_grapa_monthly_2025_01.csv
+        uri: r2://ledger-raw/raw/belgium/sfpd/sfpd-grapa-monthly-statistics-2025-02/2025/6ff9d5d99881b48be68343cb259fb86d29761e020b39afed5df217bb6fc5ce01/sfpd_grapa_monthly_2025_01.csv
+  source_capture:
+    filename: fr_stat_2502.pdf
+    source_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    sha256: 0d6173e71a0e9c2cd220cd024a5b5fecbb6ca79f8b791cbd2b3368e7f8412106
+    size_bytes: 2319705
+    fetched_at: '2026-08-30T12:08:46+00:00'
+    notes: Verbatim SFPD monthly-statistics PDF. Printed page 36, table 2.4.1, reports
+      January 2025 GRAPA beneficiaries and monthly payments for the total population
+      and mutually exclusive men and women partitions.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/sfpd/sfpd-grapa-monthly-statistics-2025-02/source_capture/0d6173e71a0e9c2cd220cd024a5b5fecbb6ca79f8b791cbd2b3368e7f8412106/fr_stat_2502.pdf
+        uri: r2://ledger-raw/raw/belgium/sfpd/sfpd-grapa-monthly-statistics-2025-02/source_capture/0d6173e71a0e9c2cd220cd024a5b5fecbb6ca79f8b791cbd2b3368e7f8412106/fr_stat_2502.pdf

@@ -1,0 +1,26 @@
+source_id: ostbelgien
+package_id: ostbelgien-child-benefit-caseload-2025-12
+dataset: ostbelgien_child_benefit_caseload_2025_12
+publisher: Ministerium der Deutschsprachigen Gemeinschaft Belgiens
+source_page: https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+table: Kindergeld in der Deutschsprachigen Gemeinschaft, Dezember 2025
+files:
+  2025:
+    filename: ostbelgien_child_benefit_caseload_2025_12.csv
+    source_url: https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+    sha256: 1fb13534cb93b039a1eeb380180a446d3343146289718b266ba751354a7d5a98
+    size_bytes: 475
+    fetched_at: '2026-08-30T12:26:22+00:00'
+    source_table: Official Ostbelgien Statistik December 2025 snapshot
+    source_urls:
+    - https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+    notes: "Curated two-row transcription of the exact children and Empf\xE4nger counts\
+      \ printed on the official HTML statistics page, audited on 2026-08-30. Automated\
+      \ artifact capture was refused by the publisher with HTTP 403, so no claim is\
+      \ made that this CSV is a verbatim page download."
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/ostbelgien/ostbelgien-child-benefit-caseload-2025-12/2025/1fb13534cb93b039a1eeb380180a446d3343146289718b266ba751354a7d5a98/ostbelgien_child_benefit_caseload_2025_12.csv
+        uri: r2://ledger-raw/raw/belgium/ostbelgien/ostbelgien-child-benefit-caseload-2025-12/2025/1fb13534cb93b039a1eeb380180a446d3343146289718b266ba751354a7d5a98/ostbelgien_child_benefit_caseload_2025_12.csv
