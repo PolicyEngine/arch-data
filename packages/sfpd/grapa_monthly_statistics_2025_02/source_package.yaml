@@ -1,0 +1,131 @@
+schema_version: ledger.source_package.v1
+package_id: sfpd-grapa-monthly-statistics-2025-02
+label: SFPD January 2025 GRAPA beneficiaries and monthly payments by sex
+artifact:
+  source_name: sfpd_grapa
+  source_table: Statistique mensuelle des prestations sociales - Février 2025, table 2.4.1
+  resource_package: db
+  resource_directory: data/sfpd/grapa_monthly_statistics_2025_02
+  manifest: manifest.yaml
+  vintage: grapa_monthly_statistics_2025_02
+  extracted_at: '2026-08-30'
+  extraction_method: >-
+    long-form transcription of the January 2025 row and its sex partitions
+    from the full SFPD monthly-statistics PDF, printed page 36, table 2.4.1
+  parser: delimited_text_full_rows
+  artifact_year: 2025
+  sheet_name: sfpd_grapa_monthly_2025_01
+record_sets:
+- record_set_id: sfpd_grapa.month2025_01.regular_payment_beneficiaries.by_sex
+  provenance_class: administrative
+  record_set_spec_id: sfpd_grapa.regular_payment_beneficiaries.by_sex.v1
+  source_record_id_prefix: sfpd_grapa.month2025_01.regular_payment_beneficiaries
+  sheet_name: sfpd_grapa_monthly_2025_01
+  period_type: month
+  period: '2025-01'
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: person
+  entity_role: grapa_beneficiary
+  domain: old_age_income_guarantee
+  groupby_dimension: sex
+  rows:
+  - value_id: all
+    label: All GRAPA beneficiaries in the regular-payment population
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: all
+    table_record_kind: total
+    filters: {}
+    constraints: []
+    guard_cells:
+    - column: B
+      row: 2
+      expected_value: 2025-01
+      label: Reference month
+    - column: C
+      row: 2
+      expected_value: regular_payment_snapshot
+      label: Statistical population
+  - value_id: male
+    label: Men receiving GRAPA in the regular-payment population
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: male
+    table_record_kind: detail
+    filters:
+      sex: male
+    constraints:
+    - variable: sex
+      operator: ==
+      value: male
+      label: Sex
+    guard_cells:
+    - column: B
+      row: 3
+      expected_value: 2025-01
+      label: Reference month
+  - value_id: female
+    label: Women receiving GRAPA in the regular-payment population
+    ordinal: 2
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: female
+    table_record_kind: detail
+    filters:
+      sex: female
+    constraints:
+    - variable: sex
+      operator: ==
+      value: female
+      label: Sex
+    guard_cells:
+    - column: B
+      row: 4
+      expected_value: 2025-01
+      label: Reference month
+  measures:
+  - measure_id: beneficiaries
+    label: GRAPA beneficiaries in the regular-payment population
+    ordinal: 0
+    column: D
+    source_column_id: beneficiaries
+    expected_column_header_row: 1
+    expected_column_header: beneficiaries
+    concept: sfpd.grapa_regular_payment_beneficiary_count
+    source_concept: sfpd.monthly_statistics.table_2_4_1.grapa_beneficiaries
+    concept_relation: exact
+    concept_authority: sfpd
+    concept_evidence_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    concept_evidence_notes: >-
+      SFPD table 2.4.1 reports 118,262 GRAPA beneficiaries for January 2025,
+      split into 42,346 men and 75,916 women. It is a monthly regular-payment
+      snapshot, not an annual-average, year-end, annual-any, eligibility, or
+      payment-transaction count. The publication uses both beneficiaries and
+      cases but does not publish its person-key deduplication method.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+  - measure_id: monthly_amount_eur
+    label: Monthly GRAPA amount paid to the regular-payment population
+    ordinal: 1
+    column: E
+    source_column_id: monthly_amount_eur
+    expected_column_header_row: 1
+    expected_column_header: monthly_amount_eur
+    concept: sfpd.grapa_regular_payment_monthly_amount
+    source_concept: sfpd.monthly_statistics.table_2_4_1.grapa_monthly_amount
+    concept_relation: exact
+    concept_authority: sfpd
+    concept_evidence_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    concept_evidence_notes: >-
+      SFPD table 2.4.1 pairs the January 2025 beneficiary population with
+      EUR 85,039,735.46 in monthly GRAPA payments. The men and women payment
+      rows sum exactly to the published total.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number

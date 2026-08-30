@@ -1,0 +1,3 @@
+value_id,period,ostbelgien.statistic,entity_view,source_label,retrieved_at,count,source_url
+paid_children,2025-12,paid_children,Kinder,Kinder die Kindergeld im Dezember 2025 erhielten,2026-08-30,15533,https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+payment_recipients,2025-12,payment_recipients,Empfänger,Empfänger von Kindergeld im Dezember 2025,2026-08-30,8302,https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/

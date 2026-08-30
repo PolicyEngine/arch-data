@@ -516,9 +516,7 @@ def test_belgium_euromod_comparator_pairs_c2_rows_with_model_outputs():
     missing_ratios = {
         row["value_id"]
         for row in c2_rows
-        if row["value_id"]
-        .replace("_external_", "_ratio_")
-        .replace("_silc_", "_ratio_")
+        if row["value_id"].replace("_external_", "_ratio_").replace("_silc_", "_ratio_")
         not in ids
     }
     assert not missing_ratios
@@ -541,6 +539,7 @@ def test_belgium_euromod_comparator_pairs_c2_rows_with_model_outputs():
 
 
 SFPD_PENSION_ALIAS = "sfpd-legal-pension-caseload-2025"
+SFPD_GRAPA_ALIAS = "sfpd-grapa-monthly-statistics-2025-02"
 GROEIPAKKET_ALIAS = "opgroeien-groeipakket-caseload-2025"
 BFP_OUTLOOK_ALIAS = "bfp-economic-outlook-2026-06"
 FPB_ANNEX_ALIAS = "fpb-economic-outlook-2026-2031-june-2026"
@@ -549,6 +548,7 @@ FPB_ANNEX_ALIAS = "fpb-economic-outlook-2026-2031-june-2026"
 def test_belgium_supplementary_publisher_aliases_are_registered():
     assert {
         SFPD_PENSION_ALIAS,
+        SFPD_GRAPA_ALIAS,
         GROEIPAKKET_ALIAS,
         BFP_OUTLOOK_ALIAS,
         FPB_ANNEX_ALIAS,
@@ -576,6 +576,32 @@ def test_sfpd_legal_pension_caseload_matches_published_cells():
     assert validate_facts(facts).valid
 
 
+def test_sfpd_grapa_snapshot_matches_payment_linked_published_cells():
+    facts = _facts(SFPD_GRAPA_ALIAS, 2025)
+    by_measure_and_sex = {
+        (fact.measure.concept, fact.filters.get("sex", "all")): fact.value
+        for fact in facts
+    }
+
+    assert by_measure_and_sex == {
+        ("sfpd.grapa_regular_payment_beneficiary_count", "all"): 118262,
+        ("sfpd.grapa_regular_payment_beneficiary_count", "male"): 42346,
+        ("sfpd.grapa_regular_payment_beneficiary_count", "female"): 75916,
+        ("sfpd.grapa_regular_payment_monthly_amount", "all"): 85039735.46,
+        ("sfpd.grapa_regular_payment_monthly_amount", "male"): 28338945.37,
+        ("sfpd.grapa_regular_payment_monthly_amount", "female"): 56700790.09,
+    }
+    assert 42346 + 75916 == 118262
+    assert Decimal("28338945.37") + Decimal("56700790.09") == Decimal("85039735.46")
+    assert {fact.period.type for fact in facts} == {"month"}
+    assert {fact.period.value for fact in facts} == {"2025-01"}
+    assert {fact.geography.id for fact in facts} == {"BE"}
+    assert {fact.source.source_sha256 for fact in facts} == {
+        "6ff9d5d99881b48be68343cb259fb86d29761e020b39afed5df217bb6fc5ce01"
+    }
+    assert validate_facts(facts).valid
+
+
 def test_groeipakket_caseload_matches_published_component_cells():
     facts = _facts(GROEIPAKKET_ALIAS, 2025)
     children = {
@@ -589,7 +615,7 @@ def test_groeipakket_caseload_matches_published_component_cells():
         if fact.measure.concept == "groeipakket_families_receiving_component"
     }
 
-    # Exact published caseload cells from Opgroeien (Flemish agency).
+    # Exact published administrative-scheme caseload cells from Opgroeien.
     assert children == {
         "social_supplement": 522148,
         "orphan_supplement": 21741,
@@ -608,8 +634,16 @@ def test_groeipakket_caseload_matches_published_component_cells():
     # basisbedrag child count is published only as a rounded ">1.6M" lower bound,
     # so it is intentionally omitted from the child record set (recorded as a gap).
     assert "basic_amount" not in children
-    assert {fact.geography.id for fact in facts} == {"BE2"}
-    assert {fact.geography.vintage for fact in facts} == {"NUTS_2024"}
+    assert {
+        (fact.geography.level, fact.geography.id, fact.geography.vintage)
+        for fact in facts
+    } == {
+        (
+            "statistical_scope",
+            "BE-GROEIPAKKET-SCHEME",
+            "GROEIPAKKET_ADMINISTRATIVE_SCOPE_2025",
+        )
+    }
     assert validate_facts(facts).valid
 
 

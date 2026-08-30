@@ -1,0 +1,228 @@
+schema_version: ledger.source_package.v1
+package_id: parlement-wallonie-child-benefit-partitions-2023-12
+label: Walloon Parliament December 2023 child-benefit household partitions
+artifact:
+  source_name: parlement_wallonie_child_benefit_response
+  source_table: Four household-group tables in the official ministerial answer
+  resource_package: db
+  resource_directory: data/parlement_wallonie/child_benefit_partitions_2023_12
+  manifest: manifest.yaml
+  vintage: child_benefit_partitions_2023_12
+  extracted_at: '2026-08-30'
+  extraction_method: >-
+    row-faithful transcription of the four publisher-authored table totals;
+    the verbatim official PDF is retained as a hash-pinned source capture
+  parser: delimited_text_full_rows
+  artifact_year: 2023
+  sheet_name: parlement_wallonie_child_benefit_partitions_2023_12
+record_sets:
+- record_set_id: parlement_wallonie.child_benefit.month2023_12.children_by_household_group
+  provenance_class: administrative
+  record_set_spec_id: parlement_wallonie.child_benefit.children_by_household_group.v1
+  source_record_id_prefix: parlement_wallonie.child_benefit.month2023_12.children
+  sheet_name: parlement_wallonie_child_benefit_partitions_2023_12
+  period_type: month
+  period: '2023-12'
+  period_coverage: &period_coverage
+    basis: calendar
+    source_period_label: décembre 2023
+    start_date: '2023-12-01'
+    end_date: '2023-12-31'
+    notes: >-
+      The official answer says the tables carry family and child information
+      for December 2023.
+  geography_id: BE-WALLOON-FRENCH
+  geography_level: statistical_scope
+  geography_name: French-language Walloon child-benefit system
+  geography_vintage: child_benefit_scope_2023
+  entity: person
+  entity_role: child_benefit_recipient_child
+  domain: child_benefit
+  groupby_dimension: parlement_wallonie.household_type
+  rows: &partition_rows
+  - value_id: single_parent_with_social_supplement
+    label: Single-parent households with social supplements
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: single_parent_with_social_supplement
+    table_record_kind: detail
+    filters:
+      parlement_wallonie.household_type: single_parent
+      parlement_wallonie.social_supplement_status: with_social_supplement
+    constraints:
+    - variable: parlement_wallonie.household_type
+      operator: ==
+      value: single_parent
+      label: Household type
+    - variable: parlement_wallonie.social_supplement_status
+      operator: ==
+      value: with_social_supplement
+      label: Social-supplement status
+    guard_cells:
+    - {column: A, row: 2, expected_value: single_parent_with_social_supplement, label: Source row identifier}
+    - {column: B, row: 2, expected_value: 2023-12, label: Reference month}
+    - {column: C, row: 2, expected_value: single_parent, label: Household type}
+    - {column: D, row: 2, expected_value: with_social_supplement, label: Social-supplement status}
+    - {column: E, row: 2, expected_value: 89575, label: Published households}
+    - {column: F, row: 2, expected_value: 118421, label: Published children aged 0-17}
+    - {column: G, row: 2, expected_value: 30748, label: Published children aged 18-24}
+    - {column: H, row: 2, expected_value: 149169, label: Published total children}
+    - {column: I, row: 2, expected_value: Ménages monoparentaux avec suppléments sociaux, label: Publisher row heading}
+    - {column: J, row: 2, expected_value: 1, label: PDF page}
+    - {column: K, row: 2, expected_value: 92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651, label: Verbatim PDF SHA-256}
+    - {column: L, row: 2, expected_value: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf, label: Official PDF URL}
+  - value_id: single_parent_without_social_supplement
+    label: Single-parent households without social supplements
+    ordinal: 1
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: single_parent_without_social_supplement
+    table_record_kind: detail
+    filters:
+      parlement_wallonie.household_type: single_parent
+      parlement_wallonie.social_supplement_status: without_social_supplement
+    constraints:
+    - variable: parlement_wallonie.household_type
+      operator: ==
+      value: single_parent
+      label: Household type
+    - variable: parlement_wallonie.social_supplement_status
+      operator: ==
+      value: without_social_supplement
+      label: Social-supplement status
+    guard_cells:
+    - {column: A, row: 3, expected_value: single_parent_without_social_supplement, label: Source row identifier}
+    - {column: B, row: 3, expected_value: 2023-12, label: Reference month}
+    - {column: C, row: 3, expected_value: single_parent, label: Household type}
+    - {column: D, row: 3, expected_value: without_social_supplement, label: Social-supplement status}
+    - {column: E, row: 3, expected_value: 24535, label: Published households}
+    - {column: F, row: 3, expected_value: 25316, label: Published children aged 0-17}
+    - {column: G, row: 3, expected_value: 13069, label: Published children aged 18-24}
+    - {column: H, row: 3, expected_value: 38385, label: Published total children}
+    - {column: I, row: 3, expected_value: Ménages monoparentaux sans suppléments sociaux, label: Publisher row heading}
+    - {column: J, row: 3, expected_value: 1, label: PDF page}
+    - {column: K, row: 3, expected_value: 92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651, label: Verbatim PDF SHA-256}
+    - {column: L, row: 3, expected_value: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf, label: Official PDF URL}
+  - value_id: other_household_with_social_supplement
+    label: Other households with social supplements
+    ordinal: 2
+    row_number: 4
+    expected_row_header_column: A
+    expected_row_header: other_household_with_social_supplement
+    table_record_kind: detail
+    filters:
+      parlement_wallonie.household_type: other_household
+      parlement_wallonie.social_supplement_status: with_social_supplement
+    constraints:
+    - variable: parlement_wallonie.household_type
+      operator: ==
+      value: other_household
+      label: Household type
+    - variable: parlement_wallonie.social_supplement_status
+      operator: ==
+      value: with_social_supplement
+      label: Social-supplement status
+    guard_cells:
+    - {column: A, row: 4, expected_value: other_household_with_social_supplement, label: Source row identifier}
+    - {column: B, row: 4, expected_value: 2023-12, label: Reference month}
+    - {column: C, row: 4, expected_value: other_household, label: Household type}
+    - {column: D, row: 4, expected_value: with_social_supplement, label: Social-supplement status}
+    - {column: E, row: 4, expected_value: 90308, label: Published households}
+    - {column: F, row: 4, expected_value: 148409, label: Published children aged 0-17}
+    - {column: G, row: 4, expected_value: 28820, label: Published children aged 18-24}
+    - {column: H, row: 4, expected_value: 177229, label: Published total children}
+    - {column: I, row: 4, expected_value: Autres ménages avec suppléments sociaux, label: Publisher row heading}
+    - {column: J, row: 4, expected_value: 1, label: PDF page}
+    - {column: K, row: 4, expected_value: 92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651, label: Verbatim PDF SHA-256}
+    - {column: L, row: 4, expected_value: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf, label: Official PDF URL}
+  - value_id: other_household_without_social_supplement
+    label: Other households without social supplements
+    ordinal: 3
+    row_number: 5
+    expected_row_header_column: A
+    expected_row_header: other_household_without_social_supplement
+    table_record_kind: detail
+    filters:
+      parlement_wallonie.household_type: other_household
+      parlement_wallonie.social_supplement_status: without_social_supplement
+    constraints:
+    - variable: parlement_wallonie.household_type
+      operator: ==
+      value: other_household
+      label: Household type
+    - variable: parlement_wallonie.social_supplement_status
+      operator: ==
+      value: without_social_supplement
+      label: Social-supplement status
+    guard_cells:
+    - {column: A, row: 5, expected_value: other_household_without_social_supplement, label: Source row identifier}
+    - {column: B, row: 5, expected_value: 2023-12, label: Reference month}
+    - {column: C, row: 5, expected_value: other_household, label: Household type}
+    - {column: D, row: 5, expected_value: without_social_supplement, label: Social-supplement status}
+    - {column: E, row: 5, expected_value: 308949, label: Published households}
+    - {column: F, row: 5, expected_value: 430670, label: Published children aged 0-17}
+    - {column: G, row: 5, expected_value: 114772, label: Published children aged 18-24}
+    - {column: H, row: 5, expected_value: 545442, label: Published total children}
+    - {column: I, row: 5, expected_value: Autres ménages sans suppléments sociaux, label: Publisher row heading}
+    - {column: J, row: 5, expected_value: 1, label: PDF page}
+    - {column: K, row: 5, expected_value: 92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651, label: Verbatim PDF SHA-256}
+    - {column: L, row: 5, expected_value: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf, label: Official PDF URL}
+  measures:
+  - measure_id: children
+    label: Recipient children in the publisher household group
+    ordinal: 0
+    column: H
+    source_column_id: children_total
+    expected_column_header_row: 1
+    expected_column_header: children_total
+    concept: parlement_wallonie.child_benefit_recipient_children_by_household_group
+    source_concept: parlement_wallonie.response.child_benefit.children_by_household_group
+    concept_relation: source_label
+    concept_authority: parlement_wallonie
+    concept_evidence_url: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf
+    concept_evidence_notes: >-
+      The ministerial answer publishes four separate December 2023 table-total
+      rows. The package retains each row and its 0-17 and 18-24 components; it
+      does not construct an all-scope value. AVIQ is identified in the answer
+      as the Walloon regulator, not as the publisher of this document.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: parlement_wallonie.child_benefit.month2023_12.households_by_household_group
+  provenance_class: administrative
+  record_set_spec_id: parlement_wallonie.child_benefit.households_by_household_group.v1
+  source_record_id_prefix: parlement_wallonie.child_benefit.month2023_12.households
+  sheet_name: parlement_wallonie_child_benefit_partitions_2023_12
+  period_type: month
+  period: '2023-12'
+  period_coverage: *period_coverage
+  geography_id: BE-WALLOON-FRENCH
+  geography_level: statistical_scope
+  geography_name: French-language Walloon child-benefit system
+  geography_vintage: child_benefit_scope_2023
+  entity: household
+  entity_role: child_benefit_recipient_household
+  domain: child_benefit
+  groupby_dimension: parlement_wallonie.household_type
+  rows: *partition_rows
+  measures:
+  - measure_id: households
+    label: Recipient households in the publisher household group
+    ordinal: 0
+    column: E
+    source_column_id: households
+    expected_column_header_row: 1
+    expected_column_header: households
+    concept: parlement_wallonie.child_benefit_recipient_households_by_household_group
+    source_concept: parlement_wallonie.response.child_benefit.households_by_household_group
+    concept_relation: source_label
+    concept_authority: parlement_wallonie
+    concept_evidence_url: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf
+    concept_evidence_notes: >-
+      The source labels these counts as ménages. Chronicle preserves the four
+      publisher rows separately and does not reinterpret them as families,
+      payment recipients, or a constructed all-scope total.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

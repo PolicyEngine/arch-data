@@ -1,0 +1,3 @@
+value_id,period,iriscare.statistic,publication_status,entity_view,legal_period,publisher_entity_label,retrieved_at,count,source_url
+entitled_children,2025-12,entitled_children,provisional,Children,LegalPeriod=202512,children,2026-08-30,304966,https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+payment_recipients,2025-12,payment_recipients,provisional,Beneficiaries,LegalPeriod=202512,allocataires,2026-08-30,162745,https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/

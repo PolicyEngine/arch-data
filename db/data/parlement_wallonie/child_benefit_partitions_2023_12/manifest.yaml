@@ -1,0 +1,41 @@
+source_id: parlement_wallonie
+package_id: parlement-wallonie-child-benefit-partitions-2023-12
+dataset: parlement_wallonie_child_benefit_partitions_2023_12
+publisher: Parlement de Wallonie, answer supplied by the Walloon Minister of Health
+  and Social Action
+source_page: https://www.parlement-wallonie.be/pwpages?iddoc=138138&p=interp-questions-voir&type=28
+table: Walloon child-benefit households and children, December 2023
+files:
+  2023:
+    filename: parlement_wallonie_child_benefit_partitions_2023_12.csv
+    source_url: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf
+    sha256: 1ffeab402feb4a597facdc749aabb85199dc9649f124ce49477320d7c4cd6d1e
+    size_bytes: 1357
+    fetched_at: '2026-08-30T12:26:22+00:00'
+    source_table: Four mutually exclusive household-group tables in the official answer
+    notes: Curated transcription of all four publisher-authored table-total rows,
+      retaining households, children aged 0-17, children aged 18-24, total children,
+      page number, official URL, and the verbatim PDF digest for each household-type
+      and social-supplement category. Chronicle emits only these source rows; it does
+      not construct an all-scope total.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/parlement_wallonie/parlement-wallonie-child-benefit-partitions-2023-12/2023/1ffeab402feb4a597facdc749aabb85199dc9649f124ce49477320d7c4cd6d1e/parlement_wallonie_child_benefit_partitions_2023_12.csv
+        uri: r2://ledger-raw/raw/belgium/parlement_wallonie/parlement-wallonie-child-benefit-partitions-2023-12/2023/1ffeab402feb4a597facdc749aabb85199dc9649f124ce49477320d7c4cd6d1e/parlement_wallonie_child_benefit_partitions_2023_12.csv
+  source_capture:
+    filename: parlement-wallonie-child-benefit-partitions-2023-12.pdf
+    source_url: https://nautilus.parlement-wallon.be/Archives_ARQE/3423.pdf
+    sha256: 92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651
+    size_bytes: 70032
+    fetched_at: '2026-08-30T12:21:36+00:00'
+    notes: Verbatim official two-page PDF answer. Its four December 2023 tables distinguish
+      single-parent versus other households and presence versus absence of a social
+      supplement.
+    storage:
+      r2:
+        provider: r2
+        bucket: ledger-raw
+        key: raw/belgium/parlement_wallonie/parlement-wallonie-child-benefit-partitions-2023-12/source_capture/92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651/parlement-wallonie-child-benefit-partitions-2023-12.pdf
+        uri: r2://ledger-raw/raw/belgium/parlement_wallonie/parlement-wallonie-child-benefit-partitions-2023-12/source_capture/92b8dee4e25b91f891f78f60179abe881c5ad9d7d9b5436c767cf69f9dc55651/parlement-wallonie-child-benefit-partitions-2023-12.pdf

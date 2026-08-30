@@ -1,0 +1,216 @@
+schema_version: ledger.source_package.v1
+package_id: iriscare-child-benefit-caseload-2025-12
+label: Iriscare December 2025 child-benefit caseload
+artifact:
+  source_name: iriscare_child_benefit_dashboard
+  source_table: Official Iriscare dashboard query for LegalPeriod 202512
+  resource_package: db
+  resource_directory: data/iriscare/child_benefit_caseload_2025_12
+  manifest: manifest.yaml
+  vintage: child_benefit_caseload_2025_12
+  extracted_at: '2026-08-30'
+  extraction_method: >-
+    curated capture of the official embedded-dashboard result with its legal
+    period filter retained in each source row
+  parser: delimited_text_full_rows
+  artifact_year: 2025
+  sheet_name: iriscare_child_benefit_caseload_2025_12
+record_sets:
+- record_set_id: iriscare.child_benefit.month2025_12.entitled_children
+  provenance_class: administrative
+  record_set_spec_id: iriscare.child_benefit.entitled_children.v1
+  source_record_id_prefix: iriscare.child_benefit.month2025_12.entitled_children
+  sheet_name: iriscare_child_benefit_caseload_2025_12
+  period_type: month
+  period: '2025-12'
+  period_coverage: &period_coverage
+    basis: calendar
+    source_period_label: LegalPeriod=202512
+    start_date: '2025-12-01'
+    end_date: '2025-12-31'
+    notes: >-
+      Iriscare identifies this as the rights month. Payments associated with
+      allocataires occur in the following month.
+  geography_id: BE-IRISCARE-CHILD-BENEFIT-SCHEME
+  geography_level: statistical_scope
+  geography_name: Iriscare child-benefit administrative scheme caseload
+  geography_vintage: IRISCARE_CHILD_BENEFIT_ADMIN_SCOPE_2025
+  entity: person
+  entity_role: child_benefit_entitled_child
+  domain: child_benefit
+  groupby_dimension: iriscare.statistic
+  shared_filters: &shared_filters
+    publication_status: provisional
+  shared_constraints: &shared_constraints
+  - variable: publication_status
+    operator: ==
+    value: provisional
+    label: Iriscare publication status
+  rows:
+  - value_id: entitled_children
+    label: Children entitled to child benefit
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: entitled_children
+    table_record_kind: total
+    filters:
+      iriscare.statistic: entitled_children
+    constraints:
+    - variable: iriscare.statistic
+      operator: ==
+      value: entitled_children
+      label: Iriscare statistic
+    guard_cells:
+    - column: A
+      row: 2
+      expected_value: entitled_children
+      label: Source result identifier
+    - column: B
+      row: 2
+      expected_value: 2025-12
+      label: Rights period
+    - column: C
+      row: 2
+      expected_value: entitled_children
+      label: Normalized statistic
+    - column: D
+      row: 2
+      expected_value: provisional
+      label: Publication status
+    - column: E
+      row: 2
+      expected_value: Children
+      label: Dashboard measure view
+    - column: F
+      row: 2
+      expected_value: LegalPeriod=202512
+      label: Dashboard legal-period filter
+    - column: G
+      row: 2
+      expected_value: children
+      label: Publisher entity label
+    - column: H
+      row: 2
+      expected_value: '2026-08-30'
+      label: Retrieval date
+    - column: J
+      row: 2
+      expected_value: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+      label: Official dashboard URL
+  measures:
+  - measure_id: children
+    label: Children entitled to child benefit
+    ordinal: 0
+    column: I
+    source_column_id: count
+    expected_column_header_row: 1
+    expected_column_header: count
+    concept: iriscare.child_benefit_entitled_children
+    source_concept: iriscare.child_benefit.dashboard.entitled_children
+    concept_relation: source_label
+    concept_authority: iriscare
+    concept_evidence_url: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+    concept_evidence_notes: >-
+      The dashboard reports children for LegalPeriod 202512. The official 2025
+      release independently prints the same December child count. Its captured
+      municipality table includes Flemish Region, Walloon Region, outside
+      Belgium, and unknown rows, so this is an Iriscare-system caseload rather
+      than a count of BE1 residents. This publisher-specific source label makes
+      no simulator or legal-rule mapping.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: iriscare.child_benefit.month2025_12.payment_recipients
+  provenance_class: administrative
+  record_set_spec_id: iriscare.child_benefit.payment_recipients.v1
+  source_record_id_prefix: iriscare.child_benefit.month2025_12.payment_recipients
+  sheet_name: iriscare_child_benefit_caseload_2025_12
+  period_type: month
+  period: '2025-12'
+  period_coverage: *period_coverage
+  geography_id: BE-IRISCARE-CHILD-BENEFIT-SCHEME
+  geography_level: statistical_scope
+  geography_name: Iriscare child-benefit administrative scheme caseload
+  geography_vintage: IRISCARE_CHILD_BENEFIT_ADMIN_SCOPE_2025
+  entity: person
+  entity_role: child_benefit_payment_recipient
+  domain: child_benefit
+  groupby_dimension: iriscare.statistic
+  shared_filters: *shared_filters
+  shared_constraints: *shared_constraints
+  rows:
+  - value_id: payment_recipients
+    label: Associated child-benefit payment recipients
+    ordinal: 0
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: payment_recipients
+    table_record_kind: total
+    filters:
+      iriscare.statistic: payment_recipients
+    constraints:
+    - variable: iriscare.statistic
+      operator: ==
+      value: payment_recipients
+      label: Iriscare statistic
+    guard_cells:
+    - column: A
+      row: 3
+      expected_value: payment_recipients
+      label: Source result identifier
+    - column: B
+      row: 3
+      expected_value: 2025-12
+      label: Rights period
+    - column: C
+      row: 3
+      expected_value: payment_recipients
+      label: Normalized statistic
+    - column: D
+      row: 3
+      expected_value: provisional
+      label: Publication status
+    - column: E
+      row: 3
+      expected_value: Beneficiaries
+      label: Dashboard measure view
+    - column: F
+      row: 3
+      expected_value: LegalPeriod=202512
+      label: Dashboard legal-period filter
+    - column: G
+      row: 3
+      expected_value: allocataires
+      label: Publisher entity label
+    - column: H
+      row: 3
+      expected_value: '2026-08-30'
+      label: Retrieval date
+    - column: J
+      row: 3
+      expected_value: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+      label: Official dashboard URL
+  measures:
+  - measure_id: payment_recipients
+    label: Associated child-benefit payment recipients
+    ordinal: 0
+    column: I
+    source_column_id: count
+    expected_column_header_row: 1
+    expected_column_header: count
+    concept: iriscare.child_benefit_payment_recipients
+    source_concept: iriscare.child_benefit.dashboard.allocataires
+    concept_relation: source_label
+    concept_authority: iriscare
+    concept_evidence_url: https://stat.iriscare.brussels/home/enfants-et-familles/allocations-familiales/statistiques-generales-allocations-familiales/
+    concept_evidence_notes: >-
+      Iriscare defines allocataires as associated people to whom benefit was
+      paid in the following month. The captured municipality table includes
+      Flemish Region, Walloon Region, outside Belgium, and unknown rows, so this
+      is an Iriscare-system caseload rather than a count of BE1 residents. This
+      is a person count, not a family or household count, and carries no
+      cross-system concept mapping.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

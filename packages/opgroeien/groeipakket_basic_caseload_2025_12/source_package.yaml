@@ -1,0 +1,130 @@
+schema_version: ledger.source_package.v1
+package_id: opgroeien-groeipakket-basic-caseload-2025-12
+label: Opgroeien December 2025 Groeipakket basic-amount child caseload
+artifact:
+  source_name: opgroeien_groeipakket_dashboard
+  source_table: Official Groeipakket dashboard query for basic-amount children
+  resource_package: db
+  resource_directory: data/opgroeien/groeipakket_basic_caseload_2025_12
+  manifest: manifest.yaml
+  vintage: groeipakket_administrative_scheme_scope_2025
+  extracted_at: '2026-08-30'
+  extraction_method: >-
+    curated capture of the official interactive-dashboard result with exact
+    query filters retained in the source row
+  parser: delimited_text_full_rows
+  artifact_year: 2025
+  sheet_name: opgroeien_groeipakket_basic_caseload_2025_12
+record_sets:
+- record_set_id: opgroeien.groeipakket.month2025_12.basic_amount.children
+  provenance_class: administrative
+  record_set_spec_id: opgroeien.groeipakket.basic_amount.children.v1
+  source_record_id_prefix: opgroeien.groeipakket.month2025_12.basic_amount.children
+  sheet_name: opgroeien_groeipakket_basic_caseload_2025_12
+  period_type: month
+  period: '2025-12'
+  period_coverage:
+    basis: calendar
+    source_period_label: 2025/12
+    start_date: '2025-12-01'
+    end_date: '2025-12-31'
+    notes: Opgroeien identifies the selected month as the rights period.
+  geography_id: BE-GROEIPAKKET-SCHEME
+  geography_level: statistical_scope
+  geography_name: Groeipakket administrative scheme caseload
+  geography_vintage: GROEIPAKKET_ADMINISTRATIVE_SCOPE_2025
+  entity: person
+  entity_role: child_benefit_recipient
+  domain: child_benefit
+  groupby_dimension: groeipakket.component
+  shared_filters:
+    publication_status: provisional
+  shared_constraints:
+  - variable: publication_status
+    operator: ==
+    value: provisional
+    label: Opgroeien publication status
+  rows:
+  - value_id: basic_amount_children
+    label: Children receiving a Groeipakket basic amount
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: basic_amount_children
+    table_record_kind: total
+    filters:
+      groeipakket.component: basic_amount
+    constraints:
+    - variable: groeipakket.component
+      operator: ==
+      value: basic_amount
+      label: Groeipakket component
+    guard_cells:
+    - column: A
+      row: 2
+      expected_value: basic_amount_children
+      label: Source result identifier
+    - column: B
+      row: 2
+      expected_value: 2025-12
+      label: Rights period
+    - column: C
+      row: 2
+      expected_value: basic_amount
+      label: Normalized component
+    - column: D
+      row: 2
+      expected_value: provisional
+      label: Publication status
+    - column: E
+      row: 2
+      expected_value: Kinderen/Gezinnen=Kinderen
+      label: Dashboard entity view
+    - column: F
+      row: 2
+      expected_value: JJJJ/MM=2025/12
+      label: Dashboard period view
+    - column: G
+      row: 2
+      expected_value: Voorlopige cijfers
+      label: Dashboard provisional-figures view
+    - column: H
+      row: 2
+      expected_value: Groeipakket=Groeipakket
+      label: Dashboard Groeipakket filter
+    - column: I
+      row: 2
+      expected_value: non-null; excludes Geen Groeipakket
+      label: Dashboard basic-amount filter
+    - column: J
+      row: 2
+      expected_value: '2026-08-30'
+      label: Retrieval date
+    - column: L
+      row: 2
+      expected_value: https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+      label: Official dashboard URL
+  measures:
+  - measure_id: children
+    label: Children receiving a Groeipakket basic amount
+    ordinal: 0
+    column: K
+    source_column_id: count
+    expected_column_header_row: 1
+    expected_column_header: count
+    concept: opgroeien.groeipakket_basic_amount_children
+    source_concept: opgroeien.groeipakket.dashboard.basic_amount.children
+    concept_relation: source_label
+    concept_authority: opgroeien
+    concept_evidence_url: https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat
+    concept_evidence_notes: >-
+      The official dashboard result is scoped to children, rights period
+      2025/12, provisional figures, Groeipakket, and a non-null basic amount
+      other than "Geen Groeipakket". The captured table also includes bilateral
+      agreements and difference-payment categories, so this is a scheme-wide
+      administrative caseload, not a count of BE2 residents. This
+      publisher-specific source label does not assert equivalence to any
+      simulator or legal-rule concept.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

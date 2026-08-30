@@ -1,0 +1,184 @@
+schema_version: ledger.source_package.v1
+package_id: ostbelgien-child-benefit-caseload-2025-12
+label: Ostbelgien December 2025 child-benefit caseload
+artifact:
+  source_name: ostbelgien_child_benefit_statistics
+  source_table: Official Ostbelgien Statistik December 2025 snapshot
+  resource_package: db
+  resource_directory: data/ostbelgien/child_benefit_caseload_2025_12
+  manifest: manifest.yaml
+  vintage: child_benefit_caseload_2025_12
+  extracted_at: '2026-08-30'
+  extraction_method: >-
+    curated transcription of the exact counts printed on the official HTML
+    page; automated byte capture was refused by the publisher with HTTP 403
+  parser: delimited_text_full_rows
+  artifact_year: 2025
+  sheet_name: ostbelgien_child_benefit_caseload_2025_12
+record_sets:
+- record_set_id: ostbelgien.child_benefit.month2025_12.paid_children
+  provenance_class: administrative
+  record_set_spec_id: ostbelgien.child_benefit.paid_children.v1
+  source_record_id_prefix: ostbelgien.child_benefit.month2025_12.paid_children
+  sheet_name: ostbelgien_child_benefit_caseload_2025_12
+  period_type: month
+  period: '2025-12'
+  period_coverage: &period_coverage
+    basis: calendar
+    source_period_label: Dezember 2025
+    start_date: '2025-12-01'
+    end_date: '2025-12-31'
+    notes: The official statistics page labels the figures as December 2025.
+  geography_id: BE-DG
+  geography_level: statistical_scope
+  geography_name: German-speaking Community child-benefit system
+  geography_vintage: child_benefit_scope_2025
+  entity: person
+  entity_role: child_benefit_paid_child
+  domain: child_benefit
+  groupby_dimension: ostbelgien.statistic
+  rows:
+  - value_id: paid_children
+    label: Children paid child benefit
+    ordinal: 0
+    row_number: 2
+    expected_row_header_column: A
+    expected_row_header: paid_children
+    table_record_kind: total
+    filters:
+      ostbelgien.statistic: paid_children
+    constraints:
+    - variable: ostbelgien.statistic
+      operator: ==
+      value: paid_children
+      label: Ostbelgien statistic
+    guard_cells:
+    - column: A
+      row: 2
+      expected_value: paid_children
+      label: Source result identifier
+    - column: B
+      row: 2
+      expected_value: 2025-12
+      label: Reference month
+    - column: C
+      row: 2
+      expected_value: paid_children
+      label: Normalized statistic
+    - column: D
+      row: 2
+      expected_value: Kinder
+      label: Publisher entity label
+    - column: E
+      row: 2
+      expected_value: Kinder die Kindergeld im Dezember 2025 erhielten
+      label: Source description
+    - column: F
+      row: 2
+      expected_value: '2026-08-30'
+      label: Retrieval date
+    - column: H
+      row: 2
+      expected_value: https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+      label: Official statistics URL
+  measures:
+  - measure_id: children
+    label: Children paid child benefit
+    ordinal: 0
+    column: G
+    source_column_id: count
+    expected_column_header_row: 1
+    expected_column_header: count
+    concept: ostbelgien.child_benefit_paid_children
+    source_concept: ostbelgien.kindergeld.paid_children
+    concept_relation: source_label
+    concept_authority: ostbelgien
+    concept_evidence_url: https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+    concept_evidence_notes: >-
+      The official page prints the number of children receiving Kindergeld in
+      December 2025. The publisher warns that supplement categories can
+      overlap, so this fact uses the unique child-benefit count only. It has no
+      simulator or legal-rule concept mapping.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+- record_set_id: ostbelgien.child_benefit.month2025_12.payment_recipients
+  provenance_class: administrative
+  record_set_spec_id: ostbelgien.child_benefit.payment_recipients.v1
+  source_record_id_prefix: ostbelgien.child_benefit.month2025_12.payment_recipients
+  sheet_name: ostbelgien_child_benefit_caseload_2025_12
+  period_type: month
+  period: '2025-12'
+  period_coverage: *period_coverage
+  geography_id: BE-DG
+  geography_level: statistical_scope
+  geography_name: German-speaking Community child-benefit system
+  geography_vintage: child_benefit_scope_2025
+  entity: person
+  entity_role: child_benefit_payment_recipient
+  domain: child_benefit
+  groupby_dimension: ostbelgien.statistic
+  rows:
+  - value_id: payment_recipients
+    label: Child-benefit payment recipients
+    ordinal: 0
+    row_number: 3
+    expected_row_header_column: A
+    expected_row_header: payment_recipients
+    table_record_kind: total
+    filters:
+      ostbelgien.statistic: payment_recipients
+    constraints:
+    - variable: ostbelgien.statistic
+      operator: ==
+      value: payment_recipients
+      label: Ostbelgien statistic
+    guard_cells:
+    - column: A
+      row: 3
+      expected_value: payment_recipients
+      label: Source result identifier
+    - column: B
+      row: 3
+      expected_value: 2025-12
+      label: Reference month
+    - column: C
+      row: 3
+      expected_value: payment_recipients
+      label: Normalized statistic
+    - column: D
+      row: 3
+      expected_value: Empfänger
+      label: Publisher entity label
+    - column: E
+      row: 3
+      expected_value: Empfänger von Kindergeld im Dezember 2025
+      label: Source description
+    - column: F
+      row: 3
+      expected_value: '2026-08-30'
+      label: Retrieval date
+    - column: H
+      row: 3
+      expected_value: https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+      label: Official statistics URL
+  measures:
+  - measure_id: payment_recipients
+    label: Child-benefit payment recipients
+    ordinal: 0
+    column: G
+    source_column_id: count
+    expected_column_header_row: 1
+    expected_column_header: count
+    concept: ostbelgien.child_benefit_payment_recipients
+    source_concept: ostbelgien.kindergeld.empfaenger
+    concept_relation: source_label
+    concept_authority: ostbelgien
+    concept_evidence_url: https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/
+    concept_evidence_notes: >-
+      The official page separately prints Empfänger. This fact treats that as
+      a payment-recipient person count, not children, families, or households,
+      and makes no cross-system concept alignment claim.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number

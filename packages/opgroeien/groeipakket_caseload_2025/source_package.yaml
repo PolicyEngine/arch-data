@@ -1,6 +1,6 @@
 schema_version: ledger.source_package.v1
 package_id: opgroeien-groeipakket-caseload-2025
-label: Opgroeien Groeipakket 2025 Flemish child benefit caseload by component
+label: Opgroeien Groeipakket 2025 administrative scheme caseload by component
 artifact:
   source_name: opgroeien_groeipakket
   source_table: Groeipakket caseload by benefit component, 2025
@@ -21,10 +21,10 @@ record_sets:
   sheet_name: opgroeien_groeipakket_caseload_2025
   period_type: calendar_year
   period: 2025
-  geography_id: BE2
-  geography_level: nuts1
-  geography_name: Flemish Region
-  geography_vintage: NUTS_2024
+  geography_id: BE-GROEIPAKKET-SCHEME
+  geography_level: statistical_scope
+  geography_name: Groeipakket administrative scheme caseload
+  geography_vintage: GROEIPAKKET_ADMINISTRATIVE_SCOPE_2025
   entity: person
   entity_role: benefit_recipient
   domain: child_benefit
@@ -132,7 +132,8 @@ record_sets:
       component. Reference basis differs by component (December 2025 for social
       and orphan supplements, end 2025 for care, foster-care and support
       supplements, school year 2025-2026 for the school allowance); the exact
-      basis for each row is preserved in the reference_basis column.
+      basis for each row is preserved in the reference_basis column. These are
+      Groeipakket administrative scheme caseloads, not counts of BE2 residents.
     unit: count
     aggregation: sum
     expected_cell_type: number
@@ -143,10 +144,10 @@ record_sets:
   sheet_name: opgroeien_groeipakket_caseload_2025
   period_type: calendar_year
   period: 2025
-  geography_id: BE2
-  geography_level: nuts1
-  geography_name: Flemish Region
-  geography_vintage: NUTS_2024
+  geography_id: BE-GROEIPAKKET-SCHEME
+  geography_level: statistical_scope
+  geography_name: Groeipakket administrative scheme caseload
+  geography_vintage: GROEIPAKKET_ADMINISTRATIVE_SCOPE_2025
   entity: household
   entity_role: benefit_recipient
   domain: child_benefit
@@ -239,7 +240,8 @@ record_sets:
       Opgroeien publishes the number of families receiving each Groeipakket
       component. The basisbedrag family count (930,010, end 2025) is published
       exactly and included here; other rows carry the same reference basis as the
-      corresponding child caseload row.
+      corresponding child caseload row. These are Groeipakket administrative
+      scheme caseloads, not counts of BE2 resident families.
     unit: count
     aggregation: sum
     expected_cell_type: number
