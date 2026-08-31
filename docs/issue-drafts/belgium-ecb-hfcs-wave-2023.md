@@ -30,4 +30,3 @@ Retrieve the official ECB HFCS Wave 2023 statistical-tables ZIP, version 5.0
   age values, or add model/target bindings.
 - Run `validate-package`, source-cell preservation, fact-load,
   consumer-artifact, raw-facts-boundary, ruff, and `git diff --check` checks.
-

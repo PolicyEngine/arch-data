@@ -25,4 +25,3 @@ Retrieve the official AVIQ 2021 annual-report PDF through the AVIQ entry in
   compute per-recipient amounts.
 - Run `validate-package`, source-cell preservation, fact-load,
   consumer-artifact, raw-facts-boundary, ruff, and `git diff --check` checks.
-

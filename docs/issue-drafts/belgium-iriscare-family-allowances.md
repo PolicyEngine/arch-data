@@ -31,4 +31,3 @@ are not artifacts.
   regional total, reconcile values, or compute per-recipient amounts.
 - Run `validate-package`, source-cell preservation, fact-load,
   consumer-artifact, raw-facts-boundary, ruff, and `git diff --check` checks.
-

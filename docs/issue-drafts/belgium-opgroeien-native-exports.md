@@ -38,4 +38,3 @@ Use the two Opgroeien entries in
   imputed periods, take-up, or model bindings.
 - Run `validate-package`, source-cell preservation, fact-load,
   consumer-artifact, raw-facts-boundary, ruff, and `git diff --check` checks.
-
