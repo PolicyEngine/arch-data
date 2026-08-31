@@ -70,7 +70,8 @@
 
 ## Next
 
-- Complete self-review and write the final report and proposed PR body.
+- Complete self-review and write the final report; the proposed PR body is
+  committed under `docs/pr-drafts/`.
 - Retry creation of the five follow-up issues, push the branch, and open a
   draft PR that references (but does not close) open issue 69.
 - Verify the actual commit messages, remote head, and PR body; do not merge.
