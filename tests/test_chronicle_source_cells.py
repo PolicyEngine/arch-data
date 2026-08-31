@@ -266,7 +266,11 @@ def test_document_number_parser_preserves_european_grouped_decimals():
     </p></body></html>
     """
 
-    cells = source_cells_from_html_tables_and_text(html, artifact)
+    cells = source_cells_from_html_tables_and_text(
+        html,
+        artifact,
+        number_format="european",
+    )
     rows = {
         cell.row_number: {}
         for cell in cells

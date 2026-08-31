@@ -5,10 +5,8 @@
 - Active role: `ledger-source-ingestor`.
 - Branch: `be-public-calibration-facts`, based on clean `origin/main` at
   `10597ae`.
-- Phase: local work complete; external GitHub handoff blocked.
-- Shell network access is unavailable (`github.com` cannot resolve); browser
-  research remains available. Push, issue creation, and draft-PR creation must
-  be retried after all local work is complete.
+- Phase: draft PR #213 published; final-head CI and renewed Fable review
+  pending after a source-scoped parser correction.
 
 ## Done
 
@@ -30,9 +28,10 @@
 - Confirmed the official SFPD February 2025 monthly-statistics PDF contains
   publisher tables for pension beneficiary counts, monthly pension expenditure,
   GRAPA beneficiary counts, and monthly GRAPA expenditure.
-- Extended the shared document-number parser to preserve unambiguous European
-  thousands/decimal formatting, with regression coverage for the SFPD number
-  shapes; single-dot values remain backward-compatible decimals.
+- Added a source-scoped European document-number format for the SFPD package,
+  with regression coverage for its number shapes. The original default parser
+  remains unchanged for every existing package; single-dot European values
+  remain backward-compatible decimals.
 - Audited the six original issue-69 selectors on current main: all six aliases
   are registered, build 587 unique valid facts in total, and pass their package
   validators. PR 207 added only geography/offline-fetch prerequisites, not
@@ -46,15 +45,15 @@
   caseload and expenditure exports, official AVIQ and Iriscare annual-report
   PDFs, the blocked Ostbelgien Statistik HTML response, and the ECB HFCS wave
   2023 statistical-tables ZIP. No unresolved source has a placeholder fact.
-- Prepared separate, ready-to-file follow-up issue bodies for Opgroeien, AVIQ,
-  Iriscare, Ostbelgien, and ECB HFCS. They all reference open issue 69 and the
-  deterministic handoff; GitHub issue creation remains pending the network
-  retry.
+- Prepared and filed separate follow-up issues for Opgroeien, AVIQ, Iriscare,
+  Ostbelgien, and ECB HFCS. They all reference open issue 69 and the
+  deterministic handoff.
 - Validated the SFPD package with zero errors or warnings; its suite preserves
   13,644 full-document cells, resolves four facts with 100% lineage, and builds
   and reloads a four-row facts-only consumer artifact.
-- Revalidated all eight other `pdf_text_numbers` packages after the European
-  number-parser change, plus the six original issue-69 packages. All passed.
+- Revalidated the parser/SFPD tests and all five existing packages that failed
+  when the first implementation accidentally broadened the default grammar;
+  all 27 tests pass after restoring the default and scoping European parsing.
 - Focused parser, offline-fetch, SFPD, selector, facts-only, and consumer tests
   passed. Ruff and `git diff --check origin/main` passed.
 - Obtained `PASS` verdicts from both required judges:
@@ -68,14 +67,13 @@
   and pre-existing Belgium-test paths. No contract, schema, core, model, or
   consumer-owned behavior changed.
 - Completed self-review and committed the exact proposed draft-PR body.
-- Retried issue creation, branch push, and draft-PR creation. GitHub DNS/API
-  access is unavailable, and `gh auth status` reports an invalid token; no
-  issue, remote branch, or PR was created, and nothing was merged.
+- Published draft PR #213 and filed the five deterministic follow-up handoffs
+  as issues #214--#218. Nothing was merged.
 - Wrote the final report to `BELGIUM_PUBLIC_FACTS_REPORT.md`.
 
 ## Next
 
-- Restore GitHub DNS/API access and refresh `gh` authentication.
-- File the five committed follow-up issue bodies, push the branch, and open a
-  draft PR referencing (not closing) issue 69 with the committed PR body.
-- Verify the remote head and rendered PR body; do not merge.
+- Complete the final-head merged-bundle CI run.
+- Authenticate the R2 pointer and resolve the source-ingestor allowed-path
+  registry gap.
+- Obtain a renewed exact-head Fable review; keep PR #213 draft and do not merge.

@@ -5,8 +5,8 @@
 - add four exact February 2025 facts: employee/self-employed pension
   beneficiaries and monthly expenditure, plus GRAPA beneficiaries and monthly
   expenditure;
-- extend document-number parsing for unambiguous European grouped/decimal
-  formats while preserving the existing single-dot behavior;
+- add a source-scoped European document-number format for SFPD while preserving
+  the original default grammar and existing single-dot behavior;
 - audit the six original Belgium selectors from #69: all remain registered,
   unique, valid, and resolve 587 facts on current main;
 - add a validated six-artifact offline-fetch handoff and five ready-to-file
@@ -43,7 +43,8 @@ value, or Axiom concept is included.
 - source suite: PASS, 13,644 full-document source cells, 4 facts, 100% lineage,
   zero agent-acceptance errors;
 - package bundle and consumer artifact build/load: PASS, 4 rows;
-- all eight other `pdf_text_numbers` packages: PASS after the parser change;
+- parser/SFPD plus the five existing packages exposed by the first CI run:
+  27 passed after restoring the original default grammar;
 - six original issue-69 package validators: PASS;
 - focused parser/offline/SFPD/selector tests: PASS;
 - facts-only and consumer tests: 33 passed;
@@ -52,11 +53,11 @@ value, or Axiom concept is included.
 - `ledger-source-fidelity`: PASS;
 - `ledger-boundary`: PASS.
 
-The all-source 151-package bundle test was stopped after 20m49s and 7.4 GB of
-temporary output while still incomplete. The relevant single-package bundle
-and consumer artifact passed; the golden source-family key changes from
-`sfpd_pensions` to `sfpd_monthly_social_benefits` with the fact count unchanged
-at four.
+The first CI run caught row shifts caused by an overly broad shared number
+grammar. The final implementation scopes European parsing to SFPD and restores
+the prior default for all existing packages. The relevant single-package
+bundle and consumer artifact pass; the all-source 151-package bundle remains a
+required final-head CI gate.
 
 ## Follow-ups and governance
 

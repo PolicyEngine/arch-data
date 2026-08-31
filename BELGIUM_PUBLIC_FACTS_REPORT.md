@@ -129,11 +129,12 @@ Ready-to-file issue bodies are committed at:
   warnings.
 - Facts-only consumer artifact build/load: PASS, four schema-v2 rows, all with
   source-cell lineage.
-- All eight other `pdf_text_numbers` packages: PASS after the parser change.
+- The European number format is source-scoped to the SFPD package. The default
+  parser remains byte-for-byte compatible at the token/scalar boundary for the
+  eight existing `pdf_text_numbers` packages.
 - Six original issue-69 package validators: PASS (18 + 565 + 1 + 1 + 1 + 1
   source records).
-- `tests/test_chronicle_source_cells.py` plus
-  `tests/test_chronicle_offline_fetch.py`: 50 passed.
+- Parser/SFPD and all five packages exposed by the first CI run: 27 passed.
 - Focused SFPD and Belgium package tests: 3 passed; the current Belgium
   selector uniqueness test separately passed.
 - `tests/test_chronicle_facts_only.py` plus
@@ -141,13 +142,13 @@ Ready-to-file issue bodies are committed at:
 - `ruff check .`: PASS.
 - `git diff --check origin/main`: PASS.
 
-The 151-package merged-bundle regression was started and then deliberately
-interrupted after 20m49s because it had generated 7.4 GB of temporary output
-while remaining far from complete. That temporary directory was removed. This
-is an incomplete optional global regression, not a passing result. The
-relevant SFPD bundle/consumer artifact passed, and the global golden source key
-was updated from `sfpd_pensions` to `sfpd_monthly_social_benefits` with its fact
-count unchanged at four.
+The first CI run exposed that the initial implementation had broadened the
+shared number grammar and shifted rows in existing Welsh CTR, Medicare, and
+LIHEAP packages. The final implementation restores the original default
+grammar and selects the European grammar explicitly from the SFPD artifact.
+All five directly exposed package regressions pass locally. The full
+151-package merged-bundle regression remains a required CI gate; it is not
+reported as passing here until the final-head run completes.
 
 Required judge evidence:
 
@@ -164,28 +165,13 @@ geography transform, model, or consumer-owned change, but strict path
 enforcement requires maintainer acceptance or a registry correction before
 merge.
 
-External operations could not complete:
+The branch is published as draft PR #213, and the five blocked-source handoffs
+are filed as issues #214--#218. Nothing is merged. The final head must remain
+draft until the full bundle gate, path-registry decision, R2-pointer
+authentication, and a renewed exact-head Fable review are complete.
 
-- `gh issue create` failed with `error connecting to api.github.com`; none of
-  the five follow-up issues was created;
-- `git push --set-upstream origin be-public-calibration-facts` failed because
-  `github.com` could not resolve;
-- `gh pr create --draft` failed because `api.github.com` could not connect;
-- `gh auth status` also reports the configured `MaxGhenis` token is invalid.
-
-Therefore no remote branch or PR exists, the proposed body was not published,
-and nothing was merged. Once DNS/network and authentication are restored:
-
-1. file the five issue bodies above, retaining `Refs #69`;
-2. push `be-public-calibration-facts`;
-3. open (do not merge) a draft PR titled
-   `Add Belgium pension, GRAPA, and source handoffs` against `main`;
-4. use `docs/pr-drafts/belgium-public-facts.md` as the exact body;
-5. verify the remote head and rendered PR body before handoff.
-
-The proposed PR-body SHA-256 is
-`54c492d27feafb4df68f97385b4c06cd2987ff389ffa84dfcc10f34b21244045`.
-It references open issue 69 without closing it.
+The tracked PR body references open issue 69 without closing it and must be
+republished and verified with the final parser-correction head.
 
 ## Actual commit messages through the reviewed implementation head
 

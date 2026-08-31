@@ -19,6 +19,7 @@ artifact:
   extracted_at: '2026-08-30'
   extraction_method: pypdf text-line number extraction from the full publisher PDF
   parser: pdf_text_numbers
+  number_format: european
   artifact_year: 2025
 
 record_sets:

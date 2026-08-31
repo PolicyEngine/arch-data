@@ -231,6 +231,8 @@ def source_cells_from_ods(
 def source_cells_from_html_tables_and_text(
     content: bytes,
     artifact: SourceArtifactMetadata,
+    *,
+    number_format: str = "english",
 ) -> list[SourceCell]:
     """Parse HTML tables and numeric document text into source cells."""
     parser = _HtmlTableAndTextParser()
@@ -246,13 +248,21 @@ def source_cells_from_html_tables_and_text(
                 sheet_name=f"table_{table_index}",
             )
         )
-    cells.extend(_html_document_number_cells(parser.blocks, artifact))
+    cells.extend(
+        _html_document_number_cells(
+            parser.blocks,
+            artifact,
+            number_format=number_format,
+        )
+    )
     return cells
 
 
 def source_cells_from_pdf_text_numbers(
     content: bytes,
     artifact: SourceArtifactMetadata,
+    *,
+    number_format: str = "english",
 ) -> list[SourceCell]:
     """Parse PDF text lines into numeric document source cells."""
     from pypdf import PdfReader
@@ -277,6 +287,7 @@ def source_cells_from_pdf_text_numbers(
         )
         for index, value in enumerate(headers)
     ]
+    number_pattern = _document_number_pattern(number_format)
     row_number = 2
     for page_number, page in enumerate(reader.pages, start=1):
         text = page.extract_text() or ""
@@ -292,7 +303,7 @@ def source_cells_from_pdf_text_numbers(
                     max(0, line_index - 2) : min(len(lines), line_index + 3)
                 ]
             )
-            for match in _HTML_NUMBER_RE.finditer(normalized_line):
+            for match in number_pattern.finditer(normalized_line):
                 number_text = match.group(0)
                 for column_number, raw_value in enumerate(
                     (
@@ -300,7 +311,10 @@ def source_cells_from_pdf_text_numbers(
                         line_number,
                         normalized_line,
                         number_text,
-                        _html_number_scalar(number_text),
+                        _html_number_scalar(
+                            number_text,
+                            number_format=number_format,
+                        ),
                         context_text,
                     ),
                     start=1,
@@ -639,9 +653,13 @@ def _ods_cell_text(cell: ElementTree.Element) -> str:
 
 _HTML_BLOCK_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "li"}
 _HTML_NUMBER_RE = re.compile(
+    r"(?<![\w.])[£$€]?-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
+    r"(?:\s*(?:thousand|million|billion)|bn)?(?![\w.])",
+    flags=re.IGNORECASE,
+)
+_EUROPEAN_NUMBER_RE = re.compile(
     r"(?<![\w.,])[£$€]?-?(?:"
     r"\d{1,3}(?:\.\d{3})+(?:,\d+)?|"
-    r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|"
     r"\d+(?:[.,]\d+)?"
     r")(?:\s*(?:thousand|million|billion)|bn)?(?![\w]|[.,]\d)",
     flags=re.IGNORECASE,
@@ -795,6 +813,8 @@ def _html_table_cells(
 def _html_document_number_cells(
     blocks: list[_HtmlBlock],
     artifact: SourceArtifactMetadata,
+    *,
+    number_format: str,
 ) -> list[SourceCell]:
     sheet_name = "document_numbers"
     headers: tuple[Scalar, ...] = (
@@ -814,9 +834,10 @@ def _html_document_number_cells(
         )
         for index, value in enumerate(headers)
     ]
+    number_pattern = _document_number_pattern(number_format)
     row_number = 2
     for block in blocks:
-        for match in _HTML_NUMBER_RE.finditer(block.text):
+        for match in number_pattern.finditer(block.text):
             number_text = match.group(0)
             for column_number, raw_value in enumerate(
                 (
@@ -824,7 +845,10 @@ def _html_document_number_cells(
                     block.tag,
                     block.text,
                     number_text,
-                    _html_number_scalar(number_text),
+                    _html_number_scalar(
+                        number_text,
+                        number_format=number_format,
+                    ),
                 ),
                 start=1,
             ):
@@ -885,7 +909,19 @@ def _html_scalar(text: str) -> Scalar:
         return text
 
 
-def _html_number_scalar(text: str) -> int | float:
+def _document_number_pattern(number_format: str) -> re.Pattern[str]:
+    if number_format == "english":
+        return _HTML_NUMBER_RE
+    if number_format == "european":
+        return _EUROPEAN_NUMBER_RE
+    raise ValueError(f"Unsupported document number format: {number_format}")
+
+
+def _html_number_scalar(
+    text: str,
+    *,
+    number_format: str,
+) -> int | float:
     normalized = text.lower().lstrip("£$€")
     multiplier = 1
     for suffix, value in (
@@ -898,7 +934,11 @@ def _html_number_scalar(text: str) -> int | float:
             multiplier = value
             normalized = normalized[: -len(suffix)].strip()
             break
-    if "," in normalized and "." in normalized:
+    if number_format == "english":
+        normalized = normalized.replace(",", "")
+    elif number_format != "european":
+        raise ValueError(f"Unsupported document number format: {number_format}")
+    elif "," in normalized and "." in normalized:
         if normalized.rfind(",") > normalized.rfind("."):
             # European grouped decimal, for example 3.759.582.728,06.
             normalized = normalized.replace(".", "").replace(",", ".")
