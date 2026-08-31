@@ -1,0 +1,144 @@
+{
+  "schema_version": "ledger.offline_fetch_manifest.v1",
+  "generated_for": "Belgium public pension, regional child-benefit, and HFCS source packages for Chronicle issue 69",
+  "artifacts": [
+    {
+      "package_id": "opgroeien-groeipakket-native-caseload",
+      "url": "https://app.powerbi.com/view?r=eyJrIjoiZTFiMzllMTUtNmUxNy00MWVkLWJiOGEtNGE3ZmVlZTY3NjZhIiwidCI6IjEzY2ZlMTgyLTY0MmEtNDgwZS1iYzhhLTVlY2Y2NWRiMGFhMCIsImMiOjh9",
+      "expected_filename": "opgroeien_groeipakket_caseload_native_export.csv",
+      "destination_path": "db/data/opgroeien/groeipakket_native_exports/opgroeien_groeipakket_caseload_native_export.csv",
+      "manifest_path": "db/data/opgroeien/groeipakket_native_exports/manifest.yaml",
+      "manifest_year": 2024,
+      "discovery_note": "Official Opgroeien Cijfers op maat landing page https://www.opgroeien.be/kennis/cijfers-en-onderzoek/groeipakket/cijfers-op-maat embeds this public Power BI report. This handoff is for a native data export, never a screenshot, copied accessibility text, or manual transcription.",
+      "r2": {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key_template": "raw/belgium/opgroeien/opgroeien-groeipakket-native-caseload/2024/{sha256}/opgroeien_groeipakket_caseload_native_export.csv",
+        "uri_template": "r2://ledger-raw/raw/belgium/opgroeien/opgroeien-groeipakket-native-caseload/2024/{sha256}/opgroeien_groeipakket_caseload_native_export.csv"
+      },
+      "post_download_steps": [
+        "Reach the report through the official Opgroeien landing page, reset all report filters, open the caseload data-table visual, choose Export data, select the native summarized/underlying-data CSV option with the current layout, and save the response bytes unchanged under expected_filename. If no tabular CSV export is enabled, or an export omits its period and measure labels, STOP; do not copy values from the rendered dashboard.",
+        "Record the report URL, report-visible update timestamp, every active filter, exported column headers, period field, administrative scope field, measure label, and unit in manifest.yaml. The artifact may contain several periods; do not relabel any row to 2024 merely because manifest_year is 2024.",
+        "Compute SHA-256 and size_bytes over the unchanged exported bytes, archive them at the content-addressed R2 template, and record the exact source URL, source table/visual name, hash, size, and R2 pointer in manifest.yaml.",
+        "Inspect whether the export's geography is an Opgroeien administrative service population, the Flemish Region, the Flemish Community, or another published scope. Preserve that publisher scope exactly; STOP rather than assigning BE2 unless the export itself supports BE2.",
+        "Only after the artifact is pinned, author exact-period caseload facts selected from native export cells and run validate-package plus source-cell, fact-load, consumer-artifact, and raw-facts-boundary tests."
+      ]
+    },
+    {
+      "package_id": "opgroeien-groeipakket-native-expenditure",
+      "url": "https://app.powerbi.com/view?r=eyJrIjoiMzU3YjY1ZTItNTAxYi00MjdhLTg3OGItMDQ5ZjJiMjU5NjlkIiwidCI6IjEzY2ZlMTgyLTY0MmEtNDgwZS1iYzhhLTVlY2Y2NWRiMGFhMCIsImMiOjh9",
+      "expected_filename": "opgroeien_groeipakket_expenditure_native_export.csv",
+      "destination_path": "db/data/opgroeien/groeipakket_native_exports/opgroeien_groeipakket_expenditure_native_export.csv",
+      "manifest_path": "db/data/opgroeien/groeipakket_native_exports/manifest.yaml",
+      "manifest_year": 2024,
+      "discovery_note": "Official Opgroeien Cijfers op maat landing page links this Groeipakket budget Power BI report. Retrieve the dashboard's native expenditure data rather than reading rendered cards or charts.",
+      "r2": {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key_template": "raw/belgium/opgroeien/opgroeien-groeipakket-native-expenditure/2024/{sha256}/opgroeien_groeipakket_expenditure_native_export.csv",
+        "uri_template": "r2://ledger-raw/raw/belgium/opgroeien/opgroeien-groeipakket-native-expenditure/2024/{sha256}/opgroeien_groeipakket_expenditure_native_export.csv"
+      },
+      "post_download_steps": [
+        "Reach the report through the official Opgroeien landing page, reset all report filters, open the expenditure/budget data-table visual, choose Export data, select the native summarized/underlying-data CSV option with the current layout, and save the response bytes unchanged under expected_filename. If no tabular CSV export is enabled, or period, component, currency, and unit labels are absent, STOP without transcribing chart values.",
+        "Record the report-visible update timestamp, exact visual name, all filters, exported headers, publisher period labels, whether values are budget or realized expenditure, currency, and any printed scale in manifest.yaml.",
+        "Compute SHA-256 and size_bytes over the unchanged export, archive it at the content-addressed R2 template, and record the source URL, hash, size, and R2 pointer.",
+        "Author only publisher-labelled expenditure facts for exact periods and scopes. Do not derive annual totals from monthly values, reconcile the expenditure export to caseload, or compute per-recipient amounts.",
+        "Run validate-package plus source-cell, fact-load, consumer-artifact, and raw-facts-boundary tests after the native artifact is pinned."
+      ]
+    },
+    {
+      "package_id": "aviq-annual-report-2021-family-allowances",
+      "url": "https://www.aviq.be/sites/default/files/documents_pro/2022-10/rapport_annuel_AVIQ_2021.pdf",
+      "expected_filename": "rapport_annuel_AVIQ_2021.pdf",
+      "destination_path": "db/data/aviq/annual_report_2021/rapport_annuel_AVIQ_2021.pdf",
+      "manifest_path": "db/data/aviq/annual_report_2021/manifest.yaml",
+      "manifest_year": 2021,
+      "discovery_note": "Official AVIQ 2021 annual-report PDF; use the publisher PDF tables that label post-2019 Walloon family-allowance caseload and expenditure. Do not use the secondary parliamentary-answer extract as the agency artifact.",
+      "r2": {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key_template": "raw/belgium/aviq/aviq-annual-report-2021-family-allowances/2021/{sha256}/rapport_annuel_AVIQ_2021.pdf",
+        "uri_template": "r2://ledger-raw/raw/belgium/aviq/aviq-annual-report-2021-family-allowances/2021/{sha256}/rapport_annuel_AVIQ_2021.pdf"
+      },
+      "post_download_steps": [
+        "Download the PDF response bytes directly from the official AVIQ URL; reject HTML challenge/error content and do not substitute a mirror.",
+        "Compute SHA-256 and size_bytes, archive the unchanged PDF at the content-addressed R2 template, and record the direct URL, hash, size, publication vintage, and exact table/page labels in manifest.yaml.",
+        "Parse the full PDF through a deterministic source-cell lane. Select only AVIQ-published family-allowance caseload and expenditure cells whose reference periods, units, and Walloon administrative/geographic scope are explicit in the PDF.",
+        "Do not reconcile AVIQ values to FAMIWAL, derive missing years, infer recipient units, or compute per-recipient amounts. Ambiguous or rounded values remain documented gaps.",
+        "Run validate-package plus source-cell, fact-load, consumer-artifact, and raw-facts-boundary tests."
+      ]
+    },
+    {
+      "package_id": "iriscare-annual-report-2024-family-allowances",
+      "url": "https://rapport.iriscare.brussels/wp-content/uploads/2025/09/Rapport-annuel-2024.pdf",
+      "expected_filename": "Rapport-annuel-2024.pdf",
+      "destination_path": "db/data/iriscare/annual_report_2024/Rapport-annuel-2024.pdf",
+      "manifest_path": "db/data/iriscare/annual_report_2024/manifest.yaml",
+      "manifest_year": 2024,
+      "discovery_note": "Official Iriscare annual-report PDF for Brussels. It is the preferred static primary artifact to inspect before using the separate Iriscare/Famiris Fabric dashboards.",
+      "r2": {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key_template": "raw/belgium/iriscare/iriscare-annual-report-2024-family-allowances/2024/{sha256}/Rapport-annuel-2024.pdf",
+        "uri_template": "r2://ledger-raw/raw/belgium/iriscare/iriscare-annual-report-2024-family-allowances/2024/{sha256}/Rapport-annuel-2024.pdf"
+      },
+      "post_download_steps": [
+        "Download the PDF response bytes directly from the official Iriscare annual-report host; reject HTML challenge/error content and do not substitute a mirror.",
+        "Compute SHA-256 and size_bytes, archive the unchanged PDF at the content-addressed R2 template, and record the direct URL, hash, size, publication vintage, and exact page/table labels in manifest.yaml.",
+        "Parse the full PDF deterministically and inspect every occurrence of family-allowance caseload and expenditure. If two publisher locations give different values or accounting scopes, preserve them as separately labelled source assertions only when both scopes are explicit; otherwise STOP and document the ambiguity.",
+        "Preserve the publisher's Brussels administrative/geographic scope, reference period, currency, scale, and accounting label. Do not combine Famiris and other fund values or compute missing totals.",
+        "Run validate-package plus source-cell, fact-load, consumer-artifact, and raw-facts-boundary tests."
+      ]
+    },
+    {
+      "package_id": "ostbelgien-family-allowances-2025",
+      "url": "https://ostbelgienstatistik.be/desktopdefault.aspx/tabid-3748/6766_read-39090/",
+      "expected_filename": "ostbelgien_family_allowances_2025.html",
+      "destination_path": "db/data/ostbelgien/family_allowances_2025/ostbelgien_family_allowances_2025.html",
+      "manifest_path": "db/data/ostbelgien/family_allowances_2025/manifest.yaml",
+      "manifest_year": 2025,
+      "discovery_note": "Official Ostbelgien Statistik family-allowance page. Automated retrieval returns HTTP 403 in the current environment; capture the publisher's raw page response in an authorized browser session, never values copied from search snippets or rendered cards.",
+      "r2": {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key_template": "raw/belgium/ostbelgien/ostbelgien-family-allowances-2025/2025/{sha256}/ostbelgien_family_allowances_2025.html",
+        "uri_template": "r2://ledger-raw/raw/belgium/ostbelgien/ostbelgien-family-allowances-2025/2025/{sha256}/ostbelgien_family_allowances_2025.html"
+      },
+      "post_download_steps": [
+        "Open the exact official URL in an authorized browser session, verify the Ostbelgien Statistik host and family-allowance page title, then save the raw HTML response/source bytes under expected_filename. Do not save a screenshot, print-to-PDF rendering, accessibility tree, search cache, or manually reconstructed table.",
+        "Verify that the saved bytes contain the publisher table labels, reference periods, units, and the caseload/expenditure values visible on the official page. If the data are injected from a separate official endpoint, STOP and replace this handoff with that native endpoint rather than packaging incomplete shell HTML.",
+        "Compute SHA-256 and size_bytes, archive the unchanged publisher response at the content-addressed R2 template, and record URL, HTTP retrieval details, page update timestamp, hash, size, and R2 pointer in manifest.yaml.",
+        "Parse the HTML deterministically and retain the German-speaking Community administrative/geographic scope and exact publisher periods. Do not transcribe search-index values or infer missing units.",
+        "Run validate-package plus source-cell, fact-load, consumer-artifact, and raw-facts-boundary tests."
+      ]
+    },
+    {
+      "package_id": "ecb-hfcs-wave-2023-statistical-tables",
+      "url": "https://www.ecb.europa.eu/home/pdf/research/hfcn/HFCS_Statistical_Tables_Wave_2023_June_2026.zip",
+      "expected_filename": "HFCS_Statistical_Tables_Wave_2023_June_2026.zip",
+      "destination_path": "db/data/ecb_hfcs/wave_2023_statistical_tables/HFCS_Statistical_Tables_Wave_2023_June_2026.zip",
+      "manifest_path": "db/data/ecb_hfcs/wave_2023_statistical_tables/manifest.yaml",
+      "manifest_year": 2023,
+      "discovery_note": "Official ECB Household Finance and Consumption Survey wave-2023 statistical-tables ZIP, version 5.0 published June 2026. Belgium fieldwork was January-December 2023; wealth components refer to interview time while income refers to 2022.",
+      "r2": {
+        "provider": "r2",
+        "bucket": "ledger-raw",
+        "key_template": "raw/belgium/ecb_hfcs/ecb-hfcs-wave-2023-statistical-tables/2023/{sha256}/HFCS_Statistical_Tables_Wave_2023_June_2026.zip",
+        "uri_template": "r2://ledger-raw/raw/belgium/ecb_hfcs/ecb-hfcs-wave-2023-statistical-tables/2023/{sha256}/HFCS_Statistical_Tables_Wave_2023_June_2026.zip"
+      },
+      "post_download_steps": [
+        "Download the ZIP response bytes directly from the official ECB URL and verify that the response is a readable ZIP, not an HTML error page.",
+        "Compute the outer ZIP SHA-256 and size_bytes, list every archive member in deterministic lexical order, compute a SHA-256 for each selected workbook member, and record the outer and member pins plus ECB version 5.0 / June 2026 vintage in manifest.yaml.",
+        "Inspect the native workbook sheets and headers before authoring. For Belgium, preserve fieldwork/reference timing exactly: assets and liabilities are measured at interview time in 2023, while income variables refer to 2022.",
+        "Select only ECB-published Belgium aggregates such as net-wealth means/medians/quantiles, distribution shares or ratios, and asset/liability component aggregates with exact cells, units, weighting labels, and survey provenance. Do not derive components, interpolate quantiles, reconcile totals, or map facts to model targets.",
+        "Run validate-package plus source-cell, fact-load, consumer-artifact, and raw-facts-boundary tests."
+      ]
+    }
+  ],
+  "final_validation": [
+    "Validate this handoff with load_offline_fetch_manifest(..., require_discovery_notes=True) before retrieval.",
+    "For each retrieved artifact, verify the exact SHA-256 and size recorded in its adjacent manifest and archive the unchanged bytes under the content-addressed R2 key.",
+    "Do not create a source package until native publisher bytes, exact source cells, periods, geography/scope, units, assertion type, URL, checksum, and deterministic selectors are all available.",
+    "Run validate-package, source-cell preservation, fact-load, consumer-artifact, raw-facts-boundary, ruff, and git diff --check for each implemented follow-up package."
+  ]
+}

@@ -5,7 +5,7 @@
 - Active role: `ledger-source-ingestor`.
 - Branch: `be-public-calibration-facts`, based on clean `origin/main` at
   `10597ae`.
-- Phase: direct-publisher SFPD package implementation.
+- Phase: deterministic offline handoffs and follow-up issue preparation.
 - Shell network access is unavailable (`github.com` cannot resolve); browser
   research remains available. Push, issue creation, and draft-PR creation must
   be retried after all local work is complete.
@@ -42,6 +42,10 @@
   2,319,705 bytes) and replaced the intermediary pension CSV selectors with
   direct publisher-cell selectors for pension and GRAPA beneficiary totals and
   monthly expenditure.
+- Added a schema-validated offline-fetch handoff for the native Opgroeien
+  caseload and expenditure exports, official AVIQ and Iriscare annual-report
+  PDFs, the blocked Ostbelgien Statistik HTML response, and the ECB HFCS wave
+  2023 statistical-tables ZIP. No unresolved source has a placeholder fact.
 
 ## Next
 

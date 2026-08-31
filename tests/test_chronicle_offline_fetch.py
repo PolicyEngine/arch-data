@@ -80,6 +80,27 @@ def test_existing_v1_fetch_manifest_remains_valid():
     )
 
 
+def test_belgium_public_facts_handoff_covers_every_blocked_primary_source():
+    manifest = load_offline_fetch_manifest(
+        REPO_ROOT / "FETCH-MANIFEST-BELGIUM-PUBLIC-FACTS.json",
+        require_discovery_notes=True,
+    )
+
+    assert len(manifest.artifacts) == 6
+    assert {artifact.package_id for artifact in manifest.artifacts} == {
+        "opgroeien-groeipakket-native-caseload",
+        "opgroeien-groeipakket-native-expenditure",
+        "aviq-annual-report-2021-family-allowances",
+        "iriscare-annual-report-2024-family-allowances",
+        "ostbelgien-family-allowances-2025",
+        "ecb-hfcs-wave-2023-statistical-tables",
+    }
+    assert all(artifact.r2 is not None for artifact in manifest.artifacts)
+    assert all(artifact.expected_sha256 is None for artifact in manifest.artifacts)
+    assert all(artifact.post_download_steps for artifact in manifest.artifacts)
+    assert manifest.final_validation
+
+
 def test_discovery_notes_are_optional_by_default_but_can_be_required():
     payload = _manifest()
     del payload["artifacts"][0]["discovery_note"]
