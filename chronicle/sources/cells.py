@@ -639,8 +639,11 @@ def _ods_cell_text(cell: ElementTree.Element) -> str:
 
 _HTML_BLOCK_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "li"}
 _HTML_NUMBER_RE = re.compile(
-    r"(?<![\w.])[£$€]?-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
-    r"(?:\s*(?:thousand|million|billion)|bn)?(?![\w.])",
+    r"(?<![\w.,])[£$€]?-?(?:"
+    r"\d{1,3}(?:\.\d{3})+(?:,\d+)?|"
+    r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|"
+    r"\d+(?:[.,]\d+)?"
+    r")(?:\s*(?:thousand|million|billion)|bn)?(?![\w]|[.,]\d)",
     flags=re.IGNORECASE,
 )
 
@@ -883,7 +886,7 @@ def _html_scalar(text: str) -> Scalar:
 
 
 def _html_number_scalar(text: str) -> int | float:
-    normalized = text.replace(",", "").lower().lstrip("£$€")
+    normalized = text.lower().lstrip("£$€")
     multiplier = 1
     for suffix, value in (
         ("thousand", 1_000),
@@ -895,6 +898,25 @@ def _html_number_scalar(text: str) -> int | float:
             multiplier = value
             normalized = normalized[: -len(suffix)].strip()
             break
+    if "," in normalized and "." in normalized:
+        if normalized.rfind(",") > normalized.rfind("."):
+            # European grouped decimal, for example 3.759.582.728,06.
+            normalized = normalized.replace(".", "").replace(",", ".")
+        else:
+            # English grouped decimal, for example 3,759,582,728.06.
+            normalized = normalized.replace(",", "")
+    elif normalized.count(".") > 1:
+        # Multiple dots unambiguously form European thousands groups.
+        normalized = normalized.replace(".", "")
+    elif normalized.count(",") > 1:
+        normalized = normalized.replace(",", "")
+    elif "," in normalized:
+        whole, fraction = normalized.rsplit(",", 1)
+        normalized = (
+            whole + fraction
+            if len(fraction) == 3 and whole.lstrip("-").isdigit()
+            else whole + "." + fraction
+        )
     value = float(normalized)
     scaled = value * multiplier
     return int(scaled) if scaled.is_integer() else scaled

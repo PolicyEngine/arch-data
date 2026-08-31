@@ -30,6 +30,9 @@
 - Confirmed the official SFPD February 2025 monthly-statistics PDF contains
   publisher tables for pension beneficiary counts, monthly pension expenditure,
   GRAPA beneficiary counts, and monthly GRAPA expenditure.
+- Extended the shared document-number parser to preserve unambiguous European
+  thousands/decimal formatting, with regression coverage for the SFPD number
+  shapes; single-dot values remain backward-compatible decimals.
 
 ## Next
 
