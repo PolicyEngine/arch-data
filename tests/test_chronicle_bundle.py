@@ -149,7 +149,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
         "scotgov": 2787,
-        "sfpd_pensions": 4,
+        "sfpd_monthly_social_benefits": 4,
         "slc": 199,
         "spf_finances_pit": 1,
         "ssa": 426,

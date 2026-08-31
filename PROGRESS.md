@@ -5,7 +5,7 @@
 - Active role: `ledger-source-ingestor`.
 - Branch: `be-public-calibration-facts`, based on clean `origin/main` at
   `10597ae`.
-- Phase: deterministic offline handoffs and follow-up issue preparation.
+- Phase: final report and GitHub handoff.
 - Shell network access is unavailable (`github.com` cannot resolve); browser
   research remains available. Push, issue creation, and draft-PR creation must
   be retried after all local work is complete.
@@ -50,16 +50,27 @@
   Iriscare, Ostbelgien, and ECB HFCS. They all reference open issue 69 and the
   deterministic handoff; GitHub issue creation remains pending the network
   retry.
+- Validated the SFPD package with zero errors or warnings; its suite preserves
+  13,644 full-document cells, resolves four facts with 100% lineage, and builds
+  and reloads a four-row facts-only consumer artifact.
+- Revalidated all eight other `pdf_text_numbers` packages after the European
+  number-parser change, plus the six original issue-69 packages. All passed.
+- Focused parser, offline-fetch, SFPD, selector, facts-only, and consumer tests
+  passed. Ruff and `git diff --check origin/main` passed.
+- Obtained `PASS` verdicts from both required judges:
+  `ledger-source-fidelity` and `ledger-boundary`.
+- Started the 151-package merged-bundle regression, then stopped it after
+  20m49s and 7.4 GB of temporary output because it remained far from complete;
+  the package-specific bundle and consumer artifact passed. The temporary test
+  output was removed.
+- Recorded the governance inconsistency that the literal source-ingestor path
+  globs omit user-required progress, raw-artifact, offline-handoff, issue-draft,
+  and pre-existing Belgium-test paths. No contract, schema, core, model, or
+  consumer-owned behavior changed.
 
 ## Next
 
-- Select only official downloadable artifacts for implemented facts; add
-  deterministic offline-fetch handoffs and explicit follow-up issues for
-  blocked or interactive regional/HFCS sources.
-- Implement a coherent reviewable package wave with direct publisher-cell
-  lineage and focused tests, committing every coherent step.
-- Run `validate-package`, package build/source-cell/consumer-artifact tests,
-  ruff, `git diff --check`, deterministic and Chronicle judge reviews, and
-  self-review.
-- Write the final report file, verify the actual commit messages and proposed PR
-  body, then retry push and draft-PR creation without merging.
+- Complete self-review and write the final report and proposed PR body.
+- Retry creation of the five follow-up issues, push the branch, and open a
+  draft PR that references (but does not close) open issue 69.
+- Verify the actual commit messages, remote head, and PR body; do not merge.

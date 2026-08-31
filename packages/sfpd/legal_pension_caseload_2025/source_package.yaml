@@ -150,7 +150,10 @@ record_sets:
     concept_evidence_notes: >-
       SFPD table 2.2, printed page 22, Total - Men and women, Without
       distinction row, Montant total column: EUR 3.759.582.728,06 for the
-      employee and/or self-employed pension population.
+      employee and/or self-employed pension population. The table itemizes the
+      total as employee pension plus bonus, self-employed pension plus bonus,
+      other pension bonuses, and the well-being bonus; Chronicle preserves the
+      publisher's total and does not reclassify or subtract those components.
     unit: eur
     aggregation: sum
     expected_cell_type: number
