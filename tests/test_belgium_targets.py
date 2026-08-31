@@ -555,24 +555,24 @@ def test_belgium_supplementary_publisher_aliases_are_registered():
     } <= set(SOURCE_PACKAGE_ALIASES)
 
 
-def test_sfpd_legal_pension_caseload_matches_published_cells():
+def test_sfpd_pension_and_grapa_totals_match_published_cells():
     facts = _facts(SFPD_PENSION_ALIAS, 2025)
-    by_scheme = {fact.filters["sfpd.scheme"]: fact.value for fact in facts}
+    by_concept = {fact.measure.concept: fact.value for fact in facts}
 
-    # Exact published counts from PensionStat.be (SFP/SFPD), January 2025.
-    assert by_scheme == {
-        "all": 2674520,
-        "employee": 2357954,
-        "self_employed": 690590,
-        "civil_servant": 604506,
+    # Exact totals from the official SFPD February 2025 PDF, tables 2.2 and 2.4.1.
+    assert by_concept == {
+        "sfpd.employee_or_self_employed_legal_pension_beneficiary_count": 2435457,
+        "sfpd.employee_or_self_employed_legal_pension_monthly_expenditure": (
+            3759582728.06
+        ),
+        "sfpd.grapa_beneficiary_count": 117650,
+        "sfpd.grapa_monthly_expenditure": 86398449.47,
     }
-    # Scheme counts are per-scheme recipients (mixed careers), not a partition:
-    # their sum exceeds the all-schemes total.
-    scheme_sum = sum(v for k, v in by_scheme.items() if k != "all")
-    assert scheme_sum > by_scheme["all"]
-    assert {fact.source.source_name for fact in facts} == {"sfpd_pensions"}
+    assert {fact.source.source_name for fact in facts} == {
+        "sfpd_monthly_social_benefits"
+    }
     assert {fact.geography.level for fact in facts} == {"country"}
-    assert {fact.measure.unit for fact in facts} == {"count"}
+    assert {fact.measure.unit for fact in facts} == {"count", "eur"}
     assert validate_facts(facts).valid
 
 

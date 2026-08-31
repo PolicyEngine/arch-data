@@ -1,51 +1,84 @@
-# Lane C5 progress
+# Belgium public facts wave progress
 
 ## State
 
-- Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
-- Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
-- Lane C5 is complete, validated, independently reviewed, and ready for handoff.
-- The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
-  to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
+- Active role: `ledger-source-ingestor`.
+- Branch: `be-public-calibration-facts`, based on clean `origin/main` at
+  `10597ae`.
+- Phase: draft PR #213 published; final-head bundle goldens corrected and the
+  complete local bundle gate passed; final-head CI and renewed Fable review
+  remain pending.
 
 ## Done
 
-- Read the repository Chronicle boundary rules in `AGENTS.md`.
-- Read `.lane-raw/SOURCES.md` and confirmed all five named publisher artifacts are present.
-- Confirmed the worktree is otherwise clean apart from `.lane-raw/` and the shared `.venv` link.
-- Verified all five staged artifact SHA-256 pins exactly.
-- Mapped FPB workbook cells: 990 facts across T01/T06/T07/T11/T17/T24, with
-  2022–2025 observations and 2026–2031 `source_projection` facts.
-- Confirmed PDF boundary evidence: printed page 19 calls 2026 the first projection year;
-  annex table units appear on printed pages 45, 48, 49, 53, 58, and 65.
-- Chosen Eurostat layout: two vintage-specific source-package aliases share new manifest
-  entries, preserving the prior package YAMLs, raw bytes, and fact outputs unchanged.
-- Reproduced the Statbel curator logic: 18 NUTS1 × sex × age-band cells totaling 11,825,551.
-- Added the hash-pinned FPB workbook and publication PDF plus the
-  `fpb-economic-outlook-2026-2031-june-2026` package alias.
-- Built 990 line-specific publisher facts (99 per year): 396 observations for
-  2022–2025 and 594 `source_projection` facts for 2026–2031.
-- Passed FPB `validate-package` and `build-suite`: 990 facts, full cell lineage,
-  zero acceptance errors, and pinned 2025 cells 320578 / 77771 / 5602 million euro.
-- Re-ran the Statbel 2026 curator logic on the 2025 ZIP and added the hash-pinned
-  raw capture plus its deterministic 18-row curated CSV.
-- Passed Statbel 2025 `validate-package` and `build-suite`: 18 facts totaling
-  11,825,551, 66 constraints, full lineage, and zero acceptance errors.
-- Added the Eurostat `gov_10a_taxag` 2025 and `spr_exp_func` 2024 manifest
-  entries plus vintage-specific package aliases, without modifying either
-  prior artifact or prior package specification.
-- Passed both new Eurostat package validations and suite builds: 12 tax facts
-  and 9 ESSPROS facts, full lineage, and zero acceptance errors.
-- Extended Belgium and Eurostat regressions for FPB table counts/cells and
-  assertion boundary, vintage non-overlap, prior-output digests, Statbel pins,
-  and the declared 0.25% Statbel/FPB population comparison tolerance.
-- Passed 43 focused tests and the full merged-bundle regression: 157,177 facts,
-  148 packages, zero aggregate-key duplicates, and expected goldens throughout.
-- Recorded pins, counts, boundary evidence, curator commands, validation tails,
-  and consumer fact families in `LANE_C5_REPORT.md`.
-- Passed independent `ledger-source-fidelity` and `ledger-boundary` reviews with
-  no required corrections.
+- Read `AGENTS.md`, `.github/chronicle-agents.yml`, the complete source-package
+  harness, and the facts-only ADR before changing package content.
+- Confirmed Chronicle must retain publisher-period facts only and must not add
+  Microcosm bindings, target profiles, aging, reconciliation, imputation,
+  take-up mechanics, PolicyEngine-computed values, or Axiom concepts.
+- Confirmed issue 69 remains open and names SFPD pensions, regionalized child
+  benefits, NBB national accounts, and other original Belgium source families.
+- Confirmed the merged offline-fetch validation contract exists on current main.
+- Identified current-main SFPD and Opgroeien packages as curated CSV extracts
+  whose value artifacts are not immutable publisher downloads; they resolve as
+  packages but do not satisfy this wave's stronger publisher-byte requirement.
+- Inspected the unmerged `be-benefit-participation-facts` branch. Its official
+  SFPD and Walloon Parliament PDFs are potentially reusable, while its manual
+  dashboard/HTML transcriptions are excluded by this task's no-transcription
+  rule.
+- Confirmed the official SFPD February 2025 monthly-statistics PDF contains
+  publisher tables for pension beneficiary counts, monthly pension expenditure,
+  GRAPA beneficiary counts, and monthly GRAPA expenditure.
+- Added a source-scoped European document-number format for the SFPD package,
+  with regression coverage for its number shapes. The original default parser
+  remains unchanged for every existing package; single-dot European values
+  remain backward-compatible decimals.
+- Audited the six original issue-69 selectors on current main: all six aliases
+  are registered, build 587 unique valid facts in total, and pass their package
+  validators. PR 207 added only geography/offline-fetch prerequisites, not
+  these fact packages.
+- Pinned the verbatim official SFPD February 2025 PDF (SHA-256
+  `0d6173e71a0e9c2cd220cd024a5b5fecbb6ca79f8b791cbd2b3368e7f8412106`,
+  2,319,705 bytes) and replaced the intermediary pension CSV selectors with
+  direct publisher-cell selectors for pension and GRAPA beneficiary totals and
+  monthly expenditure.
+- Added a schema-validated offline-fetch handoff for the native Opgroeien
+  caseload and expenditure exports, official AVIQ and Iriscare annual-report
+  PDFs, the blocked Ostbelgien Statistik HTML response, and the ECB HFCS wave
+  2023 statistical-tables ZIP. No unresolved source has a placeholder fact.
+- Prepared and filed separate follow-up issues for Opgroeien, AVIQ, Iriscare,
+  Ostbelgien, and ECB HFCS. They all reference open issue 69 and the
+  deterministic handoff.
+- Validated the SFPD package with zero errors or warnings; its suite preserves
+  13,644 full-document cells, resolves four facts with 100% lineage, and builds
+  and reloads a four-row facts-only consumer artifact.
+- Revalidated the parser/SFPD tests and all five existing packages that failed
+  when the first implementation accidentally broadened the default grammar;
+  all 27 tests pass after restoring the default and scoping European parsing.
+- Focused parser, offline-fetch, SFPD, selector, facts-only, and consumer tests
+  passed. Ruff and `git diff --check origin/main` passed.
+- Authenticated the content-addressed `ledger-raw` object with a read-only
+  download: its 2,319,705 bytes and SHA-256 exactly match the tracked SFPD PDF.
+  No R2 object was mutated.
+- Obtained `PASS` verdicts from both required judges:
+  `ledger-source-fidelity` and `ledger-boundary`.
+- Completed the 151-package merged-bundle regression. Its first final-head run
+  passed validity and the exact aggregate/source/table/geography checks, then
+  exposed stale period and entity goldens for the four SFPD facts. Updated only
+  those exact histograms: four facts move from calendar year 2025 to February
+  2025, while two expenditure facts move from person to government. The full
+  contract then passed with 171,855 facts in 14m11s.
+- Recorded the governance inconsistency that the literal source-ingestor path
+  globs omit user-required progress, raw-artifact, offline-handoff, issue-draft,
+  and pre-existing Belgium-test paths. No contract, schema, core, model, or
+  consumer-owned behavior changed.
+- Completed self-review and committed the exact proposed draft-PR body.
+- Published draft PR #213 and filed the five deterministic follow-up handoffs
+  as issues #214--#218. Nothing was merged.
+- Wrote the final report to `BELGIUM_PUBLIC_FACTS_REPORT.md`.
 
 ## Next
 
-- None; ready for handoff. No push was performed.
+- Complete final-head CI after publishing the bundle-golden correction.
+- Resolve the source-ingestor allowed-path registry gap.
+- Obtain a renewed exact-head Fable review; keep PR #213 draft and do not merge.

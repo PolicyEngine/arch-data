@@ -1,111 +1,299 @@
+# SFPD's February 2025 monthly-statistics PDF is the value artifact. The
+# package selects publisher numbers from tables 2.2 and 2.4.1 through the
+# pdf_text_numbers parser; no manually transcribed or computed value artifact
+# sits between the PDF and these Chronicle facts. The package retains its
+# historical alias while narrowing the pension total to the employee and
+# self-employed regimes explicitly covered by table 2.2.
 schema_version: ledger.source_package.v1
 package_id: sfpd-legal-pension-caseload-2025
-label: SFPD legal pension caseload 2025 by scheme
+label: SFPD February 2025 pension and GRAPA beneficiaries and monthly expenditure
 artifact:
-  source_name: sfpd_pensions
-  source_table: Legal pension beneficiaries by scheme, January 2025
+  source_name: sfpd_monthly_social_benefits
+  source_table: >-
+    Statistique mensuelle des prestations sociales - Février 2025,
+    tables 2.2 and 2.4.1
   resource_package: db
   resource_directory: data/sfpd/legal_pension_caseload_2025
   manifest: manifest.yaml
-  vintage: pensionstat_legal_pension_2025
-  extracted_at: '2026-07-04'
-  extraction_method: curated CSV extract from PensionStat.be published legal pension beneficiary headline figures
-  parser: delimited_text_full_rows
+  vintage: monthly_social_benefits_2025_02
+  extracted_at: '2026-08-30'
+  extraction_method: pypdf text-line number extraction from the full publisher PDF
+  parser: pdf_text_numbers
+  number_format: european
   artifact_year: 2025
-  sheet_name: sfpd_legal_pension_caseload_2025
+
 record_sets:
-- record_set_id: sfpd.legal_pension.cy2025.recipients.by_scheme
+- record_set_id: sfpd.month2025_02.pension.employee_self_employed.beneficiaries
   provenance_class: administrative
-  record_set_spec_id: sfpd.legal_pension.recipients.by_scheme.v1
-  source_record_id_prefix: sfpd.legal_pension.cy2025.recipients
-  sheet_name: sfpd_legal_pension_caseload_2025
-  period_type: calendar_year
-  period: 2025
+  assertion: observation
+  record_set_spec_id: sfpd.pension.employee_self_employed.beneficiaries.v1
+  source_record_id_prefix: sfpd.month2025_02.pension.employee_self_employed.beneficiaries
+  sheet_name: document_numbers
+  period_type: month
+  period: '2025-02'
+  period_coverage:
+    basis: calendar
+    start_date: '2025-02-01'
+    end_date: '2025-02-01'
+    source_period_label: au 01.02.2025
+    notes: >-
+      Table 2.2 is a stock at 1 February 2025, not an annual average or an
+      annual-any recipient count.
   geography_id: BE
   geography_level: country
   geography_name: Belgium
   geography_vintage: current
   entity: person
-  entity_role: benefit_recipient
-  domain: pensions
-  groupby_dimension: sfpd.scheme
+  entity_role: legal_pension_beneficiary
+  domain: legal_pensions
+  groupby_dimension: sfpd.published_total
   rows:
-  - value_id: all_schemes
-    label: All legal pension schemes recipients
+  - value_id: employee_or_self_employed_total
+    label: Employee and/or self-employed legal pension beneficiaries
     ordinal: 0
-    row_number: 2
-    expected_row_header_column: A
-    expected_row_header: all_schemes
+    row_number: 881
+    expected_row_header_column: C
+    expected_row_header: 2.435.457 1.810.192 93.346Nombre
     table_record_kind: total
-    filters:
-      sfpd.scheme: all
-    constraints:
-    - variable: sfpd.scheme
-      operator: ==
-      value: all
-      label: Pension scheme
-  - value_id: salarie
-    label: Employee scheme recipients
-    ordinal: 1
-    row_number: 3
-    expected_row_header_column: A
-    expected_row_header: salarie
-    table_record_kind: total
-    filters:
-      sfpd.scheme: employee
-    constraints:
-    - variable: sfpd.scheme
-      operator: ==
-      value: employee
-      label: Pension scheme
-  - value_id: independant
-    label: Self-employed scheme recipients
-    ordinal: 2
-    row_number: 4
-    expected_row_header_column: A
-    expected_row_header: independant
-    table_record_kind: total
-    filters:
-      sfpd.scheme: self_employed
-    constraints:
-    - variable: sfpd.scheme
-      operator: ==
-      value: self_employed
-      label: Pension scheme
-  - value_id: fonctionnaire
-    label: Civil servant scheme recipients
-    ordinal: 3
-    row_number: 5
-    expected_row_header_column: A
-    expected_row_header: fonctionnaire
-    table_record_kind: total
-    filters:
-      sfpd.scheme: civil_servant
-    constraints:
-    - variable: sfpd.scheme
-      operator: ==
-      value: civil_servant
-      label: Pension scheme
+    guard_cells:
+    - column: A
+      expected_value: 22
+      label: PDF page number
+    - column: B
+      expected_value: 56
+      label: PDF extracted line number
+    - column: D
+      expected_value: 2.435.457
+      label: Publisher number text
+    - column: C
+      row: 844
+      expected_value: 2.2 Répartition du nombre de bénéficiaires et dépense mensuelle (en €)
+      label: Table title line
   measures:
-  - measure_id: recipients
-    label: Legal pension beneficiaries
+  - measure_id: beneficiaries
+    label: Employee and/or self-employed legal pension beneficiaries
     ordinal: 0
     column: E
-    source_column_id: recipients
+    source_column_id: numeric_value
     expected_column_header_row: 1
-    expected_column_header: recipients
-    concept: legal_pension_recipients
-    source_concept: sfpd.legal_pension.beneficiaries
-    concept_relation: exact
-    concept_authority: ledger-be
-    concept_evidence_url: https://www.pensionstat.be/fr
+    expected_column_header: numeric_value
+    concept: sfpd.employee_or_self_employed_legal_pension_beneficiary_count
+    source_concept: sfpd.monthly_statistics.table_2_2.total_beneficiaries
+    concept_relation: source_label
+    concept_authority: sfpd
+    concept_evidence_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
     concept_evidence_notes: >-
-      PensionStat.be (Federal Pensions Service / Sigedis / INASTI) publishes the
-      count of people receiving income from the legal pension schemes, January
-      2025. The all-schemes row is the published total (2,674,520). The three
-      scheme rows are per-scheme beneficiary counts; their sum (3,653,050)
-      exceeds the total because mixed-career pensioners are counted in each
-      scheme they draw from, so the scheme rows are not a partition of the total.
+      SFPD table 2.2, printed page 22, Total - Men and women, Without
+      distinction row, Nombre column: 2.435.457. The report states that the
+      table covers people with an employee and/or self-employed retirement or
+      survivor pension. It does not include a civil-servant regime column.
     unit: count
+    aggregation: sum
+    expected_cell_type: number
+
+- record_set_id: sfpd.month2025_02.pension.employee_self_employed.monthly_expenditure
+  provenance_class: administrative
+  assertion: observation
+  record_set_spec_id: sfpd.pension.employee_self_employed.monthly_expenditure.v1
+  source_record_id_prefix: sfpd.month2025_02.pension.employee_self_employed.monthly_expenditure
+  sheet_name: document_numbers
+  period_type: month
+  period: '2025-02'
+  period_coverage:
+    basis: calendar
+    start_date: '2025-02-01'
+    end_date: '2025-02-28'
+    source_period_label: Février 2025
+    notes: Publisher-labelled monthly expenditure for February 2025.
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: government
+  entity_role: legal_pension_payment_program
+  domain: legal_pensions
+  groupby_dimension: sfpd.published_total
+  rows:
+  - value_id: employee_or_self_employed_total
+    label: Employee and/or self-employed legal pension monthly expenditure
+    ordinal: 0
+    row_number: 878
+    expected_row_header_column: C
+    expected_row_header: 3.759.582.728,06 2.748.241.379,33 891.285.866,21
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      expected_value: 22
+      label: PDF page number
+    - column: B
+      expected_value: 55
+      label: PDF extracted line number
+    - column: D
+      expected_value: 3.759.582.728,06
+      label: Publisher number text
+    - column: C
+      row: 844
+      expected_value: 2.2 Répartition du nombre de bénéficiaires et dépense mensuelle (en €)
+      label: Table title line
+  measures:
+  - measure_id: monthly_expenditure
+    label: Employee and/or self-employed legal pension monthly expenditure
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: sfpd.employee_or_self_employed_legal_pension_monthly_expenditure
+    source_concept: sfpd.monthly_statistics.table_2_2.total_monthly_amount
+    concept_relation: source_label
+    concept_authority: sfpd
+    concept_evidence_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    concept_evidence_notes: >-
+      SFPD table 2.2, printed page 22, Total - Men and women, Without
+      distinction row, Montant total column: EUR 3.759.582.728,06 for the
+      employee and/or self-employed pension population. The table itemizes the
+      total as employee pension plus bonus, self-employed pension plus bonus,
+      other pension bonuses, and the well-being bonus; Chronicle preserves the
+      publisher's total and does not reclassify or subtract those components.
+    unit: eur
+    aggregation: sum
+    expected_cell_type: number
+
+- record_set_id: sfpd.month2025_02.grapa.beneficiaries
+  provenance_class: administrative
+  assertion: observation
+  record_set_spec_id: sfpd.grapa.beneficiaries.v1
+  source_record_id_prefix: sfpd.month2025_02.grapa.beneficiaries
+  sheet_name: document_numbers
+  period_type: month
+  period: '2025-02'
+  period_coverage:
+    basis: calendar
+    start_date: '2025-02-01'
+    end_date: '2025-02-28'
+    source_period_label: Février 2025
+    notes: >-
+      Publisher-labelled February monthly GRAPA beneficiary population, not an
+      annual average, annual-any recipient count, or eligibility estimate.
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: person
+  entity_role: grapa_beneficiary
+  domain: old_age_income_guarantee
+  groupby_dimension: sfpd.published_total
+  rows:
+  - value_id: total
+    label: GRAPA beneficiaries
+    ordinal: 0
+    row_number: 1756
+    expected_row_header_column: C
+    expected_row_header: 75.523 57.588.778,24Février 2025 117.650 86.398.449,47 42.127 28.809.671,23
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      expected_value: 36
+      label: PDF page number
+    - column: B
+      expected_value: 19
+      label: PDF extracted line number
+    - column: D
+      expected_value: '117.650'
+      label: Publisher number text
+    - column: F
+      row: 1752
+      expected_value: >-
+        36 Service fédéral des Pensions Statistique mensuelle février 2025 -
+        2.4.1 2.4.1 Répartition du nombre de bénéficiaires d’une garantie de
+        revenus aux personnes âgées en combinaison avec la dépense mensuelle
+      label: Table title context
+  measures:
+  - measure_id: beneficiaries
+    label: GRAPA beneficiaries
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: sfpd.grapa_beneficiary_count
+    source_concept: sfpd.monthly_statistics.table_2_4_1.grapa_beneficiaries
+    concept_relation: source_label
+    concept_authority: sfpd
+    concept_evidence_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    concept_evidence_notes: >-
+      SFPD table 2.4.1, printed page 36, February 2025 TOTAL Nombre column:
+      117.650 GRAPA beneficiaries. The PDF parser retains a single-dot number
+      as 117.650 for backward compatibility; value_scale 1000 restores the
+      publisher's dot-grouped integer count.
+    unit: count
+    aggregation: sum
+    expected_cell_type: number
+    value_scale: 1000
+
+- record_set_id: sfpd.month2025_02.grapa.monthly_expenditure
+  provenance_class: administrative
+  assertion: observation
+  record_set_spec_id: sfpd.grapa.monthly_expenditure.v1
+  source_record_id_prefix: sfpd.month2025_02.grapa.monthly_expenditure
+  sheet_name: document_numbers
+  period_type: month
+  period: '2025-02'
+  period_coverage:
+    basis: calendar
+    start_date: '2025-02-01'
+    end_date: '2025-02-28'
+    source_period_label: Février 2025
+    notes: Publisher-labelled monthly GRAPA expenditure for February 2025.
+  geography_id: BE
+  geography_level: country
+  geography_name: Belgium
+  geography_vintage: current
+  entity: government
+  entity_role: grapa_payment_program
+  domain: old_age_income_guarantee
+  groupby_dimension: sfpd.published_total
+  rows:
+  - value_id: total
+    label: GRAPA monthly expenditure
+    ordinal: 0
+    row_number: 1757
+    expected_row_header_column: C
+    expected_row_header: 75.523 57.588.778,24Février 2025 117.650 86.398.449,47 42.127 28.809.671,23
+    table_record_kind: total
+    guard_cells:
+    - column: A
+      expected_value: 36
+      label: PDF page number
+    - column: B
+      expected_value: 19
+      label: PDF extracted line number
+    - column: D
+      expected_value: 86.398.449,47
+      label: Publisher number text
+    - column: F
+      row: 1752
+      expected_value: >-
+        36 Service fédéral des Pensions Statistique mensuelle février 2025 -
+        2.4.1 2.4.1 Répartition du nombre de bénéficiaires d’une garantie de
+        revenus aux personnes âgées en combinaison avec la dépense mensuelle
+      label: Table title context
+  measures:
+  - measure_id: monthly_expenditure
+    label: GRAPA monthly expenditure
+    ordinal: 0
+    column: E
+    source_column_id: numeric_value
+    expected_column_header_row: 1
+    expected_column_header: numeric_value
+    concept: sfpd.grapa_monthly_expenditure
+    source_concept: sfpd.monthly_statistics.table_2_4_1.grapa_monthly_amount
+    concept_relation: source_label
+    concept_authority: sfpd
+    concept_evidence_url: https://www.sfpd.fgov.be/files/3432/fr_stat_2502.pdf
+    concept_evidence_notes: >-
+      SFPD table 2.4.1, printed page 36, February 2025 TOTAL Montant mensuel
+      GRAPA column: EUR 86.398.449,47.
+    unit: eur
     aggregation: sum
     expected_cell_type: number

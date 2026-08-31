@@ -387,6 +387,7 @@ class SourceArtifactSpec:
     extracted_at: str
     extraction_method: str
     parser: str = "xls_used_range"
+    number_format: str = "english"
     sheet_name: str | None = None
     archive_member: str | None = None
     artifact_year: int | None = None
@@ -543,9 +544,17 @@ class SourceArtifactSpec:
         if self.parser == "ods_used_range":
             return source_cells_from_ods(content, artifact)
         if self.parser == "html_tables_and_text":
-            return source_cells_from_html_tables_and_text(content, artifact)
+            return source_cells_from_html_tables_and_text(
+                content,
+                artifact,
+                number_format=self.number_format,
+            )
         if self.parser == "pdf_text_numbers":
-            return source_cells_from_pdf_text_numbers(content, artifact)
+            return source_cells_from_pdf_text_numbers(
+                content,
+                artifact,
+                number_format=self.number_format,
+            )
         if self.parser == "delimited_text_selected_rows":
             return source_cells_from_delimited_text(
                 content,
@@ -1664,6 +1673,7 @@ def _artifact_from_mapping(payload: dict[str, Any]) -> SourceArtifactSpec:
         extracted_at=_required(payload, "extracted_at", "artifact"),
         extraction_method=_required(payload, "extraction_method", "artifact"),
         parser=payload.get("parser", "xls_used_range"),
+        number_format=payload.get("number_format", "english"),
         sheet_name=payload.get("sheet_name"),
         archive_member=payload.get("archive_member"),
         artifact_year=(

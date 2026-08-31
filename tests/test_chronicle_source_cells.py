@@ -247,6 +247,48 @@ def test_html_tables_and_text_parser_preserves_tables_and_document_numbers():
     assert cells_by_sheet_address[("document_numbers", "E3")].raw_value == 180_000
 
 
+def test_document_number_parser_preserves_european_grouped_decimals():
+    artifact = SourceArtifactMetadata(
+        source_name="sfpd",
+        source_table="test French PDF text",
+        source_file="test.html",
+        url="https://example.test/test.html",
+        vintage="test",
+        sha256="abc123",
+        size_bytes=10,
+        extracted_at="2026-08-30",
+        extraction_method="test",
+    )
+    html = b"""
+    <html><body><p>
+      2.435.457 pension beneficiaries; EUR 3.759.582.728,06;
+      118.262 GRAPA beneficiaries; EUR 85.039.735,46; adjustment 49,58.
+    </p></body></html>
+    """
+
+    cells = source_cells_from_html_tables_and_text(
+        html,
+        artifact,
+        number_format="european",
+    )
+    rows = {
+        cell.row_number: {}
+        for cell in cells
+        if cell.sheet_name == "document_numbers" and cell.row_number > 1
+    }
+    for cell in cells:
+        if cell.row_number in rows:
+            rows[cell.row_number][cell.column_number] = cell.raw_value
+
+    assert [(row[4], row[5]) for row in rows.values()] == [
+        ("2.435.457", 2_435_457),
+        ("3.759.582.728,06", 3_759_582_728.06),
+        ("118.262", 118.262),
+        ("85.039.735,46", 85_039_735.46),
+        ("49,58", 49.58),
+    ]
+
+
 def _two_sheet_workbook() -> bytes:
     workbook = openpyxl.Workbook()
     wanted = workbook.active
