@@ -5,7 +5,7 @@
 - Active role: `ledger-source-ingestor`.
 - Branch: `be-public-calibration-facts`, based on clean `origin/main` at
   `10597ae`.
-- Phase: final report and GitHub handoff.
+- Phase: local work complete; external GitHub handoff blocked.
 - Shell network access is unavailable (`github.com` cannot resolve); browser
   research remains available. Push, issue creation, and draft-PR creation must
   be retried after all local work is complete.
@@ -67,11 +67,15 @@
   globs omit user-required progress, raw-artifact, offline-handoff, issue-draft,
   and pre-existing Belgium-test paths. No contract, schema, core, model, or
   consumer-owned behavior changed.
+- Completed self-review and committed the exact proposed draft-PR body.
+- Retried issue creation, branch push, and draft-PR creation. GitHub DNS/API
+  access is unavailable, and `gh auth status` reports an invalid token; no
+  issue, remote branch, or PR was created, and nothing was merged.
+- Wrote the final report to `BELGIUM_PUBLIC_FACTS_REPORT.md`.
 
 ## Next
 
-- Complete self-review and write the final report; the proposed PR body is
-  committed under `docs/pr-drafts/`.
-- Retry creation of the five follow-up issues, push the branch, and open a
-  draft PR that references (but does not close) open issue 69.
-- Verify the actual commit messages, remote head, and PR body; do not merge.
+- Restore GitHub DNS/API access and refresh `gh` authentication.
+- File the five committed follow-up issue bodies, push the branch, and open a
+  draft PR referencing (not closing) issue 69 with the committed PR body.
+- Verify the remote head and rendered PR body; do not merge.
