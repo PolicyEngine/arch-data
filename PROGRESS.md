@@ -1,51 +1,46 @@
-# Lane C5 progress
+# Belgium public facts wave progress
 
 ## State
 
-- Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
-- Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
-- Lane C5 is complete, validated, independently reviewed, and ready for handoff.
-- The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
-  to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
+- Active role: `ledger-source-ingestor`.
+- Branch: `be-public-calibration-facts`, based on clean `origin/main` at
+  `10597ae`.
+- Phase: current-main selector audit and primary-artifact inventory.
+- Shell network access is unavailable (`github.com` cannot resolve); browser
+  research remains available. Push, issue creation, and draft-PR creation must
+  be retried after all local work is complete.
 
 ## Done
 
-- Read the repository Chronicle boundary rules in `AGENTS.md`.
-- Read `.lane-raw/SOURCES.md` and confirmed all five named publisher artifacts are present.
-- Confirmed the worktree is otherwise clean apart from `.lane-raw/` and the shared `.venv` link.
-- Verified all five staged artifact SHA-256 pins exactly.
-- Mapped FPB workbook cells: 990 facts across T01/T06/T07/T11/T17/T24, with
-  2022–2025 observations and 2026–2031 `source_projection` facts.
-- Confirmed PDF boundary evidence: printed page 19 calls 2026 the first projection year;
-  annex table units appear on printed pages 45, 48, 49, 53, 58, and 65.
-- Chosen Eurostat layout: two vintage-specific source-package aliases share new manifest
-  entries, preserving the prior package YAMLs, raw bytes, and fact outputs unchanged.
-- Reproduced the Statbel curator logic: 18 NUTS1 × sex × age-band cells totaling 11,825,551.
-- Added the hash-pinned FPB workbook and publication PDF plus the
-  `fpb-economic-outlook-2026-2031-june-2026` package alias.
-- Built 990 line-specific publisher facts (99 per year): 396 observations for
-  2022–2025 and 594 `source_projection` facts for 2026–2031.
-- Passed FPB `validate-package` and `build-suite`: 990 facts, full cell lineage,
-  zero acceptance errors, and pinned 2025 cells 320578 / 77771 / 5602 million euro.
-- Re-ran the Statbel 2026 curator logic on the 2025 ZIP and added the hash-pinned
-  raw capture plus its deterministic 18-row curated CSV.
-- Passed Statbel 2025 `validate-package` and `build-suite`: 18 facts totaling
-  11,825,551, 66 constraints, full lineage, and zero acceptance errors.
-- Added the Eurostat `gov_10a_taxag` 2025 and `spr_exp_func` 2024 manifest
-  entries plus vintage-specific package aliases, without modifying either
-  prior artifact or prior package specification.
-- Passed both new Eurostat package validations and suite builds: 12 tax facts
-  and 9 ESSPROS facts, full lineage, and zero acceptance errors.
-- Extended Belgium and Eurostat regressions for FPB table counts/cells and
-  assertion boundary, vintage non-overlap, prior-output digests, Statbel pins,
-  and the declared 0.25% Statbel/FPB population comparison tolerance.
-- Passed 43 focused tests and the full merged-bundle regression: 157,177 facts,
-  148 packages, zero aggregate-key duplicates, and expected goldens throughout.
-- Recorded pins, counts, boundary evidence, curator commands, validation tails,
-  and consumer fact families in `LANE_C5_REPORT.md`.
-- Passed independent `ledger-source-fidelity` and `ledger-boundary` reviews with
-  no required corrections.
+- Read `AGENTS.md`, `.github/chronicle-agents.yml`, the complete source-package
+  harness, and the facts-only ADR before changing package content.
+- Confirmed Chronicle must retain publisher-period facts only and must not add
+  Microcosm bindings, target profiles, aging, reconciliation, imputation,
+  take-up mechanics, PolicyEngine-computed values, or Axiom concepts.
+- Confirmed issue 69 remains open and names SFPD pensions, regionalized child
+  benefits, NBB national accounts, and other original Belgium source families.
+- Confirmed the merged offline-fetch validation contract exists on current main.
+- Identified current-main SFPD and Opgroeien packages as curated CSV extracts
+  whose value artifacts are not immutable publisher downloads; they resolve as
+  packages but do not satisfy this wave's stronger publisher-byte requirement.
+- Inspected the unmerged `be-benefit-participation-facts` branch. Its official
+  SFPD and Walloon Parliament PDFs are potentially reusable, while its manual
+  dashboard/HTML transcriptions are excluded by this task's no-transcription
+  rule.
+- Confirmed the official SFPD February 2025 monthly-statistics PDF contains
+  publisher tables for pension beneficiary counts, monthly pension expenditure,
+  GRAPA beneficiary counts, and monthly GRAPA expenditure.
 
 ## Next
 
-- None; ready for handoff. No push was performed.
+- Finish the exact six-selector current-main audit and source-pin inventory.
+- Select only official downloadable artifacts for implemented facts; add
+  deterministic offline-fetch handoffs and explicit follow-up issues for
+  blocked or interactive regional/HFCS sources.
+- Implement a coherent reviewable package wave with direct publisher-cell
+  lineage and focused tests, committing every coherent step.
+- Run `validate-package`, package build/source-cell/consumer-artifact tests,
+  ruff, `git diff --check`, deterministic and Chronicle judge reviews, and
+  self-review.
+- Write the final report file, verify the actual commit messages and proposed PR
+  body, then retry push and draft-PR creation without merging.
