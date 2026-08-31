@@ -46,6 +46,10 @@
   caseload and expenditure exports, official AVIQ and Iriscare annual-report
   PDFs, the blocked Ostbelgien Statistik HTML response, and the ECB HFCS wave
   2023 statistical-tables ZIP. No unresolved source has a placeholder fact.
+- Prepared separate, ready-to-file follow-up issue bodies for Opgroeien, AVIQ,
+  Iriscare, Ostbelgien, and ECB HFCS. They all reference open issue 69 and the
+  deterministic handoff; GitHub issue creation remains pending the network
+  retry.
 
 ## Next
 
