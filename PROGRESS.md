@@ -5,8 +5,9 @@
 - Active role: `ledger-source-ingestor`.
 - Branch: `be-public-calibration-facts`, based on clean `origin/main` at
   `10597ae`.
-- Phase: draft PR #213 published; final-head CI and renewed Fable review
-  pending after a source-scoped parser correction.
+- Phase: draft PR #213 published; final-head bundle goldens corrected and the
+  complete local bundle gate passed; final-head CI and renewed Fable review
+  remain pending.
 
 ## Done
 
@@ -56,12 +57,17 @@
   all 27 tests pass after restoring the default and scoping European parsing.
 - Focused parser, offline-fetch, SFPD, selector, facts-only, and consumer tests
   passed. Ruff and `git diff --check origin/main` passed.
+- Authenticated the content-addressed `ledger-raw` object with a read-only
+  download: its 2,319,705 bytes and SHA-256 exactly match the tracked SFPD PDF.
+  No R2 object was mutated.
 - Obtained `PASS` verdicts from both required judges:
   `ledger-source-fidelity` and `ledger-boundary`.
-- Started the 151-package merged-bundle regression, then stopped it after
-  20m49s and 7.4 GB of temporary output because it remained far from complete;
-  the package-specific bundle and consumer artifact passed. The temporary test
-  output was removed.
+- Completed the 151-package merged-bundle regression. Its first final-head run
+  passed validity and the exact aggregate/source/table/geography checks, then
+  exposed stale period and entity goldens for the four SFPD facts. Updated only
+  those exact histograms: four facts move from calendar year 2025 to February
+  2025, while two expenditure facts move from person to government. The full
+  contract then passed with 171,855 facts in 14m11s.
 - Recorded the governance inconsistency that the literal source-ingestor path
   globs omit user-required progress, raw-artifact, offline-handoff, issue-draft,
   and pre-existing Belgium-test paths. No contract, schema, core, model, or
@@ -73,7 +79,6 @@
 
 ## Next
 
-- Complete the final-head merged-bundle CI run.
-- Authenticate the R2 pointer and resolve the source-ingestor allowed-path
-  registry gap.
+- Complete final-head CI after publishing the bundle-golden correction.
+- Resolve the source-ingestor allowed-path registry gap.
 - Obtain a renewed exact-head Fable review; keep PR #213 draft and do not merge.

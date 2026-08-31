@@ -2,8 +2,8 @@
 
 ## Outcome
 
-The locally reviewable wave is complete at implementation head
-`206ebfa38bdc65ed4d89f416cf3cbf78eada81dd`, based on `origin/main`
+The locally reviewable wave is complete at source/parser implementation head
+`fe3fd81670f106c5509847312ba61dd4c4742626`, based on `origin/main`
 `10597ae602767b046ca1b294949e5df7bfd3b367` on branch
 `be-public-calibration-facts`. The commit containing this report necessarily
 follows that reviewed implementation head; its exact hash is reported in the
@@ -56,10 +56,12 @@ bonus components; Chronicle preserves that publisher total without
 reclassification.
 
 The manifest's R2 metadata reuses the content-addressed object path first
-recorded for the same PDF on the inspected unmerged GRAPA branch. The Git blob,
-hash, size, and metadata match. Authenticated R2 availability was not verified,
-so the pointer must be treated as metadata pending an authenticated inventory
-or read.
+recorded for the same PDF on the inspected unmerged GRAPA branch. An
+authenticated, read-only download from the `ledger-raw` bucket returned
+2,319,705 bytes with SHA-256
+`0d6173e71a0e9c2cd220cd024a5b5fecbb6ca79f8b791cbd2b3368e7f8412106`,
+exactly matching the tracked publisher PDF. No object was uploaded, replaced,
+or otherwise mutated during verification.
 
 ## Original issue-69 selector audit
 
@@ -139,6 +141,9 @@ Ready-to-file issue bodies are committed at:
   selector uniqueness test separately passed.
 - `tests/test_chronicle_facts_only.py` plus
   `tests/test_chronicle_consumer.py`: 33 passed.
+- Full 151-package merged-bundle contract: PASS in 14m11s, with 171,855
+  facts, 43 sources, 146 source tables, zero aggregate duplicate keys, and the
+  one pre-existing semantic-duplicate warning.
 - `ruff check .`: PASS.
 - `git diff --check origin/main`: PASS.
 
@@ -146,9 +151,12 @@ The first CI run exposed that the initial implementation had broadened the
 shared number grammar and shifted rows in existing Welsh CTR, Medicare, and
 LIHEAP packages. The final implementation restores the original default
 grammar and selects the European grammar explicitly from the SFPD artifact.
-All five directly exposed package regressions pass locally. The full
-151-package merged-bundle regression remains a required CI gate; it is not
-reported as passing here until the final-head run completes.
+All five directly exposed package regressions pass locally. The first complete
+151-package run then exposed only stale bundle goldens caused by the four SFPD
+facts moving from calendar-year to February 2025 and the two expenditure facts
+being classified as government rather than person. After updating those exact
+period and entity histograms, the complete merged-bundle test passed. No fact
+value, source selector, or package semantic changed in the golden correction.
 
 Required judge evidence:
 
@@ -167,8 +175,8 @@ merge.
 
 The branch is published as draft PR #213, and the five blocked-source handoffs
 are filed as issues #214--#218. Nothing is merged. The final head must remain
-draft until the full bundle gate, path-registry decision, R2-pointer
-authentication, and a renewed exact-head Fable review are complete.
+draft until final-head CI, the path-registry decision, and a renewed exact-head
+Fable review are complete.
 
 The tracked PR body references open issue 69 without closing it and must be
 republished and verified with the final parser-correction head.
@@ -184,3 +192,5 @@ republished and verified with the final parser-correction head.
 7. `6d3694dfa03626625a1af9f802469d40f19d14b1` — `Normalize Belgium issue draft endings`
 8. `94a298adf9909edfd15453f387a23b4aeec83125` — `Record Belgium validation and bundle coverage`
 9. `206ebfa38bdc65ed4d89f416cf3cbf78eada81dd` — `Prepare Belgium public facts draft PR`
+10. `ea809d084ed4913d41f9c629b41fe85cb7e23e46` — `Finalize Belgium public facts report`
+11. `fe3fd81670f106c5509847312ba61dd4c4742626` — `Scope European number parsing to SFPD`
