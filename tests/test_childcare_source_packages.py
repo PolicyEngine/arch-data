@@ -167,6 +167,12 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     rows = package.build_source_rows(2026)
     cells = package.build_source_cells(2026, source_rows=rows)
     facts = package.build_facts(2026, cells=cells, source_rows=rows)
+    declared_columns = [
+        (record_set, row, measure)
+        for record_set in package.build_source_record_set_specs(2026)
+        for row in record_set.rows
+        for measure in record_set.measures
+    ]
 
     assert report.valid
     assert len(rows) == 224
@@ -257,13 +263,19 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     assert len(set(DFE_CONCEPT_BY_MEASURE_ID.values())) == len(
         DFE_CONCEPT_BY_MEASURE_ID
     )
-    assert all(fact.layout.source_column_dimensions for fact in facts)
+    assert len(declared_columns) == len(facts)
+    assert all(measure.source_column_dimensions for _, _, measure in declared_columns)
     assert all(
         all(
-            fact.filters[dimension] == value
-            for dimension, value in fact.layout.source_column_dimensions.items()
+            {
+                **record_set.shared_filters,
+                **row.filters,
+                **measure.filters,
+            }.get(dimension)
+            == value
+            for dimension, value in measure.source_column_dimensions.items()
         )
-        for fact in facts
+        for record_set, row, measure in declared_columns
     )
     assert working_2025_ages_3_4.filters["registration_basis"] == "registered_children"
     assert working_2025_ages_3_4.filters["provision"] == "all"

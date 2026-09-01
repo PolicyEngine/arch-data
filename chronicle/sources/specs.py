@@ -339,7 +339,6 @@ def compile_source_record_set_specs(
                             or measure.source_column_id
                             or measure.measure_id
                         ),
-                        source_column_dimensions=dict(measure.source_column_dimensions),
                         table_record_kind=row.table_record_kind,
                     ),
                 )

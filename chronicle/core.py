@@ -230,7 +230,6 @@ class SourceRecordLayout:
     measure_ordinal: int | None = None
     source_row_id: str | None = None
     source_column_id: str | None = None
-    source_column_dimensions: dict[str, Scalar] = field(default_factory=dict)
     table_record_kind: str | None = None
     parent_record_set_id: str | None = None
     total_record_id: str | None = None
