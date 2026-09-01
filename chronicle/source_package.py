@@ -1876,6 +1876,10 @@ def _measure_from_mapping(
             if payload.get("source_column_id") is not None
             else None
         ),
+        source_column_dimensions={
+            str(key): _render_value(value, year=year)
+            for key, value in payload.get("source_column_dimensions", {}).items()
+        },
         expected_cell_type=payload.get("expected_cell_type", "number"),
         expected_column_header_row=(
             int(payload["expected_column_header_row"])

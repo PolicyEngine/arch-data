@@ -17,18 +17,34 @@ from chronicle.suite import build_source_suite
 
 
 REPO_ROOT = Path(__file__).parents[1]
-DFE_MEASURE_IDS = {
-    "registered_children_count",
-    "registered_children_nursery_count",
-    "registered_children_reception_count",
-    "eligible_children_count",
-    "eligible_children_nursery_count",
-    "eligible_children_universal_credit_count",
-    "eligible_children_legacy_benefit_count",
-    "registered_eligible_children_percent",
-    "registered_eligible_children_nursery_percent",
-    "all_children_count",
-    "registered_all_children_percent",
+DFE_CONCEPT_BY_MEASURE_ID = {
+    "registered_children_count": "dfe.funded_childcare_registered_children_total",
+    "registered_children_nursery_count": (
+        "dfe.funded_childcare_registered_children_nursery"
+    ),
+    "registered_children_reception_count": (
+        "dfe.funded_childcare_registered_children_reception"
+    ),
+    "eligible_children_count": "dfe.funded_childcare_eligible_children_total",
+    "eligible_children_nursery_count": (
+        "dfe.funded_childcare_eligible_children_nursery"
+    ),
+    "eligible_children_universal_credit_count": (
+        "dfe.funded_childcare_eligible_children_universal_credit"
+    ),
+    "eligible_children_legacy_benefit_count": (
+        "dfe.funded_childcare_eligible_children_legacy_benefit"
+    ),
+    "registered_eligible_children_percent": (
+        "dfe.funded_childcare_eligible_children_registered_percentage_total"
+    ),
+    "registered_eligible_children_nursery_percent": (
+        "dfe.funded_childcare_eligible_children_registered_percentage_nursery"
+    ),
+    "all_children_count": "dfe.funded_childcare_estimated_all_children",
+    "registered_all_children_percent": (
+        "dfe.funded_childcare_all_children_registered_percentage"
+    ),
 }
 
 
@@ -79,6 +95,11 @@ def test_hmrc_tax_free_childcare_package_preserves_activity_series():
         for fact in facts
         if fact.measure.concept == "hmrc.tfc_children_with_used_accounts_monthly"
     }
+    monthly_used_facts = [
+        fact
+        for fact in facts
+        if fact.measure.concept == "hmrc.tfc_children_with_used_accounts_monthly"
+    ]
 
     assert len(annual_used) == len(annual_top_up) == 9
     assert annual_used[2024] == 1_085_020
@@ -88,6 +109,40 @@ def test_hmrc_tax_free_childcare_package_preserves_activity_series():
     assert monthly_used["2024-04"] == 664_215
     assert monthly_used["2025-04"] == 699_155
     assert monthly_used["2026-03"] == 744_315
+    regimes = {
+        regime: sum(
+            fact.filters["definition_regime"] == regime for fact in monthly_used_facts
+        )
+        for regime in {
+            "used_account_in_period",
+            "payment_and_open_at_reference_date",
+        }
+    }
+    assert regimes == {
+        "used_account_in_period": 96,
+        "payment_and_open_at_reference_date": 12,
+    }
+    assert (
+        next(
+            fact for fact in monthly_used_facts if fact.period.value == "2025-03"
+        ).filters["definition_regime"]
+        == "used_account_in_period"
+    )
+    assert (
+        next(
+            fact for fact in monthly_used_facts if fact.period.value == "2025-04"
+        ).filters["definition_regime"]
+        == "payment_and_open_at_reference_date"
+    )
+    assert all(
+        any(
+            constraint.variable == "definition_regime"
+            and constraint.operator == "=="
+            and constraint.value == fact.filters["definition_regime"]
+            for constraint in fact.constraints
+        )
+        for fact in monthly_used_facts
+    )
 
     assert all(
         fact.entity.name == "person"
@@ -123,7 +178,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
 
     working_2025_ages_3_4 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_registered_children",
+        concept="dfe.funded_childcare_registered_children_total",
         period="2025-01",
         measure_id="registered_children_count",
         entitlement_type="Working parents",
@@ -131,7 +186,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     )
     working_2025_age_2 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_registered_children",
+        concept="dfe.funded_childcare_registered_children_total",
         period="2025-01",
         measure_id="registered_children_count",
         entitlement_type="Working parents",
@@ -139,7 +194,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     )
     universal_nursery_2024 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_registered_children",
+        concept="dfe.funded_childcare_registered_children_nursery",
         period="2024-01",
         measure_id="registered_children_nursery_count",
         entitlement_type="Universal",
@@ -147,7 +202,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     )
     working_2024_ages_3_4 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_registered_children",
+        concept="dfe.funded_childcare_registered_children_total",
         period="2024-01",
         measure_id="registered_children_count",
         entitlement_type="Working parents",
@@ -155,7 +210,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     )
     early_learning_2024_age_2 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_registered_children",
+        concept="dfe.funded_childcare_registered_children_total",
         period="2024-01",
         measure_id="registered_children_count",
         entitlement_type="Early learning for 2-year-olds",
@@ -163,7 +218,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     )
     eligible_2024_age_2 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_eligible_children",
+        concept="dfe.funded_childcare_eligible_children_total",
         period="2024-01",
         measure_id="eligible_children_count",
         entitlement_type="Early learning for 2-year-olds",
@@ -171,7 +226,7 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     )
     registered_share_2024_age_2 = _fact_by_dimensions(
         facts,
-        concept="dfe.funded_childcare_eligible_children_registered_percentage",
+        concept=("dfe.funded_childcare_eligible_children_registered_percentage_total"),
         period="2024-01",
         measure_id="registered_eligible_children_percent",
         entitlement_type="Early learning for 2-year-olds",
@@ -194,7 +249,22 @@ def test_dfe_funded_childcare_package_preserves_atomic_child_headlines(tmp_path)
     assert all(
         "third-week-of-January" in fact.measure.concept_evidence_notes for fact in facts
     )
-    assert all(fact.layout.measure_id in DFE_MEASURE_IDS for fact in facts)
+    assert all(fact.layout.measure_id in DFE_CONCEPT_BY_MEASURE_ID for fact in facts)
+    assert all(
+        fact.measure.concept == DFE_CONCEPT_BY_MEASURE_ID[fact.layout.measure_id]
+        for fact in facts
+    )
+    assert len(set(DFE_CONCEPT_BY_MEASURE_ID.values())) == len(
+        DFE_CONCEPT_BY_MEASURE_ID
+    )
+    assert all(fact.layout.source_column_dimensions for fact in facts)
+    assert all(
+        all(
+            fact.filters[dimension] == value
+            for dimension, value in fact.layout.source_column_dimensions.items()
+        )
+        for fact in facts
+    )
     assert working_2025_ages_3_4.filters["registration_basis"] == "registered_children"
     assert working_2025_ages_3_4.filters["provision"] == "all"
     assert universal_nursery_2024.filters["provision"] == "nursery"

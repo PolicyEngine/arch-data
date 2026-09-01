@@ -943,7 +943,11 @@ def _row_semantic_evidence_issues(
             )
 
     for variable, value in fact.filters.items():
-        if value in (None, "all"):
+        if value is None:
+            continue
+        if value == "all" and not (
+            fact.layout and fact.layout.source_column_dimensions
+        ):
             continue
         matched_values = _source_row_values(rows, variable)
         if not matched_values:
@@ -1020,30 +1024,19 @@ def _row_semantic_evidence_issues(
     return issues
 
 
-WIDE_TABLE_SOURCE_COLUMN_DIMENSIONS = {
-    "eligibilitybasis",
-    "provision",
-    "receptionstatus",
-    "registrationbasis",
-    "registrationstatus",
-}
-
-
 def _wide_table_filter_evidenced_by_source_column(
     fact: AggregateFact,
     variable: str,
     expected: Any,
 ) -> bool:
-    """Accept categorical dimensions printed in a wide-table column name."""
-    if _normalize_semantic_name(variable) not in WIDE_TABLE_SOURCE_COLUMN_DIMENSIONS:
+    """Accept an explicitly declared dimension of a guarded source column."""
+    if not fact.layout:
         return False
-    source_column_id = fact.layout.source_column_id if fact.layout else None
-    if not source_column_id:
+    dimensions = fact.layout.source_column_dimensions
+    if variable not in dimensions:
         return False
-    expected_name = _normalize_semantic_name(str(expected))
-    return bool(expected_name) and expected_name in _normalize_semantic_name(
-        source_column_id
-    )
+    declared = dimensions[variable]
+    return type(declared) is type(expected) and declared == expected
 
 
 def _wide_table_constraint_evidenced_by_source_column(

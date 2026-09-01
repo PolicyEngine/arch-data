@@ -167,6 +167,7 @@ class SourceRecordSetMeasure:
     divisor_column: str | None = None
     round_to: int | float | None = None
     source_column_id: str | None = None
+    source_column_dimensions: dict[str, Scalar] = field(default_factory=dict)
     expected_cell_type: str = "number"
     expected_column_header_row: int | None = None
     expected_column_header: Scalar = None
@@ -338,6 +339,7 @@ def compile_source_record_set_specs(
                             or measure.source_column_id
                             or measure.measure_id
                         ),
+                        source_column_dimensions=dict(measure.source_column_dimensions),
                         table_record_kind=row.table_record_kind,
                     ),
                 )
@@ -846,6 +848,8 @@ def _record_set_spec_hash(spec: SourceRecordSetSpec) -> str:
             measure.pop("divisor_column", None)
         if measure.get("round_to") is None:
             measure.pop("round_to", None)
+        if not measure.get("source_column_dimensions"):
+            measure.pop("source_column_dimensions", None)
         if measure.get("expected_column_header") is None:
             measure.pop("expected_column_header", None)
         if measure.get("expected_column_header_row") is None:

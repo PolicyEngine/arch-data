@@ -30,6 +30,7 @@ from chronicle.sources.rows import SourceRow, build_source_row_key, validate_sou
 from chronicle.suite import (
     SourceRecordSuiteReport,
     SourceRegionSuiteReport,
+    _wide_table_filter_evidenced_by_source_column,
     build_agent_acceptance_report,
     build_source_cells,
     build_source_record_specs,
@@ -38,6 +39,66 @@ from chronicle.suite import (
     validate_source_record_specs,
     validate_source_regions,
 )
+
+
+def _wide_table_fact(*, source_column_dimensions=None):
+    return AggregateFact(
+        value=1,
+        period=PeriodDimension(type="month", value="2026-01"),
+        geography=GeographyDimension(
+            level="country",
+            id="E92000001",
+            vintage="current",
+            name="England",
+        ),
+        entity=EntityDimension(name="person"),
+        measure=Measure(
+            concept="dfe.funded_childcare_registered_children",
+            unit="count",
+        ),
+        aggregation=Aggregation(method="sum"),
+        provenance_class="administrative",
+        source=SourceProvenance(
+            source_name="dfe",
+            source_table="test",
+            source_file="test.csv",
+            url="https://example.test/test.csv",
+            vintage="test",
+            extracted_at="2026-09-01",
+            extraction_method="test",
+        ),
+        filters={"provision": "all"},
+        layout=SourceRecordLayout(
+            source_column_id="registered_all_children_percent",
+            source_column_dimensions=source_column_dimensions or {},
+        ),
+    )
+
+
+def test_wide_table_evidence_requires_explicit_column_dimension():
+    fact = _wide_table_fact()
+
+    assert not _wide_table_filter_evidenced_by_source_column(
+        fact,
+        "provision",
+        "all",
+    )
+
+
+def test_wide_table_evidence_uses_exact_typed_column_dimension_value():
+    fact = _wide_table_fact(source_column_dimensions={"provision": "all"})
+
+    assert _wide_table_filter_evidenced_by_source_column(fact, "provision", "all")
+    assert not _wide_table_filter_evidenced_by_source_column(
+        fact,
+        "provision",
+        "All",
+    )
+    assert not _wide_table_filter_evidenced_by_source_column(
+        fact,
+        "registration_basis",
+        "registered_children",
+    )
 
 
 def test_build_source_suite_writes_artifacts_and_reports(tmp_path):
