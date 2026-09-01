@@ -949,6 +949,12 @@ def _row_semantic_evidence_issues(
         if not matched_values:
             if _filter_evidenced_by_source_cells(cells, variable, value):
                 continue
+            if _wide_table_filter_evidenced_by_source_column(
+                fact,
+                variable,
+                value,
+            ):
+                continue
             issues.append(
                 AgentAcceptanceIssue(
                     code="row_filter_not_evidenced",
@@ -981,6 +987,8 @@ def _row_semantic_evidence_issues(
             continue
         if _constraint_evidenced_by_source_cells(cells, constraint):
             continue
+        if _wide_table_constraint_evidenced_by_source_column(fact, constraint):
+            continue
         matched_values = _source_row_values(rows, constraint.variable)
         if not matched_values:
             issues.append(
@@ -1010,6 +1018,45 @@ def _row_semantic_evidence_issues(
                     )
                 )
     return issues
+
+
+WIDE_TABLE_SOURCE_COLUMN_DIMENSIONS = {
+    "eligibilitybasis",
+    "provision",
+    "receptionstatus",
+    "registrationbasis",
+    "registrationstatus",
+}
+
+
+def _wide_table_filter_evidenced_by_source_column(
+    fact: AggregateFact,
+    variable: str,
+    expected: Any,
+) -> bool:
+    """Accept categorical dimensions printed in a wide-table column name."""
+    if _normalize_semantic_name(variable) not in WIDE_TABLE_SOURCE_COLUMN_DIMENSIONS:
+        return False
+    source_column_id = fact.layout.source_column_id if fact.layout else None
+    if not source_column_id:
+        return False
+    expected_name = _normalize_semantic_name(str(expected))
+    return bool(expected_name) and expected_name in _normalize_semantic_name(
+        source_column_id
+    )
+
+
+def _wide_table_constraint_evidenced_by_source_column(
+    fact: AggregateFact,
+    constraint: Any,
+) -> bool:
+    if constraint.operator != "==":
+        return False
+    return _wide_table_filter_evidenced_by_source_column(
+        fact,
+        str(constraint.variable),
+        constraint.value,
+    )
 
 
 def _constraint_evidenced_by_source_cells(

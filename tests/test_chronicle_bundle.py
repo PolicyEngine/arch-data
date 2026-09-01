@@ -73,16 +73,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 171855,
+        "fact_count": 172751,
         "geography_count": 12536,
-        "period_count": 192,
+        "period_count": 247,
         "semantic_duplicate_key_count": 121,
         "skipped_source_count": 10,
-        "source_count": 43,
-        "source_package_count": 151,
+        "source_count": 44,
+        "source_package_count": 153,
         "warning_count": 1,
     }
-    assert len(rows) == 171855
+    assert len(rows) == 172751
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -100,7 +100,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 151
+    assert source_packages["source_package_count"] == 153
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -114,7 +114,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 171855
+    assert coverage["fact_count"] == 172751
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -126,6 +126,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "cms_medicaid": 515,
         "cms_medicare": 1,
         "cms_nhe": 3,
+        "dfe": 770,
         "dft": 81,
         "dwp": 6547,
         "eurostat": 207,
@@ -133,7 +134,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fpb_economic_outlook": 1000,
         "hhs_acf_liheap": 2,
         "hhs_acf_tanf": 110,
-        "hmrc": 20551,
+        "hmrc": 20677,
         "ici": 12,
         "irs_soi": 40063,
         "isc": 2,
@@ -161,7 +162,19 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 146
+    assert len(table_counts) == 148
+    assert (
+        table_counts["dfe:Funded early education and childcare 2026, Headline figures"]
+        == 770
+    )
+    assert (
+        table_counts[
+            "hmrc:Tax-Free Childcare Statistics March 2026, Table 2: Numbers "
+            "of Children with Open and Used Tax-Free Childcare Accounts and "
+            "Government Top-up"
+        ]
+        == 126
+    )
     assert (
         table_counts[
             "dwp:Universal Credit childcare element statistics to August 2025, Table 1"
@@ -481,7 +494,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         ]
         == 54
     )
-    assert coverage["counts"]["by_period"] == {
+    expected_period_counts = {
         "academic_year:2013": 6,
         "academic_year:2014": 6,
         "academic_year:2015": 6,
@@ -675,6 +688,35 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2023": 63054,
         "tax_year:2024": 40,
     }
+    for fiscal_year in range(2017, 2026):
+        key = f"fiscal_year:{fiscal_year}"
+        expected_period_counts[key] += 2
+    for year, count in {
+        2011: 4,
+        2012: 18,
+        2013: 18,
+        2014: 18,
+        2015: 32,
+        2016: 32,
+        2017: 32,
+        2018: 64,
+        2019: 64,
+        2020: 64,
+        2021: 64,
+        2022: 64,
+        2023: 64,
+        2024: 64,
+        2025: 84,
+        2026: 84,
+    }.items():
+        key = f"month:{year}-01"
+        expected_period_counts[key] = expected_period_counts.get(key, 0) + count
+    year, month = 2017, 4
+    while (year, month) <= (2026, 3):
+        key = f"month:{year}-{month:02d}"
+        expected_period_counts[key] = expected_period_counts.get(key, 0) + 1
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+    assert coverage["counts"]["by_period"] == expected_period_counts
     assert coverage["counts"]["by_geography"]["country:BE"] == 4888
     assert coverage["counts"]["by_geography"]["country:DE"] == 36
     assert coverage["counts"]["by_geography"]["country:FR"] == 36
@@ -687,7 +729,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4297
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4423
+    assert coverage["counts"]["by_geography"]["country:E92000001"] == 1300
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 497
     assert len(coverage["counts"]["by_geography"]) == 12536
     assert coverage["counts"]["by_entity"] == {
@@ -695,11 +738,11 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dwelling": 12733,
         "family": 107,
         "firm": 1439,
-        "government": 1313,
+        "government": 1322,
         "household": 40724,
         "institutional_sector": 133,
         "pension_plan": 2,
-        "person": 60466,
+        "person": 61353,
         "return": 14600,
         "social_protection_scheme": 36,
         "tax_unit": 40069,
@@ -716,12 +759,14 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         }
     ]
     for source in (
+        "dfe-funded-early-education-childcare-2026",
         "dwp-uc-childcare-element-march-2021-august-2025",
         "dwp-uc-households-carer-entitlement-april-december-2025",
         "dwp-uc-households-children-april-december-2025",
         "dwp-uc-households-family-type-april-december-2025",
         "dwp-uc-households-housing-entitlement-april-december-2025",
         "dwp-uc-households-lcwra-entitlement-april-december-2025",
+        "hmrc-tax-free-childcare-march-2026",
     ):
         assert (output_dir / "sources" / source / "consumer_facts.jsonl").exists()
     for source in (
