@@ -93,6 +93,7 @@ SOURCE_PACKAGE_ALIASES = {
     "hmrc-salary-sacrifice-reform-2029-headcounts": Path(
         "hmrc/salary_sacrifice_reform_2029_headcounts"
     ),
+    "hmrc-tax-free-childcare-march-2026": Path("hmrc/tax_free_childcare_march_2026"),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
@@ -128,6 +129,9 @@ SOURCE_PACKAGE_ALIASES = {
     "bfp-economic-outlook-2026-06": Path("bfp/economic_outlook_2026_06"),
     "fpb-economic-outlook-2026-2031-june-2026": Path(
         "fpb/economic_outlook_2026_2031_june_2026"
+    ),
+    "dfe-funded-early-education-childcare-2026": Path(
+        "dfe/funded_early_education_childcare_2026"
     ),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
@@ -1872,6 +1876,10 @@ def _measure_from_mapping(
             if payload.get("source_column_id") is not None
             else None
         ),
+        source_column_dimensions={
+            str(key): _render_value(value, year=year)
+            for key, value in payload.get("source_column_dimensions", {}).items()
+        },
         expected_cell_type=payload.get("expected_cell_type", "number"),
         expected_column_header_row=(
             int(payload["expected_column_header_row"])

@@ -575,9 +575,7 @@ def fact_counts(facts: list[AggregateFact]) -> dict[str, dict[str, int]]:
             f"{fact.period.type}:{fact.period.value}" for fact in facts
         ),
         "by_assertion": _counter_dict(fact.assertion for fact in facts),
-        "by_provenance_class": _counter_dict(
-            fact.provenance_class for fact in facts
-        ),
+        "by_provenance_class": _counter_dict(fact.provenance_class for fact in facts),
         "missing_labels": {"count": sum(1 for fact in facts if not fact.label)},
         "missing_provenance": {
             "count": sum(1 for fact in facts if _has_missing_provenance(fact))
@@ -651,7 +649,10 @@ def _validate_provenance_class(
         return
 
     if provenance_class == "survey_aggregate":
-        if type(fact.survey_instrument) is not str or not fact.survey_instrument.strip():
+        if (
+            type(fact.survey_instrument) is not str
+            or not fact.survey_instrument.strip()
+        ):
             errors.append(
                 _issue(
                     "missing_survey_instrument",

@@ -30,6 +30,7 @@ from chronicle.sources.rows import SourceRow, build_source_row_key, validate_sou
 from chronicle.suite import (
     SourceRecordSuiteReport,
     SourceRegionSuiteReport,
+    _wide_table_filter_evidenced_by_source_column,
     build_agent_acceptance_report,
     build_source_cells,
     build_source_record_specs,
@@ -38,6 +39,34 @@ from chronicle.suite import (
     validate_source_record_specs,
     validate_source_regions,
 )
+
+
+def test_wide_table_evidence_requires_explicit_column_dimension():
+    assert not _wide_table_filter_evidenced_by_source_column(
+        {},
+        "provision",
+        "all",
+    )
+
+
+def test_wide_table_evidence_uses_exact_typed_column_dimension_value():
+    dimensions = {"provision": "all"}
+
+    assert _wide_table_filter_evidenced_by_source_column(
+        dimensions,
+        "provision",
+        "all",
+    )
+    assert not _wide_table_filter_evidenced_by_source_column(
+        dimensions,
+        "provision",
+        "All",
+    )
+    assert not _wide_table_filter_evidenced_by_source_column(
+        dimensions,
+        "registration_basis",
+        "registered_children",
+    )
 
 
 def test_build_source_suite_writes_artifacts_and_reports(tmp_path):

@@ -21,6 +21,7 @@ BUNDLE_COVERAGE_SCHEMA_VERSION = "ledger.bundle_coverage.v1"
 BUNDLE_SOURCES_SCHEMA_VERSION = "ledger.bundle_sources.v1"
 DEFAULT_BUNDLE_SOURCES = tuple(sorted(SOURCE_PACKAGE_ALIASES))
 UK_BUNDLE_SOURCE_PREFIXES = (
+    "dfe",
     "dft",
     "dwp",
     "hmrc",
@@ -36,6 +37,7 @@ UK_BUNDLE_SOURCE_PREFIXES = (
     "welshgov",
 )
 UK_BUNDLE_SOURCES = (
+    "dfe-funded-early-education-childcare-2026",
     "dft-nts-vehicle-ownership-2024",
     "dwp-benefit-cap-november-2025",
     "dwp-benefit-statistics-february-2026",
@@ -59,6 +61,7 @@ UK_BUNDLE_SOURCES = (
     "hmrc-salary-sacrifice-relief-2024-25",
     "hmrc-spi-income-bands-2023-24",
     "hmrc-spi-income-by-area-2023-24",
+    "hmrc-tax-free-childcare-march-2026",
     "hmrc-vat-firm-sector-targets-2024-25",
     "hmrc-vat-firm-targets-2024-25",
     "isc-annual-census-2023",
