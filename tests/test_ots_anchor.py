@@ -323,6 +323,12 @@ def test_verify_fails_when_proof_binds_different_bytes(repo: dict) -> None:
     payload = json.loads(proof.read_text(encoding="utf-8"))
     payload["digest"] = "ab" * 32
     proof.write_text(json.dumps(payload), encoding="utf-8")
+    assert (
+        ots_anchor.classify_proof(
+            repo["manifests"][1], proof, shlex.split(repo["ots_bin"])
+        )
+        == "mismatch"
+    )
     assert run_cli(repo, "verify") == 1
 
 
