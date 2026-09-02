@@ -10,6 +10,7 @@ import yaml
 
 from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
+    build_artifact_key,
     build_artifact_rows,
     build_derived_r2_key,
     bootstrap_r2_buckets,
@@ -21,6 +22,7 @@ from chronicle.artifacts import (
     publish_derived_artifacts,
     publish_source_artifacts,
 )
+from chronicle.epoch import Epoch
 from chronicle.harness import main as harness_main
 
 
@@ -49,6 +51,39 @@ def test_build_derived_r2_key_is_build_scoped():
         "derived/irs_soi/soi-table-1-1/2023/"
         "ledger.build.v1:abc123/reports/build_summary.json"
     )
+
+
+def test_build_artifact_key_hashes_one_payload_across_epochs():
+    ledger = build_artifact_key(
+        build_id="ledger.build.v1:abc123",
+        artifact_name="reports/build_summary.json",
+        sha256="def456",
+    )
+    chronicle = build_artifact_key(
+        build_id="chronicle.build.v2:abc123",
+        artifact_name="reports/build_summary.json",
+        sha256="def456",
+        epoch=Epoch.CHRONICLE,
+    )
+
+    assert ledger.startswith("ledger.build_artifact.v1:")
+    assert chronicle.startswith("chronicle.build_artifact.v2:")
+    assert ledger.split(":", maxsplit=1)[1] == chronicle.split(":", maxsplit=1)[1]
+
+
+def test_build_artifact_key_rejects_unknown_build_epoch():
+    with pytest.raises(
+        ValueError,
+        match=(
+            "ledger[.]build[.]v1.*chronicle[.]build[.]v2|"
+            "chronicle[.]build[.]v2.*ledger[.]build[.]v1"
+        ),
+    ):
+        build_artifact_key(
+            build_id="future.build.v9:abc123",
+            artifact_name="facts.jsonl",
+            sha256="def456",
+        )
 
 
 @pytest.mark.parametrize(

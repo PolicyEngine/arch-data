@@ -32,6 +32,7 @@ from chronicle.core import (
     AggregateFact,
     build_label,
 )
+from chronicle.epoch import SCHEMA_IDS, schema_id
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
     SourceCell,
@@ -73,6 +74,7 @@ from chronicle.sources.specs import (
 )
 
 SOURCE_PACKAGE_RESOURCE_PACKAGE = "packages"
+SOURCE_PACKAGE_SCHEMA_VERSION = schema_id("source_package")
 SOURCE_PACKAGE_ALIASES = {
     "bea-nipa-personal-income-components": Path("bea/nipa_personal_income_components"),
     "bea-nipa-personal-income-disposition": Path(
@@ -1135,8 +1137,13 @@ def load_source_package(source: str | Path) -> SourcePackage:
     with path.open("r", encoding="utf-8") as file:
         payload = yaml.safe_load(file)
     schema_version = _required(payload, "schema_version", str(path))
-    if schema_version != "ledger.source_package.v1":
-        raise ValueError(f"Unsupported source package schema: {schema_version}")
+    source_package_schema = SCHEMA_IDS["source_package"]
+    if schema_version not in source_package_schema.accepted:
+        raise ValueError(
+            f"Unsupported source package schema: {schema_version!r}; accepted "
+            f"forms are {source_package_schema.ledger!r} and "
+            f"{source_package_schema.chronicle!r}"
+        )
     package_dir = path.parent
     return SourcePackage(
         package_id=_required(payload, "package_id", str(path)),
@@ -2326,7 +2333,7 @@ def _scaffold_template(
     resource_directory: str,
     manifest: str,
 ) -> str:
-    return f"""schema_version: ledger.source_package.v1
+    return f"""schema_version: {SOURCE_PACKAGE_SCHEMA_VERSION}
 package_id: {package_id}
 label: TODO package label
 artifact:

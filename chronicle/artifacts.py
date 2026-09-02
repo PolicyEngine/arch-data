@@ -18,6 +18,8 @@ from urllib.parse import unquote, urlparse
 import httpx
 import yaml
 
+from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
+
 
 DEFAULT_R2_RAW_BUCKET = "ledger-raw"
 DEFAULT_R2_DERIVED_BUCKET = "ledger-derived"
@@ -956,18 +958,20 @@ def build_artifact_key(
     build_id: str,
     artifact_name: str,
     sha256: str,
+    epoch: Epoch = EMIT_EPOCH,
 ) -> str:
     """Build a stable key for a derived build artifact registry row."""
     payload = json.dumps(
         {
             "artifact_name": artifact_name,
-            "build_id": build_id,
+            "build_id": canonicalize_key("build", build_id),
             "sha256": sha256,
         },
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
-    return f"ledger.build_artifact.v1:{hashlib.sha256(payload).hexdigest()[:32]}"
+    domain = hash_domain("build_artifact", epoch)
+    return f"{domain}:{hashlib.sha256(payload).hexdigest()[:32]}"
 
 
 def infer_build_id(input_dir: str | Path) -> str | None:

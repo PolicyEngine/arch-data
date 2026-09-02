@@ -5,8 +5,8 @@
 - Branch: `epoch-dual-domain` from `origin/main` at `ff3efd3`.
 - Assignment: chronicle#143 mechanism 1, step 1 (dual-domain acceptance; emit unchanged).
 - Approved role: `ledger-contract-maintainer`.
-- Implementation is in progress; dual-epoch bundle, relational, and remaining
-  schema readers are the current step.
+- Implementation is complete; adversarial review and full verification are the
+  current step.
 
 ## Done
 
@@ -28,13 +28,17 @@
   and clear unknown-domain errors.
 - Pinned all existing fixture and consumer-schema bytes by SHA-256; focused
   identity/artifact/schema verification passes (96 tests).
+- Made bundle ingestion validate Chronicle-only and mixed-epoch rows, with
+  cross-epoch duplicate accounting and unknown-domain rejection.
+- Added Chronicle relational emission/load coverage with valid SQLite foreign
+  keys, invariant build/build-artifact digests, and Ledger-default output.
+- Made source-package and offline-fetch readers accept both registered schema
+  ids while scaffolds and administrative generators still emit Ledger ids.
 
 ## Next
 
-- Wire bundle, relational, source-package, offline-manifest, and derived-artifact
-  surfaces to the registry while preserving every Ledger-default byte.
-- Record required files outside the role's declared `allowed_paths` for explicit
-  PR disclosure.
-- Add adversarial tests without modifying goldens, fixtures, or `releases/`.
+- Complete the adversarial diff/impact review and address any findings.
+- Record all required files outside the role's declared `allowed_paths` for
+  explicit PR disclosure.
 - Run focused tests, full verification, wheel build, and clean-venv import smoke.
 - Write `out.md`, push the branch, and open (but do not merge) the requested PR.
