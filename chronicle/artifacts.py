@@ -23,6 +23,7 @@ DEFAULT_R2_RAW_BUCKET = "ledger-raw"
 DEFAULT_R2_DERIVED_BUCKET = "ledger-derived"
 DEFAULT_R2_PREFIX = "raw"
 DEFAULT_R2_DERIVED_PREFIX = "derived"
+DEFAULT_R2_CONSUMER_PREFIX = "consumer"
 
 # New UK and New Zealand uploads are namespaced by country. US objects predate
 # the country segment and deliberately keep their legacy ``raw/{source_id}``
@@ -378,6 +379,78 @@ class DerivedArtifactPublishReport:
         }
 
 
+@dataclass(frozen=True)
+class ConsumerArtifactUploadEntry:
+    """One public consumer-artifact file upload status."""
+
+    artifact_name: str
+    local_path: str
+    sha256: str
+    size_bytes: int
+    r2_location: ArtifactStorageLocation
+    upload: ArtifactCommandResult
+
+    @property
+    def valid(self) -> bool:
+        """Whether this consumer-artifact file uploaded successfully."""
+        return self.upload.ok
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-serializable entry."""
+        return {
+            "valid": self.valid,
+            "artifact_name": self.artifact_name,
+            "local_path": self.local_path,
+            "sha256": self.sha256,
+            "size_bytes": self.size_bytes,
+            "r2_location": self.r2_location.to_dict(),
+            "upload": self.upload.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class ConsumerArtifactPublishReport:
+    """Report from publishing one public, package-scoped consumer artifact."""
+
+    input_dir: str
+    source_id: str
+    package_id: str
+    artifact_sha256: str
+    entries: tuple[ConsumerArtifactUploadEntry, ...]
+    errors: tuple[str, ...] = ()
+
+    @property
+    def valid(self) -> bool:
+        """Whether both consumer-artifact files uploaded successfully."""
+        return (
+            not self.errors
+            and len(self.entries) == 2
+            and all(entry.valid for entry in self.entries)
+        )
+
+    @property
+    def counts(self) -> dict[str, int]:
+        """Return summary counts."""
+        return {
+            "artifact_count": len(self.entries),
+            "uploaded_count": sum(1 for entry in self.entries if entry.valid),
+            "failed_count": sum(1 for entry in self.entries if not entry.valid),
+        }
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-serializable report."""
+        return {
+            "valid": self.valid,
+            "input_dir": self.input_dir,
+            "source_id": self.source_id,
+            "package_id": self.package_id,
+            "artifact_sha256": self.artifact_sha256,
+            "counts": self.counts,
+            "entries": [entry.to_dict() for entry in self.entries],
+            "errors": list(self.errors),
+        }
+
+
 def fetch_source_artifact(
     source_url: str,
     *,
@@ -588,6 +661,117 @@ def publish_derived_artifacts(
     if build_artifacts_output is not None:
         write_build_artifacts_jsonl(report, build_artifacts_output)
     return report
+
+
+def publish_consumer_artifact(
+    input_dir: str | Path,
+    *,
+    r2_bucket: str = DEFAULT_R2_DERIVED_BUCKET,
+    r2_prefix: str = DEFAULT_R2_CONSUMER_PREFIX,
+    wrangler_command: str = "npx wrangler",
+) -> ConsumerArtifactPublishReport:
+    """Publish a verified public package artifact at a content-addressed key."""
+    from policyengine_chronicle.consumer import load_consumer_artifact
+
+    input_path = Path(input_dir)
+    empty_report = {
+        "input_dir": str(input_path),
+        "source_id": "",
+        "package_id": "",
+        "artifact_sha256": "",
+        "entries": (),
+    }
+    manifest_path = input_path / "manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return ConsumerArtifactPublishReport(
+            **empty_report,
+            errors=(f"consumer_manifest_unreadable:{exc}",),
+        )
+
+    source_id = manifest.get("source_id")
+    package_id = manifest.get("package_id")
+    artifact_sha256 = manifest.get("artifact_sha256")
+    source_access = manifest.get("source_access")
+    missing = [
+        field
+        for field, value in {
+            "source_id": source_id,
+            "package_id": package_id,
+            "chronicle_source_commit": manifest.get("chronicle_source_commit"),
+            "source_access": source_access,
+            "artifact_sha256": artifact_sha256,
+        }.items()
+        if not isinstance(value, str) or not value
+    ]
+    identity = {
+        "input_dir": str(input_path),
+        "source_id": str(source_id or ""),
+        "package_id": str(package_id or ""),
+        "artifact_sha256": str(artifact_sha256 or ""),
+        "entries": (),
+    }
+    if missing:
+        return ConsumerArtifactPublishReport(
+            **identity,
+            errors=("missing_manifest_fields:" + ",".join(missing),),
+        )
+    if source_access != "public":
+        return ConsumerArtifactPublishReport(
+            **identity,
+            errors=(f"source_access_not_public:{source_access}",),
+        )
+
+    try:
+        load_consumer_artifact(input_path)
+    except (KeyError, OSError, TypeError, ValueError) as exc:
+        return ConsumerArtifactPublishReport(
+            **identity,
+            errors=(f"consumer_artifact_invalid:{exc}",),
+        )
+
+    entries: list[ConsumerArtifactUploadEntry] = []
+    errors: list[str] = []
+    for artifact_name in ("consumer_facts.jsonl", "manifest.json"):
+        artifact_path = input_path / artifact_name
+        content = artifact_path.read_bytes()
+        location = ArtifactStorageLocation(
+            provider="r2",
+            bucket=r2_bucket,
+            key=build_consumer_r2_key(
+                source_id=source_id,
+                package_id=package_id,
+                artifact_sha256=artifact_sha256,
+                artifact_name=artifact_name,
+                prefix=r2_prefix,
+            ),
+        )
+        upload = _upload_r2_object(
+            location,
+            artifact_path,
+            wrangler_command=wrangler_command,
+        )
+        if not upload.ok:
+            errors.append(f"consumer_upload_failed:{artifact_name}")
+        entries.append(
+            ConsumerArtifactUploadEntry(
+                artifact_name=artifact_name,
+                local_path=str(artifact_path),
+                sha256=hashlib.sha256(content).hexdigest(),
+                size_bytes=len(content),
+                r2_location=location,
+                upload=upload,
+            )
+        )
+    return ConsumerArtifactPublishReport(
+        input_dir=str(input_path),
+        source_id=source_id,
+        package_id=package_id,
+        artifact_sha256=artifact_sha256,
+        entries=tuple(entries),
+        errors=tuple(errors),
+    )
 
 
 def publish_source_artifacts(
@@ -951,6 +1135,28 @@ def build_derived_r2_key(
     )
 
 
+def build_consumer_r2_key(
+    *,
+    source_id: str,
+    package_id: str,
+    artifact_sha256: str,
+    artifact_name: str,
+    prefix: str = DEFAULT_R2_CONSUMER_PREFIX,
+) -> str:
+    """Build the canonical content-addressed key for a consumer artifact file."""
+    if len(artifact_sha256) != 64 or any(
+        character not in "0123456789abcdef" for character in artifact_sha256
+    ):
+        raise ValueError("Consumer artifact SHA-256 must be 64 lowercase hex digits.")
+    return posixpath.join(
+        *_clean_relative_key_parts(prefix),
+        _clean_consumer_key_part(source_id),
+        _clean_consumer_key_part(package_id),
+        artifact_sha256,
+        *_clean_relative_key_parts(artifact_name),
+    )
+
+
 def build_artifact_key(
     *,
     build_id: str,
@@ -1293,3 +1499,10 @@ def _clean_relative_key_parts(value: str) -> tuple[str, ...]:
     if not parts or any(part == ".." for part in parts):
         raise ValueError("R2 artifact paths cannot be empty or contain '..'.")
     return parts
+
+
+def _clean_consumer_key_part(value: str) -> str:
+    cleaned = _clean_key_part(value)
+    if "/" in cleaned or cleaned in {".", ".."}:
+        raise ValueError("Consumer artifact source/package IDs must be one key part.")
+    return cleaned

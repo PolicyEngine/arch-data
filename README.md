@@ -301,6 +301,35 @@ only `consumer_facts.jsonl` and `manifest.json`. Version 2 is incompatible with 
 retired v1 profile-bearing contract: loaders reject v1 manifests so downstreams must
 adopt the facts-only surface explicitly.
 
+To build and publish a hash-pinned artifact for one public source package, use
+the package path directly:
+
+```bash
+uv run chronicle build-consumer-artifact \
+  --package hmrc-tax-free-childcare-march-2026 \
+  --year 2026 \
+  --out /tmp/hmrc-tfc-consumer-artifact
+uv run chronicle publish-consumer --dir /tmp/hmrc-tfc-consumer-artifact
+```
+
+`--package` runs the package's full build suite before producing the two-file
+artifact. Its manifest records `source_id`, `package_id`,
+`chronicle_source_commit`, `source_access`, `fact_row_count`, `facts_sha256`,
+and `artifact_sha256`. The artifact digest is the SHA-256 of the canonical JSON
+manifest fields excluding `artifact_sha256`; because those fields include
+`facts_sha256`, it pins both the package identity and the exact fact bytes.
+
+`publish-consumer` verifies the artifact and uploads only `manifest.json` and
+`consumer_facts.jsonl` to `ledger-derived` under:
+
+```text
+consumer/{source_id}/{package_id}/{artifact_sha256}/{artifact_name}
+```
+
+Publication fails closed when a manifest declares `licensed` or `restricted`
+access. Those sources remain hash-only registrations; only public source
+packages may produce downloadable consumer artifacts.
+
 `--year` is inert for `--suite uk` because the UK packages are year-pinned.
 The US off-year bundle behavior is unchanged and out of scope here.
 

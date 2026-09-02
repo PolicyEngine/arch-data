@@ -21,6 +21,7 @@ from chronicle.core import (
 from chronicle.harness import main
 from policyengine_chronicle.consumer import (
     build_consumer_artifact,
+    build_package_consumer_artifact,
     load_consumer_artifact,
 )
 from policyengine_chronicle.schema import CONSUMER_FACT_SCHEMA_SHA256
@@ -86,7 +87,17 @@ def _rewrite_manifest_hash(out_dir):
     manifest_path = out_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     manifest["facts_sha256"] = hashlib.sha256(facts_file.read_bytes()).hexdigest()
+    manifest["artifact_sha256"] = _artifact_manifest_sha256(manifest)
     manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+
+def _artifact_manifest_sha256(manifest):
+    identity = {
+        key: value for key, value in manifest.items() if key != "artifact_sha256"
+    }
+    return hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
 
 
 def test_artifact_build_load_round_trip_is_facts_only(tmp_path):
@@ -97,10 +108,15 @@ def test_artifact_build_load_round_trip_is_facts_only(tmp_path):
     artifact = load_consumer_artifact(out_dir)
     manifest = json.loads((out_dir / "manifest.json").read_text())
 
+    manifest_without_artifact_sha = {
+        key: value for key, value in manifest.items() if key != "artifact_sha256"
+    }
+    expected_artifact_sha = _artifact_manifest_sha256(manifest_without_artifact_sha)
     assert report.to_dict() == {
         "schema_version": "policyengine_ledger.consumer_artifact.v2",
         "output_dir": str(out_dir),
         "fact_row_count": 2,
+        "artifact_sha256": expected_artifact_sha,
     }
     assert manifest == {
         "schema_version": "policyengine_ledger.consumer_artifact.v2",
@@ -110,6 +126,7 @@ def test_artifact_build_load_round_trip_is_facts_only(tmp_path):
         "facts_sha256": hashlib.sha256(
             (out_dir / "consumer_facts.jsonl").read_bytes()
         ).hexdigest(),
+        "artifact_sha256": expected_artifact_sha,
     }
     assert {path.name for path in out_dir.iterdir()} == {
         "consumer_facts.jsonl",
@@ -131,6 +148,57 @@ def test_artifact_is_reproducible(tmp_path):
         assert (first / name).read_bytes() == (second / name).read_bytes()
 
 
+@pytest.mark.parametrize(
+    ("package_id", "source_id", "fact_row_count"),
+    [
+        ("hmrc-tax-free-childcare-march-2026", "hmrc", 126),
+        ("dfe-funded-early-education-childcare-2026", "dfe", 770),
+    ],
+)
+def test_package_artifact_manifest_pins_package_commit_and_rows(
+    tmp_path,
+    package_id,
+    source_id,
+    fact_row_count,
+):
+    out_dir = tmp_path / "artifact"
+    source_commit = "ab" * 20
+
+    report = build_package_consumer_artifact(
+        out_dir,
+        package=package_id,
+        year=2026,
+        chronicle_source_commit=source_commit,
+    )
+    artifact = load_consumer_artifact(out_dir)
+
+    assert report.fact_row_count == fact_row_count
+    assert report.package_id == package_id
+    assert artifact.manifest["source_id"] == source_id
+    assert artifact.manifest["package_id"] == package_id
+    assert artifact.manifest["chronicle_source_commit"] == source_commit
+    assert artifact.manifest["source_access"] == "public"
+    assert artifact.manifest["artifact_sha256"] == _artifact_manifest_sha256(
+        artifact.manifest
+    )
+    assert artifact.manifest["fact_row_count"] == fact_row_count
+
+
+@pytest.mark.parametrize("source_access", ["licensed", "restricted"])
+def test_artifact_build_refuses_nonpublic_package_identity(tmp_path, source_access):
+    facts_path = _write_facts(tmp_path)
+
+    with pytest.raises(ValueError, match="public source packages"):
+        build_consumer_artifact(
+            tmp_path / "artifact",
+            facts_path=facts_path,
+            source_id="example",
+            package_id="example-package",
+            chronicle_source_commit="ab" * 20,
+            source_access=source_access,
+        )
+
+
 def test_artifact_load_rejects_tampered_facts(tmp_path):
     facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
@@ -144,6 +212,19 @@ def test_artifact_load_rejects_tampered_facts(tmp_path):
     facts_file.write_text("\n".join(rows) + "\n")
 
     with pytest.raises(ValueError, match="manifest hash"):
+        load_consumer_artifact(out_dir)
+
+
+def test_artifact_load_rejects_false_artifact_sha256(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["artifact_sha256"] = "00" * 32
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(ValueError, match="artifact_sha256"):
         load_consumer_artifact(out_dir)
 
 
@@ -282,3 +363,28 @@ def test_build_consumer_artifact_help_has_no_profile_options(capsys):
     help_text = capsys.readouterr().out
     assert "--profile" not in help_text
     assert "facts-only" in help_text
+    assert "--package" in help_text
+
+
+def test_build_consumer_artifact_cli_accepts_a_package(tmp_path, capsys):
+    out_dir = tmp_path / "artifact"
+
+    exit_code = main(
+        [
+            "build-consumer-artifact",
+            "--package",
+            "hmrc-tax-free-childcare-march-2026",
+            "--year",
+            "2026",
+            "--source-commit",
+            "ab" * 20,
+            "--out",
+            str(out_dir),
+        ]
+    )
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["package_id"] == "hmrc-tax-free-childcare-march-2026"
+    assert payload["fact_row_count"] == 126
+    assert load_consumer_artifact(out_dir).manifest["source_access"] == "public"
