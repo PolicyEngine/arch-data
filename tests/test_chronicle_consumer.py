@@ -244,6 +244,36 @@ def test_artifact_load_unknown_schema_names_both_accepted_forms(tmp_path):
     assert "policyengine_chronicle.consumer_artifact.v3" in message
 
 
+def test_artifact_load_unknown_row_schema_names_both_accepted_forms(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["consumer_fact_schema_versions"] = ["future.consumer_fact.v9"]
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(ValueError) as error:
+        load_consumer_artifact(out_dir)
+
+    message = str(error.value)
+    assert "ledger.consumer_fact.v1" in message
+    assert "chronicle.consumer_fact.v2" in message
+
+
+def test_artifact_load_rejects_declared_row_schema_drift(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["consumer_fact_schema_versions"] = ["chronicle.consumer_fact.v2"]
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(ValueError, match="but its rows use"):
+        load_consumer_artifact(out_dir)
+
+
 @pytest.mark.parametrize(
     ("case", "message"),
     [

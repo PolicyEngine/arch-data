@@ -24,7 +24,8 @@
   eight consumer-contract hash builders to the registry with invariant digest
   suffixes across epochs.
 - Added dual-epoch lineage validation, consumer-row schema normalization,
-  artifact loading, mixed-epoch acceptance, and clear unknown-domain errors.
+  artifact loading (including declared row-schema pins), mixed-epoch acceptance,
+  and clear unknown-domain errors.
 - Pinned all existing fixture and consumer-schema bytes by SHA-256; focused
   identity/artifact/schema verification passes (96 tests).
 

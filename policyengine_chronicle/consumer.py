@@ -129,6 +129,22 @@ def load_consumer_artifact(path: str | Path) -> ConsumerArtifact:
             "Consumer artifact manifests must not contain profiles; target profiles "
             "are consumer-owned contracts and must be loaded by Microcosm."
         )
+    declared_fact_schema_versions = manifest.get("consumer_fact_schema_versions")
+    if declared_fact_schema_versions is not None:
+        if not isinstance(declared_fact_schema_versions, list):
+            raise ValueError(
+                "Consumer artifact consumer_fact_schema_versions must be a list."
+            )
+        for row_schema_version in declared_fact_schema_versions:
+            try:
+                SCHEMA_IDS["consumer_fact"].infer_identifier_epoch(row_schema_version)
+            except ValueError as error:
+                raise ValueError(
+                    "Unsupported consumer fact schema_version in artifact "
+                    f"manifest: {row_schema_version!r}; accepted forms are "
+                    f"{SCHEMA_IDS['consumer_fact'].ledger!r} and "
+                    f"{SCHEMA_IDS['consumer_fact'].chronicle!r}."
+                ) from error
     manifest_schema_sha256 = manifest.get("consumer_fact_schema_sha256")
     if (
         manifest_schema_sha256 is not None
@@ -148,6 +164,16 @@ def load_consumer_artifact(path: str | Path) -> ConsumerArtifact:
             f"{actual_sha256} != {manifest['facts_sha256']}."
         )
     rows = _load_consumer_rows(facts_file, validate_schema=True)
+    actual_fact_schema_versions = sorted({row.get("schema_version") for row in rows})
+    if (
+        declared_fact_schema_versions is not None
+        and declared_fact_schema_versions != actual_fact_schema_versions
+    ):
+        raise ValueError(
+            "Consumer artifact manifest declares consumer_fact_schema_versions "
+            f"{declared_fact_schema_versions!r} but its rows use "
+            f"{actual_fact_schema_versions!r}."
+        )
     declared_row_count = manifest.get("fact_row_count")
     if declared_row_count is not None and declared_row_count != len(rows):
         raise ValueError(
