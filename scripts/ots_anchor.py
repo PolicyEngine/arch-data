@@ -247,7 +247,12 @@ def upgrade_proof(
     if backup.exists() or backup.is_symlink():
         raise AnchorError(f"refusing to overwrite existing backup: {backup}")
 
-    completed = _run_ots(ots_bin, ["upgrade", str(proof)])
+    try:
+        completed = _run_ots(ots_bin, ["upgrade", str(proof)])
+    except (AnchorError, OSError):
+        # A timeout can arrive after the client renamed the original proof.
+        _restore_upgrade_backup(proof, backup)
+        raise
     output = completed.stdout + completed.stderr
     if completed.returncode != 0:
         _restore_upgrade_backup(proof, backup)

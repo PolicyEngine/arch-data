@@ -317,6 +317,29 @@ def test_failed_upgrade_restores_original_backup(
     assert not proof.with_name(proof.name + ".bak").exists()
 
 
+def test_timed_out_upgrade_restores_original_backup(
+    repo: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert run_cli(repo, "run") == 0
+    proof = repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots"
+    original = proof.read_bytes()
+    real_run_ots = ots_anchor._run_ots
+
+    def time_out_after_backup(ots_bin, arguments, *, timeout=300):
+        if arguments[0] == "upgrade":
+            upgrade_target = Path(arguments[1])
+            upgrade_target.replace(
+                upgrade_target.with_name(upgrade_target.name + ".bak")
+            )
+            raise ots_anchor.AnchorError("ots timed out")
+        return real_run_ots(ots_bin, arguments, timeout=timeout)
+
+    monkeypatch.setattr(ots_anchor, "_run_ots", time_out_after_backup)
+    assert run_cli(repo, "run") == 1
+    assert proof.read_bytes() == original
+    assert not proof.with_name(proof.name + ".bak").exists()
+
+
 def test_run_rejects_symlinked_proof_directory(repo: dict) -> None:
     proof_directory = repo["root"] / "ots"
     proof_directory.symlink_to(repo["manifest_dir"], target_is_directory=True)

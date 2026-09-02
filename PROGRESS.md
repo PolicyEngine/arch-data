@@ -24,7 +24,9 @@ pending because classic `main` protection details are not yet readable in this l
   local-state, backup-loss, and symlink-escape findings in the trusted tool.
 - Copied the 15 proof blobs for releases 0000–0014 byte-for-byte from `545cfe56`.
 - Added `--manifests`, complete-proof binding re-verification, a testable
-  `ots/`-only change guard, and 14 hermetic fake-client tests (all passing).
+  `ots/`-only change guard, and 15 hermetic fake-client tests (all passing).
+- Restored the original proof on upgrade timeout as well as explicit client
+  failure, closing the independent core review's only finding.
 - Queried GitHub through the authenticated connector: `main` is protected,
   required-status-check enforcement is off, and repository plus parent ruleset
   lists are empty. The integration cannot read classic protection, so this is
