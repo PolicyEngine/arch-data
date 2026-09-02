@@ -12,9 +12,8 @@ import posixpath
 import re
 import shlex
 import sqlite3
-import stat
 import subprocess
-from typing import Any, Mapping
+from typing import Any
 from urllib.parse import unquote, urlparse
 
 import httpx
@@ -28,13 +27,17 @@ from chronicle.database import (
 from chronicle.env import env_value
 from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
 from chronicle.registration import (
-    filename_key,
-    is_bare_filename,
-    is_manifest_filename,
-    load_manifest_document,
-    matching_directory_entry,
-    package_manifest_paths,
-    validate_package_directory,
+    ACCESS_PUBLIC,
+    MICRODATA_RELEASE_KIND,
+    ListSpecRejected,
+    ManifestAccessError,
+    is_hash_only,
+    iter_file_specs,
+    normalize_access,
+    recorded_r2,
+    safe_entry_access,
+    safe_manifest_kind,
+    validate_file_entry,
 )
 
 
@@ -52,61 +55,15 @@ DEFAULT_R2_DERIVED_BUCKET = "ledger-derived"
 DEFAULT_R2_PREFIX = "raw"
 DEFAULT_R2_DERIVED_PREFIX = "derived"
 
+#: ``RawArtifactPublishEntry.skipped`` prefix for a licensed or restricted
+#: registration: nothing to upload, because no Chronicle store holds its bytes.
+HASH_ONLY_SKIP_PREFIX = "hash_only_access:"
+
 # Most packages keep one manifest.yaml. Publisher directories that feed several
 # source packages keep one manifest each -- db/data/irs_soi/ira_contributions
 # holds manifest_traditional_source_package.yaml beside the Roth one -- so the
 # name is an input, not a constant, wherever a caller addresses a package.
 DEFAULT_MANIFEST_FILENAME = "manifest.yaml"
-
-
-def bare_filename(value: Any, *, what: str = "filename") -> str:
-    """Return ``value`` as a bare filename, refusing any other spelling.
-
-    ``./table.csv``, ``nested/table.csv`` and an absolute path all resolve
-    outside the one-name manifest contract once joined under a package, so
-    fetch validates the spelling before reading publisher bytes.
-    """
-    if not is_bare_filename(value):
-        raise ArtifactFilenameError(
-            f"{what} must be a bare filename inside the package directory, not "
-            f"{value!r}; it may not carry a directory, '.', '..', a trailing "
-            "slash, surrounding whitespace, or an absolute path."
-        )
-    return str(value)
-
-
-def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
-    """Return the manifests a root sweep addresses.
-
-    The default is package discovery, not one literal filename: both YAML
-    extensions and every ``manifest_<package>`` sibling participate. A caller
-    that supplies another filename keeps the historical exact-name override.
-    """
-    selected_name = _manifest_path(Path(), manifest_filename).name
-    if selected_name != DEFAULT_MANIFEST_FILENAME:
-        candidates = [path for path in root.rglob("*") if path.name == selected_name]
-    else:
-        candidates = [
-            path for path in root.rglob("*") if is_manifest_filename(path.name)
-        ]
-    for path in candidates:
-        _require_regular_manifest_file(path)
-    return sorted(candidates)
-
-
-def _require_regular_manifest_file(path: Path) -> None:
-    """Refuse a manifest-named entry that is not a regular, non-symlink file.
-
-    ``is_file`` follows symlinks, so a dangling symlink, a symlink to a
-    directory, or any other non-regular entry would silently vanish from a
-    sweep and from sibling-registry checks; a registry entry that cannot be
-    read as a manifest is a defect to surface, never to skip.
-    """
-    if path.is_symlink() or not path.is_file():
-        raise MalformedManifestError(
-            f"{path} carries a manifest name but is not a regular file; "
-            "Chronicle will not sweep past it or register beside it."
-        )
 
 
 def _manifest_path(output: Path, manifest_filename: str) -> Path:
@@ -115,93 +72,46 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
     The name is a filename, not a path: it selects among the manifests a
     package directory keeps, and must not reach outside it.
     """
-    name = str(manifest_filename)
-    if not is_bare_filename(name) or any(character in name for character in "*?[]"):
+    name = manifest_filename.strip()
+    if not name or name in (".", "..") or name != Path(name).name:
         raise ManifestNameError(
             "Manifest must name a file inside the package directory, not "
             f"{manifest_filename!r}."
         )
-    if not is_manifest_filename(name):
-        raise ManifestNameError(
-            f"Manifest must be named {DEFAULT_MANIFEST_FILENAME} or "
-            f"manifest_<package>.yaml, not {manifest_filename!r}: the sweeps "
-            "address a package's manifests by those names, and a manifest "
-            "under any other name is invisible to them."
-        )
     return output / name
 
 
-def _refuse_a_stray_default_manifest(output: Path, manifest_path: Path) -> None:
-    """Refuse to create any new manifest beside a package's registry.
-
-    Every supported spelling participates: a missing ``manifest.yaml`` beside
-    ``manifest.yml`` or ``Manifest.yaml`` is just as ambiguous as one beside a
-    named manifest, and a mistyped named selector must not create a parallel
-    registry. Operators may create an intentional empty sibling explicitly,
-    then select that existing file.
-    """
-    paths = package_manifest_paths(output)
-    if (
-        any(path.name == manifest_path.name for path in paths)
-        or manifest_path.is_symlink()
-    ):
-        return
-    siblings = [path.name for path in paths]
-    if not siblings:
-        return
-    raise AmbiguousManifestError(
-        f"{output} already keeps {', '.join(siblings)}; refusing to create "
-        f"{manifest_path.name} beside that registry. Pass --manifest to name "
-        "an existing manifest, or create an intentional empty sibling "
-        "explicitly before fetching into it."
+def _sibling_manifests(output: Path) -> list[str]:
+    """Return the ``manifest_*.yaml`` files a package directory keeps."""
+    if not output.is_dir():
+        return []
+    return sorted(
+        path.name
+        for pattern in ("manifest_*.yaml", "manifest_*.yml")
+        for path in output.glob(pattern)
+        if path.is_file()
     )
 
 
-def _package_manifests(
-    output: Path,
-    manifest_path: Path,
-    existing_manifest: dict[str, Any],
-) -> dict[str, dict[str, Any]]:
-    """Return every manifest the package directory keeps, by path.
+def _refuse_a_stray_default_manifest(output: Path, manifest_path: Path) -> None:
+    """Refuse to create ``manifest.yaml`` beside a package's named manifests.
 
-    The byte boundary is the file in the directory, not whichever manifest a
-    fetch selected. A malformed sibling is therefore a pre-I/O refusal: until
-    Chronicle can read every owner, it cannot safely overwrite shared bytes.
+    A publisher directory that feeds several source packages keeps one
+    ``manifest_<package>.yaml`` per package and no ``manifest.yaml``. A fetch
+    that omits ``--manifest`` there would create a third manifest none of the
+    packages read, and would bypass the revision guard of the one it should
+    have addressed (PolicyEngine/chronicle#225).
     """
-    try:
-        paths = package_manifest_paths(output)
-    except ValueError as error:
-        # Explicit sweep selectors still inspect every sibling registry. Keep
-        # discovery refusals in the shared exception family both CLIs report.
-        raise MalformedManifestError(str(error)) from error
-    by_name: dict[str, Path] = {}
-    for path in paths:
-        key = filename_key(path.name)
-        previous = by_name.get(key)
-        if previous is not None and previous != path:
-            raise AmbiguousManifestError(
-                f"{previous} and {path} have the same normalized manifest name "
-                f"{key!r}. Physically distinct manifest aliases can hide one "
-                "another's registrations; keep exactly one spelling."
-            )
-        by_name[key] = path
-    selected_alias = by_name.get(filename_key(manifest_path.name))
-    if selected_alias is not None and selected_alias != manifest_path:
-        raise AmbiguousManifestError(
-            f"{manifest_path} and existing {selected_alias} have the same "
-            "normalized manifest name. Selecting one spelling would hide the "
-            "other's registrations; address the existing manifest or remove "
-            "the duplicate."
-        )
-
-    manifests: dict[str, dict[str, Any]] = {str(manifest_path): existing_manifest}
-    for path in paths:
-        if path == manifest_path:
-            continue
-        sibling = _read_manifest(path)
-        _manifest_files(sibling, path)
-        manifests[str(path)] = sibling
-    return manifests
+    if manifest_path.name != DEFAULT_MANIFEST_FILENAME or manifest_path.exists():
+        return
+    siblings = _sibling_manifests(output)
+    if not siblings:
+        return
+    raise AmbiguousManifestError(
+        f"{output} keeps {', '.join(siblings)} and no {DEFAULT_MANIFEST_FILENAME}; "
+        "pass --manifest to name the manifest this fetch records into rather "
+        f"than creating {DEFAULT_MANIFEST_FILENAME} beside them."
+    )
 
 
 def _manifest_files(payload: dict[str, Any], manifest_path: Path) -> dict[str, Any]:
@@ -226,33 +136,6 @@ def _manifest_files(payload: dict[str, Any], manifest_path: Path) -> dict[str, A
     return files
 
 
-def _assert_manifest_identifies(
-    existing_manifest: dict[str, Any],
-    manifest_path: Path,
-    *,
-    source_id: str,
-    package_id: str,
-) -> None:
-    """Refuse to fetch into a manifest that identifies another package.
-
-    The R2 key and registration identity are built from the fetch arguments.
-    Recording them in a manifest that declares different identifiers would
-    leave one entry making two incompatible provenance claims.
-    """
-    for field, value in (("source_id", source_id), ("package_id", package_id)):
-        if field not in existing_manifest:
-            continue
-        declared = _require_identity_segment(
-            existing_manifest[field], what=f"{manifest_path} {field}"
-        )
-        if declared != value:
-            raise SourceArtifactManifestError(
-                f"{manifest_path} declares {field}={declared!r}; refusing to "
-                f"fetch {field}={value!r} into it. Fetch into the package the "
-                "manifest identifies, or into that package's own directory."
-            )
-
-
 def default_r2_raw_bucket() -> str:
     """Resolve the raw bucket: ``$CHRONICLE_R2_RAW_BUCKET`` or the default."""
     return env_value(R2_RAW_BUCKET_ENV, default=DEFAULT_R2_RAW_BUCKET)
@@ -261,40 +144,6 @@ def default_r2_raw_bucket() -> str:
 def default_r2_derived_bucket() -> str:
     """Resolve the derived bucket: ``$CHRONICLE_R2_DERIVED_BUCKET`` or default."""
     return env_value(R2_DERIVED_BUCKET_ENV, default=DEFAULT_R2_DERIVED_BUCKET)
-
-
-def default_r2_derived_prefix() -> str:
-    """Resolve the derived route shared by publication and fact refusals."""
-    return env_value("CHRONICLE_R2_DERIVED_PREFIX", default=DEFAULT_R2_DERIVED_PREFIX)
-
-
-def is_derived_r2_route(bucket: str, key: str) -> bool:
-    """Whether an R2 bucket/key pair addresses derived build output.
-
-    Resolve publication configuration at validation time: an operator may use
-    a bucket or prefix with no ``derived`` marker in its spelling. Archived
-    rename-window routes remain derived after the active destination changes.
-    """
-    derived_buckets = {
-        "ledger-derived",
-        "chronicle-derived",
-        DEFAULT_R2_DERIVED_BUCKET,
-        default_r2_derived_bucket(),
-    }
-    derived_prefixes = {
-        "derived",
-        resolve_r2_prefix(
-            prefix=None,
-            default_prefix=DEFAULT_R2_DERIVED_PREFIX,
-        ),
-        resolve_r2_prefix(
-            prefix=None,
-            default_prefix=default_r2_derived_prefix(),
-        ),
-    }
-    return bucket in derived_buckets or any(
-        key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
-    )
 
 
 class SourceArtifactManifestError(RuntimeError):
@@ -328,15 +177,6 @@ class ManifestNameError(SourceArtifactManifestError, ValueError):
     """
 
 
-class ArtifactFilenameError(SourceArtifactManifestError, ValueError):
-    """An artifact filename is not a bare, non-manifest package filename."""
-
-
-class IdentitySegmentError(SourceArtifactManifestError, ValueError):
-    """A registration identity (source_id / package_id) is not one canonical
-    R2 key segment."""
-
-
 class AmbiguousManifestError(SourceArtifactManifestError):
     """The default manifest name would create a manifest beside the ones a
     package already keeps (PolicyEngine/chronicle#225)."""
@@ -353,13 +193,12 @@ class MalformedManifestError(SourceArtifactManifestError):
 class RecordedR2LocatorError(SourceArtifactManifestError):
     """A recorded ``storage.r2`` block does not locate exactly one object.
 
-    The provider and URI must explicitly identify R2. ``provider``, ``bucket``,
-    ``key`` and ``uri`` all describe the same object, so any additional fields
-    have to agree, and the key has to carry the ``{sha256}/{filename}`` tail
-    that says which bytes it holds. A block whose fields contradict each other
-    has no single answer to "which bytes does this entry claim R2 holds", and
-    preserving or publishing under it would ship whichever field the reader
-    happened to consult.
+    ``provider``, ``bucket``, ``key`` and ``uri`` all describe the same object,
+    so any that are supplied have to agree, and the key has to carry the
+    ``{sha256}/{filename}`` tail that says which bytes it holds. A block whose
+    fields contradict each other has no single answer to "which bytes does this
+    entry claim R2 holds", and preserving or publishing under it would ship
+    whichever field the reader happened to consult.
     """
 
 
@@ -467,16 +306,6 @@ class RecordedIdentity:
 
 
 @dataclass(frozen=True)
-class _ManifestFileOwner:
-    """One manifest entry that names a package-local artifact."""
-
-    manifest_path: Path
-    vintage: Any
-    spec: dict[str, Any]
-    identity: RecordedIdentity | None
-
-
-@dataclass(frozen=True)
 class ArtifactCommandResult:
     """Result from a storage command."""
 
@@ -558,10 +387,13 @@ class ArtifactInventoryEntry:
     source_url: str | None
     r2: dict[str, Any] | None
     errors: tuple[str, ...]
+    access: str = ACCESS_PUBLIC
+    licence: str | None = None
+    hash_only: bool = False
 
     @property
     def valid(self) -> bool:
-        """Whether this artifact is locally available and checksum-valid."""
+        """Whether this registration is complete and, if public, available."""
         return not self.errors
 
     def to_dict(self) -> dict[str, Any]:
@@ -573,6 +405,9 @@ class ArtifactInventoryEntry:
             "filename": self.filename,
             "local_path": self.local_path,
             "exists": self.exists,
+            "access": self.access,
+            "licence": self.licence,
+            "hash_only": self.hash_only,
             "sha256_expected": self.sha256_expected,
             "sha256_actual": self.sha256_actual,
             "size_bytes": self.size_bytes,
@@ -630,9 +465,17 @@ class RawArtifactPublishEntry:
         return self.upload is not None and self.upload.ok
 
     @property
+    def hash_only_refused(self) -> bool:
+        """Whether this entry was left alone because its access is hash-only."""
+        return self.skipped is not None and self.skipped.startswith(
+            HASH_ONLY_SKIP_PREFIX
+        )
+
+    @property
     def valid(self) -> bool:
-        """Whether this raw artifact is published: uploaded now, or already
-        held by the recorded object in a preserved bucket (``skipped``)."""
+        """Whether this raw artifact is published or correctly not uploaded:
+        uploaded now, already held by the recorded object in a preserved
+        bucket, or skipped as a hash-only registration (``skipped``)."""
         return not self.errors and (self.skipped is not None or self.uploaded)
 
     def to_dict(self) -> dict[str, Any]:
@@ -650,6 +493,7 @@ class RawArtifactPublishEntry:
             "size_bytes": self.size_bytes,
             "r2_location": (self.r2_location.to_dict() if self.r2_location else None),
             "upload": self.upload.to_dict() if self.upload else None,
+            "skipped": self.skipped,
             "errors": list(self.errors),
         }
 
@@ -679,6 +523,9 @@ class RawArtifactPublishReport:
                 1 for entry in self.entries if entry.skipped is not None
             ),
             "failed_count": sum(1 for entry in self.entries if not entry.valid),
+            "hash_only_refused_count": sum(
+                1 for entry in self.entries if entry.hash_only_refused
+            ),
             "r2_link_count": sum(
                 1 for entry in self.entries if entry.r2_location is not None
             ),
@@ -804,6 +651,8 @@ def fetch_source_artifact(
     table: str | None = None,
     filename: str | None = None,
     manifest_filename: str = DEFAULT_MANIFEST_FILENAME,
+    access: str = ACCESS_PUBLIC,
+    licence: str | None = None,
     upload_r2: bool = False,
     record_revision: bool = False,
     r2_bucket: str | None = None,
@@ -823,30 +672,22 @@ def fetch_source_artifact(
     the superseded object moves to ``storage.previous_r2``. Without it, bytes
     that disagree with the entry's recorded identity raise
     :class:`SourceArtifactRevisionError` before anything is overwritten.
+
+    Only ``public`` artifacts travel this path: it writes bytes into the package
+    tree and can upload them to the raw bucket. Licensed and restricted
+    artifacts are registered hash-only with
+    :func:`chronicle.registration.register_hash_only_artifact`.
     """
     r2_bucket = r2_bucket or default_r2_raw_bucket()
     output = Path(output_dir)
     manifest_path = _manifest_path(output, manifest_filename)
-    what = (
-        "--filename" if filename is not None else "The filename inferred from the URL"
-    )
-    artifact_filename = bare_filename(
-        filename if filename is not None else _infer_artifact_filename(source_url),
-        what=what,
-    )
-    if is_manifest_filename(artifact_filename):
-        raise ArtifactFilenameError(
-            f"{what} {artifact_filename!r} is a manifest name. An artifact may "
-            "not be named like a manifest, which it would overwrite; pass "
-            "--filename with the publisher's name for the bytes."
+    access_class = normalize_access(access)
+    if is_hash_only(access_class):
+        raise ManifestAccessError(
+            f"fetch-artifact stores bytes and refuses access={access_class!r}. "
+            "Register a licensed or restricted artifact by identity with "
+            "`chronicle register-artifact`."
         )
-    # These fields become object-key path segments even when this fetch does
-    # not upload. Validate them before reading the publisher so a malformed
-    # registration identity cannot overwrite package-local bytes and fail only
-    # when the prospective R2 key is constructed below.
-    _require_identity_segment(source_id, what="source_id")
-    _require_identity_segment(package_id, what="package_id")
-    _require_identity_segment(str(year), what="year")
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
         default_prefix=DEFAULT_R2_PREFIX,
@@ -856,62 +697,36 @@ def fetch_source_artifact(
     # Read and validate the entry being written before anything is fetched: a
     # manifest Chronicle cannot read, or a recorded block that names two
     # different objects, is a refusal that need not touch the publisher.
-    try:
-        _refuse_a_stray_default_manifest(output, manifest_path)
-    except SourceArtifactManifestError:
-        raise
-    except ValueError as error:
-        # package_manifest_paths refuses non-regular manifest-named entries
-        # with a plain ValueError; surface it as the manifest error the CLI
-        # reports rather than a traceback.
-        raise MalformedManifestError(str(error)) from error
+    _refuse_a_stray_default_manifest(output, manifest_path)
     existing_manifest = _read_manifest(manifest_path)
     _manifest_files(existing_manifest, manifest_path)
-    _assert_manifest_identifies(
-        existing_manifest,
-        manifest_path,
-        source_id=source_id,
-        package_id=package_id,
-    )
-    vintage_key, _existing_value, selected_spec, _index = _select_vintage_entry(
-        existing_manifest,
+    recorded_identity = _recorded_identity(
+        _manifest_file_spec(existing_manifest, year),
         manifest_path=manifest_path,
         year=year,
     )
-    recorded_identity = _recorded_identity(
-        selected_spec,
-        manifest_path=manifest_path,
-        year=vintage_key,
-    )
-    manifests = _package_manifests(output, manifest_path, existing_manifest)
-    owners = _manifest_file_owners(manifests, filename=artifact_filename)
-    _assert_shared_owner_identities_agree(owners, filename=artifact_filename)
-
-    try:
-        existing_target = matching_directory_entry(output, artifact_filename)
-    except ValueError as error:
-        raise ArtifactFilenameError(str(error)) from error
-    if existing_target is not None:
-        if existing_target.is_symlink():
-            raise ArtifactFilenameError(
-                f"{existing_target} is a symbolic link. Chronicle will not "
-                "fetch through a package-local link or overwrite its target."
-            )
-        if existing_target.name != artifact_filename:
-            raise ArtifactFilenameError(
-                f"{existing_target} has the same normalized filename as "
-                f"{artifact_filename!r}. Chronicle will not create a "
-                "physically distinct alias; pass --filename "
-                f"{existing_target.name!r}."
-            )
-        if not existing_target.is_file():
-            raise ArtifactFilenameError(
-                f"{existing_target} exists but is not a regular file. "
-                "Chronicle will not overwrite it with publisher bytes."
-            )
+    licence_text = licence.strip() if isinstance(licence, str) else None
+    if (
+        safe_manifest_kind(existing_manifest)[0] == MICRODATA_RELEASE_KIND
+        and not licence_text
+    ):
+        raise ManifestAccessError(
+            f"{manifest_path} registers a microdata release, so every entry "
+            "must record its publisher licence; pass --licence."
+        )
+    _assert_no_hash_only_entry(existing_manifest, manifest_path, year, filename)
 
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
-    content, _inferred_filename = _read_artifact(source_url)
+    content, inferred_filename = _read_artifact(source_url)
+    artifact_filename = filename or inferred_filename
+    if not artifact_filename:
+        raise ValueError("Could not infer artifact filename; pass --filename.")
+    _assert_no_hash_only_entry(
+        existing_manifest,
+        manifest_path,
+        year,
+        artifact_filename,
+    )
 
     sha256 = hashlib.sha256(content).hexdigest()
     size_bytes = len(content)
@@ -921,33 +736,13 @@ def fetch_source_artifact(
     _assert_recorded_identity_holds_these_bytes(
         recorded_identity,
         manifest_path=manifest_path,
-        year=vintage_key,
+        year=year,
         filename=artifact_filename,
         sha256=sha256,
         size_bytes=size_bytes,
         r2_bucket=r2_bucket,
         record_revision=record_revision,
     )
-    if not record_revision:
-        _assert_siblings_record_these_bytes(
-            manifests,
-            manifest_path=manifest_path,
-            filename=artifact_filename,
-            sha256=sha256,
-        )
-    for owner in owners:
-        if owner.manifest_path == manifest_path and owner.spec is selected_spec:
-            continue
-        _assert_recorded_identity_holds_these_bytes(
-            owner.identity,
-            manifest_path=owner.manifest_path,
-            year=owner.vintage,
-            filename=artifact_filename,
-            sha256=sha256,
-            size_bytes=size_bytes,
-            r2_bucket=r2_bucket,
-            record_revision=record_revision,
-        )
 
     output.mkdir(parents=True, exist_ok=True)
     local_path = output / artifact_filename
@@ -990,6 +785,8 @@ def fetch_source_artifact(
         sha256=sha256,
         size_bytes=size_bytes,
         fetched_at=fetched_at,
+        access=access_class,
+        licence=licence_text,
         r2_location=(r2_location if upload_r2 and r2_upload and r2_upload.ok else None),
         record_revision=record_revision,
     )
@@ -1011,26 +808,6 @@ def fetch_source_artifact(
     )
 
 
-def _derived_artifact_paths(input_path: Path) -> list[Path]:
-    """Preflight every build-tree entry before reading or publishing any file."""
-    if not stat.S_ISDIR(input_path.lstat().st_mode):
-        raise ValueError(f"derived_root_not_regular_directory:{input_path}")
-    artifacts: list[Path] = []
-
-    def visit(directory: Path) -> None:
-        for path in sorted(directory.iterdir()):
-            mode = path.lstat().st_mode
-            if stat.S_ISDIR(mode):
-                visit(path)
-            elif stat.S_ISREG(mode):
-                artifacts.append(path)
-            else:
-                raise ValueError(f"derived_entry_not_regular_file:{path}")
-
-    visit(input_path)
-    return sorted(artifacts)
-
-
 def publish_derived_artifacts(
     input_dir: str | Path,
     *,
@@ -1046,47 +823,6 @@ def publish_derived_artifacts(
     """Upload a deterministic build output directory to the derived R2 bucket."""
     r2_bucket = r2_bucket or default_r2_derived_bucket()
     input_path = Path(input_dir)
-    try:
-        _require_identity_segment(source_id, what="source_id")
-        _require_identity_segment(package_id, what="package_id")
-        _require_identity_segment(str(year), what="year")
-    except SourceArtifactManifestError as error:
-        return DerivedArtifactPublishReport(
-            input_dir=str(input_path),
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            build_id=build_id or "",
-            entries=(),
-            build_artifacts_path=str(build_artifacts_output)
-            if build_artifacts_output
-            else None,
-            errors=(f"r2_identity_invalid:{error}",),
-        )
-    try:
-        resolved_r2_prefix = resolve_r2_prefix(
-            prefix=r2_prefix,
-            default_prefix=default_r2_derived_prefix(),
-            source_id=source_id,
-        )
-        if not is_derived_r2_route(r2_bucket, resolved_r2_prefix):
-            raise ValueError(
-                "Set CHRONICLE_R2_DERIVED_BUCKET or CHRONICLE_R2_DERIVED_PREFIX "
-                "to identify a custom derived route before publishing to it."
-            )
-    except ValueError as error:
-        return DerivedArtifactPublishReport(
-            input_dir=str(input_path),
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            build_id=build_id or "",
-            entries=(),
-            build_artifacts_path=str(build_artifacts_output)
-            if build_artifacts_output
-            else None,
-            errors=(f"derived_route_invalid:{error}",),
-        )
     if not input_path.exists():
         return DerivedArtifactPublishReport(
             input_dir=str(input_path),
@@ -1114,22 +850,6 @@ def publish_derived_artifacts(
             errors=(f"input_dir_is_not_directory:{input_path}",),
         )
 
-    try:
-        artifact_paths = _derived_artifact_paths(input_path)
-    except (OSError, ValueError) as error:
-        return DerivedArtifactPublishReport(
-            input_dir=str(input_path),
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            build_id=build_id or "",
-            entries=(),
-            build_artifacts_path=str(build_artifacts_output)
-            if build_artifacts_output
-            else None,
-            errors=(str(error),),
-        )
-
     resolved_build_id = build_id or infer_build_id(input_path)
     if not resolved_build_id:
         return DerivedArtifactPublishReport(
@@ -1150,7 +870,6 @@ def publish_derived_artifacts(
     # input failure like the ones above, reported rather than raised.
     try:
         canonicalize_key("build", resolved_build_id)
-        _require_identity_segment(resolved_build_id, what="build_id")
     except ValueError:
         return DerivedArtifactPublishReport(
             input_dir=str(input_path),
@@ -1165,8 +884,14 @@ def publish_derived_artifacts(
             errors=("malformed_build_id",),
         )
 
+    resolved_r2_prefix = resolve_r2_prefix(
+        prefix=r2_prefix,
+        default_prefix=DEFAULT_R2_DERIVED_PREFIX,
+        source_id=source_id,
+    )
     entries: list[DerivedArtifactUploadEntry] = []
     errors: list[str] = []
+    artifact_paths = sorted(path for path in input_path.rglob("*") if path.is_file())
     for artifact_path in artifact_paths:
         relative_path = artifact_path.relative_to(input_path).as_posix()
         if relative_path == "build_artifacts.jsonl":
@@ -1229,11 +954,17 @@ def publish_source_artifacts(
     r2_bucket: str | None = None,
     r2_prefix: str | None = None,
     wrangler_command: str = "npx wrangler",
+    skip_hash_only: bool = False,
 ) -> RawArtifactPublishReport:
-    """Upload manifest-declared raw source artifacts and record R2 locations."""
+    """Upload manifest-declared raw source artifacts and record R2 locations.
+
+    Only ``public`` artifacts are uploaded. A licensed or restricted entry is
+    refused: no bytes are read or sent, and the entry carries a
+    ``hash_only_access_refuses_bytes`` error unless ``skip_hash_only`` marks the
+    scan as deliberately mixed.
+    """
     r2_bucket = r2_bucket or default_r2_raw_bucket()
     root_path = Path(root)
-    _manifest_path(Path(), manifest_filename)
     if not root_path.exists():
         return RawArtifactPublishReport(
             root=str(root_path),
@@ -1243,106 +974,63 @@ def publish_source_artifacts(
 
     entries: list[RawArtifactPublishEntry] = []
     errors: list[str] = []
-    prepared: list[tuple[Path, dict[str, Any], dict[str, Any], str, str]] = []
-    preflight_failures: list[RawArtifactPublishEntry] = []
-    for manifest_path in _root_manifest_paths(root_path, manifest_filename):
+    for manifest_path in sorted(root_path.rglob(manifest_filename)):
         try:
             manifest = _read_manifest(manifest_path)
-            files = _manifest_files(manifest, manifest_path)
-            package_manifests = _package_manifests(
-                manifest_path.parent, manifest_path, manifest
-            )
-            _assert_package_file_owner_identities_agree(package_manifests)
-        except (OSError, SourceArtifactManifestError) as exc:
+        except (OSError, MalformedManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
 
-        manifest_source_id = (
-            source_id if source_id is not None else manifest.get("source_id")
-        )
-        manifest_package_id = (
-            package_id if package_id is not None else manifest.get("package_id")
-        )
+        manifest_source_id = source_id or manifest.get("source_id")
+        manifest_package_id = package_id or manifest.get("package_id")
+        files = manifest.get("files") or {}
+        if not manifest_source_id:
+            errors.append(f"Manifest missing source_id: {manifest_path}")
+            continue
+        if not manifest_package_id:
+            errors.append(f"Manifest missing package_id: {manifest_path}")
+            continue
+        if not isinstance(files, dict):
+            errors.append(f"Manifest files must be a mapping: {manifest_path}")
+            continue
 
-        for package_manifest_name, package_manifest in package_manifests.items():
-            package_manifest_path = Path(package_manifest_name)
-            package_source_id = (
-                source_id
-                if source_id is not None
-                else package_manifest.get("source_id")
+        try:
+            resolved_r2_prefix = resolve_r2_prefix(
+                prefix=r2_prefix,
+                default_prefix=DEFAULT_R2_PREFIX,
+                source_id=str(manifest_source_id),
+                package_path=manifest_path,
             )
-            package_id_value = (
-                package_id
-                if package_id is not None
-                else package_manifest.get("package_id")
-            )
-            package_files = _manifest_files(package_manifest, package_manifest_path)
-            for year, spec in package_files.items():
-                entry, _updated_spec = _publish_raw_manifest_entry(
-                    package_manifest_path,
-                    package_source_id,
-                    package_id_value,
-                    year,
-                    spec,
-                    r2_bucket=r2_bucket,
-                    r2_prefix=r2_prefix,
-                    wrangler_command=wrangler_command,
-                    preflight_only=True,
-                    manifest_identity=package_manifest,
-                )
-                if entry.errors:
-                    preflight_failures.append(entry)
-        prepared.append(
-            (
-                manifest_path,
-                manifest,
-                files,
-                manifest_source_id,
-                manifest_package_id,
-            )
-        )
+        except ValueError as exc:
+            errors.append(f"Could not resolve R2 prefix for {manifest_path}: {exc}")
+            continue
 
-    # A root sweep is one requested publish operation. Validate every selected
-    # package before the first uploader call or manifest rewrite, otherwise a
-    # malformed later package can make the command fail after earlier packages
-    # have already changed external and local state.
-    if errors or preflight_failures:
-        entries.extend(preflight_failures)
-        return RawArtifactPublishReport(
-            root=str(root_path),
-            entries=tuple(entries),
-            errors=tuple(errors),
-        )
-
-    for (
-        manifest_path,
-        manifest,
-        files,
-        manifest_source_id,
-        manifest_package_id,
-    ) in prepared:
+        kind, kind_error = safe_manifest_kind(manifest)
+        if kind_error:
+            errors.append(f"{kind_error}: {manifest_path}")
         updated = False
         for year, spec in files.items():
-            entry, updated_spec = _publish_raw_manifest_entry(
-                manifest_path,
-                manifest_source_id,
-                manifest_package_id,
-                year,
-                spec,
-                r2_bucket=r2_bucket,
-                r2_prefix=r2_prefix,
-                wrangler_command=wrangler_command,
-                manifest_identity=manifest,
-            )
-            entries.append(entry)
-            if updated_spec is not None and isinstance(spec, dict):
-                spec.update(updated_spec)
-                updated = True
+            for file_spec in iter_file_specs(spec, kind=kind):
+                entry, updated_spec = _publish_raw_manifest_entry(
+                    manifest_path,
+                    manifest_source_id,
+                    manifest_package_id,
+                    year,
+                    file_spec,
+                    manifest=manifest,
+                    kind=kind,
+                    r2_bucket=r2_bucket,
+                    r2_prefix=resolved_r2_prefix,
+                    wrangler_command=wrangler_command,
+                    skip_hash_only=skip_hash_only,
+                )
+                entries.append(entry)
+                if updated_spec is not None and isinstance(file_spec, dict):
+                    file_spec.update(updated_spec)
+                    updated = True
         if updated:
-            if manifest_source_id:
-                manifest.setdefault("source_id", manifest_source_id)
-            if manifest_package_id:
-                manifest.setdefault("package_id", manifest_package_id)
+            manifest.setdefault("source_id", manifest_source_id)
+            manifest.setdefault("package_id", manifest_package_id)
             manifest_path.write_text(
                 yaml.safe_dump(manifest, sort_keys=False),
                 encoding="utf-8",
@@ -1403,7 +1091,6 @@ def inventory_source_artifacts(
 ) -> ArtifactInventoryReport:
     """Inventory manifest-declared source artifacts under a root directory."""
     root_path = Path(root)
-    _manifest_path(Path(), manifest_filename)
     errors: list[str] = []
     entries: list[ArtifactInventoryEntry] = []
     if not root_path.exists():
@@ -1414,34 +1101,47 @@ def inventory_source_artifacts(
                 "artifact_count": 0,
                 "missing_count": 0,
                 "checksum_mismatch_count": 0,
+                "hash_only_count": 0,
                 "r2_link_count": 0,
             },
             entries=(),
             errors=(f"Root does not exist: {root_path}",),
         )
 
-    manifest_paths = _root_manifest_paths(root_path, manifest_filename)
-    for manifest_path in manifest_paths:
+    manifests = sorted(root_path.rglob(manifest_filename))
+    for manifest_path in manifests:
         try:
             manifest = _read_manifest(manifest_path)
-            files = _manifest_files(manifest, manifest_path)
-            package_manifests = _package_manifests(
-                manifest_path.parent, manifest_path, manifest
-            )
-            _assert_package_file_owner_identities_agree(package_manifests)
-        except (OSError, SourceArtifactManifestError) as exc:
+        except (OSError, MalformedManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
+        files = manifest.get("files") or {}
+        if not isinstance(files, dict):
+            errors.append(f"Manifest files must be a mapping: {manifest_path}")
+            continue
+        kind, kind_error = safe_manifest_kind(manifest)
+        if kind_error:
+            errors.append(f"{kind_error}: {manifest_path}")
         for year, spec in files.items():
-            entries.append(_inventory_entry(manifest_path, year, spec))
+            for file_spec in iter_file_specs(spec, kind=kind):
+                entries.append(
+                    _inventory_entry(
+                        manifest_path,
+                        year,
+                        file_spec,
+                        manifest=manifest,
+                        kind=kind,
+                    )
+                )
 
     counts = {
-        "manifest_count": len(manifest_paths),
+        "manifest_count": len(manifests),
         "artifact_count": len(entries),
-        "missing_count": sum(1 for entry in entries if not entry.exists),
+        "missing_count": sum(1 for entry in entries if "missing_file" in entry.errors),
         "checksum_mismatch_count": sum(
             1 for entry in entries if "checksum_mismatch" in entry.errors
         ),
+        "hash_only_count": sum(1 for entry in entries if entry.hash_only),
         "r2_link_count": sum(1 for entry in entries if entry.r2 is not None),
     }
     return ArtifactInventoryReport(
@@ -1625,7 +1325,7 @@ def build_derived_r2_key(
     """Build the canonical R2 key for a derived build artifact."""
     resolved_prefix = resolve_r2_prefix(
         prefix=prefix,
-        default_prefix=default_r2_derived_prefix(),
+        default_prefix=DEFAULT_R2_DERIVED_PREFIX,
         source_id=source_id,
     )
     return posixpath.join(
@@ -1709,23 +1409,6 @@ def _filename_from_url(source_url: str) -> str:
     return Path(unquote(parsed.path)).name
 
 
-def _infer_artifact_filename(source_url: str) -> str:
-    """Return the filename :func:`_read_artifact` would report, without I/O.
-
-    The name is a pure function of the URL: the last path segment for http(s)
-    and ``file://`` URLs, the basename for a bare path. Resolving it before
-    the read lets every filename guard run before the publisher is touched.
-    """
-    parsed = urlparse(source_url)
-    if parsed.scheme in ("http", "https"):
-        return _filename_from_url(source_url)
-    if parsed.scheme == "file":
-        return Path(unquote(parsed.path)).name
-    if not parsed.scheme:
-        return Path(source_url).name
-    raise ValueError(f"Unsupported source URL scheme: {parsed.scheme}")
-
-
 def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     """Return a manifest's parsed payload, refusing a document it cannot read.
 
@@ -1735,15 +1418,10 @@ def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     not an absent manifest, and treating it as one would let the fetch replace
     it with a single entry and drop everything it recorded.
     """
-    if manifest_path.is_symlink():
-        raise MalformedManifestError(
-            f"{manifest_path} is a symlink; manifest reads and writes require "
-            "a regular file at its lexical package path."
-        )
     if not manifest_path.exists():
         return {}
     try:
-        payload = load_manifest_document(manifest_path.read_text(encoding="utf-8"))
+        payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
         raise MalformedManifestError(
             f"{manifest_path} is not valid YAML: {exc}"
@@ -1759,58 +1437,13 @@ def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     return payload
 
 
-def _select_vintage_entry(
-    payload: dict[str, Any],
-    *,
-    manifest_path: Path,
-    year: Any,
-) -> tuple[Any, Any, dict[str, Any], int | None]:
-    """Locate the entry a fetch revises: ``(key, files[key], entry, index)``.
-
-    Integer and quoted-integer keys are two spellings of one vintage. Preserve
-    the spelling already present, refuse a manifest that contains both, and
-    reject any present non-mapping entry before publisher I/O. The final tuple
-    slot matches the stacked #227 selector; table manifests never use a list
-    index.
-    """
-    files = payload.get("files") if isinstance(payload, dict) else None
-    if files is None:
-        return year, None, {}, None
+def _manifest_file_spec(payload: dict[str, Any], year: Any) -> dict[str, Any]:
+    """Return one manifest ``files`` entry, or an empty mapping."""
+    files = payload.get("files")
     if not isinstance(files, dict):
-        raise MalformedManifestError(
-            f"{manifest_path} files must be a mapping; it is a "
-            f"{type(files).__name__}. Chronicle will not write into a manifest "
-            "it cannot read."
-        )
-
-    forms: tuple[Any, ...]
-    if isinstance(year, bool):
-        forms = (year,)
-    elif isinstance(year, int):
-        forms = (year, str(year))
-    else:
-        text = str(year)
-        if text.isdecimal() and (text == "0" or not text.startswith("0")):
-            forms = (year, int(text))
-        else:
-            forms = (year,)
-    present = [form for form in forms if form in files]
-    if len(present) > 1:
-        raise MalformedManifestError(
-            f"{manifest_path}: Vintage {year!r} is recorded under both keys "
-            f"{present!r}; one vintage has one key. Merge the entries by hand "
-            "first. Chronicle will not choose which entry is the record."
-        )
-    if not present:
-        return year, None, {}, None
-    key = present[0]
-    existing = files[key]
-    if not isinstance(existing, dict):
-        raise MalformedManifestError(
-            f"{manifest_path} entry {key!r} must be a mapping; it is a "
-            f"{type(existing).__name__}."
-        )
-    return key, existing, existing, None
+        return {}
+    spec = files.get(year)
+    return spec if isinstance(spec, dict) else {}
 
 
 def _recorded_storage(spec: Any) -> dict[str, Any]:
@@ -1858,13 +1491,6 @@ def _validated_recorded_storage(
             f"{manifest_path} entry {year!r} storage must be a mapping; it is a "
             f"{type(storage).__name__}."
         )
-    if "previous_r2" in storage and not isinstance(storage["previous_r2"], list):
-        previous = storage["previous_r2"]
-        raise MalformedManifestError(
-            f"{manifest_path} entry {year!r} storage.previous_r2 must be a "
-            f"list; it is a {type(previous).__name__}. Chronicle will not "
-            "discard malformed archived provenance."
-        )
     return storage
 
 
@@ -1876,13 +1502,12 @@ def _validated_recorded_r2(
 ) -> RecordedR2Object | None:
     """Return the object a recorded ``storage.r2`` block names, or None.
 
-    The block must explicitly record provider ``r2`` and an ``r2://`` URI.
-    Every additional locator field it supplies is cross-checked against that
-    URI: ``key`` against its path, ``bucket`` against its authority, and the
-    resulting key against the canonical content-addressed shape
-    :func:`build_r2_key` writes. Reading one field and trusting the rest is
-    what lets a block that says two different things survive a preserve or a
-    publish.
+    Every locator field the block supplies is cross-checked against every
+    other: ``key`` against the URI's path, ``bucket`` against its authority,
+    ``provider`` against its scheme, and the resulting key against the
+    canonical content-addressed shape :func:`build_r2_key` writes. Reading one
+    field and trusting the rest is what lets a block that says two different
+    things survive a preserve or a publish.
     """
     storage = _validated_recorded_storage(spec, manifest_path=manifest_path, year=year)
     if "r2" not in storage:
@@ -1909,20 +1534,6 @@ def _validated_recorded_r2(
     bucket = supplied.get("bucket")
     key = supplied.get("key")
     uri = supplied.get("uri")
-    missing_required = [
-        field for field in ("provider", "uri") if not supplied.get(field)
-    ]
-    if missing_required:
-        raise RecordedR2LocatorError(
-            f"{where}: records no {', '.join(missing_required)}. A block under "
-            "storage.r2 must explicitly record provider='r2' and an r2:// URI."
-        )
-    if provider != "r2":
-        raise RecordedR2LocatorError(
-            f"{where}: provider={provider!r} does not identify R2. A block "
-            "under storage.r2 must use provider='r2' and an r2:// URI, not "
-            f"{provider}://."
-        )
     if uri is not None:
         parts = _split_r2_uri(uri)
         if parts is None:
@@ -1959,6 +1570,7 @@ def _validated_recorded_r2(
             "locate its object: provider, bucket and key, or a uri that "
             "supplies them."
         )
+
     segments = key.split("/")
     if (
         len(segments) < 2
@@ -2021,163 +1633,6 @@ def _recorded_identity(
         declared_sha256=declared_sha256,
         r2=None,
     )
-
-
-def _manifest_file_owners(
-    manifests: Mapping[str, dict[str, Any]],
-    *,
-    filename: str,
-) -> list[_ManifestFileOwner]:
-    """Return every entry in a package directory that names ``filename``."""
-    wanted = filename_key(filename)
-    owners: list[_ManifestFileOwner] = []
-    for name, payload in manifests.items():
-        manifest_path = Path(name)
-        for vintage, spec in _manifest_files(payload, manifest_path).items():
-            if not isinstance(spec, dict):
-                raise MalformedManifestError(
-                    f"{manifest_path} entry {vintage!r} must be a mapping; it "
-                    f"is a {type(spec).__name__}. Chronicle cannot decide "
-                    "whether it owns a shared package-local file."
-                )
-            recorded_name = spec.get("filename")
-            if recorded_name is None:
-                continue
-            if not is_bare_filename(recorded_name):
-                raise MalformedManifestError(
-                    f"{manifest_path} entry {vintage!r} filename must be a "
-                    f"bare package-local name, not {recorded_name!r}."
-                )
-            if filename_key(recorded_name) != wanted:
-                continue
-            identity = _recorded_identity(
-                spec,
-                manifest_path=manifest_path,
-                year=vintage,
-            )
-            if identity is None:
-                raise MalformedManifestError(
-                    f"{manifest_path} entry {vintage!r} names "
-                    f"{recorded_name!r} but records no sha256 identity. "
-                    "Chronicle cannot safely overwrite an unidentifiable "
-                    "shared file."
-                )
-            owners.append(
-                _ManifestFileOwner(
-                    manifest_path=manifest_path,
-                    vintage=vintage,
-                    spec=spec,
-                    identity=identity,
-                )
-            )
-    return owners
-
-
-def _assert_shared_owner_identities_agree(
-    owners: list[_ManifestFileOwner],
-    *,
-    filename: str,
-) -> None:
-    """Refuse an already-contradictory set of owners before publisher I/O."""
-    if not owners:
-        return
-    first = owners[0]
-    first_identity = first.identity
-    assert first_identity is not None
-    for owner in owners[1:]:
-        identity = owner.identity
-        assert identity is not None
-        if identity.sha256 == first_identity.sha256 and filename_key(
-            identity.filename
-        ) == filename_key(first_identity.filename):
-            continue
-        raise SourceArtifactManifestError(
-            f"{first.manifest_path} entry {first.vintage!r} and "
-            f"{owner.manifest_path} entry {owner.vintage!r} both name "
-            f"{filename!r} but identify different bytes. One package-local "
-            "file must have one recorded identity; reconcile the manifests "
-            "before fetching it again."
-        )
-
-
-def _assert_package_file_owner_identities_agree(
-    manifests: Mapping[str, dict[str, Any]],
-) -> None:
-    """Refuse contradictory identities for any package-local filename.
-
-    Publish and inventory sweep a manifest at a time, but the physical byte is
-    shared by every manifest in its directory. Validate every identified owner
-    as one package boundary before a selected manifest can upload anything.
-    Entry-shape and local-file errors remain the per-entry preflight's job.
-    """
-    collision_codes = validate_package_directory(manifests)
-    if collision_codes:
-        raise SourceArtifactManifestError(
-            "Package manifests identify different bytes for one package-local "
-            f"filename: {', '.join(collision_codes)}. Reconcile the manifests "
-            "before publishing or inventorying that directory."
-        )
-
-    owners_by_filename: dict[str, list[_ManifestFileOwner]] = {}
-    display_names: dict[str, str] = {}
-    for name, payload in manifests.items():
-        manifest_path = Path(name)
-        for vintage, spec in _manifest_files(payload, manifest_path).items():
-            if not isinstance(spec, dict):
-                continue
-            recorded_name = spec.get("filename")
-            if not is_bare_filename(recorded_name):
-                continue
-            try:
-                identity = _recorded_identity(
-                    spec,
-                    manifest_path=manifest_path,
-                    year=vintage,
-                )
-            except SourceArtifactManifestError:
-                # The complete per-entry preflight reports the precise locator
-                # or history error without letting another entry upload first.
-                continue
-            if identity is None:
-                continue
-            key = filename_key(recorded_name)
-            display_names.setdefault(key, str(recorded_name))
-            owners_by_filename.setdefault(key, []).append(
-                _ManifestFileOwner(
-                    manifest_path=manifest_path,
-                    vintage=vintage,
-                    spec=spec,
-                    identity=identity,
-                )
-            )
-    for key, owners in owners_by_filename.items():
-        _assert_shared_owner_identities_agree(
-            owners,
-            filename=display_names[key],
-        )
-
-
-def _assert_siblings_record_these_bytes(
-    manifests: Mapping[str, dict[str, Any]],
-    *,
-    manifest_path: Path,
-    filename: str,
-    sha256: str,
-) -> None:
-    """Refuse a default fetch that would stale another manifest's owner."""
-    for owner in _manifest_file_owners(manifests, filename=filename):
-        if owner.manifest_path == manifest_path:
-            continue
-        identity = owner.identity
-        assert identity is not None
-        if identity.sha256 == sha256:
-            continue
-        raise SourceArtifactRevisionError(
-            f"{owner.manifest_path} entry {owner.vintage!r} records "
-            f"{filename!r} as sha256={identity.sha256}; this fetch would write "
-            f"sha256={sha256} to the same package-local file. Re-run with "
-            "--record-revision to update every owner together."
-        )
 
 
 def _revision_error_message(
@@ -2304,50 +1759,6 @@ def _superseding_storage(
     return storage
 
 
-#: Entry fields a fetch owns. Every other field already recorded on the entry
-#: is carried forward during a refetch or explicit publisher revision.
-_FETCH_OWNED_FIELDS: frozenset[str] = frozenset(
-    {
-        "filename",
-        "source_url",
-        "sha256",
-        "size_bytes",
-        "fetched_at",
-        "storage",
-    }
-)
-
-
-def _storage_for_fetched_identity(
-    recorded_spec: dict[str, Any],
-    *,
-    identity: RecordedIdentity | None,
-    filename: str,
-    sha256: str,
-    new_r2: dict[str, Any] | None,
-    fetched_at: str,
-) -> dict[str, Any]:
-    """Return one owner's storage after a refetch or explicit revision."""
-    recorded_storage = _recorded_storage(recorded_spec)
-    holds = identity is not None and identity.holds(
-        sha256=sha256,
-        filename=filename,
-    )
-    if holds and identity.r2 is not None:
-        # A same-byte copy does not replace the object's recorded history.
-        return {**recorded_storage, "r2": _recorded_r2(recorded_spec)}
-    if identity is not None and not holds:
-        return _superseding_storage(
-            recorded_spec,
-            recorded_r2=identity.r2,
-            new_r2=new_r2,
-            superseded_at=fetched_at,
-        )
-    if new_r2 is not None:
-        return {**recorded_storage, "r2": new_r2}
-    return dict(recorded_storage)
-
-
 def _upsert_manifest(
     manifest_path: Path,
     *,
@@ -2362,20 +1773,12 @@ def _upsert_manifest(
     sha256: str,
     size_bytes: int,
     fetched_at: str,
+    access: str,
+    licence: str | None,
     r2_location: ArtifactStorageLocation | None,
     record_revision: bool = False,
 ) -> None:
     payload = _read_manifest(manifest_path)
-    _manifest_files(payload, manifest_path)
-    _assert_manifest_identifies(
-        payload,
-        manifest_path,
-        source_id=source_id,
-        package_id=package_id,
-    )
-    manifests = _package_manifests(manifest_path.parent, manifest_path, payload)
-    owners = _manifest_file_owners(manifests, filename=filename)
-    _assert_shared_owner_identities_agree(owners, filename=filename)
     payload.setdefault("source_id", source_id)
     payload.setdefault("package_id", package_id)
     payload.setdefault("dataset", dataset)
@@ -2385,109 +1788,116 @@ def _upsert_manifest(
         # setdefault keeps an explicit null (a bare ``files:`` line); the
         # entry below needs a mapping to record into.
         payload["files"] = {}
-    key, _existing_value, recorded_spec, _index = _select_vintage_entry(
-        payload,
-        manifest_path=manifest_path,
-        year=year,
-    )
+    # Access is written explicitly on every entry this command touches, so a
+    # manifest never relies on the inferred ``public`` default once rewritten.
     file_entry: dict[str, Any] = {
         "filename": filename,
         "source_url": source_url,
-        "sha256": sha256,
-        "size_bytes": size_bytes,
-        "fetched_at": fetched_at,
+        "access": access,
     }
-    for field, value in recorded_spec.items():
-        if field not in _FETCH_OWNED_FIELDS and field not in file_entry:
-            file_entry[field] = value
-    identity = _recorded_identity(recorded_spec, manifest_path=manifest_path, year=key)
+    if licence:
+        file_entry["licence"] = licence
+    file_entry.update(
+        {
+            "sha256": sha256,
+            "size_bytes": size_bytes,
+            "fetched_at": fetched_at,
+        }
+    )
+    existing = (
+        payload["files"].get(year) if isinstance(payload["files"], dict) else None
+    )
+    recorded_spec = _manifest_file_spec(payload, year)
+    recorded_storage = _recorded_storage(recorded_spec)
+    identity = _recorded_identity(recorded_spec, manifest_path=manifest_path, year=year)
     new_r2 = r2_location.to_dict() if r2_location is not None else None
-    r2_bucket = (new_r2 or {}).get("bucket") or default_r2_raw_bucket()
-    _assert_recorded_identity_holds_these_bytes(
-        identity,
-        manifest_path=manifest_path,
-        year=key,
-        filename=filename,
-        sha256=sha256,
-        size_bytes=size_bytes,
-        r2_bucket=r2_bucket,
-        record_revision=record_revision,
-    )
-    if not record_revision:
-        _assert_siblings_record_these_bytes(
-            manifests,
-            manifest_path=manifest_path,
-            filename=filename,
-            sha256=sha256,
+    holds = identity is not None and identity.holds(sha256=sha256, filename=filename)
+    if identity is not None and not holds and not record_revision:
+        # Different bytes under the same vintage. The guard in
+        # fetch_source_artifact refuses this without --record-revision; repeat
+        # the check here so no caller can reach a false-provenance write.
+        raise SourceArtifactRevisionError(
+            _revision_error_message(
+                manifest_path=manifest_path,
+                year=year,
+                filename=filename,
+                identity=identity,
+                sha256=sha256,
+                size_bytes=size_bytes,
+                r2_bucket=(new_r2 or {}).get("bucket") or default_r2_raw_bucket(),
+            )
         )
-    for owner in owners:
-        if owner.manifest_path == manifest_path and owner.spec is recorded_spec:
-            continue
-        _assert_recorded_identity_holds_these_bytes(
-            owner.identity,
-            manifest_path=owner.manifest_path,
-            year=owner.vintage,
-            filename=filename,
-            sha256=sha256,
-            size_bytes=size_bytes,
-            r2_bucket=r2_bucket,
-            record_revision=record_revision,
+    if holds and identity.r2 is not None:
+        # A recorded storage.r2 block for these exact bytes is historical
+        # truth: archived witness records pin raw R2 URLs by hash. Re-fetching
+        # under a renamed bucket copies bytes; it does not restate where the
+        # bytes were first published (PolicyEngine/chronicle#143, mechanism 3).
+        storage = {**recorded_storage, "r2": _recorded_r2(recorded_spec)}
+    elif identity is not None and not holds:
+        storage = _superseding_storage(
+            recorded_spec,
+            recorded_r2=identity.r2,
+            new_r2=new_r2,
+            superseded_at=fetched_at,
         )
-
-    storage = _storage_for_fetched_identity(
-        recorded_spec,
-        identity=identity,
-        filename=filename,
-        sha256=sha256,
-        new_r2=new_r2,
-        fetched_at=fetched_at,
-    )
+    elif new_r2 is not None:
+        storage = {**recorded_storage, "r2": new_r2}
+    else:
+        storage = dict(recorded_storage)
     # An entry that has no storage to record carries no empty block: a
     # revision over a never-published entry supersedes nothing.
     if storage:
         file_entry["storage"] = storage
-    payload["files"][key] = file_entry
+    if isinstance(existing, list):
+        replaced = [
+            entry
+            for entry in existing
+            if not (isinstance(entry, dict) and entry.get("filename") == filename)
+        ]
+        payload["files"][year] = [*replaced, file_entry]
+    else:
+        payload["files"][year] = file_entry
+    manifest_path.write_text(
+        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
 
-    revision = any(
-        owner.identity is not None
-        and not owner.identity.holds(sha256=sha256, filename=filename)
-        for owner in owners
-    ) or (identity is not None and not identity.holds(sha256=sha256, filename=filename))
-    changed_paths = {manifest_path}
-    if record_revision and revision:
-        for owner in owners:
-            if owner.manifest_path == manifest_path and owner.spec is recorded_spec:
-                continue
-            revised_entry = dict(owner.spec)
-            revised_entry.update(
-                {
-                    "filename": filename,
-                    "sha256": sha256,
-                    "size_bytes": size_bytes,
-                    "fetched_at": fetched_at,
-                }
-            )
-            owner_storage = _storage_for_fetched_identity(
-                owner.spec,
-                identity=owner.identity,
-                filename=filename,
-                sha256=sha256,
-                new_r2=new_r2,
-                fetched_at=fetched_at,
-            )
-            if owner_storage:
-                revised_entry["storage"] = owner_storage
-            else:
-                revised_entry.pop("storage", None)
-            manifests[str(owner.manifest_path)]["files"][owner.vintage] = revised_entry
-            changed_paths.add(owner.manifest_path)
 
-    rendered = {
-        path: yaml.safe_dump(manifests[str(path)], sort_keys=False)
-        for path in changed_paths
-    }
-    for path, text in sorted(rendered.items(), key=lambda item: str(item[0])):
-        path.write_text(text, encoding="utf-8")
+def _load_manifest_payload(manifest_path: Path) -> dict[str, Any]:
+    """Load a manifest mapping, or an empty mapping when absent or unreadable."""
+    if not manifest_path.exists():
+        return {}
+    payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8")) or {}
+    if not isinstance(payload, dict):
+        raise ValueError(f"Manifest must be a mapping: {manifest_path}")
+    return payload
+
+
+def _assert_no_hash_only_entry(
+    manifest: dict[str, Any],
+    manifest_path: Path,
+    year: Any,
+    filename: str | None,
+) -> None:
+    """Refuse to fetch bytes over an existing hash-only registration."""
+    if not filename:
+        return
+    files = manifest.get("files")
+    if not isinstance(files, dict):
+        return
+    kind, _kind_error = safe_manifest_kind(manifest)
+    for spec in iter_file_specs(files.get(year), kind=kind):
+        if not isinstance(spec, dict):
+            continue
+        if spec.get("filename") != filename:
+            continue
+        access = safe_entry_access(spec)
+        if is_hash_only(access):
+            raise ManifestAccessError(
+                f"{manifest_path} registers {filename!r} for {year} as "
+                f"access={access!r}. Its bytes must not enter a Chronicle "
+                "store; keep the hash-only registration."
+            )
 
 
 def _upload_r2_object(
@@ -2519,24 +1929,84 @@ def _publish_raw_manifest_entry(
     year: Any,
     spec: Any,
     *,
+    manifest: dict[str, Any] | None = None,
+    kind: str | None = None,
     r2_bucket: str,
-    r2_prefix: str | None,
+    r2_prefix: str,
     wrangler_command: str,
-    preflight_only: bool = False,
-    manifest_identity: dict[str, Any] | None = None,
+    skip_hash_only: bool = False,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
-    # Validate original values below; reports must still serialize refusals of
-    # YAML dates, sets, and other non-string declarations through the CLI.
-    reported_source_id = str(source_id) if source_id is not None else ""
-    reported_package_id = str(package_id) if package_id is not None else ""
+    if isinstance(spec, ListSpecRejected):
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename="",
+                local_path=str(manifest_path.parent),
+                sha256=None,
+                size_bytes=None,
+                r2_location=None,
+                upload=None,
+                errors=("list_file_spec_requires_microdata_release_kind",),
+            ),
+            None,
+        )
     if not isinstance(spec, dict):
         spec = {}
         errors.append("malformed_file_spec")
     filename = str(spec.get("filename") or "")
-    artifact_path = manifest_path.parent
+    access = safe_entry_access(spec)
+    if is_hash_only(access):
+        # Refuse before touching bytes: no Chronicle store holds a licensed or
+        # restricted artifact, so there is nothing here to upload.
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(manifest_path.parent / filename),
+                sha256=spec.get("sha256"),
+                size_bytes=spec.get("size_bytes"),
+                r2_location=None,
+                upload=None,
+                errors=(
+                    ()
+                    if skip_hash_only
+                    else (f"hash_only_access_refuses_bytes:{access}",)
+                ),
+                skipped=f"{HASH_ONLY_SKIP_PREFIX}{access}",
+            ),
+            None,
+        )
+    errors.extend(
+        validate_file_entry(
+            spec,
+            kind=kind or safe_manifest_kind(manifest)[0],
+            manifest=manifest,
+            local_file_exists=(manifest_path.parent / filename).exists()
+            if filename
+            else False,
+        )
+    )
+    artifact_path = manifest_path.parent / filename
+    sha256_expected = spec.get("sha256")
     sha256_actual = None
     size_bytes = None
+    if not filename:
+        errors.append("missing_filename")
+    elif not artifact_path.exists():
+        errors.append("missing_file")
+    else:
+        content = artifact_path.read_bytes()
+        sha256_actual = hashlib.sha256(content).hexdigest()
+        size_bytes = len(content)
+        if sha256_expected and sha256_actual != sha256_expected:
+            errors.append("checksum_mismatch")
 
     def refuse(reason: str | None = None) -> tuple[RawArtifactPublishEntry, None]:
         """Report the entry unpublished, with nothing uploaded or rewritten."""
@@ -2545,8 +2015,8 @@ def _publish_raw_manifest_entry(
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=reported_source_id,
-                package_id=reported_package_id,
+                source_id=source_id,
+                package_id=package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(artifact_path),
@@ -2559,40 +2029,9 @@ def _publish_raw_manifest_entry(
             None,
         )
 
-    if filename and not is_bare_filename(filename):
-        return (
-            RawArtifactPublishEntry(
-                manifest_path=str(manifest_path),
-                source_id=reported_source_id,
-                package_id=reported_package_id,
-                year=str(year),
-                filename=filename,
-                local_path=str(manifest_path.parent),
-                sha256=None,
-                size_bytes=None,
-                r2_location=None,
-                upload=None,
-                errors=(f"non_canonical_filename:{filename}",),
-            ),
-            None,
-        )
-    if is_manifest_filename(filename):
-        return (
-            RawArtifactPublishEntry(
-                manifest_path=str(manifest_path),
-                source_id=reported_source_id,
-                package_id=reported_package_id,
-                year=str(year),
-                filename=filename,
-                local_path=str(manifest_path.parent),
-                sha256=None,
-                size_bytes=None,
-                r2_location=None,
-                upload=None,
-                errors=(f"manifest_named_filename:{filename}",),
-            ),
-            None,
-        )
+    if errors:
+        return refuse()
+
     try:
         recorded_r2 = _validated_recorded_r2(
             spec, manifest_path=manifest_path, year=year
@@ -2601,51 +2040,6 @@ def _publish_raw_manifest_entry(
         # A block that does not name one object cannot be treated as history,
         # and publishing under it would ship whichever field was read.
         return refuse(f"recorded_r2_locator_invalid:{error}")
-    if recorded_r2 is None:
-        try:
-            _require_identity_segment(source_id, what="source_id")
-            _require_identity_segment(package_id, what="package_id")
-            _require_identity_segment(str(year), what="year")
-            _assert_manifest_identifies(
-                manifest_identity or {},
-                manifest_path,
-                source_id=source_id,
-                package_id=package_id,
-            )
-        except SourceArtifactManifestError as error:
-            return refuse(f"r2_identity_invalid:{error}")
-
-    try:
-        artifact_path = (
-            matching_directory_entry(manifest_path.parent, filename)
-            or manifest_path.parent / filename
-        )
-        if filename and artifact_path.name != filename:
-            errors.append(f"artifact_spelling_mismatch:{filename}:{artifact_path.name}")
-    except ValueError:
-        errors.append(f"duplicate_artifact_spellings:{filename}")
-        artifact_path = manifest_path.parent / filename
-    sha256_expected = spec.get("sha256")
-    sha256_actual = None
-    size_bytes = None
-    if not filename:
-        errors.append("missing_filename")
-    elif errors:
-        pass
-    elif artifact_path.is_symlink():
-        errors.append(f"artifact_path_is_symlink:{filename}")
-    elif not artifact_path.is_file():
-        errors.append("missing_file")
-    else:
-        content = artifact_path.read_bytes()
-        sha256_actual = hashlib.sha256(content).hexdigest()
-        size_bytes = len(content)
-        if sha256_expected and sha256_actual != sha256_expected:
-            errors.append("checksum_mismatch")
-
-    if errors:
-        return refuse()
-
     if recorded_r2 is not None and (recorded_r2.sha256, recorded_r2.filename) != (
         sha256_actual or "",
         Path(filename).name,
@@ -2663,25 +2057,33 @@ def _publish_raw_manifest_entry(
             f"local_filename={Path(filename).name}"
         )
 
-    if recorded_r2 is not None:
-        # A recorded content-addressed object whose tail identifies the bytes
-        # in hand is published history. Its source/package/year route may
-        # predate today's country prefix or intentionally represent the
-        # publisher's explicit route (for example Statbel's 2023 snapshots and
-        # USDA's cross-manifest archive). Reconstructing a current route and
-        # requiring equality would rewrite that history during a bucket
-        # cutover. Only the checksum/filename tail decides byte identity.
-        skipped = "recorded_r2_already_published"
-        if recorded_r2.bucket != r2_bucket:
-            skipped = (
-                "recorded_r2_bucket_is_preserved_history:"
-                f"recorded={recorded_r2.bucket}:requested={r2_bucket}"
-            )
+    location = ArtifactStorageLocation(
+        provider="r2",
+        bucket=r2_bucket,
+        key=build_r2_key(
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            sha256=sha256_actual or "",
+            filename=filename,
+            prefix=r2_prefix,
+            package_path=manifest_path,
+        ),
+    )
+    recorded_bucket = recorded_r2.bucket if recorded_r2 is not None else None
+    if recorded_r2 is not None and recorded_bucket != location.bucket:
+        # The recorded bucket is preserved history and, per the identity check
+        # above, its object holds exactly these bytes: the artifact is already
+        # published. Restating it under the configured bucket would rewrite
+        # where the bytes were first published (a backfill copy is not a
+        # restatement), so the entry is reported as skipped with nothing
+        # uploaded or rewritten. After the bucket-default flip every entry
+        # published before it takes this path, and the sweep stays green.
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=reported_source_id,
-                package_id=reported_package_id,
+                source_id=source_id,
+                package_id=package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(artifact_path),
@@ -2694,54 +2096,18 @@ def _publish_raw_manifest_entry(
                 ),
                 upload=None,
                 errors=(),
-                skipped=skipped,
+                skipped=(
+                    "recorded_r2_bucket_is_preserved_history:"
+                    f"recorded={recorded_bucket}:requested={location.bucket}"
+                ),
             ),
             None,
         )
-
-    if not source_id:
-        return refuse("missing_source_id")
-    if not package_id:
-        return refuse("missing_package_id")
-    try:
-        resolved_r2_prefix = resolve_r2_prefix(
-            prefix=r2_prefix,
-            default_prefix=DEFAULT_R2_PREFIX,
-            source_id=source_id,
-            package_path=manifest_path,
-        )
-    except ValueError as error:
-        return refuse(f"r2_prefix_invalid:{error}")
-
-    location = ArtifactStorageLocation(
-        provider="r2",
-        bucket=r2_bucket,
-        key=build_r2_key(
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            sha256=sha256_actual or "",
-            filename=filename,
-            prefix=resolved_r2_prefix,
-            package_path=manifest_path,
-        ),
-    )
-    if preflight_only:
-        return (
-            RawArtifactPublishEntry(
-                manifest_path=str(manifest_path),
-                source_id=reported_source_id,
-                package_id=reported_package_id,
-                year=str(year),
-                filename=filename,
-                local_path=str(artifact_path),
-                sha256=sha256_actual,
-                size_bytes=size_bytes,
-                r2_location=location,
-                upload=None,
-                errors=(),
-            ),
-            None,
+    recorded_key = recorded_r2.key if recorded_r2 is not None else None
+    if recorded_key and recorded_key != location.key:
+        return refuse(
+            "recorded_r2_key_disagrees_with_country_prefix:"
+            f"recorded={recorded_key}:expected={location.key}"
         )
     upload = _upload_r2_object(
         location,
@@ -2767,8 +2133,8 @@ def _publish_raw_manifest_entry(
     return (
         RawArtifactPublishEntry(
             manifest_path=str(manifest_path),
-            source_id=reported_source_id,
-            package_id=reported_package_id,
+            source_id=source_id,
+            package_id=package_id,
             year=str(year),
             filename=filename,
             local_path=str(artifact_path),
@@ -2786,88 +2152,51 @@ def _inventory_entry(
     manifest_path: Path,
     year: Any,
     spec: Any,
+    *,
+    manifest: dict[str, Any] | None = None,
+    kind: str | None = None,
 ) -> ArtifactInventoryEntry:
     errors: list[str] = []
+    original_spec = spec
+    if isinstance(spec, ListSpecRejected):
+        return ArtifactInventoryEntry(
+            manifest_path=str(manifest_path),
+            year=str(year),
+            filename="",
+            local_path=str(manifest_path.parent),
+            exists=False,
+            sha256_expected=None,
+            sha256_actual=None,
+            size_bytes=None,
+            source_url=None,
+            r2=None,
+            errors=("list_file_spec_requires_microdata_release_kind",),
+        )
     if not isinstance(spec, dict):
         spec = {}
         errors.append("malformed_file_spec")
     filename = str(spec.get("filename") or "")
-    r2 = None
-    recorded_r2 = None
-    try:
-        recorded_r2 = _validated_recorded_r2(
-            spec, manifest_path=manifest_path, year=year
+    artifact_path = manifest_path.parent / filename
+    exists = bool(filename) and artifact_path.exists()
+    access = safe_entry_access(spec)
+    hash_only = is_hash_only(access)
+    errors.extend(
+        validate_file_entry(
+            original_spec,
+            kind=kind or safe_manifest_kind(manifest)[0],
+            manifest=manifest,
+            local_file_exists=exists,
         )
-    except SourceArtifactManifestError as error:
-        errors.append(f"recorded_r2_locator_invalid:{error}")
-    if recorded_r2 is not None and (
-        recorded_r2.filename != filename
-        or (spec.get("sha256") is not None and recorded_r2.sha256 != spec["sha256"])
-    ):
-        errors.append("recorded_r2_identity_mismatch")
-    if errors:
-        return ArtifactInventoryEntry(
-            manifest_path=str(manifest_path),
-            year=str(year),
-            filename=filename,
-            local_path=str(manifest_path.parent),
-            exists=False,
-            sha256_expected=spec.get("sha256"),
-            sha256_actual=None,
-            size_bytes=None,
-            source_url=spec.get("source_url"),
-            r2=None,
-            errors=tuple(errors),
-        )
-    if filename and not is_bare_filename(filename):
-        return ArtifactInventoryEntry(
-            manifest_path=str(manifest_path),
-            year=str(year),
-            filename=filename,
-            local_path=str(manifest_path.parent),
-            exists=False,
-            sha256_expected=spec.get("sha256"),
-            sha256_actual=None,
-            size_bytes=None,
-            source_url=spec.get("source_url"),
-            r2=r2,
-            errors=(f"non_canonical_filename:{filename}",),
-        )
-    if is_manifest_filename(filename):
-        return ArtifactInventoryEntry(
-            manifest_path=str(manifest_path),
-            year=str(year),
-            filename=filename,
-            local_path=str(manifest_path.parent),
-            exists=False,
-            sha256_expected=spec.get("sha256"),
-            sha256_actual=None,
-            size_bytes=None,
-            source_url=spec.get("source_url"),
-            r2=r2,
-            errors=(f"manifest_named_filename:{filename}",),
-        )
-    try:
-        artifact_path = (
-            matching_directory_entry(manifest_path.parent, filename)
-            or manifest_path.parent / filename
-        )
-        if filename and artifact_path.name != filename:
-            errors.append(f"artifact_spelling_mismatch:{filename}:{artifact_path.name}")
-    except ValueError:
-        errors.append(f"duplicate_artifact_spellings:{filename}")
-        artifact_path = manifest_path.parent / filename
-    symlink = bool(filename) and artifact_path.is_symlink()
-    exists = bool(filename) and not errors and not symlink and artifact_path.is_file()
+    )
     sha256_expected = spec.get("sha256")
     sha256_actual = None
-    size_bytes = None
+    size_bytes = spec.get("size_bytes") if hash_only else None
     if not filename:
         errors.append("missing_filename")
-    elif errors:
+    elif hash_only:
+        # A licensed or restricted registration is identity only: Chronicle
+        # never holds the bytes, so a missing local file is the correct state.
         pass
-    elif symlink:
-        errors.append(f"artifact_path_is_symlink:{filename}")
     elif not exists:
         errors.append("missing_file")
     else:
@@ -2876,16 +2205,7 @@ def _inventory_entry(
         size_bytes = len(content)
         if sha256_expected and sha256_actual != sha256_expected:
             errors.append("checksum_mismatch")
-    if recorded_r2 is not None:
-        if sha256_actual is not None and sha256_actual != recorded_r2.sha256:
-            errors.append("recorded_r2_identity_mismatch")
-        if not errors:
-            r2 = {
-                "provider": recorded_r2.provider,
-                "bucket": recorded_r2.bucket,
-                "key": recorded_r2.key,
-                "uri": recorded_r2.uri,
-            }
+    r2 = recorded_r2(spec)
     return ArtifactInventoryEntry(
         manifest_path=str(manifest_path),
         year=str(year),
@@ -2896,8 +2216,11 @@ def _inventory_entry(
         sha256_actual=sha256_actual,
         size_bytes=size_bytes,
         source_url=spec.get("source_url"),
-        r2=r2,
-        errors=tuple(errors),
+        r2=dict(r2) if r2 is not None else None,
+        errors=tuple(dict.fromkeys(errors)),
+        access=access,
+        licence=spec.get("licence"),
+        hash_only=hash_only,
     )
 
 
@@ -2933,33 +2256,6 @@ def _clean_key_part(value: str) -> str:
     if not cleaned:
         raise ValueError("R2 key parts cannot be empty.")
     return cleaned.replace(" ", "_")
-
-
-def _require_identity_segment(value: Any, *, what: str) -> str:
-    """Require a registration identity to be one canonical key segment.
-
-    ``_clean_key_part`` normalizes what it is given (strips, folds spaces to
-    underscores) because it also renders legacy recorded values; a NEW
-    registration identity must already be canonical, or two spellings such as
-    ``foo bar`` and ``foo_bar`` would collide in one R2 namespace and a
-    separator would shift the key's path shape.
-    """
-    if (
-        not isinstance(value, str)
-        or not value
-        or value in (".", "..")
-        or value != value.strip()
-        or any(character.isspace() for character in value)
-        or "/" in value
-        or "\\" in value
-        or _clean_key_part(value) != value
-    ):
-        raise IdentitySegmentError(
-            f"{what} must be one canonical R2 key segment (no whitespace, "
-            f"slashes, or '..'), not {value!r}; R2 key parts cannot be empty "
-            "or rewritten."
-        )
-    return value
 
 
 def _clean_relative_key_parts(value: str) -> tuple[str, ...]:
