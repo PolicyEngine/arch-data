@@ -5,8 +5,9 @@
 - Branch: `epoch-dual-domain` from `origin/main` at `ff3efd3`.
 - Assignment: chronicle#143 mechanism 1, step 1 (dual-domain acceptance; emit unchanged).
 - Approved role: `ledger-contract-maintainer`.
-- Implementation is complete; adversarial review and full verification are the
-  current step.
+- Implementation, adversarial review, and local verification are complete.
+- Publication is the current step: commit the final report, push the branch,
+  open the requested PR without merging it, and record its URL.
 
 ## Done
 
@@ -37,11 +38,22 @@
 - Addressed adversarial audit findings in governance schema validation,
   source-cell/suite lineage resolution, explicit Ledger-canonical build hashing,
   the Statbel package generator, and `validate-facts` CLI coverage.
+- Preserved the bundle reader's historical permissive row-shape boundary while
+  adding a non-mutating dual-epoch identifier gate; the two full-build bundle
+  regressions and Chronicle/mixed/unknown-domain cases pass.
+- Passed the complete test suite: 783 passed, 1 skipped, 14 warnings.
+- Passed repository-wide Ruff lint and formatting for every changed Python file.
+  The exact repository-wide format check still identifies eight untouched
+  baseline files, all byte-identical to `origin/main`.
+- Built the sdist and wheel offline with uv from cached build dependencies, then
+  installed the wheel into a clean venv and passed the epoch import smoke.
+- Passed independent `ledger-contract` and `ledger-boundary` judge reviews.
+- Confirmed no changes under `releases/`, frozen fixture directories, frozen
+  schema directories, or `.github/chronicle-agents.yml`.
+- Removed the generated `.gitnexus/` index and incomplete ignored local `.venv/`.
 
 ## Next
 
-- Complete the adversarial diff/impact review and address any findings.
-- Record all required files outside the role's declared `allowed_paths` for
-  explicit PR disclosure.
-- Run focused tests, full verification, wheel build, and clean-venv import smoke.
-- Write `out.md`, push the branch, and open (but do not merge) the requested PR.
+- Push `epoch-dual-domain` and open the requested PR against `main`.
+- Record the PR URL in `out.md`, commit that final state, and push it.
+- Do not merge the PR and do not comment on issue #143.
