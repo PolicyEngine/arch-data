@@ -16,6 +16,7 @@ from chronicle.core import (
     validate_fact,
     validate_facts,
 )
+from chronicle.epoch import EMIT_EPOCH, HASH_DOMAINS, SCHEMA_IDS, Epoch
 
 
 def _fact(**overrides):
@@ -71,7 +72,6 @@ def test_quantile_aggregation_passes_validation():
     )
 
     assert validate_fact(fact) == ()
-
 
 
 def test_stable_key_ignores_human_label():
@@ -156,3 +156,84 @@ def test_label_generation_uses_metadata_not_key_path():
         "for tax unit (filing status=all) "
         "[irs_soi Publication 1304 Table 1.1 23in11si.xls tax_year_2023]"
     )
+
+
+def test_epoch_registry_covers_frozen_domains_and_schema_ids():
+    expected_hash_domains = {
+        "source_release": ("ledger.source_release.v2", "chronicle.source_release.v3"),
+        "source_series": ("ledger.source_series.v2", "chronicle.source_series.v3"),
+        "observed_measure": (
+            "ledger.observed_measure.v2",
+            "chronicle.observed_measure.v3",
+        ),
+        "dimension_set": ("ledger.dimension_set.v2", "chronicle.dimension_set.v3"),
+        "universe_constraint_set": (
+            "ledger.universe_constraint_set.v2",
+            "chronicle.universe_constraint_set.v3",
+        ),
+        "aggregate_fact": ("ledger.aggregate_fact.v2", "chronicle.aggregate_fact.v3"),
+        "semantic_fact": ("ledger.semantic_fact.v2", "chronicle.semantic_fact.v3"),
+        "concept_alignment": (
+            "ledger.concept_alignment.v2",
+            "chronicle.concept_alignment.v3",
+        ),
+        "fact": ("ledger.fact.v1", "chronicle.fact.v2"),
+        "source_cell": ("ledger.source_cell.v1", "chronicle.source_cell.v2"),
+        "source_row": ("ledger.source_row.v1", "chronicle.source_row.v2"),
+        "source_column": ("ledger.source_column.v1", "chronicle.source_column.v2"),
+        "source_row_value": (
+            "ledger.source_row_value.v1",
+            "chronicle.source_row_value.v2",
+        ),
+        "build": ("ledger.build.v1", "chronicle.build.v2"),
+        "build_artifact": (
+            "ledger.build_artifact.v1",
+            "chronicle.build_artifact.v2",
+        ),
+    }
+    expected_schema_ids = {
+        "bundle": ("ledger.bundle.v1", "chronicle.bundle.v2"),
+        "bundle_coverage": (
+            "ledger.bundle_coverage.v1",
+            "chronicle.bundle_coverage.v2",
+        ),
+        "bundle_sources": ("ledger.bundle_sources.v1", "chronicle.bundle_sources.v2"),
+        "consumer_fact": ("ledger.consumer_fact.v1", "chronicle.consumer_fact.v2"),
+        "relational": ("ledger.relational.v1", "chronicle.relational.v2"),
+        "source_package": ("ledger.source_package.v1", "chronicle.source_package.v2"),
+        "offline_fetch_manifest": (
+            "ledger.offline_fetch_manifest.v1",
+            "chronicle.offline_fetch_manifest.v2",
+        ),
+        "fetch_manifest": ("ledger.fetch_manifest.v1", "chronicle.fetch_manifest.v2"),
+        "consumer_artifact": (
+            "policyengine_ledger.consumer_artifact.v2",
+            "policyengine_chronicle.consumer_artifact.v3",
+        ),
+        "approved_agents": (
+            "policyengine_ledger.approved_agents.v1",
+            "policyengine_chronicle.approved_agents.v2",
+        ),
+    }
+
+    assert EMIT_EPOCH == Epoch.LEDGER
+    assert {name: pair.accepted for name, pair in HASH_DOMAINS.items()} == (
+        expected_hash_domains
+    )
+    assert {name: pair.accepted for name, pair in SCHEMA_IDS.items()} == (
+        expected_schema_ids
+    )
+
+
+def test_epoch_registry_unknown_key_names_both_accepted_forms():
+    pair = HASH_DOMAINS["fact"]
+
+    try:
+        pair.infer_key_epoch("future.fact.v9:abc")
+    except ValueError as error:
+        message = str(error)
+    else:
+        raise AssertionError("unknown key domain was accepted")
+
+    assert pair.ledger in message
+    assert pair.chronicle in message
