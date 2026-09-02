@@ -6,8 +6,10 @@
 - Assignment: chronicle#143 mechanism 1, step 1 (dual-domain acceptance; emit unchanged).
 - Approved role: `ledger-contract-maintainer`.
 - Implementation, adversarial review, and local verification are complete.
-- Publication is the current step: commit the final report, push the branch,
-  open the requested PR without merging it, and record its URL.
+- Publication is externally blocked. Direct `git push` and the required
+  `gh pr create --body-file` cannot reach GitHub from the sandbox, and the
+  installed GitHub connector cancels write mutations despite reporting admin
+  permission for the active account.
 
 ## Done
 
@@ -51,9 +53,22 @@
 - Confirmed no changes under `releases/`, frozen fixture directories, frozen
   schema directories, or `.github/chronicle-agents.yml`.
 - Removed the generated `.gitnexus/` index and incomplete ignored local `.venv/`.
+- Committed `out.md` with the complete verification, scope, governance,
+  residual-risk, and downstream-consumer handoff report.
+- Prepared the completed PR-template body ending in the required Claude Code
+  attribution.
+- Attempted `git push origin epoch-dual-domain`; it failed because the sandbox
+  cannot resolve or connect to GitHub.
+- Attempted the exact required `gh pr create --body-file` flow; it failed because
+  `api.github.com` is unreachable.
+- Confirmed the installed GitHub connector sees `MaxGhenis` with admin
+  permission on `PolicyEngine/chronicle`, but both branch and blob creation were
+  cancelled by the connector before mutation.
 
 ## Next
 
-- Push `epoch-dual-domain` and open the requested PR against `main`.
+- Restore outbound GitHub access or authorize GitHub connector write mutations.
+- Push `epoch-dual-domain` and open the requested PR against `main` after
+  regenerating the already reviewed body-file content.
 - Record the PR URL in `out.md`, commit that final state, and push it.
 - Do not merge the PR and do not comment on issue #143.

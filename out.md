@@ -9,9 +9,33 @@ through the single `EMIT_EPOCH = Epoch.LEDGER` default. Chronicle-era and mixed
 rows are accepted; unknown identity domains are rejected with errors naming both
 accepted forms.
 
-PR: **PENDING — updated immediately after PR creation**
+PR: **NOT CREATED — publication blocked by sandbox/network and connector write
+authorization; see “Publication status” below.**
 
 No PR was merged and no comment was added to issue #143.
+
+## Publication status
+
+The requested publication steps were attempted after all local work and
+verification completed:
+
+```text
+$ git push origin epoch-dual-domain
+fatal: unable to access 'https://github.com/PolicyEngine/chronicle.git/':
+Could not resolve host: github.com
+
+$ gh pr create --repo PolicyEngine/chronicle --base main \
+  --head epoch-dual-domain --title <requested-title> --body-file PR_BODY.md
+error connecting to api.github.com
+check your internet connection or https://githubstatus.com
+```
+
+The installed GitHub connector can read the repository and reports the active
+`MaxGhenis` account has `admin` permission. Its `create_branch` and
+`create_blob` mutations both returned `user cancelled MCP tool call`, so it
+could not provide a write-capable fallback. The local branch is ready, and the
+reviewed PR-body content can be regenerated unchanged; its temporary file was
+removed after the failed attempt. No remote branch or PR was created.
 
 ## Scope and identity behavior
 
