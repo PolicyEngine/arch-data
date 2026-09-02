@@ -47,6 +47,10 @@ delivery, and reporting remain.
   their missing proofs could not be stamped in this lane.
 - Confirmed all 15 committed proof blob IDs match `545cfe56` byte-for-byte and
   that the revised workflow passes `actionlint` (including ShellCheck).
+- Closed the first PR-path review's race findings: refresh the journal before
+  importing retry proofs, reject divergent main/bot proof edits, detect main
+  movement before and after the bot push, reuse an unchanged verified bot head,
+  and accept merge/auto-merge only when the PR still names the verified SHA.
 
 ## Next
 
