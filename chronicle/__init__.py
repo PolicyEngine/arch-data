@@ -1,9 +1,12 @@
 """Chronicle source-data foundation.
 
-Chronicle owns government-statistics releases: source artifacts, source-backed
-facts, constraints, and provenance. Selection contracts, raw microdata storage,
-source reconciliation, aging, imputation, target activation, and calibration
-belong in downstream systems such as Microcosm.
+Chronicle owns government-statistics releases: source artifacts (including
+registrations of raw microdata releases and custody of redistributable
+public-use bytes), source-backed facts, constraints, and provenance. Microdata
+content (rows, cells, facts computed from raw microdata), licensed or
+restricted microdata bytes, selection contracts, source reconciliation, aging,
+imputation, target activation, and calibration belong in downstream systems
+such as Microcosm.
 """
 
 __all__ = [
