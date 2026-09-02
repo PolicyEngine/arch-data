@@ -2,11 +2,10 @@
 
 ## State
 
-The pending-proof classification fix and direct-push publication workflow are
-complete and locally verified. Final repository verification, reporting, and
-GitHub delivery remain. The worktree started from `ots-anchor-main` at
-`03b27674`, matching the locally cached remote-tracking ref; GitHub DNS is
-currently unavailable.
+The pending-proof classification fix, direct-push publication workflow, final
+repository verification, and report are complete. GitHub delivery is blocked:
+shell DNS prevents fetch/push/`gh pr edit`, and the authenticated connector's PR
+body mutation was cancelled. PR #229 remains open and unmerged.
 
 ## Done
 
@@ -51,10 +50,19 @@ currently unavailable.
 - Reconfirmed all 20 `.ots` blob bytes are unchanged (combined checksum
   `420c3f54b47df5c58c58edc7202f580dcbad40193a4264bec20c133b71a375b1`)
   and there are no `releases/` or `ledger/` changes.
+- Ran the final required suite: 17 focused tests, repository-wide Ruff lint,
+  focused Ruff formatting, and actionlint all pass.
+- Confirmed local proof structure with the real cached OpenTimestamps 0.7.2
+  executable: 15 Bitcoin-complete and 5 pending. Calendar DNS prevents the full
+  status binding pass, so the captured-output fixture tests are the documented
+  no-network fallback.
+- Wrote the final implementation, verification, integrity, and delivery report
+  to `out.md`.
+- Read PR #229 through the authenticated connector and prepared the replacement
+  “Publication path” body at `/tmp/pr229-body.md`. The exact `gh pr edit` command
+  failed on DNS, and the connector write was cancelled.
 
 ## Next
 
-- Run focused tests, lint, formatting, actionlint, guard checks, and real-proof
-  status against the journal checkout.
-- Update this log and `out.md`, edit PR #229 when GitHub is reachable, and push
-  `ots-anchor-main` without merging it.
+- When GitHub access is available, push `ots-anchor-main` and run
+  `gh pr edit 229 --body-file /tmp/pr229-body.md` without merging the PR.
