@@ -14,6 +14,14 @@ artifacts as fetched: workbooks, CSVs, PDFs, ZIPs, HTML snapshots, and similar
 government-statistics release files. Raw objects are
 content-addressed by checksum and should never be overwritten in place.
 
+Raw microdata releases follow the same rule at the artifact level only. The
+bytes of redistributable public-use files (Census public-use files are the
+model case) live in `ledger-raw` under the same content-addressed key shape.
+Licensed or restricted microdata (FRS, BE-SILC, the IRS PUF) is registered by
+manifest, with checksum, vintage, licence, and access route, and no bytes in
+any Chronicle store. No microdata is parsed into source rows, cells, or facts.
+See `docs/adr-chronicle-raw-microdata-identity.md`.
+
 `ledger-derived` is the reproducible artifact archive. It stores build outputs
 that Chronicle can regenerate from raw bytes, package specs, parser code, and build
 configuration. Examples include parsed-cell or parsed-row Parquet/JSONL files,
@@ -36,6 +44,7 @@ Hosted tables mirror accepted build outputs and provide a shared query surface.
 |------------|-------------------|---------------|-------------------|------------------|-------------------|
 | Source package specs | Authoritative YAML and parser code | No | Optional packaged snapshot | No | Metadata only |
 | Raw publisher files | Tiny fixtures only | Authoritative bytes | No | Metadata only | Metadata plus R2 pointer |
+| Raw microdata releases | Manifest only, never bytes | Bytes for redistributable public-use files; hash-only for licensed or restricted | No | Metadata only | Metadata, licence, access class, R2 pointer where bytes exist |
 | Source manifests | Authoritative checked metadata | No | Optional snapshot | Metadata loaded into tables | Queryable artifact registry |
 | Parsed source rows/cells | Generated local output | No | Snapshot artifact | Queryable table | Queryable mirror |
 | Source records/facts | Generated local output | No | Snapshot artifact | Queryable table | Queryable mirror |
@@ -154,9 +163,12 @@ to it. Use `--dry-run` to verify local JSONL files without writing.
 
 Supabase should not store large raw binary artifacts. It should point to R2.
 
-Chronicle should not store raw survey or administrative microdata. It reflects
-government statistics releases and the provenance needed to audit those
-published facts.
+Chronicle should not parse survey or administrative microdata into source rows,
+cells, or facts, and should not hold licensed or restricted microdata bytes in
+any store. It registers microdata releases as source artifacts and archives
+only redistributable public-use bytes (see
+`docs/adr-chronicle-raw-microdata-identity.md`). It reflects government
+statistics releases and the provenance needed to audit those published facts.
 
 R2 should not be the schema authority. It stores bytes and reproducible build
 files, while Chronicle code and checked specs define semantics.
