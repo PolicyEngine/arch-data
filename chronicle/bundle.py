@@ -16,7 +16,7 @@ from chronicle.source_package import (
     validate_source_package,
 )
 from chronicle.suite import BuildSuiteReport, build_source_suite
-from policyengine_chronicle.consumer import load_consumer_rows
+from policyengine_chronicle.schema import normalize_consumer_fact_row_epochs
 
 BUNDLE_SCHEMA_VERSION = schema_id("bundle")
 BUNDLE_COVERAGE_SCHEMA_VERSION = schema_id("bundle_coverage")
@@ -622,7 +622,19 @@ def _prepare_output_dir(output_path: Path, *, replace: bool) -> None:
 
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
-    return list(load_consumer_rows(path))
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(
+        path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+        if not line:
+            continue
+        row = json.loads(line)
+        # Bundle assembly historically consumes suite output without applying
+        # the stricter consumer-artifact schema. Keep that boundary intact,
+        # while still rejecting identifiers outside the two accepted epochs.
+        normalize_consumer_fact_row_epochs(row, line_number, path)
+        rows.append(row)
+    return rows
 
 
 def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
