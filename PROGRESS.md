@@ -2,8 +2,7 @@
 
 ## State
 
-Trusted anchoring core implemented and tested. Publication-path selection remains
-pending because classic `main` protection details are not yet readable in this lane.
+Implementation is complete. Verification, delivery, and final reporting remain.
 
 ## Done
 
@@ -33,9 +32,9 @@ pending because classic `main` protection details are not yet readable in this l
   not yet enough evidence to choose direct push.
 - Added main-owned proof documentation, the root README overview, and explicit
   focused OTS lint/test steps without narrowing main's existing full CI suite.
+- Added the daily/manual main-owned workflow with sibling credential boundaries,
+  pre-push full verification, proof-only guards, and bounded rebase/rerun retries.
 
 ## Next
 
-- Obtain live `main` rules evidence and select direct-push versus bot-PR publication.
-- Add and validate the main-owned scheduled workflow.
 - Run the full required verification, push the branch, and open the superseding PR.
