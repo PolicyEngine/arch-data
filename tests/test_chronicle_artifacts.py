@@ -185,6 +185,7 @@ def test_fetch_source_artifact_writes_manifest_and_inventory(tmp_path):
     assert inventory.counts == {
         "artifact_count": 1,
         "checksum_mismatch_count": 0,
+        "hash_only_count": 0,
         "manifest_count": 1,
         "missing_count": 0,
         "r2_link_count": 0,
@@ -251,6 +252,7 @@ def test_publish_source_artifacts_uploads_manifest_entries(tmp_path):
     assert report.counts == {
         "artifact_count": 1,
         "failed_count": 0,
+        "hash_only_refused_count": 0,
         "manifest_count": 1,
         "r2_link_count": 1,
         "skipped_count": 0,
