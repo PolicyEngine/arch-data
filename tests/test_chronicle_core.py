@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+
 from chronicle.core import (
     Aggregation,
     EntityDimension,
@@ -17,6 +20,19 @@ from chronicle.core import (
     validate_facts,
 )
 from chronicle.epoch import EMIT_EPOCH, HASH_DOMAINS, SCHEMA_IDS, Epoch
+from chronicle.sources.cells import (
+    SourceArtifactMetadata,
+    SourceCell,
+    build_source_cell_key,
+)
+from chronicle.sources.rows import (
+    SourceColumn,
+    SourceRow,
+    SourceRowValue,
+    build_source_column_key,
+    build_source_row_key,
+    build_source_row_value_key,
+)
 
 
 def _fact(**overrides):
@@ -47,6 +63,20 @@ def _fact(**overrides):
         label="United States tax year 2023 sum adjusted gross income",
     )
     return AggregateFact(**{**fact.__dict__, **overrides})
+
+
+def _source_artifact() -> SourceArtifactMetadata:
+    return SourceArtifactMetadata(
+        source_name="test_publisher",
+        source_table="table",
+        source_file="table.csv",
+        url="https://example.test/table.csv",
+        vintage="2026",
+        sha256="a" * 64,
+        size_bytes=10,
+        extracted_at="2026-09-02",
+        extraction_method="test",
+    )
 
 
 def test_valid_fact_passes_validation():
@@ -237,3 +267,160 @@ def test_epoch_registry_unknown_key_names_both_accepted_forms():
 
     assert pair.ledger in message
     assert pair.chronicle in message
+
+
+def test_fact_key_epochs_hash_the_same_canonical_payload():
+    ledger_key = build_fact_key(_fact(), epoch=Epoch.LEDGER)
+    chronicle_key = build_fact_key(_fact(), epoch=Epoch.CHRONICLE)
+
+    assert build_fact_key(_fact()) == ledger_key
+    assert ledger_key.partition(":")[0] == "ledger.fact.v1"
+    assert chronicle_key.partition(":")[0] == "chronicle.fact.v2"
+    assert ledger_key.partition(":")[2] == chronicle_key.partition(":")[2]
+
+
+def test_source_key_epochs_hash_the_same_canonical_payload():
+    artifact = _source_artifact()
+    cell = SourceCell(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        row_number=2,
+        column_number=3,
+        address="C2",
+        cell_type="number",
+        raw_value=42,
+        display_value="42",
+    )
+    row = SourceRow(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        row_number=2,
+        values={"amount": 42},
+    )
+    column = SourceColumn(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        column_number=1,
+        raw_name="amount",
+        normalized_name="amount",
+    )
+    cases = (
+        (build_source_cell_key, cell, "source_cell"),
+        (build_source_row_key, row, "source_row"),
+        (build_source_column_key, column, "source_column"),
+    )
+
+    for builder, record, domain in cases:
+        ledger_key = builder(record, epoch=Epoch.LEDGER)
+        chronicle_key = builder(record, epoch=Epoch.CHRONICLE)
+        assert builder(record) == ledger_key
+        assert ledger_key.partition(":")[0] == HASH_DOMAINS[domain].ledger
+        assert chronicle_key.partition(":")[0] == HASH_DOMAINS[domain].chronicle
+        assert ledger_key.partition(":")[2] == chronicle_key.partition(":")[2]
+
+
+def test_source_row_value_hash_canonicalizes_nested_key_epochs():
+    artifact = _source_artifact()
+    row = SourceRow(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        row_number=2,
+        values={"amount": 42},
+    )
+    column = SourceColumn(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        column_number=1,
+        raw_name="amount",
+        normalized_name="amount",
+    )
+    ledger_value = SourceRowValue(
+        source_row_key=build_source_row_key(row, epoch=Epoch.LEDGER),
+        source_column_key=build_source_column_key(column, epoch=Epoch.LEDGER),
+        row_number=2,
+        column_number=1,
+        raw_column_name="amount",
+        normalized_column_name="amount",
+        value=42,
+    )
+    chronicle_value = SourceRowValue(
+        source_row_key=build_source_row_key(row, epoch=Epoch.CHRONICLE),
+        source_column_key=build_source_column_key(column, epoch=Epoch.CHRONICLE),
+        row_number=2,
+        column_number=1,
+        raw_column_name="amount",
+        normalized_column_name="amount",
+        value=42,
+    )
+
+    ledger_key = build_source_row_value_key(ledger_value, epoch=Epoch.LEDGER)
+    chronicle_key = build_source_row_value_key(
+        chronicle_value,
+        epoch=Epoch.CHRONICLE,
+    )
+
+    assert build_source_row_value_key(ledger_value) == ledger_key
+    assert ledger_key.partition(":")[2] == chronicle_key.partition(":")[2]
+    assert ledger_key.startswith("ledger.source_row_value.v1:")
+    assert chronicle_key.startswith("chronicle.source_row_value.v2:")
+
+
+def test_fact_validation_accepts_both_lineage_key_epochs():
+    artifact = _source_artifact()
+    cell = SourceCell(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        row_number=2,
+        column_number=1,
+        address="A2",
+        cell_type="number",
+        raw_value=42,
+        display_value="42",
+    )
+    row = SourceRow(
+        artifact=artifact,
+        sheet_name="Sheet1",
+        row_number=2,
+        values={"amount": 42},
+    )
+
+    fact = _fact(
+        source_cell_keys=(
+            build_source_cell_key(cell, epoch=Epoch.LEDGER),
+            build_source_cell_key(cell, epoch=Epoch.CHRONICLE),
+        ),
+        source_row_keys=(
+            build_source_row_key(row, epoch=Epoch.LEDGER),
+            build_source_row_key(row, epoch=Epoch.CHRONICLE),
+        ),
+    )
+
+    assert validate_fact(fact) == ()
+
+
+def test_fact_validation_rejects_unknown_lineage_prefix_with_both_forms():
+    errors = validate_fact(_fact(source_cell_keys=("future.source_cell.v9:1234",)))
+
+    error = next(issue for issue in errors if issue.code == "malformed_lineage_key")
+    assert error.field == "source_cell_keys"
+    assert "ledger.source_cell.v1" in error.message
+    assert "chronicle.source_cell.v2" in error.message
+
+
+def test_frozen_fixture_bytes_are_unchanged():
+    fixture_root = Path(__file__).parents[1] / "chronicle" / "fixtures"
+    expected_sha256 = {
+        fixture_root / "facts.jsonl": (
+            "b0dd06765db7932c16a678b1ab321a7d908af26e2f2014d7da99c0eb5127e401"
+        ),
+        fixture_root / "consumer_facts.jsonl": (
+            "6123f1cca28ccc72c053b105b8d50b5c25a72a5f5b92e73e7219f32de152a96a"
+        ),
+        fixture_root / "source_cells" / "soi_table_1_1_2023_cells.jsonl": (
+            "615639f21ee63e54595c677e24c3eddff484c00a795a2f91b45a8575f021c7e2"
+        ),
+    }
+
+    assert {
+        path: hashlib.sha256(path.read_bytes()).hexdigest() for path in expected_sha256
+    } == expected_sha256

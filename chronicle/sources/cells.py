@@ -20,8 +20,10 @@ from zipfile import ZipFile
 import openpyxl
 import xlrd
 
+from chronicle.epoch import EMIT_EPOCH, Epoch, hash_domain
+
 Scalar = str | int | float | bool | None
-SOURCE_CELL_KEY_PREFIX = "ledger.source_cell.v1"
+SOURCE_CELL_KEY_PREFIX = hash_domain("source_cell")
 
 
 @dataclass(frozen=True)
@@ -99,7 +101,11 @@ class SourceCellReport:
         }
 
 
-def build_source_cell_key(cell: SourceCell) -> str:
+def build_source_cell_key(
+    cell: SourceCell,
+    *,
+    epoch: Epoch = EMIT_EPOCH,
+) -> str:
     """Build a stable key from artifact hash and sheet coordinates."""
     payload = {
         "artifact_sha256": cell.artifact.sha256,
@@ -109,7 +115,7 @@ def build_source_cell_key(cell: SourceCell) -> str:
     }
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
-    return f"{SOURCE_CELL_KEY_PREFIX}:{digest}"
+    return f"{hash_domain('source_cell', epoch)}:{digest}"
 
 
 def source_cells_from_xls(

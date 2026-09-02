@@ -17,6 +17,7 @@ from typing import Any
 
 import openpyxl
 
+from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
     SourceCell,
@@ -24,9 +25,9 @@ from chronicle.sources.cells import (
 )
 
 Scalar = str | int | float | bool | None
-SOURCE_ROW_KEY_PREFIX = "ledger.source_row.v1"
-SOURCE_COLUMN_KEY_PREFIX = "ledger.source_column.v1"
-SOURCE_ROW_VALUE_KEY_PREFIX = "ledger.source_row_value.v1"
+SOURCE_ROW_KEY_PREFIX = hash_domain("source_row")
+SOURCE_COLUMN_KEY_PREFIX = hash_domain("source_column")
+SOURCE_ROW_VALUE_KEY_PREFIX = hash_domain("source_row_value")
 
 
 @dataclass(frozen=True)
@@ -103,7 +104,11 @@ class SourceRowReport:
         }
 
 
-def build_source_row_key(row: SourceRow) -> str:
+def build_source_row_key(
+    row: SourceRow,
+    *,
+    epoch: Epoch = EMIT_EPOCH,
+) -> str:
     """Build a stable key from artifact hash and row coordinate."""
     payload = {
         "artifact_sha256": row.artifact.sha256,
@@ -112,10 +117,14 @@ def build_source_row_key(row: SourceRow) -> str:
     }
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
-    return f"{SOURCE_ROW_KEY_PREFIX}:{digest}"
+    return f"{hash_domain('source_row', epoch)}:{digest}"
 
 
-def build_source_column_key(column: SourceColumn) -> str:
+def build_source_column_key(
+    column: SourceColumn,
+    *,
+    epoch: Epoch = EMIT_EPOCH,
+) -> str:
     """Build a stable key from artifact hash and column coordinate."""
     payload = {
         "artifact_sha256": column.artifact.sha256,
@@ -124,18 +133,24 @@ def build_source_column_key(column: SourceColumn) -> str:
     }
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
-    return f"{SOURCE_COLUMN_KEY_PREFIX}:{digest}"
+    return f"{hash_domain('source_column', epoch)}:{digest}"
 
 
-def build_source_row_value_key(row_value: SourceRowValue) -> str:
+def build_source_row_value_key(
+    row_value: SourceRowValue,
+    *,
+    epoch: Epoch = EMIT_EPOCH,
+) -> str:
     """Build a stable key from source row and column keys."""
     payload = {
-        "source_row_key": row_value.source_row_key,
-        "source_column_key": row_value.source_column_key,
+        "source_row_key": canonicalize_key("source_row", row_value.source_row_key),
+        "source_column_key": canonicalize_key(
+            "source_column", row_value.source_column_key
+        ),
     }
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
-    return f"{SOURCE_ROW_VALUE_KEY_PREFIX}:{digest}"
+    return f"{hash_domain('source_row_value', epoch)}:{digest}"
 
 
 def source_rows_from_delimited_text(
@@ -248,7 +263,9 @@ def source_rows_from_xlsx_table(
                 ]
                 continue
             values = {
-                column: _xlsx_row_scalar(raw_row[index]) if index < len(raw_row) else None
+                column: _xlsx_row_scalar(raw_row[index])
+                if index < len(raw_row)
+                else None
                 for index, column in enumerate(header or ())
             }
             rows.append(

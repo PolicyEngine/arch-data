@@ -30,6 +30,7 @@ from chronicle.core import (
     build_aggregate_constraints,
     validate_facts,
 )
+from chronicle.epoch import HASH_DOMAINS, SCHEMA_IDS, Epoch
 from chronicle.harness import main
 from chronicle.jurisdictions.us.soi import build_soi_table_1_1_facts
 from chronicle.store import save_facts_jsonl
@@ -168,6 +169,101 @@ def test_consumer_fact_row_exposes_chronicle_and_lineage_keys():
         "irs_soi.ty2023.table_1_1.all.adjusted_gross_income"
     )
     assert row["lineage"]["source_cell_keys"]
+
+
+@pytest.mark.parametrize(
+    ("domain_name", "builder_name"),
+    [
+        ("source_release", "build_source_release_key"),
+        ("source_series", "build_source_series_key"),
+        ("observed_measure", "build_observed_measure_key"),
+        ("dimension_set", "build_dimension_set_key"),
+        ("universe_constraint_set", "build_universe_constraint_set_key"),
+        ("aggregate_fact", "build_aggregate_fact_key"),
+        ("semantic_fact", "build_semantic_fact_key"),
+        ("concept_alignment", "build_concept_alignment_key"),
+    ],
+)
+def test_consumer_key_epochs_change_only_the_hash_domain(
+    domain_name,
+    builder_name,
+):
+    """The epoch is domain separation, not a canonical-payload migration."""
+    builder = getattr(consumer_contract, builder_name)
+
+    for fact in (_soi_agi_fact(), _soi_agi_bracket_fact()):
+        ledger_key = builder(fact, epoch=Epoch.LEDGER)
+        chronicle_key = builder(fact, epoch=Epoch.CHRONICLE)
+        pair = HASH_DOMAINS[domain_name]
+
+        assert ledger_key.startswith(f"{pair.ledger}:")
+        assert chronicle_key.startswith(f"{pair.chronicle}:")
+        assert ledger_key.partition(":")[2] == chronicle_key.partition(":")[2]
+
+
+def test_chronicle_epoch_consumer_row_uses_successor_ids_consistently():
+    fact = replace(
+        _soi_agi_fact(),
+        source_row_keys=("ledger.source_row.v1:source-row",),
+    )
+
+    ledger_row = consumer_fact_row(fact)
+    chronicle_row = consumer_fact_row(fact, emit_epoch=Epoch.CHRONICLE)
+
+    assert ledger_row["schema_version"] == SCHEMA_IDS["consumer_fact"].ledger
+    assert chronicle_row["schema_version"] == SCHEMA_IDS["consumer_fact"].chronicle
+    key_fields = {
+        "aggregate_fact_key": "aggregate_fact",
+        "semantic_fact_key": "semantic_fact",
+        "legacy_fact_key": "fact",
+        "source_release_key": "source_release",
+        "source_series_key": "source_series",
+        "observed_measure_key": "observed_measure",
+        "dimension_set_key": "dimension_set",
+        "universe_constraint_set_key": "universe_constraint_set",
+    }
+    for field, domain_name in key_fields.items():
+        pair = HASH_DOMAINS[domain_name]
+        assert ledger_row[field].startswith(f"{pair.ledger}:")
+        assert chronicle_row[field].startswith(f"{pair.chronicle}:")
+        assert (
+            ledger_row[field].partition(":")[2]
+            == (chronicle_row[field].partition(":")[2])
+        )
+
+    ledger_alignment = ledger_row["concept_alignment"]["concept_alignment_key"]
+    chronicle_alignment = chronicle_row["concept_alignment"]["concept_alignment_key"]
+    assert ledger_alignment.startswith(f"{HASH_DOMAINS['concept_alignment'].ledger}:")
+    assert chronicle_alignment.startswith(
+        f"{HASH_DOMAINS['concept_alignment'].chronicle}:"
+    )
+    assert ledger_alignment.partition(":")[2] == chronicle_alignment.partition(":")[2]
+
+    assert chronicle_row["lineage"]["source_cell_keys"] == [
+        HASH_DOMAINS["source_cell"].key_for_epoch(
+            key,
+            Epoch.CHRONICLE,
+        )
+        for key in fact.source_cell_keys
+    ]
+    assert chronicle_row["lineage"]["source_row_keys"] == [
+        "chronicle.source_row.v2:source-row"
+    ]
+
+
+def test_chronicle_epoch_writer_reports_successor_schema(tmp_path):
+    output = tmp_path / "consumer_facts.jsonl"
+
+    report = write_consumer_facts_jsonl(
+        [_soi_agi_fact()],
+        output,
+        emit_epoch=Epoch.CHRONICLE,
+    )
+    row = json.loads(output.read_text())
+
+    assert report.schema_version == SCHEMA_IDS["consumer_fact"].chronicle
+    assert row["schema_version"] == SCHEMA_IDS["consumer_fact"].chronicle
+    assert row["aggregate_fact_key"].startswith("chronicle.aggregate_fact.v3:")
 
 
 def test_aggregate_fact_key_ignores_lineage_labels_and_evidence_notes():

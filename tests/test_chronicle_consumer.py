@@ -19,6 +19,7 @@ from chronicle.core import (
     SourceRecordLayout,
 )
 from chronicle.harness import main
+from chronicle.epoch import Epoch
 from policyengine_chronicle.consumer import (
     build_consumer_artifact,
     load_consumer_artifact,
@@ -81,6 +82,12 @@ def _write_facts(tmp_path):
     return facts_path
 
 
+def _write_rows(path, rows):
+    with path.open("w") as file:
+        for row in rows:
+            file.write(json.dumps(row, sort_keys=True) + "\n")
+
+
 def _rewrite_manifest_hash(out_dir):
     facts_file = out_dir / "consumer_facts.jsonl"
     manifest_path = out_dir / "manifest.json"
@@ -131,6 +138,50 @@ def test_artifact_is_reproducible(tmp_path):
         assert (first / name).read_bytes() == (second / name).read_bytes()
 
 
+def test_chronicle_epoch_artifact_loads_end_to_end(tmp_path):
+    facts_path = tmp_path / "chronicle-consumer-facts.jsonl"
+    rows = consumer_fact_rows(
+        [_fact(value=100, period_value=2021)], emit_epoch=Epoch.CHRONICLE
+    )
+    _write_rows(facts_path, rows)
+    out_dir = tmp_path / "chronicle-artifact"
+
+    report = build_consumer_artifact(
+        out_dir,
+        facts_path=facts_path,
+        emit_epoch=Epoch.CHRONICLE,
+    )
+    artifact = load_consumer_artifact(out_dir)
+
+    assert report.schema_version == "policyengine_chronicle.consumer_artifact.v3"
+    assert artifact.manifest["schema_version"] == (
+        "policyengine_chronicle.consumer_artifact.v3"
+    )
+    assert artifact.rows[0]["schema_version"] == "chronicle.consumer_fact.v2"
+    assert artifact.rows[0]["aggregate_fact_key"].startswith(
+        "chronicle.aggregate_fact.v3:"
+    )
+
+
+def test_mixed_epoch_rows_load_in_one_artifact(tmp_path):
+    ledger_row = consumer_fact_rows([_fact(value=100, period_value=2021)])[0]
+    chronicle_row = consumer_fact_rows(
+        [_fact(value=110, period_value=2022)], emit_epoch=Epoch.CHRONICLE
+    )[0]
+    facts_path = tmp_path / "mixed-consumer-facts.jsonl"
+    _write_rows(facts_path, [ledger_row, chronicle_row])
+    out_dir = tmp_path / "mixed-artifact"
+
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    artifact = load_consumer_artifact(out_dir)
+
+    assert artifact.manifest["consumer_fact_schema_versions"] == [
+        "chronicle.consumer_fact.v2",
+        "ledger.consumer_fact.v1",
+    ]
+    assert len(artifact.rows) == 2
+
+
 def test_artifact_load_rejects_tampered_facts(tmp_path):
     facts_path = _write_facts(tmp_path)
     out_dir = tmp_path / "artifact"
@@ -174,6 +225,23 @@ def test_artifact_load_rejects_legacy_v1_schema(tmp_path):
         match="Unsupported consumer artifact schema_version",
     ):
         load_consumer_artifact(out_dir)
+
+
+def test_artifact_load_unknown_schema_names_both_accepted_forms(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    manifest_path = out_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["schema_version"] = "future.consumer_artifact.v9"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(ValueError) as error:
+        load_consumer_artifact(out_dir)
+
+    message = str(error.value)
+    assert "policyengine_ledger.consumer_artifact.v2" in message
+    assert "policyengine_chronicle.consumer_artifact.v3" in message
 
 
 @pytest.mark.parametrize(

@@ -5,7 +5,8 @@
 - Branch: `epoch-dual-domain` from `origin/main` at `ff3efd3`.
 - Assignment: chronicle#143 mechanism 1, step 1 (dual-domain acceptance; emit unchanged).
 - Approved role: `ledger-contract-maintainer`.
-- Implementation is in progress; the central epoch registry is the current step.
+- Implementation is in progress; dual-epoch bundle, relational, and remaining
+  schema readers are the current step.
 
 ## Done
 
@@ -19,11 +20,18 @@
   target-profile and resolved-target v1 contracts must not be reintroduced.
 - Added the central frozen Ledger/Chronicle epoch registry with Ledger as the
   single emission default.
+- Wired fact, source-cell, source-row, source-column, source-row-value, and all
+  eight consumer-contract hash builders to the registry with invariant digest
+  suffixes across epochs.
+- Added dual-epoch lineage validation, consumer-row schema normalization,
+  artifact loading, mixed-epoch acceptance, and clear unknown-domain errors.
+- Pinned all existing fixture and consumer-schema bytes by SHA-256; focused
+  identity/artifact/schema verification passes (96 tests).
 
 ## Next
 
-- Wire key emitters and validators to the epoch registry while preserving every
-  current Ledger-default byte.
+- Wire bundle, relational, source-package, offline-manifest, and derived-artifact
+  surfaces to the registry while preserving every Ledger-default byte.
 - Record required files outside the role's declared `allowed_paths` for explicit
   PR disclosure.
 - Add adversarial tests without modifying goldens, fixtures, or `releases/`.
