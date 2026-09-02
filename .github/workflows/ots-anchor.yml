@@ -179,6 +179,8 @@ jobs:
           # Record the effective rules in the run log. Authoring-time evidence
           # established that main is protected but could not establish a direct
           # GITHUB_TOKEN bypass, so publication deliberately stays on a PR path.
+          # Failure to read current metadata is deliberately fatal and occurs
+          # before any proof or branch mutation.
           gh api \
             "repos/$GITHUB_REPOSITORY/rules/branches/$MAIN_BRANCH?per_page=100" \
             > "$RUNNER_TEMP/main-rules.json"
@@ -344,7 +346,20 @@ jobs:
                 exit 1
               fi
             else
-              pr_url="$create_output"
+              printf '%s\n' "$create_output"
+              pr_url="$(
+                gh pr list \
+                  --repo "$GITHUB_REPOSITORY" \
+                  --base "$MAIN_BRANCH" \
+                  --head "$BOT_BRANCH" \
+                  --state open \
+                  --json url \
+                  --jq '.[0].url // empty'
+              )"
+              if [[ -z "$pr_url" ]]; then
+                printf 'created proof PR could not be resolved by head\n' >&2
+                exit 1
+              fi
             fi
           fi
           gh pr edit "$pr_url" --body-file "$pr_body"
