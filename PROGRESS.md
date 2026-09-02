@@ -34,6 +34,9 @@
   keys, invariant build/build-artifact digests, and Ledger-default output.
 - Made source-package and offline-fetch readers accept both registered schema
   ids while scaffolds and administrative generators still emit Ledger ids.
+- Addressed adversarial audit findings in governance schema validation,
+  source-cell/suite lineage resolution, explicit Ledger-canonical build hashing,
+  the Statbel package generator, and `validate-facts` CLI coverage.
 
 ## Next
 

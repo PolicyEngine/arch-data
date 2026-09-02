@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 from chronicle.core import (
@@ -20,6 +21,7 @@ from chronicle.core import (
     validate_facts,
 )
 from chronicle.epoch import EMIT_EPOCH, HASH_DOMAINS, SCHEMA_IDS, Epoch
+from chronicle.harness import main as harness_main
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
     SourceCell,
@@ -33,6 +35,7 @@ from chronicle.sources.rows import (
     build_source_row_key,
     build_source_row_value_key,
 )
+from chronicle.store import save_facts_jsonl
 
 
 def _fact(**overrides):
@@ -405,6 +408,37 @@ def test_fact_validation_rejects_unknown_lineage_prefix_with_both_forms():
     assert error.field == "source_cell_keys"
     assert "ledger.source_cell.v1" in error.message
     assert "chronicle.source_cell.v2" in error.message
+
+
+def test_validate_facts_cli_accepts_chronicle_lineage_end_to_end(tmp_path, capsys):
+    fact = _fact(
+        source_cell_keys=("chronicle.source_cell.v2:accepted",),
+        source_row_keys=("chronicle.source_row.v2:accepted",),
+    )
+    path = tmp_path / "chronicle-facts.jsonl"
+    save_facts_jsonl([fact], path)
+
+    exit_code = harness_main(["validate-facts", "--input", str(path)])
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["valid"]
+
+
+def test_validate_facts_cli_unknown_lineage_names_both_forms(tmp_path, capsys):
+    path = tmp_path / "unknown-facts.jsonl"
+    save_facts_jsonl(
+        [_fact(source_cell_keys=("future.source_cell.v9:rejected",))],
+        path,
+    )
+
+    exit_code = harness_main(["validate-facts", "--input", str(path)])
+    payload = json.loads(capsys.readouterr().out)
+    message = json.dumps(payload)
+
+    assert exit_code == 1
+    assert "ledger.source_cell.v1" in message
+    assert "chronicle.source_cell.v2" in message
 
 
 def test_frozen_fixture_bytes_are_unchanged():

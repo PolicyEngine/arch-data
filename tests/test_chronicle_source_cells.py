@@ -8,6 +8,7 @@ from io import BytesIO
 import openpyxl
 import pytest
 
+from chronicle.epoch import HASH_DOMAINS
 from chronicle.harness import (
     build_fixture_source_cell_file,
     validate_fixture_source_cells,
@@ -63,6 +64,25 @@ def test_fixture_source_cells_validate():
     assert report.valid
     assert report.cell_count == 1932
     assert report.counts["by_sheet"] == {"TBL11": 1932}
+
+
+def test_source_cell_validation_accepts_both_row_epochs_and_rejects_unknown():
+    cell = build_soi_table_1_1_source_cells(2023)[0]
+    pair = HASH_DOMAINS["source_row"]
+
+    for prefix in pair.accepted:
+        accepted = replace(cell, source_row_key=f"{prefix}:same-payload")
+        assert validate_source_cells([accepted]).valid
+
+    report = validate_source_cells(
+        [replace(cell, source_row_key="future.source_row.v9:same-payload")]
+    )
+
+    assert not report.valid
+    error = report.errors[0]
+    assert error.code == "malformed_source_row_key"
+    assert pair.ledger in error.message
+    assert pair.chronicle in error.message
 
 
 def test_source_record_selector_guard_fails_on_changed_row_header():

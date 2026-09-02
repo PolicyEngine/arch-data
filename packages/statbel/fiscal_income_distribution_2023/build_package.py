@@ -25,8 +25,11 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 import yaml
 
+from chronicle.epoch import schema_id
+
 
 PACKAGE_ID = "statbel-fiscal-income-distribution-2023"
+SOURCE_PACKAGE_SCHEMA_VERSION = schema_id("source_package")
 LANDING_PAGE = "https://statbel.fgov.be/en/themes/households/taxable-income"
 RAW_BASE_URL = (
     "https://statbel.fgov.be/sites/default/files/files/documents/"
@@ -1654,7 +1657,7 @@ def _build_source_package(
         )
 
     payload = {
-        "schema_version": "ledger.source_package.v1",
+        "schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
         "package_id": PACKAGE_ID,
         "label": (
             "Statbel fiscal income distribution 2023 by income class, decile, "

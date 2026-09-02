@@ -40,7 +40,7 @@ from chronicle.sources.rows import (
     source_row_to_mapping,
 )
 
-LEDGER_DB_SCHEMA_VERSION = schema_id("relational")
+LEDGER_DB_SCHEMA_VERSION = schema_id("relational", Epoch.LEDGER)
 
 
 @dataclass(frozen=True)
@@ -986,12 +986,15 @@ def _build_id(
 ) -> str:
     digest = hashlib.sha256()
     _update_build_hash(digest, "schema", {"version": LEDGER_DB_SCHEMA_VERSION})
-    for fact in sorted(facts, key=build_fact_key):
+    for fact in sorted(
+        facts,
+        key=lambda item: build_fact_key(item, epoch=Epoch.LEDGER),
+    ):
         _update_build_hash(
             digest,
             "fact",
             {
-                "fact_key": build_fact_key(fact),
+                "fact_key": build_fact_key(fact, epoch=Epoch.LEDGER),
                 "fact": _canonical_fact_mapping(fact),
                 "constraints": [
                     asdict(constraint)
@@ -999,21 +1002,33 @@ def _build_id(
                 ],
             },
         )
-    for cell in sorted(cells, key=build_source_cell_key):
+    for cell in sorted(
+        cells,
+        key=lambda item: build_source_cell_key(item, epoch=Epoch.LEDGER),
+    ):
         _update_build_hash(
             digest,
             "source_cell",
             {
-                "source_cell_key": build_source_cell_key(cell),
+                "source_cell_key": build_source_cell_key(
+                    cell,
+                    epoch=Epoch.LEDGER,
+                ),
                 "source_cell": _canonical_source_cell_mapping(cell),
             },
         )
-    for row in sorted(rows, key=build_source_row_key):
+    for row in sorted(
+        rows,
+        key=lambda item: build_source_row_key(item, epoch=Epoch.LEDGER),
+    ):
         _update_build_hash(
             digest,
             "source_row",
             {
-                "source_row_key": build_source_row_key(row),
+                "source_row_key": build_source_row_key(
+                    row,
+                    epoch=Epoch.LEDGER,
+                ),
                 "source_row": source_row_to_mapping(row),
             },
         )

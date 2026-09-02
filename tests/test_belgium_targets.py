@@ -19,6 +19,9 @@ from chronicle.source_package import (
     load_source_package,
     validate_source_package,
 )
+from packages.statbel.fiscal_income_distribution_2023.build_package import (
+    SOURCE_PACKAGE_SCHEMA_VERSION as FISCAL_DISTRIBUTION_SCHEMA_VERSION,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -118,6 +121,21 @@ def test_statbel_fiscal_distribution_alias_resolves():
         load_source_package(FISCAL_DISTRIBUTION_ALIAS).package_id
         == FISCAL_DISTRIBUTION_ALIAS
     )
+
+
+def test_statbel_fiscal_distribution_generator_keeps_ledger_schema_bytes():
+    payload = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "packages"
+            / "statbel"
+            / "fiscal_income_distribution_2023"
+            / "source_package.yaml"
+        ).read_text()
+    )
+
+    assert FISCAL_DISTRIBUTION_SCHEMA_VERSION == "ledger.source_package.v1"
+    assert payload["schema_version"] == FISCAL_DISTRIBUTION_SCHEMA_VERSION
 
 
 def test_statbel_fiscal_distribution_artifact_pins_and_r2_keys():
@@ -516,9 +534,7 @@ def test_belgium_euromod_comparator_pairs_c2_rows_with_model_outputs():
     missing_ratios = {
         row["value_id"]
         for row in c2_rows
-        if row["value_id"]
-        .replace("_external_", "_ratio_")
-        .replace("_silc_", "_ratio_")
+        if row["value_id"].replace("_external_", "_ratio_").replace("_silc_", "_ratio_")
         not in ids
     }
     assert not missing_ratios

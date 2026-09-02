@@ -20,7 +20,7 @@ from zipfile import ZipFile
 import openpyxl
 import xlrd
 
-from chronicle.epoch import EMIT_EPOCH, Epoch, hash_domain
+from chronicle.epoch import EMIT_EPOCH, HASH_DOMAINS, Epoch, hash_domain
 
 Scalar = str | int | float | bool | None
 SOURCE_CELL_KEY_PREFIX = hash_domain("source_cell")
@@ -443,6 +443,30 @@ def validate_source_cells(cells: list[SourceCell]) -> SourceCellReport:
                     cell_index=index,
                 )
             )
+        if cell.source_row_key is not None:
+            source_row_pair = HASH_DOMAINS["source_row"]
+            if not isinstance(cell.source_row_key, str):
+                message = (
+                    f"Unsupported source-row key {cell.source_row_key!r}; accepted "
+                    f"prefixes are {source_row_pair.ledger!r} and "
+                    f"{source_row_pair.chronicle!r}"
+                )
+            else:
+                try:
+                    source_row_pair.infer_key_epoch(cell.source_row_key)
+                except ValueError as error:
+                    message = str(error)
+                else:
+                    message = None
+            if message is not None:
+                errors.append(
+                    SourceCellIssue(
+                        code="malformed_source_row_key",
+                        message=message,
+                        source_cell_key=key,
+                        cell_index=index,
+                    )
+                )
 
     for key, indices in key_indices.items():
         if len(indices) > 1:

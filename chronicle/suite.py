@@ -23,6 +23,7 @@ from chronicle.core import (
     validate_facts,
 )
 from chronicle.database import ChronicleDbBuildReport, build_chronicle_db
+from chronicle.epoch import canonicalize_key
 from chronicle.sources.cells import (
     SourceCell,
     SourceCellReport,
@@ -554,6 +555,19 @@ def validate_source_regions(
     )
 
 
+def _canonicalize_lineage_key(domain_name: str, key: Any) -> str:
+    """Canonicalize an accepted lineage key without hiding invalid prefixes."""
+
+    if not isinstance(key, str):
+        return f"<invalid-{domain_name}-key:{key!r}>"
+    try:
+        return canonicalize_key(domain_name, key)
+    except ValueError:
+        # ``validate_facts`` reports the dual-prefix error. Keeping an unknown
+        # value here lets agent acceptance also report it as unresolved.
+        return key
+
+
 def build_agent_acceptance_report(
     facts: list[AggregateFact],
     rows: list[SourceRow],
@@ -576,9 +590,14 @@ def build_agent_acceptance_report(
         **{row.artifact.sha256: row.artifact for row in rows},
         **{cell.artifact.sha256: cell.artifact for cell in cells},
     }
-    source_rows_by_key = {build_source_row_key(row): row for row in rows}
+    source_rows_by_key = {
+        canonicalize_key("source_row", build_source_row_key(row)): row for row in rows
+    }
     source_row_keys = set(source_rows_by_key)
-    source_cells_by_key = {build_source_cell_key(cell): cell for cell in cells}
+    source_cells_by_key = {
+        canonicalize_key("source_cell", build_source_cell_key(cell)): cell
+        for cell in cells
+    }
     source_column_dimensions_by_record_id = source_column_dimensions_by_record_id or {}
     raw_r2_link_count = 0
 
@@ -654,8 +673,12 @@ def build_agent_acceptance_report(
                     )
                 )
                 continue
+            canonical_row_keys = [
+                _canonicalize_lineage_key("source_row", key)
+                for key in fact.source_row_keys
+            ]
             unresolved_keys = [
-                key for key in fact.source_row_keys if key not in source_row_keys
+                key for key in canonical_row_keys if key not in source_row_keys
             ]
             if unresolved_keys:
                 missing_row_resolution_count += 1
@@ -673,11 +696,17 @@ def build_agent_acceptance_report(
                 continue
             for issue in _row_semantic_evidence_issues(
                 fact,
-                [source_rows_by_key[key] for key in fact.source_row_keys],
+                [source_rows_by_key[key] for key in canonical_row_keys],
                 [
-                    source_cells_by_key[key]
+                    source_cells_by_key[canonical_key]
                     for key in fact.source_cell_keys
-                    if key in source_cells_by_key
+                    if (
+                        canonical_key := _canonicalize_lineage_key(
+                            "source_cell",
+                            key,
+                        )
+                    )
+                    in source_cells_by_key
                 ],
                 source_column_dimensions=(
                     source_column_dimensions_by_record_id.get(
