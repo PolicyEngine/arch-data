@@ -19,24 +19,40 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      # main is protected and a direct GITHUB_TOKEN push is not assumed. The
-      # proof commit is published through a bot-branch pull request instead.
+      # API evidence on 2026-09-02 showed no effective rules, required checks,
+      # reviews, or push restrictions blocking a GITHUB_TOKEN update to main.
       contents: write
-      pull-requests: write
     env:
-      BOT_BRANCH: automation/ots-anchor
-      GH_TOKEN: ${{ github.token }}
       MAIN_BRANCH: main
       JOURNAL_BRANCH: codex/thesis-ledger-facts
       OTS_BIN: uvx --from opentimestamps-client==0.7.2 ots
     steps:
+      - name: Log main publication rule evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+
+          log_api() {
+            endpoint="$1"
+            printf 'gh api %s\n' "$endpoint"
+            if ! gh api "$endpoint"; then
+              printf '::warning::Could not read %s; the bounded push remains authoritative.\n' \
+                "$endpoint" >&2
+            fi
+          }
+
+          log_api "repos/$GITHUB_REPOSITORY/rules/branches/$MAIN_BRANCH"
+          log_api "repos/$GITHUB_REPOSITORY/rulesets"
+          log_api "repos/$GITHUB_REPOSITORY/branches/$MAIN_BRANCH/protection"
+
       - name: Check out trusted main
         uses: actions/checkout@v4
         with:
           ref: main
           path: main
           fetch-depth: 0
-          # A credential is needed only to push the proof commit to BOT_BRANCH.
           persist-credentials: true
 
       - name: Check out journal manifests without credentials
@@ -109,296 +125,53 @@ jobs:
             fi
             if [[ -n "$(git status --porcelain)" ]]; then
               git status --short >&2
-              printf 'refusing to publish a dirty worktree\n' >&2
+              printf 'refusing to push a dirty worktree\n' >&2
               return 1
             fi
           }
-
-          # Carry an existing bot PR's proof bytes across a retry, but trust no
-          # other path from that mutable branch. Every imported proof must map
-          # to a current immutable journal manifest and is re-verified below by
-          # main's script before it can be committed again.
-          import_bot_proofs() {
-            bot_remote_sha=""
-            if ! git fetch --no-tags origin "refs/heads/$BOT_BRANCH"; then
-              return
-            fi
-            bot_remote_sha="$(git rev-parse FETCH_HEAD)"
-            bot_base="$(
-              git merge-base "origin/$MAIN_BRANCH" "$bot_remote_sha"
-            )"
-
-            deleted_paths="$(
-              git diff --diff-filter=D --name-only \
-                "origin/$MAIN_BRANCH...$bot_remote_sha"
-            )"
-            if [[ -n "$deleted_paths" ]]; then
-              printf 'refusing bot branch proof deletions:\n%s\n' \
-                "$deleted_paths" >&2
-              return 1
-            fi
-
-            while IFS= read -r -d '' changed_path; do
-              if [[ ! "$changed_path" =~ ^ots/[0-9]{4}-[0-9a-f]{16}\.json\.ots$ ]]; then
-                printf 'refusing unexpected bot branch path: %s\n' \
-                  "$changed_path" >&2
-                return 1
-              fi
-              proof_name="${changed_path#ots/}"
-              manifest_path="$manifest_dir/${proof_name%.ots}"
-              if [[ ! -f "$manifest_path" || -L "$manifest_path" ]]; then
-                printf 'bot proof has no regular journal manifest: %s\n' \
-                  "$changed_path" >&2
-                return 1
-              fi
-
-              base_blob="$(
-                git rev-parse "$bot_base:$changed_path" 2>/dev/null || true
-              )"
-              main_blob="$(
-                git rev-parse \
-                  "origin/$MAIN_BRANCH:$changed_path" 2>/dev/null || true
-              )"
-              bot_blob="$(git rev-parse "$bot_remote_sha:$changed_path")"
-              if [[ "$main_blob" != "$base_blob" && \
-                    "$main_blob" != "$bot_blob" ]]; then
-                printf 'refusing divergent main/bot proof: %s\n' \
-                  "$changed_path" >&2
-                return 1
-              fi
-              if [[ "$main_blob" == "$bot_blob" ]]; then
-                continue
-              fi
-              git checkout "$bot_remote_sha" -- "$changed_path"
-            done < <(
-              git diff --name-only -z \
-                "origin/$MAIN_BRANCH...$bot_remote_sha"
-            )
-          }
-
-          # Record the effective rules in the run log. Authoring-time evidence
-          # established that main is protected but could not establish a direct
-          # GITHUB_TOKEN bypass, so publication deliberately stays on a PR path.
-          # Failure to read current metadata is deliberately fatal and occurs
-          # before any proof or branch mutation.
-          gh api \
-            "repos/$GITHUB_REPOSITORY/rules/branches/$MAIN_BRANCH?per_page=100" \
-            > "$RUNNER_TEMP/main-rules.json"
-          jq '{effective_rule_types: map(.type)}' \
-            "$RUNNER_TEMP/main-rules.json"
-          gh api "repos/$GITHUB_REPOSITORY/branches/$MAIN_BRANCH" \
-            > "$RUNNER_TEMP/main-branch.json"
-          jq '{protected, required_status_checks: .protection.required_status_checks}' \
-            "$RUNNER_TEMP/main-branch.json"
-          main_protected="$(jq -r '.protected' "$RUNNER_TEMP/main-branch.json")"
 
           git config user.name "github-actions[bot]"
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
 
-          published_head_sha=""
-          pushed=0
+          anchor_and_verify
+          commit_proofs
+          if git diff --quiet "origin/$MAIN_BRANCH"...HEAD; then
+            printf 'no proof changes to publish\n'
+            exit 0
+          fi
+          assert_commit_scope
+
           for attempt in 1 2 3; do
-            # A main race is resolved before every publication attempt. The
-            # trusted tool then stamps and verifies again against a freshly
-            # fetched journal tip, so neither a rebase nor a retry can publish
-            # a stale proof tree.
-            git fetch --no-tags origin "$MAIN_BRANCH"
-            verified_main_sha="$(git rev-parse "origin/$MAIN_BRANCH")"
-            git rebase "origin/$MAIN_BRANCH"
+            if push_output="$(git push origin HEAD:main 2>&1)"; then
+              printf '%s\n' "$push_output"
+              exit 0
+            fi
+            printf '%s\n' "$push_output" >&2
+            if ! git fetch --no-tags origin main; then
+              printf 'push failed and main could not be fetched for retry analysis\n' >&2
+              exit 1
+            fi
+            if git merge-base --is-ancestor HEAD origin/main; then
+              printf 'local proof commit is already contained in main\n'
+              exit 0
+            fi
+            if git merge-base --is-ancestor origin/main HEAD; then
+              printf 'push failed for a reason other than non-fast-forward\n' >&2
+              exit 1
+            fi
+            if [[ "$attempt" -eq 3 ]]; then
+              printf 'push remained non-fast-forward after 3 attempts\n' >&2
+              exit 1
+            fi
+
+            git rebase origin/main
             refresh_journal
-            import_bot_proofs
             anchor_and_verify
             commit_proofs
-
-            if git diff --quiet "origin/$MAIN_BRANCH"...HEAD; then
-              printf 'no proof changes to publish\n'
+            if git diff --quiet origin/main...HEAD; then
+              printf 'proof changes already landed during retry\n'
               exit 0
             fi
             assert_commit_scope
-
-            # A bot-branch push cannot itself be rejected merely because main
-            # advanced. Check main explicitly so that such a race also goes
-            # through the bounded rebase + fresh journal + re-verification path.
-            git fetch --no-tags origin "$MAIN_BRANCH"
-            if [[ "$(git rev-parse "origin/$MAIN_BRANCH")" != \
-                  "$verified_main_sha" ]]; then
-              if [[ "$attempt" -eq 3 ]]; then
-                printf 'main kept moving after 3 verified attempts\n' >&2
-                exit 1
-              fi
-              printf 'main moved; rebasing and re-verifying\n' >&2
-              continue
-            fi
-
-            # If an open bot PR is already based on this main tip and has the
-            # exact proof tree just re-verified, retain its head instead of
-            # force-pushing an equivalent commit and churning the PR.
-            if [[ -n "$bot_remote_sha" ]] && \
-               git merge-base --is-ancestor \
-                 "origin/$MAIN_BRANCH" "$bot_remote_sha" && \
-               git diff --quiet "$bot_remote_sha" HEAD -- ots/; then
-              published_head_sha="$bot_remote_sha"
-              printf 'existing bot head already has the verified proof tree\n'
-            else
-              if [[ -n "$bot_remote_sha" ]]; then
-                push_command=(
-                  git push
-                  "--force-with-lease=refs/heads/$BOT_BRANCH:$bot_remote_sha"
-                  origin "HEAD:refs/heads/$BOT_BRANCH"
-                )
-              else
-                push_command=(
-                  git push origin "HEAD:refs/heads/$BOT_BRANCH"
-                )
-              fi
-
-              if push_output="$("${push_command[@]}" 2>&1)"; then
-                printf '%s\n' "$push_output"
-                published_head_sha="$(git rev-parse HEAD)"
-              else
-                printf '%s\n' "$push_output" >&2
-                if [[ "$push_output" != *"non-fast-forward"* && \
-                      "$push_output" != *"(fetch first)"* && \
-                      "$push_output" != *"stale info"* ]]; then
-                  printf 'bot branch push failed for an unexpected reason\n' >&2
-                  exit 1
-                fi
-                if [[ "$attempt" -eq 3 ]]; then
-                  printf 'bot branch remained stale after 3 attempts\n' >&2
-                  exit 1
-                fi
-                printf '%s\n' \
-                  'bot branch moved; fetching, rebasing, and re-verifying' >&2
-                continue
-              fi
-            fi
-
-            # Close the last main race between the pre-push check and the bot
-            # update. A changed tip goes around the loop and re-verifies again.
-            git fetch --no-tags origin "$MAIN_BRANCH"
-            if [[ "$(git rev-parse "origin/$MAIN_BRANCH")" != \
-                  "$verified_main_sha" ]]; then
-              if [[ "$attempt" -eq 3 ]]; then
-                printf 'main moved after all 3 publication attempts\n' >&2
-                exit 1
-              fi
-              printf 'main moved during publication; re-verifying\n' >&2
-              continue
-            fi
-            pushed=1
-            break
           done
-
-          if [[ "$pushed" -ne 1 ]]; then
-            printf 'proof commit was not published\n' >&2
-            exit 1
-          fi
-
-          pr_body="$RUNNER_TEMP/ots-anchor-pr.md"
-          {
-            printf '%s\n' \
-              '## Automated OpenTimestamps publication' \
-              '' \
-              "- Publication path: bot-branch pull request into protected \`main\`." \
-              "- Direct \`GITHUB_TOKEN\` pushes to \`main\` are never attempted." \
-              "- API evidence: \`main\` protected=$main_protected; no direct token bypass was established." \
-              '- The proof-only bot branch was pushed or reused before this PR was created or updated.' \
-              "- The trusted script came from \`main\`; the journal checkout had no credential." \
-              '- The complete manifest/proof tree was verified before this branch was pushed.' \
-              "- Only \`ots/<manifest>.json.ots\` paths were carried from an earlier bot retry." \
-              '' \
-              "Source run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-              '' \
-              '🤖 Generated with [Claude Code](https://claude.com/claude-code)'
-          } > "$pr_body"
-
-          pr_url="$(
-            gh pr list \
-              --repo "$GITHUB_REPOSITORY" \
-              --base "$MAIN_BRANCH" \
-              --head "$BOT_BRANCH" \
-              --state open \
-              --json url \
-              --jq '.[0].url // empty'
-          )"
-          if [[ -z "$pr_url" ]]; then
-            if ! create_output="$(
-              gh pr create \
-                --repo "$GITHUB_REPOSITORY" \
-                --base "$MAIN_BRANCH" \
-                --head "$BOT_BRANCH" \
-                --title "Update Bitcoin anchors for the witnessed journal" \
-                --body-file "$pr_body" 2>&1
-            )"; then
-              printf '%s\n' "$create_output" >&2
-              pr_url="$(
-                gh pr list \
-                  --repo "$GITHUB_REPOSITORY" \
-                  --base "$MAIN_BRANCH" \
-                  --head "$BOT_BRANCH" \
-                  --state open \
-                  --json url \
-                  --jq '.[0].url // empty'
-              )"
-              if [[ -z "$pr_url" ]]; then
-                printf 'failed to create or find proof publication PR\n' >&2
-                exit 1
-              fi
-            else
-              printf '%s\n' "$create_output"
-              pr_url="$(
-                gh pr list \
-                  --repo "$GITHUB_REPOSITORY" \
-                  --base "$MAIN_BRANCH" \
-                  --head "$BOT_BRANCH" \
-                  --state open \
-                  --json url \
-                  --jq '.[0].url // empty'
-              )"
-              if [[ -z "$pr_url" ]]; then
-                printf 'created proof PR could not be resolved by head\n' >&2
-                exit 1
-              fi
-            fi
-          fi
-          gh pr edit "$pr_url" --body-file "$pr_body"
-          printf 'proof publication PR: %s\n' "$pr_url"
-
-          merge_status=0
-          merge_output="$(
-            gh pr merge "$pr_url" \
-              --auto \
-              --merge \
-              --delete-branch \
-              --match-head-commit "$published_head_sha" 2>&1
-          )" || merge_status=$?
-          if [[ -n "$merge_output" ]]; then
-            printf '%s\n' "$merge_output"
-          fi
-
-          pr_state="$(
-            gh pr view "$pr_url" \
-              --json state,headRefOid,autoMergeRequest,mergeStateStatus
-          )"
-          observed_head="$(jq -r '.headRefOid' <<< "$pr_state")"
-          observed_state="$(jq -r '.state' <<< "$pr_state")"
-          auto_merge_set="$(jq -r '.autoMergeRequest != null' <<< "$pr_state")"
-          if [[ "$observed_head" != "$published_head_sha" ]]; then
-            if [[ "$auto_merge_set" == "true" ]]; then
-              gh pr merge "$pr_url" --disable-auto || true
-            fi
-            printf 'PR head moved after verification: expected %s, found %s\n' \
-              "$published_head_sha" "$observed_head" >&2
-            exit 1
-          fi
-          if [[ "$observed_state" == "MERGED" ]]; then
-            exit 0
-          fi
-          if [[ "$observed_state" == "OPEN" && "$auto_merge_set" == "true" ]]; then
-            exit 0
-          fi
-          printf '%s\n' "$pr_state" >&2
-          printf 'merge/auto-merge did not stick (gh exit %s)\n' \
-            "$merge_status" >&2
-          exit 1

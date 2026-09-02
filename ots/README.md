@@ -65,6 +65,11 @@ calendar transactions confirm. They therefore cannot live under `releases/`.
 Keeping the proof tree, anchoring script, tests, and scheduled workflow together
 on protected `main` also establishes the privilege boundary. The workflow runs
 `main`'s trusted script against a separate, shallow journal checkout that has no
-persisted credential. It verifies the entire manifest/proof tree and rejects
-any worktree change outside `ots/` before publication. It never pushes to the
-journal branch.
+persisted credential. It runs `run`, `verify`, and `guard`, stages only `ots/`,
+and refuses a dirty worktree or a committed path outside `ots/` before it pushes
+the proof-only commit directly to `main` with `git push origin HEAD:main`.
+
+A non-fast-forward rejection starts a bounded retry: fetch and rebase onto the
+new `origin/main`, refresh the credential-free journal checkout, rerun `run`,
+`verify`, and `guard`, then recommit and retry. The workflow makes at most three
+non-force push attempts and never pushes the journal branch.

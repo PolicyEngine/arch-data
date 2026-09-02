@@ -2,10 +2,11 @@
 
 ## State
 
-The pending-proof classification fix is complete and locally verified. Work is
-in progress on the direct-push publication workflow. The worktree started from
-`ots-anchor-main` at `03b27674`, matching the locally cached remote-tracking ref;
-GitHub DNS is currently unavailable.
+The pending-proof classification fix and direct-push publication workflow are
+complete and locally verified. Final repository verification, reporting, and
+GitHub delivery remain. The worktree started from `ots-anchor-main` at
+`03b27674`, matching the locally cached remote-tracking ref; GitHub DNS is
+currently unavailable.
 
 ## Done
 
@@ -33,11 +34,26 @@ GitHub DNS is currently unavailable.
 - Ran real status with the cached 0.7.2 executable. All 15 complete proofs were
   recognized, then calendar DNS errors prevented binding classification for the
   five pending proofs; the fixture suite covers their supplied captured output.
+- Replaced bot-branch import, PR creation, and auto-merge machinery with a
+  proof-only, non-force `git push origin HEAD:main` using only `contents: write`.
+- Added best-effort start-of-job logging for the three supplied effective-rules
+  and classic-protection API endpoints; metadata read failures warn but do not
+  block the publication attempt.
+- Retained the credential-free journal checkout, `run` + `verify` + `guard`,
+  `ots/`-only staging and committed-scope checks, and dirty-worktree refusal.
+- Added a three-attempt non-fast-forward path that fetches and rebases current
+  `main`, refreshes the journal, reruns all checks, and recommits before retry.
+  Failed-push classification uses fetched commit ancestry, covering server-side
+  ref races and ambiguous successes without parsing Git's localized output.
+- Updated both proof documentation sections to say automation pushes proof-only
+  commits to `main` and to document bounded retries plus the guarantees against
+  force-pushing or pushing the journal branch. `actionlint` passes.
+- Reconfirmed all 20 `.ots` blob bytes are unchanged (combined checksum
+  `420c3f54b47df5c58c58edc7202f580dcbad40193a4264bec20c133b71a375b1`)
+  and there are no `releases/` or `ledger/` changes.
 
 ## Next
 
-- Replace bot-branch/PR/auto-merge publication with a bounded, non-force direct
-  push to `main`, and update documentation.
 - Run focused tests, lint, formatting, actionlint, guard checks, and real-proof
   status against the journal checkout.
 - Update this log and `out.md`, edit PR #229 when GitHub is reachable, and push
