@@ -31,9 +31,11 @@ pending because classic `main` protection details are not yet readable in this l
   required-status-check enforcement is off, and repository plus parent ruleset
   lists are empty. The integration cannot read classic protection, so this is
   not yet enough evidence to choose direct push.
+- Added main-owned proof documentation, the root README overview, and explicit
+  focused OTS lint/test steps without narrowing main's existing full CI suite.
 
 ## Next
 
 - Obtain live `main` rules evidence and select direct-push versus bot-PR publication.
-- Add the main-owned workflow, documentation, CI wiring, and tests.
+- Add and validate the main-owned scheduled workflow.
 - Run the full required verification, push the branch, and open the superseding PR.
