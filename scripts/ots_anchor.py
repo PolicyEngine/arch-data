@@ -50,20 +50,17 @@ OTS_DIR = pathlib.Path("ots")
 MANIFEST_NAME_RE = re.compile(r"^(\d{4})-([0-9a-f]{16})\.json$")
 SUBPROCESS_TIMEOUT = 300
 
-# Full-line patterns observed from opentimestamps-client 0.7.2. Calendar URLs
-# and errors are untrusted text, so substring matches are intentionally unsafe.
-_MISMATCH_LINE_RE = re.compile(r"^\s*File does not match original!?\s*$", re.MULTILINE)
+# Full-line output observed from opentimestamps-client 0.7.2. Calendar URLs and
+# errors are untrusted text, so substring matches are intentionally unsafe.
+_MISMATCH_LINE = "File does not match original"
 _VERIFY_PENDING_LINE_RE = re.compile(
-    r"^\s*Pending confirmation in Bitcoin blockchain\s*$", re.MULTILINE
+    r"Calendar \S+: Pending confirmation in Bitcoin blockchain"
 )
 _VERIFY_MANUAL_LINE_RE = re.compile(
-    r"^\s*To verify manually, check that Bitcoin block \d+ "
-    r"has merkleroot [0-9a-fA-F]+\s*$",
-    re.MULTILINE,
+    r"To verify manually, check that Bitcoin block \d+ "
+    r"has merkleroot [0-9a-fA-F]{64}"
 )
-_NO_NODE_LINE_RE = re.compile(
-    r"^\s*Could not connect to Bitcoin node(?:[.:].*)?\s*$", re.MULTILINE
-)
+_VERIFY_BITCOIN_DISABLED_LINE = "Not checking Bitcoin attestation; Bitcoin disabled"
 _UPGRADE_PENDING_LINE_RE = re.compile(
     r"^\s*(?:Failed!\s*)?Timestamp not complete\.?\s*$", re.MULTILINE
 )
@@ -284,22 +281,29 @@ def upgrade_proof(
 def verify_proof_binding(
     manifest: pathlib.Path, proof: pathlib.Path, ots_bin: list[str]
 ) -> bool:
-    """Return false only when ``ots`` proves the file digest is mismatched."""
+    """Return false only for the client's exact digest-mismatch output."""
 
     completed = _run_ots(
         ots_bin, ["--no-bitcoin", "verify", "-f", str(manifest), str(proof)]
     )
     output = completed.stdout + completed.stderr
-    if _MISMATCH_LINE_RE.search(output):
+    lines = completed.stdout.splitlines() + completed.stderr.splitlines()
+    if _MISMATCH_LINE in lines:
         return False
-    if completed.returncode == 0:
-        return True
     if (
-        _VERIFY_PENDING_LINE_RE.search(output)
-        or _VERIFY_MANUAL_LINE_RE.search(output)
-        or _NO_NODE_LINE_RE.search(output)
+        completed.returncode == 1
+        and lines
+        and all(_VERIFY_PENDING_LINE_RE.fullmatch(line) for line in lines)
     ):
         return True
+    if completed.returncode == 1 and len(lines) >= 2 and len(lines) % 2 == 0:
+        pairs = zip(lines[::2], lines[1::2])
+        if all(
+            disabled == _VERIFY_BITCOIN_DISABLED_LINE
+            and _VERIFY_MANUAL_LINE_RE.fullmatch(manual)
+            for disabled, manual in pairs
+        ):
+            return True
     raise AnchorError(
         f"unrecognized ots verify outcome for {proof.name}: {output.strip()}"
     )
@@ -310,9 +314,10 @@ def classify_proof(
 ) -> str:
     """Classify a locally stored proof after checking its exact-file binding."""
 
+    state = local_proof_state(proof, ots_bin)
     if not verify_proof_binding(manifest, proof, ots_bin):
         return "mismatch"
-    return local_proof_state(proof, ots_bin)
+    return state
 
 
 def command_run(
@@ -346,7 +351,7 @@ def command_run(
             raise AnchorError(
                 f"proof {proof.name} does not match manifest bytes; refusing to skip"
             )
-        if proof_is_complete(proof, ots_bin):
+        if state == "bitcoin":
             continue
         if upgrade_proof(manifest, proof, ots_bin):
             upgraded.append(manifest.name)

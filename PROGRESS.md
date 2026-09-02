@@ -2,9 +2,10 @@
 
 ## State
 
-Work is in progress on the direct-push publication workflow and the pending-proof
-classification fix. The worktree is on `ots-anchor-main` at `03b27674`, matching
-the locally cached `origin/ots-anchor-main`; GitHub DNS is currently unavailable.
+The pending-proof classification fix is complete and locally verified. Work is
+in progress on the direct-push publication workflow. The worktree started from
+`ots-anchor-main` at `03b27674`, matching the locally cached remote-tracking ref;
+GitHub DNS is currently unavailable.
 
 ## Done
 
@@ -19,11 +20,22 @@ the locally cached `origin/ots-anchor-main`; GitHub DNS is currently unavailable
   requirements are the current source of truth.
 - Accepted the Chronicle boundary and the prohibitions on changing `releases/`,
   `ledger/`, or proof bytes.
+- Fixed proof classification to inspect local `ots info` structure first, give
+  any Bitcoin block-header attestation precedence over leftover pending
+  attestations, and then validate binding from the exact 0.7.2 output contract.
+- Replaced permissive verify-output recognition with exact/full-line parsing:
+  the exact mismatch line is the only mismatch, captured pending and paired
+  Bitcoin-disabled/manual lines bind successfully, and unknown output fails
+  closed.
+- Updated the hermetic fake client with the captured four-calendar pending,
+  mixed complete, mismatch, upgrade, and unrecognized outputs. All 17 focused
+  tests pass; focused Ruff lint and formatting checks pass.
+- Ran real status with the cached 0.7.2 executable. All 15 complete proofs were
+  recognized, then calendar DNS errors prevented binding classification for the
+  five pending proofs; the fixture suite covers their supplied captured output.
 
 ## Next
 
-- Reproduce and fix pending/complete/mismatch classification with hermetic
-  fixtures for the captured OpenTimestamps 0.7.2 output.
 - Replace bot-branch/PR/auto-merge publication with a bounded, non-force direct
   push to `main`, and update documentation.
 - Run focused tests, lint, formatting, actionlint, guard checks, and real-proof
