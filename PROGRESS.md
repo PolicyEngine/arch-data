@@ -2,7 +2,8 @@
 
 ## State
 
-Implementation is complete. Verification, delivery, and final reporting remain.
+Implementation and local proof verification are complete. Final review,
+delivery, and reporting remain.
 
 ## Done
 
@@ -28,13 +29,26 @@ Implementation is complete. Verification, delivery, and final reporting remain.
   failure, closing the independent core review's only finding.
 - Queried GitHub through the authenticated connector: `main` is protected,
   required-status-check enforcement is off, and repository plus parent ruleset
-  lists are empty. The integration cannot read classic protection, so this is
-  not yet enough evidence to choose direct push.
+  lists are empty. The integration cannot read classic protection, so direct
+  `GITHUB_TOKEN` publication is not established and is never attempted.
 - Added main-owned proof documentation, the root README overview, and explicit
   focused OTS lint/test steps without narrowing main's existing full CI suite.
-- Added the daily/manual main-owned workflow with sibling credential boundaries,
-  pre-push full verification, proof-only guards, and bounded rebase/rerun retries.
+- Replaced the provisional direct-push workflow with a fixed bot-branch PR
+  publication path. It queries effective rules in the run log, imports only
+  manifest-matched proof files from an earlier retry, re-verifies them with
+  `main`'s script, uses a bounded fetch/rebase/rerun loop, and invokes
+  `gh pr merge --auto`; it never pushes the journal or `main` directly.
+- Ran the required focused suite: 15 tests passed; `ruff check .` passed. The
+  repository-wide format check reports the same 14 pre-existing files on
+  `origin/main`; both added Python files pass the focused format check.
+- Added `/tmp/journal` at `origin/codex/thesis-ledger-facts` and verified all 15
+  carried proof bindings against its real manifest bytes. Full `status` reports
+  exactly manifests 0015--0019 as unanchored. Calendar DNS is unavailable, so
+  their missing proofs could not be stamped in this lane.
+- Confirmed all 15 committed proof blob IDs match `545cfe56` byte-for-byte and
+  that the revised workflow passes `actionlint` (including ShellCheck).
 
 ## Next
 
-- Run the full required verification, push the branch, and open the superseding PR.
+- Complete the independent final workflow review, write `out.md`, push the
+  branch, and open the superseding PR.
