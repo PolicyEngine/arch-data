@@ -2,22 +2,34 @@
 
 Status: accepted 2026-09-02 (amends the facts-only store; narrows the
 "no raw microdata" non-goal in `docs/storage-architecture.md` and
-`docs/chronicle-governance.md`)
+`docs/chronicle-governance.md`). The fail-closed registration path this
+ADR relies on (`kind: microdata_release`, access-aware refusal in
+`fetch-artifact` and `publish-raw`, `register-artifact`) lands with
+chronicle#221. Until it merges, do not point the existing commands at a
+licensed or restricted file: they materialize and upload bytes.
 
 ## Decision
 
 Chronicle registers every raw microdata release its consumers build from, and
-stores none of their content.
+stores none of their content. "Content" means parsed rows, cells, or facts.
+Custody of a redistributable public-use file's bytes is not content; custody
+of licensed or restricted bytes is never taken at all.
 
 1. **Registration.** A microdata release (CPS ASEC, ACS PUMS, SCF, SIPP, FRS,
    BE-SILC, the IRS PUF, and their successors in every jurisdiction) is a
    source artifact like any publisher workbook: publisher, source URL or
    access route, vintage, SHA-256, size, fetch time, licence, and an access
-   class from a closed set (`public`, `licensed`, `restricted`). Registration
-   is manifest-level. It uses the existing `fetch-artifact` and `publish-raw`
-   path and the content-addressed key shape
-   `raw/{source_id}/{package_id}/{year}/{sha256}/{filename}`. No source
-   package parses the file.
+   class from a closed set (`public`, `licensed`, `restricted`), on a manifest
+   declared `kind: microdata_release`. That kind is required, not inferred:
+   it is what lets `validate-package`, the suite builder, and every parser
+   refuse the file, so a public microdata release can never be mistaken for a
+   public aggregate workbook. Registration is manifest-level. It uses the
+   `fetch-artifact` / `publish-raw` path extended with an access-aware
+   refusal (chronicle#221), and the content-addressed key convention in
+   `docs/storage-architecture.md`: `raw/{country}/{source_id}/{package_id}/
+   {year}/{sha256}/{filename}` for UK and New Zealand sources, the legacy
+   `raw/{source_id}/...` shape for US sources. No source package parses the
+   file.
 2. **Bytes only where the publisher permits redistribution.** Public-use files
    whose terms allow redistribution (Census public-use files are the model
    case) are archived in the raw bucket under that key. Licensed or restricted
@@ -25,11 +37,13 @@ stores none of their content.
    PUF) are registered hash-only: no bytes in any Chronicle store, and no
    Chronicle credential grants access to them. Their bytes stay in the
    licensed environments consumers already operate.
-3. **No rows, no facts.** No microdata record, column, or cell enters
-   `source_rows`, `source_cells`, the relational registry, or the journal. No
-   fact is minted from microdata by Chronicle. An aggregate a publisher
-   computes from its own microdata and publishes is an ordinary fact; an
-   aggregate a consumer computes from microdata is that consumer's artifact.
+3. **No rows, no cells, no facts.** No microdata record, column, or cell
+   enters `source_rows`, `source_cells`, the relational registry, or the
+   journal. No fact is computed directly from raw microdata by Chronicle, and
+   none computed that way by a consumer enters Chronicle. An aggregate a
+   publisher computes from its own microdata and publishes is an ordinary
+   fact with ordinary provenance; an aggregate a consumer computes from
+   microdata is that consumer's artifact.
 4. **Consumers point at the registration.** A Microcosm source-stage manifest
    that names a microdata artifact carries the Chronicle artifact reference
    and the same SHA-256, so every root of a build graph resolves to one
@@ -73,7 +87,8 @@ stores none of their content.
   releases.
 - `docs/chronicle-governance.md` allows registering microdata releases and
   forbids parsing them or holding gated bytes; the `ledger-boundary` judge
-  fails a change that does either.
+  contract in `.github/chronicle-agents.yml` names both refusals, so the
+  configured judge cannot pass a change that does either.
 - Microcosm's raw-input entries reference Chronicle registrations; the
   consumer side is tracked in PolicyEngine/microcosm.
 - Flip conditions for revisiting content: a consumer other than Microcosm
