@@ -2,8 +2,8 @@
 
 ## State
 
-Implementation and local proof verification are complete. Final review,
-delivery, and reporting remain.
+Implementation and local proof verification are complete. Delivery is blocked
+on establishing or authorizing a GitHub publication path for protected `main`.
 
 ## Done
 
@@ -51,8 +51,16 @@ delivery, and reporting remain.
   importing retry proofs, reject divergent main/bot proof edits, detect main
   movement before and after the bot push, reuse an unchanged verified bot head,
   and accept merge/auto-merge only when the PR still names the verified SHA.
+- Final publication review confirmed two external prerequisites cannot be
+  established in this lane: repository metadata currently has
+  `allow_auto_merge: false`, and the Actions setting that permits
+  `GITHUB_TOKEN` to create pull requests is unreadable. Direct token updates to
+  protected `main` also remain unproven because classic protection is unreadable.
 
 ## Next
 
-- Complete the independent final workflow review, write `out.md`, push the
-  branch, and open the superseding PR.
+- Obtain the exact `main` protection/effective-rules output proving direct
+  `GITHUB_TOKEN` updates are allowed, or authorization to enable repository
+  auto-merge and Actions-created pull requests (or to use an approved App/PAT).
+- Then finalize the selected workflow, write `out.md`, push the branch, and
+  open the superseding PR.
