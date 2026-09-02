@@ -2,8 +2,8 @@
 
 ## State
 
-Design evidence reviewed; implementation is next. The lane currently has no DNS
-access to GitHub, so the required live `main` rules API evidence remains pending.
+Trusted anchoring core implemented and tested. Publication-path selection remains
+pending because classic `main` protection details are not yet readable in this lane.
 
 ## Done
 
@@ -20,10 +20,18 @@ access to GitHub, so the required live `main` rules API evidence remains pending
   `gate_surface` and `data_surface`, while `releases/**` must not change.
 - Attempted `gh api repos/PolicyEngine/chronicle/rules/branches/main`; GitHub DNS
   is unavailable in this lane, so no publication-path assumption has been made.
+- Re-read Sol's completed #182 verdict and addressed its output-spoofing,
+  local-state, backup-loss, and symlink-escape findings in the trusted tool.
+- Copied the 15 proof blobs for releases 0000–0014 byte-for-byte from `545cfe56`.
+- Added `--manifests`, complete-proof binding re-verification, a testable
+  `ots/`-only change guard, and 14 hermetic fake-client tests (all passing).
+- Queried GitHub through the authenticated connector: `main` is protected,
+  required-status-check enforcement is off, and repository plus parent ruleset
+  lists are empty. The integration cannot read classic protection, so this is
+  not yet enough evidence to choose direct push.
 
 ## Next
 
 - Obtain live `main` rules evidence and select direct-push versus bot-PR publication.
-- Reuse the proven anchoring tool and proofs while addressing all gate findings.
 - Add the main-owned workflow, documentation, CI wiring, and tests.
 - Run the full required verification, push the branch, and open the superseding PR.
