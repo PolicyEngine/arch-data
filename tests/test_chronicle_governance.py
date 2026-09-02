@@ -50,6 +50,14 @@ def test_chronicle_governance_files_define_required_review_surface():
     for judge_id in required_judges:
         assert judge_id in pr_template
 
+    boundary_verdict = agents["required_judges"]["ledger-boundary"]["verdict"]
+    for phrase in (
+        "microdata records, rows, columns, row values, or cells",
+        "facts derived from raw microdata",
+        "licensed or restricted microdata bytes",
+    ):
+        assert phrase in boundary_verdict
+
 
 def test_ci_runs_boundary_and_governance_tests():
     ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text()

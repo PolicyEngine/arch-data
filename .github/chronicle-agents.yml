@@ -43,4 +43,4 @@ required_judges:
   ledger-contract:
     verdict: PASS if schema or identity changes preserve source provenance and do not move Microcosm responsibilities into Chronicle.
   ledger-boundary:
-    verdict: PASS if reconciliation, aging, imputation, support-aware activation, and solver construction remain outside Chronicle, no microdata rows, cells, or facts computed directly from raw microdata enter Chronicle, and no licensed or restricted microdata bytes enter any Chronicle store (docs/adr-chronicle-raw-microdata-identity.md).
+    verdict: PASS if reconciliation, aging, imputation, support-aware activation, and solver construction remain outside Chronicle; no microdata records, rows, columns, row values, or cells and no facts derived from raw microdata by Chronicle or a consumer enter Chronicle; and no licensed or restricted microdata bytes enter any Chronicle store (docs/adr-chronicle-raw-microdata-identity.md).

@@ -12,12 +12,12 @@ Chronicle may normalize structure: parse files, type values, declare units and
 scales, assign geography and period identifiers, preserve lineage back to
 source artifacts, and publish source-backed facts. Chronicle does not own
 selection or measurement contracts, reconcile inconsistent sources, impute
-missing data, parse survey or administrative microdata into rows, cells, or
-facts, hold licensed or restricted microdata bytes, or execute
-simulator-specific calibration. Chronicle
+missing data, parse survey or administrative microdata into records, rows,
+columns, row values, or cells, derive facts from raw microdata, hold licensed
+or restricted microdata bytes, or execute simulator-specific calibration. Chronicle
 does register the microdata releases its consumers build from (publisher,
-vintage, checksum, licence) and archives the bytes of redistributable public-use
-files; see
+vintage, checksum, licence) and archives the bytes of public-use files whose
+licence is on its redistributable allowlist; see
 [`docs/adr-chronicle-raw-microdata-identity.md`](docs/adr-chronicle-raw-microdata-identity.md).
 
 Microcosm consumes Chronicle facts, owns the contracts that select and bind

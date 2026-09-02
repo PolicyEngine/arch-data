@@ -21,8 +21,9 @@ Chronicle may:
 
 - register raw publisher artifacts and checksums
 - register raw microdata releases as source artifacts (publisher, access
-  route, vintage, checksum, licence, fetch time), archiving bytes only where
-  the publisher's terms permit redistribution
+  route, vintage, checksum, licence, hash source, verification date),
+  archiving bytes only when the release is `public` and its licence is on
+  the redistributable allowlist
 - parse source rows and cells
 - emit source-backed aggregate facts, including publisher projections typed
   `assertion: source_projection`
@@ -40,8 +41,10 @@ Chronicle must not:
   levels) as facts or in any other store object
 - compute aligned values; it publishes the source period and value unchanged
 - impute missing values
-- parse survey or administrative microdata into source rows, cells, or facts,
-  or hold licensed or restricted microdata bytes in any Chronicle store
+- parse survey or administrative microdata into records, rows, columns, row
+  values, or cells, derive facts from raw microdata (by Chronicle or a
+  consumer), or hold licensed or restricted microdata bytes in any Chronicle
+  store
 - own selection, measurement, period-alignment, or model-binding contracts
 - choose a support-aware active target subset
 - build solver-ready calibration targets
@@ -70,5 +73,6 @@ types are:
 The overall verdict fails if any required judge fails. A judge must fail if a
 change moves reconciliation, aging, imputation, active target selection, or
 solver construction from Microcosm into Chronicle, stores a
-PolicyEngine-computed value as a fact, parses microdata into rows or facts, or
-stores licensed or restricted microdata bytes.
+PolicyEngine-computed value as a fact, parses microdata into records, rows,
+columns, row values, or cells, derives facts from raw microdata, or stores
+licensed or restricted microdata bytes.
