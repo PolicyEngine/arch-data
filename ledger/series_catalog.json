@@ -1,11 +1,11 @@
 {
   "comment": "Canonical series catalog. One row per (concept, geography level/id/vintage, entity) identity. UUID authority is the append-only ledger/series_uuid_registry.jsonl (digest below): a uuid is minted once, inherited from the registry on every regeneration, and changes only through explicit, chained supersede/retire/revive/succeeds events recorded there (live bindings and rows stay in bijection). Consumers reference series by uuid or concept only. Regenerate with scripts/build_series_catalog.py; verify with --check. Aliases are curated identity statements (plus observed spellings of the same identity) and inherit only within one (geography, entity) slice; aliases listed in ambiguous_aliases match multiple rows and never drive inheritance. source_concepts are publisher labels — provenance, never identity. Cross-spelling and cross-vintage merges are manual curation: delete the absorbed row, alias its concept on the survivor, regenerate with --allow-remint.",
   "generator_version": 3,
-  "observations_sha256": "d4fe16b9072cc8493f3f47b1554ee96a96e89183952941dc111345480717b1e5",
-  "observation_rows": 216,
-  "current_assertion_rows": 216,
+  "observations_sha256": "2da302b25d15386aeab7089a199edf79e395a33eca5e6b35c023d3fbc45d3bce",
+  "observation_rows": 221,
+  "current_assertion_rows": 221,
   "docket_seed_sha256": "5914192517350e0166045afd9064a515ea312acbea1844d9cb594cc9f525dbb9",
-  "uuid_registry_sha256": "0d9d893f4fc922650b897a5b250fbbb291e9db89ec23bb6246ca8e69ebb48fea",
+  "uuid_registry_sha256": "6cf24b1eff573ac6e8d7de21c7f3e0091bb92a96e72fa2073379be59fbffd683",
   "suspect_segments": [
     "LNU02374597"
   ],
@@ -71,6 +71,7 @@
       "boe.bank_rate"
     ],
     "2026_07": [
+      "bea.trade.goods_services_deficit",
       "bls.cpi.owners_equivalent_rent_mom",
       "bls.cpi.rent_primary_residence_mom",
       "bls.cpi.services_less_energy_mom",
@@ -78,6 +79,8 @@
       "bls.cpi.shelter_mom",
       "bls.cps.u6_underemployment_rate",
       "bls.export_prices.all_commodities_mom",
+      "bls.jolts.hires_rate",
+      "census.construction_spending.total_mom",
       "census.housing.completions_saar",
       "census.housing.permits_saar",
       "census.m3.durable_goods_new_orders_mom",
@@ -237,6 +240,10 @@
       "us.dol.initial_claims.sa"
     ],
     "week_2026-08-15": [
+      "dol.eta.continued_claims.sa",
+      "us.dol.initial_claims.sa"
+    ],
+    "week_2026-08-22": [
       "dol.eta.continued_claims.sa",
       "us.dol.initial_claims.sa"
     ],
@@ -920,20 +927,36 @@
       "uuid": "7be75093-832c-4734-a002-a0ff19c610ce",
       "concept": "bea.trade.goods_services_deficit",
       "family_patterns": [
-        "bea.trade.goods_services_deficit"
+        "bea.trade.goods_services_deficit.{P}"
       ],
-      "status": "docket-only",
+      "status": "observed",
       "unit": "usd_billions",
       "cadence": "month",
-      "geography": null,
-      "entity": null,
-      "sources": [],
-      "aliases": [],
-      "source_concepts": [],
-      "rid_patterns": [],
-      "first_observed_period": null,
-      "last_observed_period": null,
-      "observation_count": 0
+      "geography": {
+        "level": "country",
+        "id": "0100000US",
+        "vintage": "current",
+        "name": "United States"
+      },
+      "entity": {
+        "name": "economy",
+        "role": "aggregate"
+      },
+      "sources": [
+        "bea_census_trade"
+      ],
+      "aliases": [
+        "bea.trade.goods_services_deficit.2026_07"
+      ],
+      "source_concepts": [
+        "BOPGSTB"
+      ],
+      "rid_patterns": [
+        "bea.trade.goods_services_deficit.{P}.first_print"
+      ],
+      "first_observed_period": "2026-07",
+      "last_observed_period": "2026-07",
+      "observation_count": 1
     },
     {
       "uuid": "27202e84-7743-46ed-a6e8-2c907aa79a6c",
@@ -2151,7 +2174,8 @@
         "bls_jolts"
       ],
       "aliases": [
-        "bls.jolts.hires_rate.2026_06"
+        "bls.jolts.hires_rate.2026_06",
+        "bls.jolts.hires_rate.2026_07"
       ],
       "source_concepts": [
         "JTSHIR"
@@ -2160,8 +2184,8 @@
         "bls.jolts.hires_rate.{P}.first_print"
       ],
       "first_observed_period": "2026-06",
-      "last_observed_period": "2026-06",
-      "observation_count": 1
+      "last_observed_period": "2026-07",
+      "observation_count": 2
     },
     {
       "uuid": "020dafc2-2ca3-453b-a6bc-f96d443a5f77",
@@ -2533,7 +2557,8 @@
         "census_construction"
       ],
       "aliases": [
-        "census.construction_spending.total_mom.2026_06"
+        "census.construction_spending.total_mom.2026_06",
+        "census.construction_spending.total_mom.2026_07"
       ],
       "source_concepts": [
         "TTLCONS"
@@ -2542,8 +2567,8 @@
         "census.construction_spending.total_mom.{P}.first_print"
       ],
       "first_observed_period": "2026-06",
-      "last_observed_period": "2026-06",
-      "observation_count": 1
+      "last_observed_period": "2026-07",
+      "observation_count": 2
     },
     {
       "uuid": "e16080e3-02e9-4ae1-95c6-3ded737cf697",
@@ -3122,8 +3147,8 @@
         "dol.eta.continued_claims.sa.{P}.first_print"
       ],
       "first_observed_period": "2026-06-27",
-      "last_observed_period": "2026-08-15",
-      "observation_count": 8
+      "last_observed_period": "2026-08-22",
+      "observation_count": 9
     },
     {
       "uuid": "32b335ea-b2dd-4fba-8321-e9751df19318",
@@ -7135,8 +7160,8 @@
         "us.dol.initial_claims.sa.{P}"
       ],
       "first_observed_period": "2026-06-20",
-      "last_observed_period": "2026-08-15",
-      "observation_count": 8
+      "last_observed_period": "2026-08-22",
+      "observation_count": 9
     },
     {
       "uuid": "830e68bb-9ed6-493c-a8a4-440ba8e53f76",
