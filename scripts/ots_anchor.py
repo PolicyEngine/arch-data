@@ -20,15 +20,20 @@ Subcommands:
 - ``run``: stamp any manifest that lacks a proof, then try to upgrade pending
   proofs to complete Bitcoin attestations. Idempotent; safe on a schedule.
 - ``verify``: check every proof against its manifest's current bytes and
-  report the state stored in each local proof. Exits nonzero on a digest
-  mismatch or a manifest with no proof.
-- ``status``: list proofs and whether each is unanchored, pending locally, or
-  Bitcoin-complete locally.
+  report the state stored in each local proof. Every manifest is reported;
+  the exit status is nonzero if any proof is missing or mismatched.
+- ``status``: list proofs and whether each is unanchored, mismatched, pending
+  locally, or Bitcoin-complete locally. Exits nonzero only if the client
+  could not inspect a proof, so the listing would be incomplete.
 - ``guard``: fail if the repository has any change outside ``ots/``.
 
 Requires the ``ots`` CLI (PyPI ``opentimestamps-client``); stamping and
-upgrading contact public calendar servers. Verification with ``--no-bitcoin``
-checks the file binding and prints manual Bitcoin block-check information.
+upgrading contact public calendar servers. The binding between a proof and a
+manifest is established locally: the ``File sha256 hash`` that ``ots info``
+reads out of the proof must equal the manifest's SHA-256. The client's own
+``--no-bitcoin verify`` then runs as an independent check. Its calendar
+messages are logged, never parsed, and only its exact digest-mismatch line
+can fail a proof.
 """
 
 from __future__ import annotations
@@ -43,6 +48,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from typing import NamedTuple
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST_DIR = pathlib.Path("releases/manifests")
@@ -50,17 +56,16 @@ OTS_DIR = pathlib.Path("ots")
 MANIFEST_NAME_RE = re.compile(r"^(\d{4})-([0-9a-f]{16})\.json$")
 SUBPROCESS_TIMEOUT = 300
 
-# Full-line output observed from opentimestamps-client 0.7.2. Calendar URLs and
-# errors are untrusted text, so substring matches are intentionally unsafe.
-_MISMATCH_LINE = "File does not match original"
-_VERIFY_PENDING_LINE_RE = re.compile(
-    r"Calendar \S+: Pending confirmation in Bitcoin blockchain"
+# Full-line output of opentimestamps-client 0.7.2 (otsclient/cmds.py). Calendar
+# URLs and error reasons are untrusted text, so every match below is anchored
+# to a whole line and nothing is matched inside text a calendar can influence.
+#
+# verify_command: logging.error("File does not match original!"), then exit 1.
+_MISMATCH_LINE = "File does not match original!"
+# info_command: print("File %s hash: %s" % (hash name, hex digest)) on stdout.
+_INFO_FILE_HASH_LINE_RE = re.compile(
+    r"^File (?P<algorithm>[a-z0-9]+) hash: (?P<digest>[0-9a-fA-F]+)$", re.MULTILINE
 )
-_VERIFY_MANUAL_LINE_RE = re.compile(
-    r"To verify manually, check that Bitcoin block \d+ "
-    r"has merkleroot [0-9a-fA-F]{64}"
-)
-_VERIFY_BITCOIN_DISABLED_LINE = "Not checking Bitcoin attestation; Bitcoin disabled"
 _UPGRADE_PENDING_LINE_RE = re.compile(
     r"^\s*(?:Failed!\s*)?Timestamp not complete\.?\s*$", re.MULTILINE
 )
@@ -186,8 +191,22 @@ def stamp_manifest(
     return destination
 
 
-def local_proof_state(proof: pathlib.Path, ots_bin: list[str]) -> str:
-    """Return the attestation state serialized in the local proof itself."""
+class ProofInfo(NamedTuple):
+    """What ``ots info`` reads out of a local proof file."""
+
+    digest: str
+    """Lowercase hex SHA-256 of the file the proof commits to."""
+    state: str
+    """``"bitcoin"`` or ``"pending"``."""
+
+
+def inspect_proof(proof: pathlib.Path, ots_bin: list[str]) -> ProofInfo:
+    """Read the bound file digest and attestation state from the proof itself.
+
+    ``ots info`` only deserializes the proof; it never contacts a calendar, so
+    it is the trusted source for both facts. The digest line must appear
+    exactly once and name SHA-256; anything else fails closed.
+    """
 
     check_proof_destination(proof)
     if not proof.is_file():
@@ -196,14 +215,34 @@ def local_proof_state(proof: pathlib.Path, ots_bin: list[str]) -> str:
     output = completed.stdout + completed.stderr
     if completed.returncode != 0:
         raise AnchorError(f"ots info failed for {proof.name}: {output.strip()}")
+    digest_lines = _INFO_FILE_HASH_LINE_RE.findall(completed.stdout)
+    if len(digest_lines) != 1:
+        raise AnchorError(
+            f"ots info for {proof.name} printed {len(digest_lines)} file hash "
+            "lines; expected exactly one"
+        )
+    algorithm, digest = digest_lines[0]
+    if algorithm != "sha256" or len(digest) != 64:
+        raise AnchorError(
+            f"proof {proof.name} commits to a {algorithm} digest of "
+            f"{len(digest)} hex characters; only SHA-256 proofs are anchored"
+        )
     if _INFO_BITCOIN_LINE_RE.search(output):
-        return "bitcoin"
-    if _INFO_PENDING_LINE_RE.search(output):
-        return "pending"
-    raise AnchorError(
-        f"proof {proof.name} lists neither a Bitcoin nor a pending "
-        "attestation; refusing to guess"
-    )
+        state = "bitcoin"
+    elif _INFO_PENDING_LINE_RE.search(output):
+        state = "pending"
+    else:
+        raise AnchorError(
+            f"proof {proof.name} lists neither a Bitcoin nor a pending "
+            "attestation; refusing to guess"
+        )
+    return ProofInfo(digest=digest.lower(), state=state)
+
+
+def local_proof_state(proof: pathlib.Path, ots_bin: list[str]) -> str:
+    """Return the attestation state serialized in the local proof itself."""
+
+    return inspect_proof(proof, ots_bin).state
 
 
 def proof_is_complete(proof: pathlib.Path, ots_bin: list[str]) -> bool:
@@ -278,46 +317,100 @@ def upgrade_proof(
     return state == "bitcoin"
 
 
+def _log_client_output(label: str, completed: subprocess.CompletedProcess[str]) -> None:
+    """Echo client output into the run log without interpreting it.
+
+    Every echoed line is indented so that untrusted calendar text can never
+    start a line: GitHub Actions reads ``::``-prefixed workflow commands from
+    job output.
+    """
+
+    print(f"{label}: exit status {completed.returncode}", file=sys.stderr)
+    for line in completed.stdout.splitlines() + completed.stderr.splitlines():
+        print(f"  {line}", file=sys.stderr)
+
+
 def verify_proof_binding(
     manifest: pathlib.Path, proof: pathlib.Path, ots_bin: list[str]
 ) -> bool:
-    """Return false only for the client's exact digest-mismatch output."""
+    """Run the client's own verification as an independent, fail-closed check.
+
+    Returns false only when the client prints its exact digest-mismatch line,
+    which it does before consulting any calendar. Otherwise
+    ``--no-bitcoin verify`` exits 1 whether the proof is pending or complete,
+    and first asks each calendar for upgrades, printing lines such as
+    ``Got 1 attestation(s) from <url>``, ``Calendar <url>: Pending
+    confirmation in Bitcoin blockchain``, or ``Calendar <url>: <error>``
+    whose exact shape depends on calendar state and network conditions. That
+    output is logged verbatim and never parsed; the binding itself comes from
+    ``inspect_proof``. An exit status the client never uses means the
+    verification did not run, which fails closed.
+    """
 
     completed = _run_ots(
         ots_bin, ["--no-bitcoin", "verify", "-f", str(manifest), str(proof)]
     )
-    output = completed.stdout + completed.stderr
+    _log_client_output(f"ots verify {proof.name}", completed)
     lines = completed.stdout.splitlines() + completed.stderr.splitlines()
     if _MISMATCH_LINE in lines:
         return False
-    if (
-        completed.returncode == 1
-        and lines
-        and all(_VERIFY_PENDING_LINE_RE.fullmatch(line) for line in lines)
-    ):
-        return True
-    if completed.returncode == 1 and len(lines) >= 2 and len(lines) % 2 == 0:
-        pairs = zip(lines[::2], lines[1::2])
-        if all(
-            disabled == _VERIFY_BITCOIN_DISABLED_LINE
-            and _VERIFY_MANUAL_LINE_RE.fullmatch(manual)
-            for disabled, manual in pairs
-        ):
-            return True
-    raise AnchorError(
-        f"unrecognized ots verify outcome for {proof.name}: {output.strip()}"
-    )
+    if completed.returncode not in (0, 1):
+        raise AnchorError(
+            f"ots verify did not run to completion for {proof.name} "
+            f"(exit status {completed.returncode})"
+        )
+    return True
 
 
 def classify_proof(
     manifest: pathlib.Path, proof: pathlib.Path, ots_bin: list[str]
 ) -> str:
-    """Classify a locally stored proof after checking its exact-file binding."""
+    """Classify a local proof as ``"mismatch"``, ``"pending"``, or ``"bitcoin"``.
 
-    state = local_proof_state(proof, ots_bin)
+    The digest ``ots info`` reads out of the proof must equal the manifest's
+    SHA-256. That comparison needs no calendar traffic and is the binding this
+    tool relies on; a mismatch is final and skips the client's verification.
+    Otherwise the client's own verification runs as a second, independent
+    check that can only downgrade the result.
+    """
+
+    info = inspect_proof(proof, ots_bin)
+    if info.digest != sha256_file(manifest):
+        return "mismatch"
     if not verify_proof_binding(manifest, proof, ots_bin):
         return "mismatch"
-    return state
+    return info.state
+
+
+def classify_manifest(
+    root: pathlib.Path, manifest: pathlib.Path, ots_bin: list[str]
+) -> tuple[str, str]:
+    """Classify one manifest for a report without aborting the sweep.
+
+    Returns ``(state, detail)``. ``state`` is ``"unanchored"``, ``"mismatch"``,
+    ``"error"``, ``"pending"``, or ``"bitcoin"``; ``detail`` explains the first
+    three. ``run`` deliberately does not use this: it must stop at the first
+    manifest it cannot anchor, while ``verify`` and ``status`` must report
+    every manifest so that no failure hides behind an earlier one.
+    """
+
+    try:
+        check_manifest_name_digest(manifest)
+    except AnchorError:
+        return "mismatch", "manifest bytes contradict its filename"
+    except OSError as exc:
+        return "error", str(exc)
+    proof = proof_path(root, manifest)
+    try:
+        check_proof_destination(proof)
+        if not proof.exists():
+            return "unanchored", "no OpenTimestamps proof"
+        state = classify_proof(manifest, proof, ots_bin)
+    except (AnchorError, OSError) as exc:
+        return "error", str(exc)
+    if state == "mismatch":
+        return "mismatch", "proof does not match manifest bytes"
+    return state, ""
 
 
 def command_run(
@@ -381,21 +474,15 @@ def command_verify(
     pending_count = 0
     bitcoin_count = 0
     for manifest in manifests:
-        check_manifest_name_digest(manifest)
-        proof = proof_path(root, manifest)
-        check_proof_destination(proof)
-        if not proof.exists():
-            failures.append(f"{manifest.name}: no OpenTimestamps proof")
-            continue
-        state = classify_proof(manifest, proof, ots_bin)
-        if state == "mismatch":
-            failures.append(f"{manifest.name}: proof does not match manifest bytes")
+        state, detail = classify_manifest(root, manifest, ots_bin)
+        if state == "bitcoin":
+            bitcoin_count += 1
         elif state == "pending":
             pending_count += 1
             if require_bitcoin:
                 failures.append(f"{manifest.name}: attestation not yet in local proof")
         else:
-            bitcoin_count += 1
+            failures.append(f"{manifest.name}: {detail}")
     print(
         f"ots anchor verify: {len(manifests)} manifests, "
         f"{bitcoin_count} locally Bitcoin-complete, {pending_count} pending locally"
@@ -412,21 +499,24 @@ def command_status(
     root: pathlib.Path, manifest_dir: pathlib.Path, ots_bin: list[str]
 ) -> int:
     manifests = discover_manifests(manifest_dir)
+    errors = 0
     for manifest in manifests:
-        check_manifest_name_digest(manifest)
-        proof = proof_path(root, manifest)
-        check_proof_destination(proof)
-        if not proof.exists():
-            print(f"{manifest.name}: unanchored")
-            continue
-        state = classify_proof(manifest, proof, ots_bin)
-        label = {
-            "bitcoin": "bitcoin attestation stored locally",
-            "pending": "pending local proof",
-            "mismatch": "MISMATCH",
-        }[state]
+        state, detail = classify_manifest(root, manifest, ots_bin)
+        if state == "bitcoin":
+            label = "bitcoin attestation stored locally"
+        elif state == "pending":
+            label = "pending local proof"
+        elif state == "unanchored":
+            label = "unanchored"
+        elif state == "mismatch":
+            label = f"MISMATCH ({detail})"
+        else:
+            errors += 1
+            label = f"ERROR ({detail})"
         print(f"{manifest.name}: {label}")
-    return 0
+    # A mismatch is a finding this listing exists to show; a client failure
+    # means the listing is incomplete, which is the only nonzero exit here.
+    return 1 if errors else 0
 
 
 def git_changed_paths(root: pathlib.Path) -> list[str]:

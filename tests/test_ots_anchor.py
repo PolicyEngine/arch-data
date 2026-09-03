@@ -1,9 +1,11 @@
 """Tests for scripts/ots_anchor.py.
 
 The suite never contacts calendar servers or Bitcoin: a fake ``ots``
-executable reproduces the observed opentimestamps-client 0.7.2 output
-contract (stamp/upgrade/info/verify), and every invocation is logged so the
-tests can assert which operations ran.
+executable reproduces the opentimestamps-client 0.7.2 output contract
+(stamp/upgrade/info/verify, as read from ``otsclient/cmds.py`` and observed
+against the real client), and every invocation is logged so the tests can
+assert which operations ran. Like the real client, the fake prints ``info``
+output on stdout and every logged message on stderr.
 """
 
 from __future__ import annotations
@@ -29,24 +31,61 @@ CALENDARS = (
     "https://alice.btc.calendar.opentimestamps.org",
     "https://bob.btc.calendar.opentimestamps.org",
 )
-PENDING_VERIFY_OUTPUT = "".join(
-    f"Calendar {calendar}: Pending confirmation in Bitcoin blockchain\n"
-    for calendar in CALENDARS
+BITCOIN_ATTESTATIONS = (
+    (963242, "34ff137ec701d2ee72ac4f88a08ddee948932f6be2840a066198acfae077a24d"),
+    (963243, "583d3abcc52c06fdffa5ba3d24177b6fb6f048f63733e2f79734897648827278"),
+    (963253, "20f7fb6f9e04f098f4cdecb138618d62d4e302a22f1e144c1e3f16c7d97fb00e"),
+    (963257, "376fd236cf6f231bb0453fcb5b109d3dfc2bebfac2455f3e723f0a79b6919f75"),
 )
-PENDING_INFO_OUTPUT = "".join(
+
+
+def pending_line(calendar: str) -> str:
+    return f"Calendar {calendar}: Pending confirmation in Bitcoin blockchain\n"
+
+
+def confirmed_line(calendar: str) -> str:
+    return f"Got 1 attestation(s) from {calendar}\n"
+
+
+def manual_check_lines(block: int, merkle_root: str) -> str:
+    return (
+        "Not checking Bitcoin attestation; Bitcoin disabled\n"
+        f"To verify manually, check that Bitcoin block {block} "
+        f"has merkleroot {merkle_root}\n"
+    )
+
+
+MISMATCH_VERIFY_OUTPUT = "File does not match original!\n"
+PENDING_VERIFY_OUTPUT = "".join(pending_line(calendar) for calendar in CALENDARS)
+COMPLETE_VERIFY_OUTPUT = "".join(
+    manual_check_lines(block, root) for block, root in BITCOIN_ATTESTATIONS
+)
+# A locally pending proof whose calendars have all confirmed: the client's
+# verify path upgrades in memory first, then reports each attestation.
+RESOLVED_VERIFY_OUTPUT = (
+    "".join(confirmed_line(calendar) for calendar in CALENDARS) + COMPLETE_VERIFY_OUTPUT
+)
+# The normal progression: some calendars confirmed, the rest still pending.
+MIXED_VERIFY_OUTPUT = (
+    confirmed_line(CALENDARS[0])
+    + pending_line(CALENDARS[1])
+    + confirmed_line(CALENDARS[2])
+    + pending_line(CALENDARS[3])
+    + "".join(
+        manual_check_lines(block, root) for block, root in BITCOIN_ATTESTATIONS[:2]
+    )
+)
+# Transient calendar failures are logged with the URLError reason text.
+TRANSIENT_VERIFY_OUTPUT = (
+    f"Calendar {CALENDARS[0]}: timed out\n"
+    f"Calendar {CALENDARS[1]}: [Errno -3] Temporary failure in name resolution\n"
+    + pending_line(CALENDARS[2])
+    + pending_line(CALENDARS[3])
+)
+PENDING_INFO_TREE = "".join(
     f"    verify PendingAttestation('{calendar}')\n" for calendar in CALENDARS
 )
-COMPLETE_VERIFY_OUTPUT = """\
-Not checking Bitcoin attestation; Bitcoin disabled
-To verify manually, check that Bitcoin block 963242 has merkleroot 34ff137ec701d2ee72ac4f88a08ddee948932f6be2840a066198acfae077a24d
-Not checking Bitcoin attestation; Bitcoin disabled
-To verify manually, check that Bitcoin block 963243 has merkleroot 583d3abcc52c06fdffa5ba3d24177b6fb6f048f63733e2f79734897648827278
-Not checking Bitcoin attestation; Bitcoin disabled
-To verify manually, check that Bitcoin block 963253 has merkleroot 20f7fb6f9e04f098f4cdecb138618d62d4e302a22f1e144c1e3f16c7d97fb00e
-Not checking Bitcoin attestation; Bitcoin disabled
-To verify manually, check that Bitcoin block 963257 has merkleroot 376fd236cf6f231bb0453fcb5b109d3dfc2bebfac2455f3e723f0a79b6919f75
-"""
-COMPLETE_INFO_OUTPUT = """\
+COMPLETE_INFO_TREE = """\
     verify PendingAttestation('https://btc.calendar.catallaxy.com')
     verify BitcoinBlockHeaderAttestation(963257)
     verify PendingAttestation('https://bob.btc.calendar.opentimestamps.org')
@@ -56,6 +95,11 @@ COMPLETE_INFO_OUTPUT = """\
     verify PendingAttestation('https://finney.calendar.eternitywall.com')
     verify BitcoinBlockHeaderAttestation(963253)
 """
+
+
+def info_output(digest: str, tree: str) -> str:
+    return f"File sha256 hash: {digest}\nTimestamp:\n{tree}"
+
 
 FAKE_OTS = r"""
 import hashlib
@@ -91,18 +135,56 @@ BITCOIN_ATTESTATIONS = (
 )
 
 
-def print_pending_calendars():
-    for calendar in CALENDARS:
-        print(f"Calendar {calendar}: Pending confirmation in Bitcoin blockchain")
+def log_line(message):
+    # otsclient/ots.py: logging.basicConfig(format="%(message)s") -> stderr.
+    print(message, file=sys.stderr)
 
 
-def print_complete_verification():
-    for block, merkle_root in BITCOIN_ATTESTATIONS:
-        print("Not checking Bitcoin attestation; Bitcoin disabled")
-        print(
-            f"To verify manually, check that Bitcoin block {block} "
-            f"has merkleroot {merkle_root}"
+def calendar_pending(calendar):
+    log_line(f"Calendar {calendar}: Pending confirmation in Bitcoin blockchain")
+
+
+def calendar_confirmed(calendar):
+    log_line(f"Got 1 attestation(s) from {calendar}")
+
+
+def manual_check(block, merkle_root):
+    log_line("Not checking Bitcoin attestation; Bitcoin disabled")
+    log_line(
+        f"To verify manually, check that Bitcoin block {block} "
+        f"has merkleroot {merkle_root}"
+    )
+
+
+def verify_pending_proof(mode):
+    # upgrade_timestamp() chatter first, then one report per attestation now
+    # held in memory, exactly as verify_timestamp() in otsclient/cmds.py does.
+    confirmed = 0
+    if mode == "pending":
+        for calendar in CALENDARS:
+            calendar_pending(calendar)
+    elif mode == "resolved":
+        for calendar in CALENDARS:
+            calendar_confirmed(calendar)
+        confirmed = len(CALENDARS)
+    elif mode == "mixed":
+        calendar_confirmed(CALENDARS[0])
+        calendar_pending(CALENDARS[1])
+        calendar_confirmed(CALENDARS[2])
+        calendar_pending(CALENDARS[3])
+        confirmed = 2
+    elif mode == "transient":
+        log_line(f"Calendar {CALENDARS[0]}: timed out")
+        log_line(
+            f"Calendar {CALENDARS[1]}: "
+            "[Errno -3] Temporary failure in name resolution"
         )
+        calendar_pending(CALENDARS[2])
+        calendar_pending(CALENDARS[3])
+    else:
+        raise SystemExit(f"unexpected FAKE_OTS_VERIFY_CALENDARS: {mode}")
+    for block, merkle_root in BITCOIN_ATTESTATIONS[:confirmed]:
+        manual_check(block, merkle_root)
 
 
 def log(entry):
@@ -128,10 +210,17 @@ def main():
         write_proof(
             str(target) + ".ots", {"digest": digest, "state": "pending"}
         )
-        print("Submitting to remote calendar https://fake.calendar")
+        for calendar in CALENDARS:
+            log_line(f"Submitting to remote calendar {calendar}")
         return 0
     if command == "info":
         proof = read_proof(arguments[1])
+        spoof = os.environ.get("FAKE_OTS_INFO_SPOOF")
+        print(f"File sha256 hash: {proof['digest']}")
+        print("Timestamp:")
+        if spoof == "hash-line":
+            # A second full digest line must not be trusted over the first.
+            print(f"File sha256 hash: {os.environ['FAKE_OTS_SPOOF_DIGEST']}")
         if proof["state"] == "bitcoin":
             print("    verify PendingAttestation('https://btc.calendar.catallaxy.com')")
             print("    verify BitcoinBlockHeaderAttestation(963257)")
@@ -150,10 +239,15 @@ def main():
                 "'https://finney.calendar.eternitywall.com')"
             )
             print("    verify BitcoinBlockHeaderAttestation(963253)")
-        elif os.environ.get("FAKE_OTS_INFO_SPOOF") == "yes":
+        elif spoof == "attestation":
             print(
                 "verify PendingAttestation("
                 "'https://fake/BitcoinBlockHeaderAttestation(1)')"
+            )
+        elif spoof == "hash-in-uri":
+            print(
+                "    verify PendingAttestation('https://fake/"
+                f"File sha256 hash: {os.environ['FAKE_OTS_SPOOF_DIGEST']}')"
             )
         else:
             for calendar in CALENDARS:
@@ -169,36 +263,40 @@ def main():
             pathlib.Path(str(path) + ".bak").write_text(
                 "backup", encoding="utf-8"
             )
-            print("Success! Timestamp complete")
+            for calendar in CALENDARS:
+                calendar_confirmed(calendar)
+            log_line("Success! Timestamp complete")
             return 0
         if upgrade == "broken":
             path.replace(pathlib.Path(str(path) + ".bak"))
-            print("calendar response could not be serialized")
+            log_line("calendar response could not be serialized")
             return 2
-        print_pending_calendars()
-        print("Failed! Timestamp not complete")
+        for calendar in CALENDARS:
+            calendar_pending(calendar)
+        log_line("Failed! Timestamp not complete")
         return 1
     if command == "verify":
         target = pathlib.Path(arguments[arguments.index("-f") + 1])
         proof = read_proof(arguments[-1])
         digest = hashlib.sha256(target.read_bytes()).hexdigest()
-        if digest != proof["digest"]:
-            print("File does not match original")
-            return 1
-        if os.environ.get("FAKE_OTS_VERIFY_OUTCOME") == "unrecognized":
-            print("File does not match original!")
-            print(
-                "Calendar https://fake.calendar: Pending confirmation in Bitcoin "
-                "blockchain (unexpected trailing text)"
-            )
-            return 1
         if (
-            proof["state"] == "bitcoin"
-            or os.environ.get("FAKE_OTS_VERIFY_RESOLVED") == "yes"
+            digest != proof["digest"]
+            or os.environ.get("FAKE_OTS_VERIFY_FORCE_MISMATCH") == "yes"
         ):
-            print_complete_verification()
+            # otsclient/cmds.py verify_command: the digest check happens
+            # before any calendar is consulted.
+            log_line("File does not match original!")
             return 1
-        print_pending_calendars()
+        abnormal_exit = os.environ.get("FAKE_OTS_VERIFY_EXIT")
+        if abnormal_exit:
+            log_line("Traceback (most recent call last):")
+            log_line("RuntimeError: simulated client crash")
+            return int(abnormal_exit)
+        if proof["state"] == "bitcoin":
+            for block, merkle_root in BITCOIN_ATTESTATIONS:
+                manual_check(block, merkle_root)
+            return 1
+        verify_pending_proof(os.environ.get("FAKE_OTS_VERIFY_CALENDARS", "pending"))
         return 1
     raise SystemExit(f"unexpected fake ots command: {command}")
 
@@ -258,6 +356,18 @@ def invoke_fake_ots(repo: dict, *arguments: str) -> subprocess.CompletedProcess[
     )
 
 
+def proof_for(repo: dict, index: int) -> Path:
+    return repo["root"] / "ots" / f"{repo['manifests'][index].name}.ots"
+
+
+def rebind_proof(proof: Path, **changes: str) -> None:
+    """Rewrite a fake proof so it binds other bytes or carries another state."""
+
+    payload = json.loads(proof.read_text(encoding="utf-8"))
+    payload.update(changes)
+    proof.write_text(json.dumps(payload), encoding="utf-8")
+
+
 def test_run_stamps_every_manifest_into_ots_dir(repo: dict) -> None:
     assert run_cli(repo, "run") == 0
     proofs = sorted((repo["root"] / "ots").iterdir())
@@ -313,16 +423,14 @@ def test_verify_passes_with_pending_proofs_by_default(repo: dict) -> None:
 
 def test_verify_fails_on_missing_proof(repo: dict) -> None:
     assert run_cli(repo, "run") == 0
-    (repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots").unlink()
+    proof_for(repo, 0).unlink()
     assert run_cli(repo, "verify") == 1
 
 
 def test_verify_fails_when_proof_binds_different_bytes(repo: dict) -> None:
     assert run_cli(repo, "run") == 0
-    proof = repo["root"] / "ots" / f"{repo['manifests'][1].name}.ots"
-    payload = json.loads(proof.read_text(encoding="utf-8"))
-    payload["digest"] = "ab" * 32
-    proof.write_text(json.dumps(payload), encoding="utf-8")
+    proof = proof_for(repo, 1)
+    rebind_proof(proof, digest="ab" * 32)
     assert (
         ots_anchor.classify_proof(
             repo["manifests"][1], proof, shlex.split(repo["ots_bin"])
@@ -332,13 +440,72 @@ def test_verify_fails_when_proof_binds_different_bytes(repo: dict) -> None:
     assert run_cli(repo, "verify") == 1
 
 
+def test_fake_client_emits_the_real_mismatch_line(repo: dict) -> None:
+    """opentimestamps-client 0.7.2 logs ``File does not match original!``."""
+
+    assert run_cli(repo, "run") == 0
+    proof = proof_for(repo, 1)
+    verify = invoke_fake_ots(
+        repo, "--no-bitcoin", "verify", "-f", str(repo["manifests"][0]), str(proof)
+    )
+    assert verify.returncode == 1
+    assert verify.stdout == ""
+    assert verify.stderr == MISMATCH_VERIFY_OUTPUT
+    assert verify.stderr.strip() == ots_anchor._MISMATCH_LINE
+
+
+def test_verify_enumerates_every_mismatch(repo: dict, capsys) -> None:
+    assert run_cli(repo, "run") == 0
+    for index in (0, 1):
+        rebind_proof(proof_for(repo, index), digest="ab" * 32)
+    capsys.readouterr()
+
+    assert run_cli(repo, "verify") == 1
+    captured = capsys.readouterr()
+    failures = [line for line in captured.err.splitlines() if "FAIL" in line]
+    assert failures == [
+        f"  FAIL {manifest.name}: proof does not match manifest bytes"
+        for manifest in repo["manifests"]
+    ]
+    assert "0 locally Bitcoin-complete, 0 pending locally" in captured.out
+
+
+def test_verify_reports_tampered_manifest_without_aborting(repo: dict, capsys) -> None:
+    assert run_cli(repo, "run") == 0
+    repo["manifests"][0].write_bytes(b'{"releaseIndex": 0, "tampered": true}\n')
+    capsys.readouterr()
+
+    assert run_cli(repo, "verify") == 1
+    captured = capsys.readouterr()
+    failures = [line for line in captured.err.splitlines() if "FAIL" in line]
+    assert failures == [
+        f"  FAIL {repo['manifests'][0].name}: manifest bytes contradict its filename"
+    ]
+    assert "0 locally Bitcoin-complete, 1 pending locally" in captured.out
+
+
+def test_status_prints_mismatch_for_tampered_manifest_and_proof(
+    repo: dict, capsys
+) -> None:
+    assert run_cli(repo, "run") == 0
+    repo["manifests"][0].write_bytes(b'{"releaseIndex": 0, "tampered": true}\n')
+    rebind_proof(proof_for(repo, 1), digest="ab" * 32)
+    capsys.readouterr()
+
+    assert run_cli(repo, "status") == 0
+    assert capsys.readouterr().out.splitlines() == [
+        f"{repo['manifests'][0].name}: MISMATCH (manifest bytes contradict its filename)",
+        f"{repo['manifests'][1].name}: MISMATCH (proof does not match manifest bytes)",
+    ]
+
+
 def test_status_reports_multi_calendar_pending_proofs(repo: dict, capsys) -> None:
     assert run_cli(repo, "status") == 0
     output = capsys.readouterr().out
     assert output.count("unanchored") == 2
 
     assert run_cli(repo, "run") == 0
-    proof = repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots"
+    proof = proof_for(repo, 0)
     verify = invoke_fake_ots(
         repo,
         "--no-bitcoin",
@@ -348,13 +515,16 @@ def test_status_reports_multi_calendar_pending_proofs(repo: dict, capsys) -> Non
         str(proof),
     )
     assert verify.returncode == 1
-    assert verify.stdout == PENDING_VERIFY_OUTPUT
+    assert verify.stdout == ""
+    assert verify.stderr == PENDING_VERIFY_OUTPUT
     info = invoke_fake_ots(repo, "info", str(proof))
     assert info.returncode == 0
-    assert info.stdout == PENDING_INFO_OUTPUT
+    digest = hashlib.sha256(repo["manifests"][0].read_bytes()).hexdigest()
+    assert info.stdout == info_output(digest, PENDING_INFO_TREE)
+    assert info.stderr == ""
     upgrade = invoke_fake_ots(repo, "upgrade", str(proof))
     assert upgrade.returncode == 1
-    assert upgrade.stdout == PENDING_VERIFY_OUTPUT + "Failed! Timestamp not complete\n"
+    assert upgrade.stderr == PENDING_VERIFY_OUTPUT + "Failed! Timestamp not complete\n"
 
     commands_before = len(logged_commands(repo))
     assert run_cli(repo, "status") == 0
@@ -367,14 +537,13 @@ def test_status_prefers_bitcoin_info_with_leftover_pending_attestations(
     repo: dict, capsys
 ) -> None:
     assert run_cli(repo, "run") == 0
-    proof = repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots"
-    payload = json.loads(proof.read_text(encoding="utf-8"))
-    payload["state"] = "bitcoin"
-    proof.write_text(json.dumps(payload), encoding="utf-8")
+    proof = proof_for(repo, 0)
+    rebind_proof(proof, state="bitcoin")
 
     info = invoke_fake_ots(repo, "info", str(proof))
     assert info.returncode == 0
-    assert info.stdout == COMPLETE_INFO_OUTPUT
+    digest = hashlib.sha256(repo["manifests"][0].read_bytes()).hexdigest()
+    assert info.stdout == info_output(digest, COMPLETE_INFO_TREE)
     verify = invoke_fake_ots(
         repo,
         "--no-bitcoin",
@@ -384,7 +553,7 @@ def test_status_prefers_bitcoin_info_with_leftover_pending_attestations(
         str(proof),
     )
     assert verify.returncode == 1
-    assert verify.stdout == COMPLETE_VERIFY_OUTPUT
+    assert verify.stderr == COMPLETE_VERIFY_OUTPUT
 
     assert run_cli(repo, "status") == 0
     output = capsys.readouterr().out
@@ -392,16 +561,167 @@ def test_status_prefers_bitcoin_info_with_leftover_pending_attestations(
     assert output.count("pending local proof") == 1
 
 
-def test_status_fails_closed_on_unrecognized_verify_output(
+@pytest.mark.parametrize(
+    ("calendars", "expected_output", "logged_marker"),
+    [
+        ("mixed", MIXED_VERIFY_OUTPUT, "Got 1 attestation(s) from"),
+        ("transient", TRANSIENT_VERIFY_OUTPUT, "Temporary failure in name resolution"),
+        ("resolved", RESOLVED_VERIFY_OUTPUT, "Got 1 attestation(s) from"),
+    ],
+)
+def test_run_reaches_upgrade_despite_verify_calendar_chatter(
+    repo: dict,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys,
+    calendars: str,
+    expected_output: str,
+    logged_marker: str,
+) -> None:
+    """Calendar progress and transient errors during verify never abort a run.
+
+    The real client's verify path upgrades in memory first, so a locally
+    pending proof whose calendars have confirmed prints ``Got N
+    attestation(s) from ...`` lines, and a calendar timeout prints
+    ``Calendar <url>: <error>``. Neither is a grammar the tool checks: the
+    binding comes from ``ots info``, the chatter is logged, and the run goes
+    on to ``upgrade_proof`` for every pending proof.
+    """
+
+    assert run_cli(repo, "run") == 0
+    monkeypatch.setenv("FAKE_OTS_VERIFY_CALENDARS", calendars)
+    proof = proof_for(repo, 0)
+    verify = invoke_fake_ots(
+        repo, "--no-bitcoin", "verify", "-f", str(repo["manifests"][0]), str(proof)
+    )
+    assert verify.returncode == 1
+    assert verify.stderr == expected_output
+    upgrades_before = logged_commands(repo).count("upgrade")
+    capsys.readouterr()
+
+    assert run_cli(repo, "run") == 0
+    captured = capsys.readouterr()
+    assert logged_commands(repo).count("upgrade") == upgrades_before + 2
+    assert "still pending 2" in captured.out
+    assert f"ots verify {proof.name}: exit status 1" in captured.err
+    assert logged_marker in captured.err
+
+    assert run_cli(repo, "status") == 0
+    assert capsys.readouterr().out.count("pending local proof") == 2
+    assert run_cli(repo, "verify") == 0
+
+
+def test_verify_chatter_is_indented_in_the_log(
+    repo: dict, monkeypatch: pytest.MonkeyPatch, capsys
+) -> None:
+    """Echoed calendar text can never start a log line."""
+
+    assert run_cli(repo, "run") == 0
+    monkeypatch.setenv("FAKE_OTS_VERIFY_CALENDARS", "transient")
+    capsys.readouterr()
+
+    assert run_cli(repo, "status") == 0
+    err_lines = capsys.readouterr().err.splitlines()
+    echoed = [line for line in err_lines if "Calendar " in line]
+    assert len(echoed) == 8
+    assert all(line.startswith("  ") for line in echoed)
+
+
+def test_classify_reports_mismatch_from_info_digest_without_calendar_traffic(
+    repo: dict,
+) -> None:
+    assert run_cli(repo, "run") == 0
+    proof = proof_for(repo, 1)
+    rebind_proof(proof, digest="ab" * 32)
+    commands_before = len(logged_commands(repo))
+
+    assert (
+        ots_anchor.classify_proof(
+            repo["manifests"][1], proof, shlex.split(repo["ots_bin"])
+        )
+        == "mismatch"
+    )
+    assert logged_commands(repo)[commands_before:] == ["info"]
+
+
+def test_classify_fails_closed_on_the_clients_mismatch_line(
+    repo: dict, monkeypatch: pytest.MonkeyPatch, capsys
+) -> None:
+    """Even when ``ots info`` agrees, the client's own mismatch line wins."""
+
+    assert run_cli(repo, "run") == 0
+    monkeypatch.setenv("FAKE_OTS_VERIFY_FORCE_MISMATCH", "yes")
+    proof = proof_for(repo, 0)
+    assert (
+        ots_anchor.classify_proof(
+            repo["manifests"][0], proof, shlex.split(repo["ots_bin"])
+        )
+        == "mismatch"
+    )
+    capsys.readouterr()
+    assert run_cli(repo, "verify") == 1
+    assert capsys.readouterr().err.count("FAIL") == 2
+    assert run_cli(repo, "run") == 1
+
+
+def test_classify_fails_closed_on_abnormal_verify_exit(
     repo: dict, monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
     assert run_cli(repo, "run") == 0
-    monkeypatch.setenv("FAKE_OTS_VERIFY_OUTCOME", "unrecognized")
+    monkeypatch.setenv("FAKE_OTS_VERIFY_EXIT", "2")
+    capsys.readouterr()
 
     assert run_cli(repo, "status") == 1
     captured = capsys.readouterr()
-    assert "unrecognized ots verify outcome" in captured.err
-    assert "MISMATCH" not in captured.out
+    assert captured.out.count("ERROR (ots verify did not run to completion") == 2
+    assert run_cli(repo, "verify") == 1
+    assert run_cli(repo, "run") == 1
+
+
+def test_inspect_proof_reads_digest_and_state(repo: dict) -> None:
+    assert run_cli(repo, "run") == 0
+    proof = proof_for(repo, 0)
+    ots_bin = shlex.split(repo["ots_bin"])
+    digest = hashlib.sha256(repo["manifests"][0].read_bytes()).hexdigest()
+    assert ots_anchor.inspect_proof(proof, ots_bin) == ots_anchor.ProofInfo(
+        digest=digest, state="pending"
+    )
+    rebind_proof(proof, state="bitcoin", digest=digest.upper())
+    assert ots_anchor.inspect_proof(proof, ots_bin) == ots_anchor.ProofInfo(
+        digest=digest, state="bitcoin"
+    )
+
+
+def test_inspect_proof_fails_closed_without_exactly_one_digest_line(
+    repo: dict, monkeypatch: pytest.MonkeyPatch, capsys
+) -> None:
+    assert run_cli(repo, "run") == 0
+    proof = proof_for(repo, 0)
+    rebind_proof(proof, digest="ab" * 32)
+    digest = hashlib.sha256(repo["manifests"][0].read_bytes()).hexdigest()
+    monkeypatch.setenv("FAKE_OTS_INFO_SPOOF", "hash-line")
+    monkeypatch.setenv("FAKE_OTS_SPOOF_DIGEST", digest)
+
+    with pytest.raises(ots_anchor.AnchorError, match="2 file hash lines"):
+        ots_anchor.inspect_proof(proof, shlex.split(repo["ots_bin"]))
+    capsys.readouterr()
+    assert run_cli(repo, "status") == 1
+    assert "ERROR (ots info for" in capsys.readouterr().out
+    assert run_cli(repo, "run") == 1
+
+
+def test_inspect_proof_ignores_digest_text_inside_attestation_lines(
+    repo: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert run_cli(repo, "run") == 0
+    proof = proof_for(repo, 0)
+    rebind_proof(proof, digest="ab" * 32)
+    digest = hashlib.sha256(repo["manifests"][0].read_bytes()).hexdigest()
+    monkeypatch.setenv("FAKE_OTS_INFO_SPOOF", "hash-in-uri")
+    monkeypatch.setenv("FAKE_OTS_SPOOF_DIGEST", digest)
+
+    ots_bin = shlex.split(repo["ots_bin"])
+    assert ots_anchor.inspect_proof(proof, ots_bin).digest == "ab" * 32
+    assert ots_anchor.classify_proof(repo["manifests"][0], proof, ots_bin) == "mismatch"
 
 
 def test_manifests_option_reads_external_checkout(repo: dict) -> None:
@@ -447,15 +767,11 @@ def test_guard_accepts_only_ots_and_rejects_outside_changes(tmp_path: Path) -> N
 
 def test_run_reverifies_bitcoin_complete_proof_binding(repo: dict) -> None:
     assert run_cli(repo, "run") == 0
-    proof = repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots"
-    payload = json.loads(proof.read_text(encoding="utf-8"))
-    payload.update(state="bitcoin", digest="ab" * 32)
-    proof.write_text(json.dumps(payload), encoding="utf-8")
-    verifies_before = logged_commands(repo).count("verify")
+    proof = proof_for(repo, 0)
+    rebind_proof(proof, state="bitcoin", digest="ab" * 32)
     upgrades_before = logged_commands(repo).count("upgrade")
 
     assert run_cli(repo, "run") == 1
-    assert logged_commands(repo).count("verify") == verifies_before + 1
     assert logged_commands(repo).count("upgrade") == upgrades_before
 
 
@@ -463,8 +779,8 @@ def test_local_state_resists_calendar_output_spoofing(
     repo: dict, monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
     assert run_cli(repo, "run") == 0
-    monkeypatch.setenv("FAKE_OTS_INFO_SPOOF", "yes")
-    monkeypatch.setenv("FAKE_OTS_VERIFY_RESOLVED", "yes")
+    monkeypatch.setenv("FAKE_OTS_INFO_SPOOF", "attestation")
+    monkeypatch.setenv("FAKE_OTS_VERIFY_CALENDARS", "resolved")
 
     assert run_cli(repo, "status") == 0
     assert capsys.readouterr().out.count("pending local proof") == 2
@@ -478,7 +794,7 @@ def test_failed_upgrade_restores_original_backup(
     repo: dict, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     assert run_cli(repo, "run") == 0
-    proof = repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots"
+    proof = proof_for(repo, 0)
     original = proof.read_bytes()
     monkeypatch.setenv("FAKE_OTS_UPGRADE", "broken")
 
@@ -491,7 +807,7 @@ def test_timed_out_upgrade_restores_original_backup(
     repo: dict, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     assert run_cli(repo, "run") == 0
-    proof = repo["root"] / "ots" / f"{repo['manifests'][0].name}.ots"
+    proof = proof_for(repo, 0)
     original = proof.read_bytes()
     real_run_ots = ots_anchor._run_ots
 
