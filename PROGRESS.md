@@ -1,45 +1,74 @@
-# PR #228 gate round 1 fix progress
+# Epoch dual-domain acceptance progress
 
 ## State
 
-- Branch: `fix-228-r2` at reviewed head `af418dc`.
-- Assignment: address all four gate round 1 findings with reproductions and
-  regression coverage.
-- Applicable repository instructions: `AGENTS.md`; no `CLAUDE.md` is present.
-- All four gate round 1 findings are fixed with regression coverage.
-- Final lint, format, and full-suite verification are complete and passing.
-- The required final report is written to runner output path `out.md`.
-- No network access or push will be attempted.
+- Branch: `epoch-dual-domain` from `origin/main` at `ff3efd3`.
+- Assignment: chronicle#143 mechanism 1, step 1 (dual-domain acceptance; emit unchanged).
+- Approved role: `ledger-contract-maintainer`.
+- Implementation, adversarial review, and local verification are complete.
+- Publication is externally blocked. Direct `git push` and the required
+  `gh pr create --body-file` cannot reach GitHub from the sandbox, and the
+  installed GitHub connector cancels write mutations despite reporting admin
+  permission for the active account.
 
 ## Done
 
-- Read `AGENTS.md`, `HEAD_SHA.txt`, and `_inputs/peer-round1.md`.
-- Confirmed the reviewed head matches `HEAD_SHA.txt`.
-- Confirmed runner-owned inputs, logs, and `out.md` are untracked and will not be
-  included in implementation commits.
-- Reproduced all four findings on the reviewed implementation.
-- Made derived publication validate the resolved build identity before uploads
-  or metadata output, with omitted/supplied-output regression cases proving no
-  uploader call and no metadata truncation.
-- Reject canonical duplicate cell/row lineage aliases during fact validation
-  with the explicit `duplicate_lineage_key` issue code.
-- Deduplicate canonical lineage defensively in both consumer and relational
-  emission while keeping ordinals, relationship counts, and build hashing
-  consistent.
-- Bootstrap the Statbel generator from its own checkout before importing the
-  epoch registry; cover direct-file execution with an isolated subprocess whose
-  `PYTHONPATH` and site packages cannot mask cross-worktree resolution.
-- Preserve null and integer identity values during bundle coverage
-  canonicalization and sort mixed scalar identities deterministically.
-- Passed repository-wide Ruff lint.
-- Passed Ruff formatting for all 12 changed Python files.
-- Passed the complete test suite with direct exit code 0: 792 passed, 1 skipped,
-  and 14 warnings in 1364.36 seconds.
-- Completed two independent read-only final reviews with no actionable findings.
-- Wrote the reproduction, fix, test, commit, and verification report to
-  `out.md` without adding runner-owned root artifacts to Git.
+- Read `AGENTS.md`, `.github/chronicle-agents.yml`,
+  `docs/chronicle-governance.md`, and `docs/adr-chronicle-fact-identity-v2.md`.
+- Confirmed the worktree began clean at the requested base commit.
+- Retrieved and read Max's first-comment migration spec through the GitHub API.
+- Completed the initial inventory of hashed domains, schema ids, validators,
+  emitters, tests, and role-path implications.
+- Confirmed that the live facts-only consumer artifact is v2→v3; retired
+  target-profile and resolved-target v1 contracts must not be reintroduced.
+- Added the central frozen Ledger/Chronicle epoch registry with Ledger as the
+  single emission default.
+- Wired fact, source-cell, source-row, source-column, source-row-value, and all
+  eight consumer-contract hash builders to the registry with invariant digest
+  suffixes across epochs.
+- Added dual-epoch lineage validation, consumer-row schema normalization,
+  artifact loading (including declared row-schema pins), mixed-epoch acceptance,
+  and clear unknown-domain errors.
+- Pinned all existing fixture and consumer-schema bytes by SHA-256; focused
+  identity/artifact/schema verification passes (96 tests).
+- Made bundle ingestion validate Chronicle-only and mixed-epoch rows, with
+  cross-epoch duplicate accounting and unknown-domain rejection.
+- Added Chronicle relational emission/load coverage with valid SQLite foreign
+  keys, invariant build/build-artifact digests, and Ledger-default output.
+- Made source-package and offline-fetch readers accept both registered schema
+  ids while scaffolds and administrative generators still emit Ledger ids.
+- Addressed adversarial audit findings in governance schema validation,
+  source-cell/suite lineage resolution, explicit Ledger-canonical build hashing,
+  the Statbel package generator, and `validate-facts` CLI coverage.
+- Preserved the bundle reader's historical permissive row-shape boundary while
+  adding a non-mutating dual-epoch identifier gate; the two full-build bundle
+  regressions and Chronicle/mixed/unknown-domain cases pass.
+- Passed the complete test suite: 783 passed, 1 skipped, 14 warnings.
+- Passed repository-wide Ruff lint and formatting for every changed Python file.
+  The exact repository-wide format check still identifies eight untouched
+  baseline files, all byte-identical to `origin/main`.
+- Built the sdist and wheel offline with uv from cached build dependencies, then
+  installed the wheel into a clean venv and passed the epoch import smoke.
+- Passed independent `ledger-contract` and `ledger-boundary` judge reviews.
+- Confirmed no changes under `releases/`, frozen fixture directories, frozen
+  schema directories, or `.github/chronicle-agents.yml`.
+- Removed the generated `.gitnexus/` index and incomplete ignored local `.venv/`.
+- Committed `out.md` with the complete verification, scope, governance,
+  residual-risk, and downstream-consumer handoff report.
+- Prepared the completed PR-template body ending in the required Claude Code
+  attribution.
+- Attempted `git push origin epoch-dual-domain`; it failed because the sandbox
+  cannot resolve or connect to GitHub.
+- Attempted the exact required `gh pr create --body-file` flow; it failed because
+  `api.github.com` is unreachable.
+- Confirmed the installed GitHub connector sees `MaxGhenis` with admin
+  permission on `PolicyEngine/chronicle`, but both branch and blob creation were
+  cancelled by the connector before mutation.
 
 ## Next
 
-- No implementation work remains. Hand off the committed fix lane and `out.md`.
-- Do not push; publication is outside this lane's instructions.
+- Restore outbound GitHub access or authorize GitHub connector write mutations.
+- Push `epoch-dual-domain` and open the requested PR against `main` after
+  regenerating the already reviewed body-file content.
+- Record the PR URL in `out.md`, commit that final state, and push it.
+- Do not merge the PR and do not comment on issue #143.
