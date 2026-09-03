@@ -196,6 +196,8 @@ def source_cells_from_xlsx(
 def source_cells_from_ods(
     content: bytes,
     artifact: SourceArtifactMetadata,
+    *,
+    coerce_numeric_text: bool = False,
 ) -> list[SourceCell]:
     """Parse all used-range cells from an ODS workbook."""
     with ZipFile(BytesIO(content)) as archive:
@@ -208,7 +210,7 @@ def source_cells_from_ods(
     cells: list[SourceCell] = []
     for table in spreadsheet.findall("table:table", _ODS_NAMESPACES):
         sheet_name = table.attrib.get(_ods_attr("table", "name"), "Sheet")
-        rows = _ods_rows(table)
+        rows = _ods_rows(table, coerce_numeric_text=coerce_numeric_text)
         max_column = max((len(row) for row in rows), default=0)
         for row_index, row in enumerate(rows, start=1):
             for column_index in range(1, max_column + 1):
@@ -580,10 +582,20 @@ def _ods_attr(namespace: str, name: str) -> str:
     return f"{{{_ODS_NAMESPACES[namespace]}}}{name}"
 
 
-def _ods_rows(table: ElementTree.Element) -> list[list[Scalar]]:
+_ODS_NUMERIC_TEXT_RE = re.compile(r"-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?")
+
+
+def _ods_rows(
+    table: ElementTree.Element,
+    *,
+    coerce_numeric_text: bool = False,
+) -> list[list[Scalar]]:
     rows: list[list[Scalar]] = []
     for row in table.findall("table:table-row", _ODS_NAMESPACES):
-        row_values = _ods_row_values(row)
+        row_values = _ods_row_values(
+            row,
+            coerce_numeric_text=coerce_numeric_text,
+        )
         row_repeat = int(row.attrib.get(_ods_attr("table", "number-rows-repeated"), 1))
         if not any(value is not None for value in row_values):
             row_repeat = min(row_repeat, 1)
@@ -594,10 +606,16 @@ def _ods_rows(table: ElementTree.Element) -> list[list[Scalar]]:
     return rows
 
 
-def _ods_row_values(row: ElementTree.Element) -> list[Scalar]:
+def _ods_row_values(
+    row: ElementTree.Element,
+    *,
+    coerce_numeric_text: bool = False,
+) -> list[Scalar]:
     values: list[Scalar] = []
     for cell in row.findall("table:table-cell", _ODS_NAMESPACES):
         raw_value = _ods_cell_raw_value(cell)
+        if coerce_numeric_text and isinstance(raw_value, str):
+            raw_value = _coerce_ods_numeric_text(raw_value)
         column_repeat = int(
             cell.attrib.get(_ods_attr("table", "number-columns-repeated"), 1)
         )
@@ -608,6 +626,16 @@ def _ods_row_values(row: ElementTree.Element) -> list[Scalar]:
     while values and values[-1] is None:
         values.pop()
     return values
+
+
+def _coerce_ods_numeric_text(value: str) -> int | float | str:
+    stripped = value.strip()
+    if _ODS_NUMERIC_TEXT_RE.fullmatch(stripped) is None:
+        return value
+    normalized = stripped.replace(",", "")
+    if "." in normalized:
+        return float(normalized)
+    return int(normalized)
 
 
 def _ods_cell_raw_value(cell: ElementTree.Element) -> Scalar:

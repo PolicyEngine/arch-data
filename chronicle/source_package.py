@@ -84,8 +84,11 @@ SOURCE_PACKAGE_ALIASES = {
         "bea/regional_personal_income_state"
     ),
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
-    "hmrc-cgt-size-of-gain-2025": Path("hmrc/cgt_size_of_gain_2025"),
-    "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
+    "hmrc-cgt-age-2026": Path("hmrc/cgt_age_2026"),
+    "hmrc-cgt-country-region-2026": Path("hmrc/cgt_country_region_2026"),
+    "hmrc-cgt-gain-by-income-2026": Path("hmrc/cgt_gain_by_income_2026"),
+    "hmrc-cgt-size-of-gain-2026": Path("hmrc/cgt_size_of_gain_2026"),
+    "hmrc-cgt-statistics-2026": Path("hmrc/cgt_statistics_2026"),
     "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
     "hmrc-salary-sacrifice-relief-2024-25": Path(
         "hmrc/salary_sacrifice_relief_2024_25"
@@ -133,7 +136,11 @@ SOURCE_PACKAGE_ALIASES = {
     "dfe-funded-early-education-childcare-2026": Path(
         "dfe/funded_early_education_childcare_2026"
     ),
+    "dft-bus0415-fares-index-2026": Path("dft/bus0415_fares_index_2026"),
+    "dft-bus05i-revenue-support-2025": Path("dft/bus05i_revenue_support_2025"),
+    "dft-nts0705-local-bus-trips-2024": Path("dft/nts0705_local_bus_trips_2024"),
     "dft-nts-vehicle-ownership-2024": Path("dft/nts_vehicle_ownership_2024"),
+    "dfc-ni-uc-statistics-may-2026": Path("dfc_ni/uc_statistics_may_2026"),
     "dwp-benefit-cap-november-2025": Path("dwp/benefit_cap_november_2025"),
     "dwp-benefit-statistics-february-2026": Path(
         "dwp/benefit_statistics_february_2026"
@@ -546,6 +553,12 @@ class SourceArtifactSpec:
             )
         if self.parser == "ods_used_range":
             return source_cells_from_ods(content, artifact)
+        if self.parser == "ods_numeric_text_used_range":
+            return source_cells_from_ods(
+                content,
+                artifact,
+                coerce_numeric_text=True,
+            )
         if self.parser == "html_tables_and_text":
             return source_cells_from_html_tables_and_text(content, artifact)
         if self.parser == "pdf_text_numbers":
