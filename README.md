@@ -59,13 +59,12 @@ publisher asserted — including the publisher's own projections — is a fact,
 except publisher-authored values at microdata grain, which are content and
 never facts; only the values a publisher asserted and published over that
 microdata are facts, whether the microdata's own publisher or another (see
-`docs/adr-chronicle-raw-microdata-identity.md`).
-Everything PolicyEngine computes (aged, uprated, forecast, or reconciled
-levels) is a downstream build artifact and never enters the store; Microcosm
-owns aging as a named, versioned model over Chronicle growth-factor facts. A
-fact's `period` is the period its value refers to. Consumers must enforce any
-contract that aligns it to another period (see
-[`docs/adr-chronicle-facts-only.md`](docs/adr-chronicle-facts-only.md)).
+`docs/adr-chronicle-raw-microdata-identity.md`). Everything PolicyEngine
+computes (aged, uprated, forecast, or reconciled levels) is a downstream build
+artifact and never enters the store; Microcosm owns aging as a named, versioned
+model over Chronicle growth-factor facts. A fact's `period` is the period its
+value refers to. Consumers must enforce any contract that aligns it to another
+period (see [`docs/adr-chronicle-facts-only.md`](docs/adr-chronicle-facts-only.md)).
 
 | Layer | Owns | Examples |
 |-------|------|----------|
