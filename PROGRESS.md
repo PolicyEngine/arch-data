@@ -1,68 +1,51 @@
-# PR #229 completion
+# Lane C5 progress
 
 ## State
 
-The pending-proof classification fix, direct-push publication workflow, final
-repository verification, and report are complete. GitHub delivery is blocked:
-shell DNS prevents fetch/push/`gh pr edit`, and the authenticated connector's PR
-body mutation was cancelled. PR #229 remains open and unmerged.
+- Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
+- Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
+- Lane C5 is complete, validated, independently reviewed, and ready for handoff.
+- The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
+  to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
 
 ## Done
 
-- Checked for another `ots-anchor-main` process; this sandbox denies process-list
-  access to both `pgrep` and `ps`, so no process result was available.
-- Attempted the required `git fetch origin`; DNS resolution for GitHub failed.
-- Confirmed local `HEAD` and `origin/ots-anchor-main` both resolve to
-  `03b27674028a0d8cf5bdc71437f5944661f3c6cb`, then reset the worktree to that
-  remote-tracking ref.
-- Read the inherited progress log. Attempted to read PR #229 with `gh`; the same
-  GitHub DNS failure prevented access, so the supplied dispatch facts and PR-body
-  requirements are the current source of truth.
-- Accepted the Chronicle boundary and the prohibitions on changing `releases/`,
-  `ledger/`, or proof bytes.
-- Fixed proof classification to inspect local `ots info` structure first, give
-  any Bitcoin block-header attestation precedence over leftover pending
-  attestations, and then validate binding from the exact 0.7.2 output contract.
-- Replaced permissive verify-output recognition with exact/full-line parsing:
-  the exact mismatch line is the only mismatch, captured pending and paired
-  Bitcoin-disabled/manual lines bind successfully, and unknown output fails
-  closed.
-- Updated the hermetic fake client with the captured four-calendar pending,
-  mixed complete, mismatch, upgrade, and unrecognized outputs. All 17 focused
-  tests pass; focused Ruff lint and formatting checks pass.
-- Ran real status with the cached 0.7.2 executable. All 15 complete proofs were
-  recognized, then calendar DNS errors prevented binding classification for the
-  five pending proofs; the fixture suite covers their supplied captured output.
-- Replaced bot-branch import, PR creation, and auto-merge machinery with a
-  proof-only, non-force `git push origin HEAD:main` using only `contents: write`.
-- Added best-effort start-of-job logging for the three supplied effective-rules
-  and classic-protection API endpoints; metadata read failures warn but do not
-  block the publication attempt.
-- Retained the credential-free journal checkout, `run` + `verify` + `guard`,
-  `ots/`-only staging and committed-scope checks, and dirty-worktree refusal.
-- Added a three-attempt non-fast-forward path that fetches and rebases current
-  `main`, refreshes the journal, reruns all checks, and recommits before retry.
-  Failed-push classification uses fetched commit ancestry, covering server-side
-  ref races and ambiguous successes without parsing Git's localized output.
-- Updated both proof documentation sections to say automation pushes proof-only
-  commits to `main` and to document bounded retries plus the guarantees against
-  force-pushing or pushing the journal branch. `actionlint` passes.
-- Reconfirmed all 20 `.ots` blob bytes are unchanged (combined checksum
-  `420c3f54b47df5c58c58edc7202f580dcbad40193a4264bec20c133b71a375b1`)
-  and there are no `releases/` or `ledger/` changes.
-- Ran the final required suite: 17 focused tests, repository-wide Ruff lint,
-  focused Ruff formatting, and actionlint all pass.
-- Confirmed local proof structure with the real cached OpenTimestamps 0.7.2
-  executable: 15 Bitcoin-complete and 5 pending. Calendar DNS prevents the full
-  status binding pass, so the captured-output fixture tests are the documented
-  no-network fallback.
-- Wrote the final implementation, verification, integrity, and delivery report
-  to `out.md`.
-- Read PR #229 through the authenticated connector and prepared the replacement
-  “Publication path” body at `/tmp/pr229-body.md`. The exact `gh pr edit` command
-  failed on DNS, and the connector write was cancelled.
+- Read the repository Chronicle boundary rules in `AGENTS.md`.
+- Read `.lane-raw/SOURCES.md` and confirmed all five named publisher artifacts are present.
+- Confirmed the worktree is otherwise clean apart from `.lane-raw/` and the shared `.venv` link.
+- Verified all five staged artifact SHA-256 pins exactly.
+- Mapped FPB workbook cells: 990 facts across T01/T06/T07/T11/T17/T24, with
+  2022–2025 observations and 2026–2031 `source_projection` facts.
+- Confirmed PDF boundary evidence: printed page 19 calls 2026 the first projection year;
+  annex table units appear on printed pages 45, 48, 49, 53, 58, and 65.
+- Chosen Eurostat layout: two vintage-specific source-package aliases share new manifest
+  entries, preserving the prior package YAMLs, raw bytes, and fact outputs unchanged.
+- Reproduced the Statbel curator logic: 18 NUTS1 × sex × age-band cells totaling 11,825,551.
+- Added the hash-pinned FPB workbook and publication PDF plus the
+  `fpb-economic-outlook-2026-2031-june-2026` package alias.
+- Built 990 line-specific publisher facts (99 per year): 396 observations for
+  2022–2025 and 594 `source_projection` facts for 2026–2031.
+- Passed FPB `validate-package` and `build-suite`: 990 facts, full cell lineage,
+  zero acceptance errors, and pinned 2025 cells 320578 / 77771 / 5602 million euro.
+- Re-ran the Statbel 2026 curator logic on the 2025 ZIP and added the hash-pinned
+  raw capture plus its deterministic 18-row curated CSV.
+- Passed Statbel 2025 `validate-package` and `build-suite`: 18 facts totaling
+  11,825,551, 66 constraints, full lineage, and zero acceptance errors.
+- Added the Eurostat `gov_10a_taxag` 2025 and `spr_exp_func` 2024 manifest
+  entries plus vintage-specific package aliases, without modifying either
+  prior artifact or prior package specification.
+- Passed both new Eurostat package validations and suite builds: 12 tax facts
+  and 9 ESSPROS facts, full lineage, and zero acceptance errors.
+- Extended Belgium and Eurostat regressions for FPB table counts/cells and
+  assertion boundary, vintage non-overlap, prior-output digests, Statbel pins,
+  and the declared 0.25% Statbel/FPB population comparison tolerance.
+- Passed 43 focused tests and the full merged-bundle regression: 157,177 facts,
+  148 packages, zero aggregate-key duplicates, and expected goldens throughout.
+- Recorded pins, counts, boundary evidence, curator commands, validation tails,
+  and consumer fact families in `LANE_C5_REPORT.md`.
+- Passed independent `ledger-source-fidelity` and `ledger-boundary` reviews with
+  no required corrections.
 
 ## Next
 
-- When GitHub access is available, push `ots-anchor-main` and run
-  `gh pr edit 229 --body-file /tmp/pr229-body.md` without merging the PR.
+- None; ready for handoff. No push was performed.
