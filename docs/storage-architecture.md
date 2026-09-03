@@ -84,6 +84,18 @@ Legacy US derived keys likewise remain `derived/{source_id}/...`.
 Derived artifacts are reproducible and may be replaced by a new build, but a
 specific `{build_id}` path should be immutable once published.
 
+Public, package-scoped consumer artifacts use the existing `ledger-derived`
+bucket and a country-neutral content-addressed key:
+
+```text
+consumer/{source_id}/{package_id}/{artifact_sha256}/{artifact_name}
+```
+
+Each leaf contains exactly `manifest.json` and `consumer_facts.jsonl`. The
+manifest pins the package, Chronicle source commit, row count, fact-file hash,
+and canonical artifact hash. Explicitly `licensed` or `restricted` packages
+are never published at this surface.
+
 ## Relational Registry Contract
 
 The hosted `chronicle` schema should be the lookup surface for Chronicle, not the place

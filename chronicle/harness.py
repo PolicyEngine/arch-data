@@ -10,12 +10,14 @@ from pathlib import Path
 from chronicle.artifacts import (
     ArtifactFetchReport,
     ArtifactInventoryReport,
+    ConsumerArtifactPublishReport,
     DerivedArtifactPublishReport,
     R2BootstrapReport,
     RawArtifactPublishReport,
     bootstrap_r2_buckets,
     fetch_source_artifact,
     inventory_source_artifacts,
+    publish_consumer_artifact,
     publish_derived_artifacts,
     publish_source_artifacts,
 )
@@ -428,6 +430,22 @@ def publish_derived_artifact_files(
     )
 
 
+def publish_consumer_artifact_files(
+    input_dir: str | Path,
+    *,
+    r2_bucket: str = "ledger-derived",
+    r2_prefix: str = "consumer",
+    wrangler_command: str = "npx wrangler",
+) -> ConsumerArtifactPublishReport:
+    """Publish a verified package consumer artifact to content-addressed R2."""
+    return publish_consumer_artifact(
+        input_dir,
+        r2_bucket=r2_bucket,
+        r2_prefix=r2_prefix,
+        wrangler_command=wrangler_command,
+    )
+
+
 def export_chronicle_db_table_files(
     db_path: str | Path,
     output_dir: str | Path,
@@ -757,11 +775,33 @@ def main(argv: list[str] | None = None) -> int:
         help="Build a versioned facts-only consumer artifact",
         description="Build a versioned facts-only consumer artifact.",
     )
-    consumer_artifact_parser.add_argument(
+    consumer_artifact_input = consumer_artifact_parser.add_mutually_exclusive_group(
+        required=True
+    )
+    consumer_artifact_input.add_argument(
         "--facts",
         type=Path,
-        required=True,
         help="Path to a consumer_facts.jsonl file or a bundle directory",
+    )
+    consumer_artifact_input.add_argument(
+        "--package",
+        help=(
+            "Public source package alias, directory, or source_package.yaml to "
+            "build before creating the artifact"
+        ),
+    )
+    consumer_artifact_parser.add_argument(
+        "--year",
+        type=int,
+        default=2023,
+        help="Source year used with --package (default: 2023)",
+    )
+    consumer_artifact_parser.add_argument(
+        "--source-commit",
+        help=(
+            "Chronicle Git commit to pin with --package. Defaults to the current "
+            "checkout HEAD."
+        ),
     )
     consumer_artifact_parser.add_argument(
         "--out",
@@ -1037,6 +1077,32 @@ def main(argv: list[str] | None = None) -> int:
         help="Optional path to write build_artifacts JSONL rows.",
     )
 
+    consumer_publish_parser = subparsers.add_parser(
+        "publish-consumer",
+        help="Upload a package consumer artifact at a content-addressed R2 key",
+    )
+    consumer_publish_parser.add_argument(
+        "--dir",
+        type=Path,
+        required=True,
+        help="Consumer artifact directory containing manifest.json and facts.",
+    )
+    consumer_publish_parser.add_argument(
+        "--r2-bucket",
+        default="ledger-derived",
+        help="R2 bucket for public consumer artifacts.",
+    )
+    consumer_publish_parser.add_argument(
+        "--r2-prefix",
+        default="consumer",
+        help="Stable R2 prefix for public consumer artifacts.",
+    )
+    consumer_publish_parser.add_argument(
+        "--wrangler-command",
+        default="npx wrangler",
+        help="Wrangler command prefix to use for R2 uploads.",
+    )
+
     mirror_export_parser = subparsers.add_parser(
         "export-db-tables",
         help="Export a Chronicle SQLite DB artifact to per-table JSONL files",
@@ -1274,13 +1340,27 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
         return 0 if report.valid else 1
     if args.command == "build-consumer-artifact":
-        from policyengine_chronicle.consumer import build_consumer_artifact
-
-        artifact_report = build_consumer_artifact(
-            args.out,
-            facts_path=args.facts,
-            replace=args.replace,
+        from policyengine_chronicle.consumer import (
+            build_consumer_artifact,
+            build_package_consumer_artifact,
         )
+
+        if args.package:
+            artifact_report = build_package_consumer_artifact(
+                args.out,
+                package=args.package,
+                year=args.year,
+                chronicle_source_commit=args.source_commit,
+                replace=args.replace,
+            )
+        else:
+            if args.source_commit:
+                raise ValueError("--source-commit requires --package.")
+            artifact_report = build_consumer_artifact(
+                args.out,
+                facts_path=args.facts,
+                replace=args.replace,
+            )
         print(json.dumps(artifact_report.to_dict(), indent=2, sort_keys=True))
         return 0
     if args.command == "validate-package":
@@ -1356,6 +1436,15 @@ def main(argv: list[str] | None = None) -> int:
             r2_prefix=args.r2_prefix,
             wrangler_command=args.wrangler_command,
             build_artifacts_output=args.build_artifacts_out,
+        )
+        print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+        return 0 if report.valid else 1
+    if args.command == "publish-consumer":
+        report = publish_consumer_artifact_files(
+            args.dir,
+            r2_bucket=args.r2_bucket,
+            r2_prefix=args.r2_prefix,
+            wrangler_command=args.wrangler_command,
         )
         print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
         return 0 if report.valid else 1

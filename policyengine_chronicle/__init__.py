@@ -29,6 +29,7 @@ from chronicle.core import (
 from policyengine_chronicle.consumer import (
     ConsumerArtifact,
     build_consumer_artifact,
+    build_package_consumer_artifact,
     load_consumer_artifact,
 )
 
@@ -51,6 +52,7 @@ __all__ = [
     "ValidationReport",
     "build_aggregate_constraints",
     "build_consumer_artifact",
+    "build_package_consumer_artifact",
     "build_fact_key",
     "build_label",
     "load_consumer_artifact",

@@ -19,7 +19,8 @@ def main() -> None:
             "  validate-facts\n"
             "  validate-source-cells\n"
             "  export-consumer-facts\n"
-            "  build-consumer-artifact\n\n"
+            "  build-consumer-artifact\n"
+            "  publish-consumer\n\n"
             "Run `chronicle <command> --help` for command-specific help."
         )
         return

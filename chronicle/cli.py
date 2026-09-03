@@ -24,6 +24,7 @@ def main() -> None:
         ["inventory-artifacts"],
         ["load-supabase-mirror"],
         ["plan-pe-sources"],
+        ["publish-consumer"],
         ["publish-derived"],
         ["publish-raw"],
         ["scaffold-package"],

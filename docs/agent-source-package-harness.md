@@ -579,6 +579,26 @@ uv run chronicle build-bundle --suite uk --out /tmp/chronicle-uk --replace
 uv run chronicle build-consumer-artifact --facts /tmp/chronicle-uk --out /tmp/chronicle-uk-artifact --replace
 ```
 
+When a downstream test needs a small package fixture instead of the merged UK
+feed, build and publish the package-scoped artifact:
+
+```bash
+uv run chronicle build-consumer-artifact \
+  --package dfe-funded-early-education-childcare-2026 \
+  --year 2026 \
+  --out /tmp/dfe-childcare-consumer-artifact \
+  --replace
+uv run chronicle publish-consumer \
+  --dir /tmp/dfe-childcare-consumer-artifact
+```
+
+The manifest records the package ID, source ID, Chronicle commit, public access
+class, row count, facts hash, and artifact hash. Publication verifies all of
+those fields and writes the two files to
+`consumer/{source_id}/{package_id}/{artifact_sha256}/` in `ledger-derived`.
+Packages declaring `licensed` or `restricted` access are rejected before any
+upload.
+
 `--year` is inert for `--suite uk` because the UK packages are year-pinned.
 The US off-year bundle behavior is unchanged and out of scope here.
 

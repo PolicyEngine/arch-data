@@ -11,6 +11,7 @@ import yaml
 from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
     build_artifact_rows,
+    build_consumer_r2_key,
     build_derived_r2_key,
     bootstrap_r2_buckets,
     build_r2_key,
@@ -19,9 +20,11 @@ from chronicle.artifacts import (
     infer_build_id,
     inventory_source_artifacts,
     publish_derived_artifacts,
+    publish_consumer_artifact,
     publish_source_artifacts,
 )
 from chronicle.harness import main as harness_main
+from policyengine_chronicle.consumer import build_consumer_artifact
 
 
 def test_build_r2_key_is_content_addressed():
@@ -49,6 +52,32 @@ def test_build_derived_r2_key_is_build_scoped():
         "derived/irs_soi/soi-table-1-1/2023/"
         "ledger.build.v1:abc123/reports/build_summary.json"
     )
+
+
+def test_build_consumer_r2_key_is_package_and_content_addressed():
+    artifact_sha256 = "ab" * 32
+
+    key = build_consumer_r2_key(
+        source_id="hmrc",
+        package_id="hmrc-tax-free-childcare-march-2026",
+        artifact_sha256=artifact_sha256,
+        artifact_name="manifest.json",
+    )
+
+    assert key == (
+        "consumer/hmrc/hmrc-tax-free-childcare-march-2026/"
+        f"{artifact_sha256}/manifest.json"
+    )
+
+
+def test_build_consumer_r2_key_rejects_path_like_package_ids():
+    with pytest.raises(ValueError, match="must be one key part"):
+        build_consumer_r2_key(
+            source_id="hmrc",
+            package_id="../restricted",
+            artifact_sha256="ab" * 32,
+            artifact_name="manifest.json",
+        )
 
 
 @pytest.mark.parametrize(
@@ -487,6 +516,108 @@ def test_publish_derived_artifacts_uploads_build_directory(tmp_path):
     assert build_artifact_rows[0]["r2_bucket"] == "ledger-derived"
     assert "ledger-derived/derived/irs_soi/soi-table-1-1/2023/" in command_log
     assert "reports/build_summary.json" in command_log
+
+
+def test_publish_consumer_artifact_uploads_only_the_pinned_pair(tmp_path):
+    artifact_dir = tmp_path / "artifact"
+    build_consumer_artifact(
+        artifact_dir,
+        facts_path="chronicle/fixtures/consumer_facts.jsonl",
+        source_id="irs_soi",
+        package_id="soi-table-1-1",
+        chronicle_source_commit="ab" * 20,
+        source_access="public",
+    )
+    manifest = json.loads((artifact_dir / "manifest.json").read_text())
+    log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
+    wrangler.chmod(0o755)
+
+    report = publish_consumer_artifact(
+        artifact_dir,
+        wrangler_command=str(wrangler),
+    )
+
+    assert report.valid
+    assert report.artifact_sha256 == manifest["artifact_sha256"]
+    assert report.counts == {
+        "artifact_count": 2,
+        "failed_count": 0,
+        "uploaded_count": 2,
+    }
+    assert {entry.artifact_name for entry in report.entries} == {
+        "consumer_facts.jsonl",
+        "manifest.json",
+    }
+    command_log = log.read_text()
+    stable_prefix = (
+        f"ledger-derived/consumer/irs_soi/soi-table-1-1/{manifest['artifact_sha256']}"
+    )
+    assert command_log.count(stable_prefix) == 2
+
+
+def test_publish_consumer_artifact_refuses_nonpublic_manifest(tmp_path):
+    artifact_dir = tmp_path / "artifact"
+    build_consumer_artifact(
+        artifact_dir,
+        facts_path="chronicle/fixtures/consumer_facts.jsonl",
+        source_id="irs_soi",
+        package_id="soi-table-1-1",
+        chronicle_source_commit="ab" * 20,
+        source_access="public",
+    )
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["source_access"] = "restricted"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+    log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
+    wrangler.chmod(0o755)
+
+    report = publish_consumer_artifact(
+        artifact_dir,
+        wrangler_command=str(wrangler),
+    )
+
+    assert not report.valid
+    assert report.errors == ("source_access_not_public:restricted",)
+    assert not log.exists()
+
+
+def test_publish_consumer_cli_emits_the_stable_locations(tmp_path, capsys):
+    artifact_dir = tmp_path / "artifact"
+    build_consumer_artifact(
+        artifact_dir,
+        facts_path="chronicle/fixtures/consumer_facts.jsonl",
+        source_id="irs_soi",
+        package_id="soi-table-1-1",
+        chronicle_source_commit="ab" * 20,
+        source_access="public",
+    )
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text("#!/bin/sh\necho ok\n")
+    wrangler.chmod(0o755)
+
+    exit_code = harness_main(
+        [
+            "publish-consumer",
+            "--dir",
+            str(artifact_dir),
+            "--wrangler-command",
+            str(wrangler),
+        ]
+    )
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["valid"]
+    assert payload["counts"]["uploaded_count"] == 2
+    assert all(
+        entry["r2_location"]["key"].startswith("consumer/irs_soi/soi-table-1-1/")
+        for entry in payload["entries"]
+    )
 
 
 def test_build_artifact_rows_skips_failed_uploads(tmp_path):
