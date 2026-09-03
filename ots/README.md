@@ -21,10 +21,14 @@ accepted a proposal at a particular time, or that no parallel fork exists. A
 rewritten history can acquire new anchors, but Bitcoin exposes the later time at
 which those replacement bytes first existed; it cannot be backdated.
 
-The 15 proofs initially carried here bind releases 0000–0014 and were first
-stamped on 2026-08-19. The daily workflow stamps later manifests after they
-appear and upgrades locally pending proof files when calendar attestations can
-be folded into the serialized proof.
+As of 2026-09-02 this directory carries 20 proofs, one per release 0000–0019,
+and every proof is committed whatever its state. The proofs for releases
+0000–0014 were first stamped on 2026-08-19 and already contain Bitcoin block
+attestations. The proofs for releases 0015–0019 were stamped on 2026-09-02 and
+are committed while still pending: each holds only calendar commitments until
+the workflow upgrades it in place. The daily workflow stamps later manifests
+after they appear and upgrades pending proof files when calendar attestations
+can be folded into the serialized proof.
 
 ## Verify
 
@@ -50,10 +54,22 @@ python3 scripts/ots_anchor.py verify \
   --ots-bin "uvx --from opentimestamps-client==0.7.2 ots"
 ```
 
-This is strict: a mismatched or missing proof fails. Add `--require-bitcoin` to
-also fail while any committed proof file still contains only pending calendar
+This is strict: a mismatched or missing proof fails, and every manifest is
+reported rather than only the first failure. Add `--require-bitcoin` to also
+fail while any committed proof file still contains only pending calendar
 attestations. `status` distinguishes that local serialized state from an
 attestation a calendar may resolve in memory during verification.
+
+The script establishes the binding without calendar traffic: the
+`File sha256 hash` that `ots info` reads out of the proof must equal the
+manifest's SHA-256. It then runs the client's own `--no-bitcoin verify` as an
+independent check and echoes that output into the log. The client's verify path
+first asks each calendar for upgrades, so for a pending proof the log carries
+lines such as `Got 1 attestation(s) from <url>`, `Calendar <url>: Pending
+confirmation in Bitcoin blockchain`, or `Calendar <url>: <error>` after a
+transient failure. None of that is interpreted. Only the client's exact
+`File does not match original!` line, or an exit status the client never uses,
+fails a proof.
 
 ## Why proofs and automation live on `main`
 
@@ -63,13 +79,31 @@ stamping creates them after a release exists, and upgrading rewrites them as
 calendar transactions confirm. They therefore cannot live under `releases/`.
 
 Keeping the proof tree, anchoring script, tests, and scheduled workflow together
-on protected `main` also establishes the privilege boundary. The workflow runs
-`main`'s trusted script against a separate, shallow journal checkout that has no
-persisted credential. It runs `run`, `verify`, and `guard`, stages only `ots/`,
-and refuses a dirty worktree or a committed path outside `ots/` before it pushes
-the proof-only commit directly to `main` with `git push origin HEAD:main`.
+on `main` keeps the trusted code and the mutable proofs in one place. The
+workflow runs `main`'s script against a separate, shallow journal checkout that
+has no persisted credential. It runs `run`, `verify`, and `guard`, stages only
+`ots/`, and refuses a dirty worktree or a committed path outside `ots/` before
+it pushes the proof-only commit directly to `main` with a plain, non-force
+`git push origin HEAD:main`.
 
 A non-fast-forward rejection starts a bounded retry: fetch and rebase onto the
 new `origin/main`, refresh the credential-free journal checkout, rerun `run`,
 `verify`, and `guard`, then recommit and retry. The workflow makes at most three
 non-force push attempts and never pushes the journal branch.
+
+## What the `ots/`-only guard does and does not provide
+
+`main` is not protected. When the workflow was written (2026-09-02) the
+repository API reported no rulesets, required checks, review requirements, or
+push restrictions on `main`, and the direct push depends on that absence. The
+workflow logs the current rule evidence at the start of every run, so a later
+change shows up in the job log.
+
+The `guard` subcommand and the workflow's `assert_commit_scope` run client-side,
+in the same job that holds the `contents: write` token. They bound what a
+correctly functioning run can publish: a stray file, an unexpected edit, or a
+dirty worktree stops the push. They are not a server-side control. A compromised
+job, a malicious dependency pulled in by the pinned client, or anyone else with
+push access to `main` is not constrained by them. A repository ruleset that
+protects `main` and lists this workflow as a bypass actor would add the
+server-side boundary this design does not provide.
