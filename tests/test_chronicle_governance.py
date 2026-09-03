@@ -53,6 +53,8 @@ def test_chronicle_governance_files_define_required_review_surface():
     boundary_verdict = agents["required_judges"]["ledger-boundary"]["verdict"]
     from chronicle.boundary import MICRODATA_BOUNDARY_CLAUSES
 
+    assert len(MICRODATA_BOUNDARY_CLAUSES) == 3
+    assert all(len(clause) > 60 for clause in MICRODATA_BOUNDARY_CLAUSES)
     for clause in MICRODATA_BOUNDARY_CLAUSES:
         assert clause in boundary_verdict
     governance_doc = (ROOT / "docs" / "chronicle-governance.md").read_text()

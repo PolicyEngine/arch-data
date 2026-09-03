@@ -21,10 +21,12 @@ Chronicle may:
 
 - register raw publisher artifacts and checksums
 - register raw microdata releases as source artifacts (publisher, access
-  route, vintage, checksum, licence, hash source, verification date),
-  archiving bytes only when the release is `public`, its licence is on
-  the redistributable allowlist, and the entry carries artifact-bound
-  redistribution evidence naming the file
+  route, vintage, checksum, licence, hash source, verification date) once
+  chronicle#221 lands its access-aware refusals, archiving bytes only when
+  the release is `public`, its licence is on the redistributable allowlist,
+  and the entry carries artifact-bound redistribution evidence naming the
+  file; until then no microdata release may be pointed at any Chronicle
+  command
 - parse source rows and cells
 - emit source-backed aggregate facts, including publisher projections typed
   `assertion: source_projection`
