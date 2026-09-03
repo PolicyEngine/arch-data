@@ -49,7 +49,7 @@ Hosted tables mirror accepted build outputs and provide a shared query surface.
 |------------|-------------------|---------------|-------------------|------------------|-------------------|
 | Source package specs | Authoritative YAML and parser code | No | Optional packaged snapshot | No | Metadata only |
 | Raw publisher files | Tiny fixtures only | Authoritative bytes | No | Metadata only | Metadata plus R2 pointer |
-| Raw microdata releases | Manifest only (`kind: microdata_release`), never bytes | Bytes only for `public` releases on the redistributable allowlist; hash-only otherwise | No | Not represented until chronicle#221 | Not represented until chronicle#221 |
+| Raw microdata releases | Manifest only (`kind: microdata_release`); public bytes staged in an untracked transient directory, never tracked | Bytes only for `public` releases with artifact-bound redistribution evidence; hash-only otherwise | No | Not represented until chronicle#221 | Not represented until chronicle#221 |
 | Source manifests | Authoritative checked metadata | No | Optional snapshot | Metadata loaded into tables | Queryable artifact registry |
 | Parsed source rows/cells | Generated local output | No | Snapshot artifact | Queryable table | Queryable mirror |
 | Source records/facts | Generated local output | No | Snapshot artifact | Queryable table | Queryable mirror |

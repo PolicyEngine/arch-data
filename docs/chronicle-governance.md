@@ -73,6 +73,5 @@ types are:
 The overall verdict fails if any required judge fails. A judge must fail if a
 change moves reconciliation, aging, imputation, active target selection, or
 solver construction from Microcosm into Chronicle, stores a
-PolicyEngine-computed value as a fact, parses microdata into records, rows,
-columns, row values, or cells, derives facts from raw microdata, or stores
-licensed or restricted microdata bytes.
+PolicyEngine-computed value as a fact, or breaks any clause of the microdata
+boundary in `chronicle/boundary.py`, quoted here verbatim: (1) no microdata records, rows, columns, row values, or cells enter any Chronicle parsed-source surface, registry, derived artifact, or journal; (2) no fact derived from raw microdata by Chronicle or by a consumer enters Chronicle, however many intermediate artifacts stand between them, the only exception being an aggregate that the publisher of that microdata computed and published itself; (3) no licensed or restricted microdata bytes enter any Chronicle store, and public microdata bytes enter only with artifact-bound redistribution evidence.

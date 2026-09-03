@@ -14,10 +14,10 @@ source artifacts, and publish source-backed facts. Chronicle does not own
 selection or measurement contracts, reconcile inconsistent sources, impute
 missing data, parse survey or administrative microdata into records, rows,
 columns, row values, or cells, derive facts from raw microdata, hold licensed
-or restricted microdata bytes, or execute simulator-specific calibration. Chronicle
-does register the microdata releases its consumers build from (publisher,
-vintage, checksum, licence) and archives the bytes of public-use files whose
-licence is on its redistributable allowlist; see
+or restricted microdata bytes, or execute simulator-specific calibration. Once
+chronicle#221 lands, Chronicle registers the microdata releases its consumers
+build from (publisher, vintage, checksum, licence) and archives the bytes of
+public-use files that carry artifact-bound redistribution evidence; see
 [`docs/adr-chronicle-raw-microdata-identity.md`](docs/adr-chronicle-raw-microdata-identity.md).
 
 Microcosm consumes Chronicle facts, owns the contracts that select and bind
@@ -55,7 +55,10 @@ The load-bearing rule:
 > consumer or transform it in ways that change its meaning.
 
 The store is facts-only, and the line is who asserted the value. Everything a
-publisher asserted — including the publisher's own projections — is a fact.
+publisher asserted — including the publisher's own projections — is a fact,
+except publisher-authored values at microdata grain, which are content and
+never facts; only the publisher's own published aggregates over its microdata
+are facts (see `docs/adr-chronicle-raw-microdata-identity.md`).
 Everything PolicyEngine computes (aged, uprated, forecast, or reconciled
 levels) is a downstream build artifact and never enters the store; Microcosm
 owns aging as a named, versioned model over Chronicle growth-factor facts. A
