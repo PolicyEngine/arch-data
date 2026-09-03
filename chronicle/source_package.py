@@ -97,6 +97,7 @@ SOURCE_PACKAGE_ALIASES = {
         "hmrc/salary_sacrifice_reform_2029_headcounts"
     ),
     "hmrc-tax-free-childcare-march-2026": Path("hmrc/tax_free_childcare_march_2026"),
+    "hmrc-child-benefit-august-2025": Path("hmrc/child_benefit_august_2025"),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
@@ -176,11 +177,20 @@ SOURCE_PACKAGE_ALIASES = {
     "dwp-uc-households-lcwra-entitlement-april-december-2025": Path(
         "dwp/uc_households_lcwra_entitlement_april_december_2025"
     ),
-    "dwp-uc-payment-distribution-may-2025": Path(
-        "dwp/uc_payment_distribution_may_2025"
+    "dwp-uc-households-family-type-child-entitlement-april-december-2025": Path(
+        "dwp/uc_households_family_type_child_entitlement_april_december_2025"
     ),
-    "dwp-uc-scotland-youngest-child-may-2025": Path(
-        "dwp/uc_scotland_youngest_child_may_2025"
+    "dwp-uc-households-children-child-entitlement-april-december-2025": Path(
+        "dwp/uc_households_children_child_entitlement_april_december_2025"
+    ),
+    "dwp-uc-households-family-type-payment-indicator-april-december-2025": Path(
+        "dwp/uc_households_family_type_payment_indicator_april_december_2025"
+    ),
+    "dwp-uc-payment-distribution-april-december-2025": Path(
+        "dwp/uc_payment_distribution_april_december_2025"
+    ),
+    "dwp-uc-scotland-youngest-child-april-december-2025": Path(
+        "dwp/uc_scotland_youngest_child_april_december_2025"
     ),
     "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
@@ -300,6 +310,9 @@ SOURCE_PACKAGE_ALIASES = {
         "kff/marketplace_effectuated_enrollment"
     ),
     "ons-census2021-ts041-households-lad": Path("ons/census2021_ts041_households_lad"),
+    "ons-census2021-ts003-household-composition-country": Path(
+        "ons/census2021_ts003_household_composition_country"
+    ),
     "ons-census2021-ts041-households-pcon24": Path(
         "ons/census2021_ts041_households_pcon24"
     ),
@@ -316,6 +329,9 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-pipr-rents-by-area-june-2026": Path("ons/pipr_rents_by_area_june_2026"),
     "nrs-census2022-households-ukpc24": Path("nrs/census2022_households_ukpc24"),
     "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
+    "nrs-census2022-uv113-household-composition-country": Path(
+        "nrs/census2022_uv113_household_composition_country"
+    ),
     "nrs-census2022-uv404-tenure-council-area": Path(
         "nrs/census2022_uv404_tenure_council_area"
     ),
@@ -323,6 +339,9 @@ SOURCE_PACKAGE_ALIASES = {
     "nisra-census2021-households-pcon24": Path("nisra/census2021_households_pcon24"),
     "nisra-pcon24-population-by-age-2024": Path("nisra/pcon24_population_by_age_2024"),
     "nisra-census2021-tenure-lgd": Path("nisra/census2021_tenure_lgd"),
+    "nisra-census2021-household-composition-country": Path(
+        "nisra/census2021_household_composition_country"
+    ),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "scotgov-band-d-council-tax-rates-2026-27": Path(
         "scotgov/band_d_council_tax_rates_2026_27"

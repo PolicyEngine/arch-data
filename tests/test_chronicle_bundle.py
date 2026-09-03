@@ -79,16 +79,16 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 188876,
+        "fact_count": 192505,
         "geography_count": 12539,
-        "period_count": 249,
-        "semantic_duplicate_key_count": 163,
+        "period_count": 269,
+        "semantic_duplicate_key_count": 177,
         "skipped_source_count": 10,
         "source_count": 45,
-        "source_package_count": 160,
+        "source_package_count": 167,
         "warning_count": 1,
     }
-    assert len(rows) == 188876
+    assert len(rows) == 192505
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -106,7 +106,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert rows[0]["aggregate_fact_key"].startswith("ledger.aggregate_fact.v2:")
     assert rows[0]["semantic_fact_key"].startswith("ledger.semantic_fact.v2:")
-    assert source_packages["source_package_count"] == 160
+    assert source_packages["source_package_count"] == 167
     assert source_packages["skipped_source_count"] == 10
     assert sorted(item["source"] for item in source_packages["skipped_sources"]) == [
         "census-acs-s0101-congressional-district-age-2024",
@@ -120,7 +120,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 188876
+    assert coverage["fact_count"] == 192505
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -135,13 +135,13 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dfe": 770,
         "dfc_ni": 1189,
         "dft": 233,
-        "dwp": 6547,
+        "dwp": 8175,
         "eurostat": 207,
         "federal_reserve": 1,
         "fpb_economic_outlook": 1000,
         "hhs_acf_liheap": 2,
         "hhs_acf_tanf": 110,
-        "hmrc": 21153,
+        "hmrc": 22319,
         "ici": 12,
         "irs_soi": 40063,
         "isc": 2,
@@ -149,11 +149,11 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "kff": 52,
         "mhclg": 2712,
         "nbb_national_accounts": 1,
-        "nisra": 510,
-        "nrs": 5589,
+        "nisra": 533,
+        "nrs": 5615,
         "obr": 270,
         "onem_rva_unemployment": 1,
-        "ons": 79955,
+        "ons": 80741,
         "onss_contributions": 1,
         "opgroeien_groeipakket": 11,
         "scotgov": 2787,
@@ -169,7 +169,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "welshgov": 216,
     }
     table_counts = coverage["counts"]["by_source_table"]
-    assert len(table_counts) == 155
+    assert len(table_counts) == 162
     assert (
         table_counts["dfe:Funded early education and childcare 2026, Headline figures"]
         == 770
@@ -604,14 +604,14 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "calendar_year:2015": 74,
         "calendar_year:2016": 72,
         "calendar_year:2017": 72,
-        "calendar_year:2018": 86,
-        "calendar_year:2019": 85,
-        "calendar_year:2020": 85,
-        "calendar_year:2021": 4017,
-        "calendar_year:2022": 2075,
-        "calendar_year:2023": 6355,
-        "calendar_year:2024": 33948,
-        "calendar_year:2025": 4571,
+        "calendar_year:2018": 176,
+        "calendar_year:2019": 175,
+        "calendar_year:2020": 175,
+        "calendar_year:2021": 4196,
+        "calendar_year:2022": 2191,
+        "calendar_year:2023": 6445,
+        "calendar_year:2024": 34038,
+        "calendar_year:2025": 4661,
         "calendar_year:2026": 341,
         "calendar_year:2027": 320,
         "calendar_year:2028": 320,
@@ -653,12 +653,40 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fiscal_year:2028": 35,
         "fiscal_year:2029": 35,
         "fiscal_year:2030": 31,
+        "month:2003-08": 7,
+        "month:2004-08": 7,
+        "month:2005-08": 7,
+        "month:2006-08": 7,
+        "month:2007-08": 7,
+        "month:2008-08": 7,
+        "month:2009-08": 7,
+        "month:2010-08": 7,
+        "month:2011-05": 21,
+        "month:2011-08": 18,
+        "month:2012-05": 21,
+        "month:2012-08": 18,
+        "month:2013-05": 21,
+        "month:2013-08": 22,
+        "month:2014-05": 21,
+        "month:2014-08": 22,
+        "month:2015-05": 21,
+        "month:2015-08": 22,
+        "month:2016-05": 21,
+        "month:2016-08": 22,
+        "month:2017-05": 21,
+        "month:2017-08": 22,
+        "month:2018-05": 21,
+        "month:2018-08": 22,
+        "month:2019-05": 21,
+        "month:2019-08": 23,
+        "month:2020-05": 21,
+        "month:2020-08": 23,
         "month:2021-03": 1,
         "month:2021-04": 1,
-        "month:2021-05": 1,
+        "month:2021-05": 22,
         "month:2021-06": 1,
         "month:2021-07": 1,
-        "month:2021-08": 1,
+        "month:2021-08": 24,
         "month:2021-09": 1,
         "month:2021-10": 1,
         "month:2021-11": 1,
@@ -667,10 +695,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2022-02": 1,
         "month:2022-03": 1,
         "month:2022-04": 1,
-        "month:2022-05": 1,
+        "month:2022-05": 22,
         "month:2022-06": 1,
         "month:2022-07": 1,
-        "month:2022-08": 1,
+        "month:2022-08": 24,
         "month:2022-09": 1,
         "month:2022-10": 1,
         "month:2022-11": 1,
@@ -679,10 +707,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2023-02": 379,
         "month:2023-03": 387,
         "month:2023-04": 379,
-        "month:2023-05": 379,
+        "month:2023-05": 400,
         "month:2023-06": 387,
         "month:2023-07": 379,
-        "month:2023-08": 379,
+        "month:2023-08": 402,
         "month:2023-09": 387,
         "month:2023-10": 379,
         "month:2023-11": 379,
@@ -691,10 +719,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2024-02": 379,
         "month:2024-03": 387,
         "month:2024-04": 379,
-        "month:2024-05": 379,
+        "month:2024-05": 400,
         "month:2024-06": 387,
         "month:2024-07": 379,
-        "month:2024-08": 379,
+        "month:2024-08": 402,
         "month:2024-09": 387,
         "month:2024-10": 485,
         "month:2024-11": 485,
@@ -702,15 +730,15 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2025-01": 487,
         "month:2025-02": 485,
         "month:2025-03": 615,
-        "month:2025-04": 490,
-        "month:2025-05": 6599,
-        "month:2025-06": 406,
-        "month:2025-07": 398,
-        "month:2025-08": 402,
-        "month:2025-09": 414,
-        "month:2025-10": 397,
-        "month:2025-11": 412,
-        "month:2025-12": 661,
+        "month:2025-04": 689,
+        "month:2025-05": 6656,
+        "month:2025-06": 605,
+        "month:2025-07": 597,
+        "month:2025-08": 1034,
+        "month:2025-09": 613,
+        "month:2025-10": 596,
+        "month:2025-11": 611,
+        "month:2025-12": 860,
         "month:2026-01": 381,
         "month:2026-02": 385,
         "month:2026-03": 386,
@@ -742,19 +770,19 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2009": 9,
         "tax_year:2010": 9,
         "tax_year:2011": 9,
-        "tax_year:2012": 9,
-        "tax_year:2013": 9,
-        "tax_year:2014": 9,
-        "tax_year:2015": 9,
-        "tax_year:2016": 9,
+        "tax_year:2012": 11,
+        "tax_year:2013": 11,
+        "tax_year:2014": 11,
+        "tax_year:2015": 11,
+        "tax_year:2016": 11,
         "tax_year:2017": 9,
-        "tax_year:2018": 9,
-        "tax_year:2019": 9,
-        "tax_year:2020": 9,
-        "tax_year:2021": 9,
-        "tax_year:2022": 41237,
-        "tax_year:2023": 63276,
-        "tax_year:2024": 294,
+        "tax_year:2018": 11,
+        "tax_year:2019": 11,
+        "tax_year:2020": 11,
+        "tax_year:2021": 11,
+        "tax_year:2022": 41239,
+        "tax_year:2023": 63310,
+        "tax_year:2024": 296,
     }
     for fiscal_year in range(2017, 2026):
         key = f"fiscal_year:{fiscal_year}"
@@ -797,26 +825,26 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4862
-    assert coverage["counts"]["by_geography"]["country:E92000001"] == 1390
-    assert coverage["counts"]["by_geography"]["country:K03000001"] == 551
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 6373
+    assert coverage["counts"]["by_geography"]["country:E92000001"] == 1437
+    assert coverage["counts"]["by_geography"]["country:K03000001"] == 2020
     assert len(coverage["counts"]["by_geography"]) == 12539
     assert coverage["counts"]["by_entity"] == {
-        "benefit_unit": 233,
+        "benefit_unit": 2024,
         "dwelling": 27041,
-        "family": 107,
+        "family": 1299,
         "firm": 1439,
-        "government": 1322,
-        "household": 40724,
+        "government": 1350,
+        "household": 40676,
         "institutional_sector": 261,
         "pension_plan": 2,
-        "person": 62616,
+        "person": 63282,
         "return": 14600,
         "social_protection_scheme": 36,
         "tax_unit": 40495,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
-    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 163
+    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 177
     assert summary["warnings"] == [
         {
             "code": "duplicate_semantic_fact_key",
