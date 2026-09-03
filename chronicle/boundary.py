@@ -13,10 +13,12 @@ from __future__ import annotations
 MICRODATA_BOUNDARY_CLAUSES: tuple[str, ...] = (
     "no microdata records, rows, columns, row values, or cells enter any "
     "Chronicle parsed-source surface, registry, derived artifact, or journal",
-    "no fact derived from raw microdata by Chronicle or by a consumer enters "
-    "Chronicle, however many intermediate artifacts stand between them, the only "
-    "exception being an aggregate that the publisher of that microdata computed "
-    "and published itself",
+    "no fact computed from raw microdata by Chronicle or by a PolicyEngine-side "
+    "consumer (Microcosm, PolicyEngine, Thesis, or any system that builds from a "
+    "Chronicle registration) enters Chronicle, however many intermediate artifacts "
+    "stand between them, while a value that a third party asserted and published, "
+    "whether the microdata's own publisher or another, is an ordinary fact with "
+    "ordinary provenance",
     "no licensed or restricted microdata bytes enter any Chronicle store, and "
     "public microdata bytes enter only with artifact-bound redistribution evidence",
 )

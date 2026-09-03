@@ -2,8 +2,8 @@
 
 Status: accepted 2026-09-02. Enforcement lands in two steps and this ADR's
 guarantees are prospective until they merge: chronicle#221 (PR #227: manifest
-classification, the access-aware refusals in `fetch-artifact`, `publish-raw`,
-`register-artifact`, and the source-package byte reader, the redistribution
+classification, the access-aware refusals in `validate-package`,
+`fetch-artifact`, `publish-raw`, and the source-package byte reader, the redistribution
 allowlist, artifact-bound licence evidence, untracked staging for public
 microdata bytes) and chronicle#238 (asserting principal and root-artifact
 lineage on fact provenance). Until #227 merges, no microdata release may be
@@ -15,15 +15,18 @@ obligation, not a validator.
 
 Chronicle registers every raw microdata release its consumers build from, and
 stores none of their content. "Content" means any parsed representation:
-microdata records, rows, columns, row values, or cells, and any fact derived
-from them by Chronicle or a consumer. Custody of a public-use file's bytes
+microdata records, rows, columns, row values, or cells, and any fact computed
+from them by Chronicle or by a PolicyEngine-side consumer (Microcosm,
+PolicyEngine, Thesis, or any system that builds from a Chronicle
+registration). A value that a third party asserted and published, whether the
+microdata's own publisher or another, is an ordinary fact. Custody of a public-use file's bytes
 under artifact-bound redistribution evidence is not content; custody of
 licensed or restricted bytes is never taken at all.
 
 1. **Classification is explicit.** Every manifest created or modified after
    this ADR declares `kind`, either `publisher_table` or
    `microdata_release`. `validate-package`, `fetch-artifact`, `publish-raw`,
-   `register-artifact`, and the source-package byte reader refuse a new or
+   and the source-package byte reader refuse a new or
    modified manifest without it, at every entry point. The manifests that
    exist at #227's merge commit are grandfathered as publisher tables by an
    explicit frozen list checked into the repository; a kindless manifest
@@ -67,15 +70,19 @@ licensed or restricted bytes is never taken at all.
    enters `source_records`, `source_rows`, `source_columns`,
    `source_row_values`, `source_cells`, the relational registry, the
    derived-artifact bucket, or the journal, whether the release is public or
-   gated. No fact derived from raw microdata by Chronicle or by a consumer
-   enters Chronicle, however many intermediate artifacts stand between the
-   microdata and the value. The only exception is assertion-based: an
-   aggregate that the publisher of that microdata computed and published
-   itself is an ordinary fact with ordinary provenance. This is enforceable
+   gated. No fact computed from raw microdata by Chronicle or by a
+   PolicyEngine-side consumer enters Chronicle, however many intermediate
+   artifacts stand between the microdata and the value. The test is who
+   asserted the value: a value that a third party asserted and published,
+   whether the microdata's own publisher (Census over the ASEC) or another
+   publisher (JCT or TPC over the IRS PUF, JRC over EU-SILC), is an ordinary
+   fact with ordinary provenance; a value Chronicle or a PolicyEngine-side
+   consumer computed is not. This is enforceable
    only once facts carry an asserting principal and root-artifact lineage
    (`asserted_by`, `root_artifacts`; chronicle#238): a fact rooted in a
    `microdata_release` registration is then rejected unless `asserted_by` is
-   that release's publisher. Until then reviewers enforce it by hand.
+   a third-party publisher, never Chronicle or a PolicyEngine-side consumer.
+   Until then reviewers enforce it by hand.
 5. **What a registration attests, and who.** Each registration records
    `hash_source` and its attester:
    - `chronicle_fetch`: Chronicle fetched the bytes and hashed them;

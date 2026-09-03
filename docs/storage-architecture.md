@@ -16,7 +16,9 @@ content-addressed by checksum and should never be overwritten in place.
 
 Raw microdata releases follow the same rule at the artifact level only. The
 bytes of a `public` release whose licence is on Chronicle's redistributable
-allowlist (Census public-use files are the model case) live in the raw bucket
+allowlist, and whose registration carries artifact-bound redistribution
+evidence naming the file (Census public-use files are the model case), live in
+the raw bucket
 under the same content-addressed key shape. Every other microdata release
 (FRS, BE-SILC, the IRS PUF, and any publicly downloadable file under
 unstated terms) is registered by manifest, with checksum, vintage, licence,
@@ -172,7 +174,8 @@ Chronicle should not parse survey or administrative microdata into records,
 rows, columns, row values, or cells, derive facts from it, or hold licensed or
 restricted microdata bytes in any store. It registers microdata releases as
 source artifacts and archives bytes only for public releases on its
-redistributable allowlist (see
+redistributable allowlist that carry artifact-bound redistribution evidence
+(see
 `docs/adr-chronicle-raw-microdata-identity.md`). It reflects government
 statistics releases and the provenance needed to audit those published facts.
 
