@@ -84,11 +84,11 @@ SOURCE_PACKAGE_ALIASES = {
         "bea/regional_personal_income_state"
     ),
     "hmrc-spi-income-bands-2023-24": Path("hmrc/spi_income_bands_2023_24"),
-    "hmrc-cgt-age-2025": Path("hmrc/cgt_age_2025"),
-    "hmrc-cgt-country-region-2025": Path("hmrc/cgt_country_region_2025"),
-    "hmrc-cgt-gain-by-income-2025": Path("hmrc/cgt_gain_by_income_2025"),
-    "hmrc-cgt-size-of-gain-2025": Path("hmrc/cgt_size_of_gain_2025"),
-    "hmrc-cgt-statistics-2025": Path("hmrc/cgt_statistics_2025"),
+    "hmrc-cgt-age-2026": Path("hmrc/cgt_age_2026"),
+    "hmrc-cgt-country-region-2026": Path("hmrc/cgt_country_region_2026"),
+    "hmrc-cgt-gain-by-income-2026": Path("hmrc/cgt_gain_by_income_2026"),
+    "hmrc-cgt-size-of-gain-2026": Path("hmrc/cgt_size_of_gain_2026"),
+    "hmrc-cgt-statistics-2026": Path("hmrc/cgt_statistics_2026"),
     "hmrc-spi-income-by-area-2023-24": Path("hmrc/spi_income_by_area_2023_24"),
     "hmrc-salary-sacrifice-relief-2024-25": Path(
         "hmrc/salary_sacrifice_relief_2024_25"
@@ -553,6 +553,12 @@ class SourceArtifactSpec:
             )
         if self.parser == "ods_used_range":
             return source_cells_from_ods(content, artifact)
+        if self.parser == "ods_numeric_text_used_range":
+            return source_cells_from_ods(
+                content,
+                artifact,
+                coerce_numeric_text=True,
+            )
         if self.parser == "html_tables_and_text":
             return source_cells_from_html_tables_and_text(content, artifact)
         if self.parser == "pdf_text_numbers":

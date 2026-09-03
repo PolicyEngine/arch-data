@@ -193,15 +193,23 @@ def test_hmrc_packages_preserve_provenance_and_definition_year_metadata():
 
 def test_hmrc_cgt_reuses_one_publisher_series_across_definition_years():
     """CGT years are facts in one package, not competing hardcoded targets."""
-    package = load_source_package("hmrc-cgt-statistics-2025")
+    package = load_source_package("hmrc-cgt-statistics-2026")
     facts = [
         fact
-        for fact in package.build_facts(2023)
+        for fact in package.build_facts(2026)
         if fact.measure.concept == "hmrc.cgt_tax_total"
     ]
 
     assert {fact.period.type for fact in facts} == {"tax_year"}
-    assert {fact.period.value for fact in facts} >= {2021, 2022, 2023}
+    assert {fact.period.value for fact in facts} >= {2021, 2022, 2023, 2024}
+    assert (
+        next(fact for fact in facts if fact.period.value == 2023).value
+        == 12_773_000_000
+    )
+    assert (
+        next(fact for fact in facts if fact.period.value == 2024).value
+        == 24_169_000_000
+    )
     assert {fact.assertion for fact in facts} == {"observation"}
     assert all(fact.source.source_name == "hmrc" for fact in facts)
     assert all(fact.measure.source_concept == "hmrc.cgt_tax_total" for fact in facts)
@@ -227,44 +235,50 @@ def test_hmrc_cgt_reuses_one_publisher_series_across_definition_years():
 
 def test_hmrc_cgt_size_of_gain_package_builds_microcosm_visible_band_facts():
     """CGT gain bands must carry dimension values the consumer can select."""
-    report = validate_source_package("hmrc-cgt-size-of-gain-2025", year=2025)
+    report = validate_source_package("hmrc-cgt-size-of-gain-2026", year=2026)
 
     assert report.valid
     assert report.counts == {
-        "record_set_count": 1,
-        "row_count": 9,
-        "measure_count": 2,
-        "source_record_count": 18,
-        "source_region_count": 1,
+        "record_set_count": 26,
+        "row_count": 26,
+        "measure_count": 51,
+        "source_record_count": 51,
+        "source_region_count": 26,
     }
 
-    package = load_source_package("hmrc-cgt-size-of-gain-2025")
-    cells = package.build_source_cells(2025)
-    facts = package.build_facts(2025, cells=cells)
+    package = load_source_package("hmrc-cgt-size-of-gain-2026")
+    cells = package.build_source_cells(2026)
+    facts = package.build_facts(2026, cells=cells)
     consumer_rows = consumer_fact_rows(facts)
     values_by_record = {fact.source_record_id: fact for fact in facts}
 
     assert validate_source_cells(cells).valid
     assert validate_facts(facts).valid
     assert validate_consumer_fact_contract(facts).valid
-    assert len(facts) == 18
+    assert len(facts) == 51
 
     first_band_gains = values_by_record[
-        "hmrc.cgt_size_of_gain_2025.table2_1a.ty2023."
+        "hmrc.cgt_size_of_gain_2026.table2_2a.ty2023."
         "gain_12300_to_24999.gains_individuals"
     ]
     first_band_taxpayers = values_by_record[
-        "hmrc.cgt_size_of_gain_2025.table2_1a.ty2023."
+        "hmrc.cgt_size_of_gain_2026.table2_2a.ty2023."
         "gain_12300_to_24999.taxpayers_individuals"
     ]
     top_band_gains = values_by_record[
-        "hmrc.cgt_size_of_gain_2025.table2_1a.ty2023."
+        "hmrc.cgt_size_of_gain_2026.table2_2a.ty2023."
         "gain_5000000_plus.gains_individuals"
     ]
+    new_aea_band_gains = values_by_record[
+        "hmrc.cgt_size_of_gain_2026.table2_1a.ty2024."
+        "gain_3000_to_5999.gains_individuals"
+    ]
 
-    assert first_band_taxpayers.value == 79_000
-    assert first_band_gains.value == 1_418_000_000
-    assert top_band_gains.value == 22_714_000_000
+    assert first_band_taxpayers.value == 84_000
+    assert first_band_gains.value == 1_509_000_000
+    assert top_band_gains.value == 23_645_000_000
+    assert new_aea_band_gains.value == 311_000_000
+    assert {fact.period.value for fact in facts} == {2023, 2024}
     assert first_band_gains.period.type == "tax_year"
     assert first_band_gains.period.value == 2023
     assert first_band_gains.filters == {"cgt_gain_band": "gain_12300_to_24999"}
@@ -282,7 +296,7 @@ def test_hmrc_cgt_size_of_gain_package_builds_microcosm_visible_band_facts():
         for row in consumer_rows
         if row["lineage"]["source_record_id"]
         == (
-            "hmrc.cgt_size_of_gain_2025.table2_1a.ty2023."
+            "hmrc.cgt_size_of_gain_2026.table2_2a.ty2023."
             "gain_12300_to_24999.gains_individuals"
         )
     )
@@ -397,31 +411,37 @@ def test_dft_bus0415_package_preserves_quarters_from_2023_through_2026():
 
 def test_hmrc_cgt_table3_preserves_joint_gain_and_income_bands():
     """Table 3 emits numeric cells and retains sub-thousand markers as guards."""
-    report = validate_source_package("hmrc-cgt-gain-by-income-2025", year=2025)
+    report = validate_source_package("hmrc-cgt-gain-by-income-2026", year=2026)
 
     assert report.valid
     assert report.counts == {
-        "record_set_count": 11,
-        "row_count": 11,
-        "measure_count": 142,
-        "source_record_count": 142,
-        "source_region_count": 11,
+        "record_set_count": 22,
+        "row_count": 22,
+        "measure_count": 290,
+        "source_record_count": 290,
+        "source_region_count": 22,
     }
 
-    facts = load_source_package("hmrc-cgt-gain-by-income-2025").build_facts(2025)
+    facts = load_source_package("hmrc-cgt-gain-by-income-2026").build_facts(2026)
     top_gain_top_income = next(
         fact
         for fact in facts
+        if fact.period.value == 2024
         if fact.measure.concept == "hmrc.cgt_gains_individuals"
         and fact.filters.get("cgt_gain_band") == "gain_5000000_plus"
         and fact.filters.get("cgt_taxable_income_band") == "income_200000_plus"
     )
 
-    assert len(facts) == 142
-    assert {fact.period.value for fact in facts} == {2023}
-    assert top_gain_top_income.value == 16_631_000_000
+    assert len(facts) == 290
+    assert {fact.period.value for fact in facts} == {2023, 2024}
+    assert top_gain_top_income.value == 37_479_000_000
+    assert {fact.filters.get("cgt_taxable_income_band") for fact in facts} >= {
+        "income_100000_to_125139",
+        "income_125140_to_199999",
+    }
     assert not any(
-        fact.measure.concept == "hmrc.cgt_taxpayers_individuals"
+        fact.period.value == 2024
+        and fact.measure.concept == "hmrc.cgt_taxpayers_individuals"
         and fact.filters.get("cgt_gain_band") == "gain_5000000_plus"
         and fact.filters.get("cgt_taxable_income_band") == "income_0_to_37699"
         for fact in facts
@@ -430,55 +450,57 @@ def test_hmrc_cgt_table3_preserves_joint_gain_and_income_bands():
 
 def test_hmrc_cgt_table5_preserves_country_and_region_facts():
     """Table 5 facts use GSS country and English-region identifiers."""
-    report = validate_source_package("hmrc-cgt-country-region-2025", year=2025)
+    report = validate_source_package("hmrc-cgt-country-region-2026", year=2026)
 
     assert report.valid
     assert report.counts == {
-        "record_set_count": 1,
-        "row_count": 14,
-        "measure_count": 3,
-        "source_record_count": 42,
-        "source_region_count": 1,
+        "record_set_count": 2,
+        "row_count": 28,
+        "measure_count": 6,
+        "source_record_count": 84,
+        "source_region_count": 2,
     }
 
-    facts = load_source_package("hmrc-cgt-country-region-2025").build_facts(2025)
+    facts = load_source_package("hmrc-cgt-country-region-2026").build_facts(2026)
     london_gains = next(
         fact
         for fact in facts
         if fact.measure.concept == "hmrc.cgt_gains_total"
         and fact.geography.id == "E12000007"
+        and fact.period.value == 2024
     )
 
-    assert len(facts) == 42
-    assert {fact.period.value for fact in facts} == {2023}
-    assert london_gains.value == 18_369_000_000
+    assert len(facts) == 84
+    assert {fact.period.value for fact in facts} == {2023, 2024}
+    assert london_gains.value == 34_717_000_000
     assert london_gains.geography.level == "region"
 
 
 def test_hmrc_cgt_table6_preserves_age_band_facts():
     """Table 6 carries the nine source age bands plus the all-ages row."""
-    report = validate_source_package("hmrc-cgt-age-2025", year=2025)
+    report = validate_source_package("hmrc-cgt-age-2026", year=2026)
 
     assert report.valid
     assert report.counts == {
-        "record_set_count": 1,
-        "row_count": 10,
-        "measure_count": 3,
-        "source_record_count": 30,
-        "source_region_count": 1,
+        "record_set_count": 2,
+        "row_count": 20,
+        "measure_count": 6,
+        "source_record_count": 60,
+        "source_region_count": 2,
     }
 
-    facts = load_source_package("hmrc-cgt-age-2025").build_facts(2025)
+    facts = load_source_package("hmrc-cgt-age-2026").build_facts(2026)
     age_55_to_64 = next(
         fact
         for fact in facts
         if fact.measure.concept == "hmrc.cgt_taxpayers_individuals"
         and fact.filters.get("age_band") == "age_55_to_64"
+        and fact.period.value == 2024
     )
 
-    assert len(facts) == 30
-    assert {fact.period.value for fact in facts} == {2023}
-    assert age_55_to_64.value == 96_000
+    assert len(facts) == 60
+    assert {fact.period.value for fact in facts} == {2023, 2024}
+    assert age_55_to_64.value == 144_000
     assert {
         (constraint.variable, constraint.operator, constraint.value)
         for constraint in age_55_to_64.constraints
@@ -605,9 +627,9 @@ def test_dwp_uc_deductions_package_preserves_rows_and_derives_uc_units():
         if row["observed_measure"]["source_measure_id"] == "total_units"
     ]
     assert len(total_unit_rows) == 11
-    assert {
-        row["observed_measure"]["source_concept"] for row in total_unit_rows
-    } == {"dwp.uc_benefit_units"}
+    assert {row["observed_measure"]["source_concept"] for row in total_unit_rows} == {
+        "dwp.uc_benefit_units"
+    }
 
 
 def test_dwp_uc_childcare_element_package_preserves_monthly_publisher_series():
@@ -803,12 +825,12 @@ def test_dwp_uc_composition_packages_cover_the_caseload_months(
     assert all(fact.provenance_class == "administrative" for fact in facts)
     assert all(fact.source_row_keys for fact in facts)
     assert validate_consumer_fact_contract(facts).valid
-    assert {
-        row["observed_measure"]["source_concept"] for row in consumer_rows
-    } == {"dwp.uc_households"}
-    assert {
-        row["observed_measure"]["source_measure_id"] for row in consumer_rows
-    } == {"benefit_units"}
+    assert {row["observed_measure"]["source_concept"] for row in consumer_rows} == {
+        "dwp.uc_households"
+    }
+    assert {row["observed_measure"]["source_measure_id"] for row in consumer_rows} == {
+        "benefit_units"
+    }
 
 
 def test_source_package_alias_compiles_soi_table_1_1_specs():

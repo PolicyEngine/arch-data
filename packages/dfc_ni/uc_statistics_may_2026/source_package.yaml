@@ -14,10 +14,10 @@ artifact:
   resource_directory: data/dfc_ni/uc_statistics_may_2026
   manifest: manifest.yaml
   vintage: uc_statistics_may_2026
-  extracted_at: '2026-08-27'
-  extraction_method: XLSX workbook used-range parse of supplementary tables 6 and 7, January 2023 to May
+  extracted_at: '2026-09-03'
+  extraction_method: ODS workbook used-range parse of supplementary tables 6 and 7, January 2023 to May
     2026
-  parser: xlsx_used_range
+  parser: ods_used_range
   artifact_year: 2026
 record_sets:
 - <<: &id001

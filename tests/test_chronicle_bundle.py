@@ -34,6 +34,10 @@ def test_build_bundle_dir_uk_suite_uses_curated_sources(tmp_path, monkeypatch):
     assert report.valid
     assert "dfc-ni-uc-statistics-may-2026" in UK_BUNDLE_SOURCES
     assert "dfc-ni-uc-statistics-may-2025" not in UK_BUNDLE_SOURCES
+    assert "hmrc-cgt-statistics-2026" in UK_BUNDLE_SOURCES
+    assert "hmrc-cgt-statistics-2025" not in UK_BUNDLE_SOURCES
+    assert "hmrc-cgt-size-of-gain-2026" in UK_BUNDLE_SOURCES
+    assert "hmrc-cgt-size-of-gain-2025" not in UK_BUNDLE_SOURCES
     assert tuple(captured["sources"]) == UK_BUNDLE_SOURCES
     assert captured["output_dir"] == tmp_path / "bundle"
 
@@ -75,7 +79,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 188614,
+        "fact_count": 188876,
         "geography_count": 12539,
         "period_count": 249,
         "semantic_duplicate_key_count": 143,
@@ -84,7 +88,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "source_package_count": 160,
         "warning_count": 1,
     }
-    assert len(rows) == 188614
+    assert len(rows) == 188876
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -116,7 +120,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 188614
+    assert coverage["fact_count"] == 188876
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -137,7 +141,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fpb_economic_outlook": 1000,
         "hhs_acf_liheap": 2,
         "hhs_acf_tanf": 110,
-        "hmrc": 20891,
+        "hmrc": 21153,
         "ici": 12,
         "irs_soi": 40063,
         "isc": 2,
@@ -198,24 +202,24 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert (
         table_counts[
-            "hmrc:Capital Gains Tax statistics Table 3.1: individual taxpayers and "
-            "gains by size of gain and taxable income, 2023-24"
+            "hmrc:Capital Gains Tax statistics Table 3: individual taxpayers and "
+            "gains by size of gain and taxable income"
         ]
-        == 142
+        == 290
     )
     assert (
         table_counts[
-            "hmrc:Capital Gains Tax statistics Table 5.1: taxpayers, gains and "
-            "liabilities by UK country and region, 2023-24"
+            "hmrc:Capital Gains Tax statistics Table 5: taxpayers, gains and "
+            "liabilities by UK country and region"
         ]
-        == 42
+        == 84
     )
     assert (
         table_counts[
-            "hmrc:Capital Gains Tax statistics Table 6.1: individual taxpayers, gains "
-            "and liabilities by age, 2023-24"
+            "hmrc:Capital Gains Tax statistics Table 6: individual taxpayers, gains "
+            "and liabilities by age"
         ]
-        == 30
+        == 60
     )
     assert (
         table_counts[
@@ -424,11 +428,17 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert (
         table_counts[
-            "hmrc:Capital Gains Tax statistics Table 2.1a: estimated number of "
-            "taxpayers, amounts of gains and tax liabilities by size of gain for "
-            "individuals"
+            "hmrc:Capital Gains Tax statistics Table 2: estimated number of taxpayers, "
+            "amounts of gains and tax liabilities by size of gain"
         ]
-        == 18
+        == 51
+    )
+    assert (
+        table_counts[
+            "hmrc:Capital Gains Tax statistics Table 1: taxpayer numbers, gains and "
+            "tax liabilities by year of disposal"
+        ]
+        == 342
     )
     assert (
         table_counts[
@@ -743,8 +753,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "tax_year:2020": 9,
         "tax_year:2021": 9,
         "tax_year:2022": 41237,
-        "tax_year:2023": 63268,
-        "tax_year:2024": 40,
+        "tax_year:2023": 63276,
+        "tax_year:2024": 294,
     }
     for fiscal_year in range(2017, 2026):
         key = f"fiscal_year:{fiscal_year}"
@@ -787,8 +797,8 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     assert (
         coverage["counts"]["by_geography"]["congressional_district:5001700US0601"] == 56
     )
-    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4639
-    assert coverage["counts"]["by_geography"]["country:E92000001"] == 1387
+    assert coverage["counts"]["by_geography"]["country:K02000001"] == 4862
+    assert coverage["counts"]["by_geography"]["country:E92000001"] == 1390
     assert coverage["counts"]["by_geography"]["country:K03000001"] == 551
     assert len(coverage["counts"]["by_geography"]) == 12539
     assert coverage["counts"]["by_entity"] == {
@@ -800,7 +810,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "household": 40724,
         "institutional_sector": 261,
         "pension_plan": 2,
-        "person": 62780,
+        "person": 63042,
         "return": 14600,
         "social_protection_scheme": 36,
         "tax_unit": 40069,
@@ -829,9 +839,11 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dwp-uc-households-lcwra-entitlement-april-december-2025",
         "hmrc-tax-free-childcare-march-2026",
         "dfc-ni-uc-statistics-may-2026",
-        "hmrc-cgt-age-2025",
-        "hmrc-cgt-country-region-2025",
-        "hmrc-cgt-gain-by-income-2025",
+        "hmrc-cgt-age-2026",
+        "hmrc-cgt-country-region-2026",
+        "hmrc-cgt-gain-by-income-2026",
+        "hmrc-cgt-size-of-gain-2026",
+        "hmrc-cgt-statistics-2026",
     ):
         assert (output_dir / "sources" / source / "consumer_facts.jsonl").exists()
     for source in (
@@ -967,7 +979,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         / "consumer_facts.jsonl"
     ).exists()
     assert (
-        output_dir / "sources" / "hmrc-cgt-size-of-gain-2025" / "consumer_facts.jsonl"
+        output_dir / "sources" / "hmrc-cgt-size-of-gain-2026" / "consumer_facts.jsonl"
     ).exists()
     assert (
         output_dir

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from io import BytesIO
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import openpyxl
 import pytest
@@ -21,6 +22,7 @@ from chronicle.sources.cells import (
     load_source_cells_jsonl,
     source_cells_from_delimited_text,
     source_cells_from_html_tables_and_text,
+    source_cells_from_ods,
     source_cells_from_xlsx,
     validate_source_cells,
 )
@@ -30,6 +32,58 @@ from chronicle.sources.rows import (
     source_rows_from_delimited_text,
 )
 from chronicle.sources.specs import resolve_source_record
+
+
+def test_ods_numeric_text_mode_coerces_formatted_numbers_only():
+    artifact = SourceArtifactMetadata(
+        source_name="hmrc",
+        source_table="test",
+        source_file="test.ods",
+        url="https://example.test/test.ods",
+        vintage="test",
+        sha256="abc123",
+        size_bytes=10,
+        extracted_at="2026-09-03",
+        extraction_method="test",
+    )
+    content = BytesIO()
+    with ZipFile(content, "w", ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "content.xml",
+            """<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:spreadsheet>
+      <table:table table:name="Table_1">
+        <table:table-row>
+          <table:table-cell office:value-type="string"><text:p>119,258</text:p></table:table-cell>
+          <table:table-cell office:value-type="string"><text:p>-12.5</text:p></table:table-cell>
+          <table:table-cell office:value-type="string"><text:p>[Fewer than 1]</text:p></table:table-cell>
+        </table:table-row>
+      </table:table>
+    </office:spreadsheet>
+  </office:body>
+</office:document-content>
+""",
+        )
+
+    uncoerced = source_cells_from_ods(content.getvalue(), artifact)
+    cells = source_cells_from_ods(
+        content.getvalue(),
+        artifact,
+        coerce_numeric_text=True,
+    )
+
+    assert [cell.raw_value for cell in uncoerced] == [
+        "119,258",
+        "-12.5",
+        "[Fewer than 1]",
+    ]
+    assert [cell.raw_value for cell in cells] == [119_258, -12.5, "[Fewer than 1]"]
+    assert [cell.cell_type for cell in cells] == ["number", "number", "text"]
 
 
 def test_build_soi_table_1_1_source_cells_preserves_workbook_used_range():
