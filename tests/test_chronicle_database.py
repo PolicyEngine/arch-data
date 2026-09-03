@@ -9,13 +9,14 @@ import pytest
 
 from chronicle.core import build_aggregate_constraints
 from chronicle.database import build_chronicle_db
-from chronicle.epoch import Epoch
+from chronicle.epoch import HASH_DOMAINS, Epoch
 from chronicle.harness import build_chronicle_db_file
 from chronicle.jurisdictions.us.soi import (
     AXIOM_IRC_AGI_CONCEPT,
     build_soi_table_1_1_source_cells,
     build_soi_table_1_1_facts,
 )
+from chronicle.sources.cells import build_source_cell_key
 from chronicle.sources.rows import SourceRow, build_source_row_key
 
 
@@ -260,6 +261,90 @@ def test_build_chronicle_db_emits_chronicle_epoch_with_valid_lineage(tmp_path):
     assert row_value_keys[1].startswith("chronicle.source_row.v2:")
     assert row_value_keys[2].startswith("chronicle.source_column.v2:")
     assert foreign_key_errors == []
+
+
+@pytest.mark.parametrize("emit_epoch", [Epoch.LEDGER, Epoch.CHRONICLE])
+def test_build_chronicle_db_defensively_deduplicates_lineage_aliases(
+    tmp_path,
+    emit_epoch,
+):
+    fact = next(
+        fact
+        for fact in build_soi_table_1_1_facts(2023)
+        if fact.source_record_id == "irs_soi.ty2023.table_1_1.all.return_count"
+    )
+    cell = next(
+        cell for cell in build_soi_table_1_1_source_cells(2023) if cell.address == "B10"
+    )
+    row = SourceRow(
+        artifact=cell.artifact,
+        sheet_name=cell.sheet_name,
+        row_number=cell.row_number,
+        values={"Returns": cell.raw_value},
+    )
+    source_cell_key = build_source_cell_key(cell)
+    source_row_key = build_source_row_key(row)
+    cell = replace(cell, source_row_key=source_row_key)
+    fact = replace(
+        fact,
+        source_cell_keys=(
+            source_cell_key,
+            HASH_DOMAINS["source_cell"].key_for_epoch(
+                source_cell_key,
+                Epoch.CHRONICLE,
+            ),
+        ),
+        source_row_keys=(
+            source_row_key,
+            HASH_DOMAINS["source_row"].key_for_epoch(
+                source_row_key,
+                Epoch.CHRONICLE,
+            ),
+        ),
+    )
+    db_path = tmp_path / f"{emit_epoch}.db"
+
+    build_chronicle_db(
+        [fact],
+        db_path,
+        source_cells=[cell],
+        source_rows=[row],
+        emit_epoch=emit_epoch,
+    )
+
+    with sqlite3.connect(db_path) as connection:
+        source_cell_links = connection.execute(
+            "SELECT source_cell_key, ordinal FROM fact_source_cells"
+        ).fetchall()
+        source_row_links = connection.execute(
+            "SELECT source_row_key, ordinal FROM fact_source_rows"
+        ).fetchall()
+        lineage_counts = connection.execute(
+            """
+            SELECT source_cell_count, source_row_count
+            FROM source_records
+            """
+        ).fetchone()
+
+    assert source_cell_links == [
+        (
+            HASH_DOMAINS["source_cell"].key_for_epoch(
+                source_cell_key,
+                emit_epoch,
+            ),
+            0,
+        )
+    ]
+    assert source_row_links == [
+        (
+            HASH_DOMAINS["source_row"].key_for_epoch(
+                source_row_key,
+                emit_epoch,
+            ),
+            0,
+        )
+    ]
+    assert lineage_counts == (1, 1)
 
 
 def test_build_chronicle_db_rejects_unknown_explicit_build_epoch(tmp_path):

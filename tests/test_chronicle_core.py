@@ -368,37 +368,40 @@ def test_source_row_value_hash_canonicalizes_nested_key_epochs():
     assert chronicle_key.startswith("chronicle.source_row_value.v2:")
 
 
-def test_fact_validation_accepts_both_lineage_key_epochs():
-    artifact = _source_artifact()
-    cell = SourceCell(
-        artifact=artifact,
-        sheet_name="Sheet1",
-        row_number=2,
-        column_number=1,
-        address="A2",
-        cell_type="number",
-        raw_value=42,
-        display_value="42",
-    )
-    row = SourceRow(
-        artifact=artifact,
-        sheet_name="Sheet1",
-        row_number=2,
-        values={"amount": 42},
-    )
-
+def test_fact_validation_accepts_mixed_lineage_epochs_with_distinct_digests():
     fact = _fact(
         source_cell_keys=(
-            build_source_cell_key(cell, epoch=Epoch.LEDGER),
-            build_source_cell_key(cell, epoch=Epoch.CHRONICLE),
+            "ledger.source_cell.v1:ledger-cell",
+            "chronicle.source_cell.v2:chronicle-cell",
         ),
         source_row_keys=(
-            build_source_row_key(row, epoch=Epoch.LEDGER),
-            build_source_row_key(row, epoch=Epoch.CHRONICLE),
+            "ledger.source_row.v1:ledger-row",
+            "chronicle.source_row.v2:chronicle-row",
         ),
     )
 
     assert validate_fact(fact) == ()
+
+
+def test_fact_validation_rejects_canonical_duplicate_lineage_keys():
+    fact = _fact(
+        source_cell_keys=(
+            "ledger.source_cell.v1:same-cell",
+            "chronicle.source_cell.v2:same-cell",
+        ),
+        source_row_keys=(
+            "ledger.source_row.v1:same-row",
+            "chronicle.source_row.v2:same-row",
+        ),
+    )
+
+    errors = [(issue.code, issue.field, issue.message) for issue in validate_fact(fact)]
+
+    assert [(code, field) for code, field, _message in errors] == [
+        ("duplicate_lineage_key", "source_cell_keys"),
+        ("duplicate_lineage_key", "source_row_keys"),
+    ]
+    assert all("Ledger and Chronicle aliases" in message for _, _, message in errors)
 
 
 def test_fact_validation_rejects_unknown_lineage_prefix_with_both_forms():

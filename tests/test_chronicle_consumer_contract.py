@@ -251,6 +251,39 @@ def test_chronicle_epoch_consumer_row_uses_successor_ids_consistently():
     ]
 
 
+@pytest.mark.parametrize("emit_epoch", [Epoch.LEDGER, Epoch.CHRONICLE])
+def test_consumer_row_defensively_deduplicates_lineage_aliases(emit_epoch):
+    fact = _soi_agi_fact()
+    source_cell_key = fact.source_cell_keys[0]
+    source_row_key = "ledger.source_row.v1:source-row"
+    fact = replace(
+        fact,
+        source_cell_keys=(
+            source_cell_key,
+            HASH_DOMAINS["source_cell"].key_for_epoch(
+                source_cell_key,
+                Epoch.CHRONICLE,
+            ),
+        ),
+        source_row_keys=(
+            source_row_key,
+            HASH_DOMAINS["source_row"].key_for_epoch(
+                source_row_key,
+                Epoch.CHRONICLE,
+            ),
+        ),
+    )
+
+    row = consumer_fact_row(fact, emit_epoch=emit_epoch)
+
+    assert row["lineage"]["source_cell_keys"] == [
+        HASH_DOMAINS["source_cell"].key_for_epoch(source_cell_key, emit_epoch)
+    ]
+    assert row["lineage"]["source_row_keys"] == [
+        HASH_DOMAINS["source_row"].key_for_epoch(source_row_key, emit_epoch)
+    ]
+
+
 def test_chronicle_epoch_writer_reports_successor_schema(tmp_path):
     output = tmp_path / "consumer_facts.jsonl"
 

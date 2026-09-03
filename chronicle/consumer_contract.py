@@ -711,7 +711,7 @@ def _lineage_keys_for_epoch(
     """Return accepted lineage identities under the requested emit epoch."""
 
     pair = HASH_DOMAINS[domain_name]
-    return [pair.key_for_epoch(key, epoch) for key in keys]
+    return list(dict.fromkeys(pair.key_for_epoch(key, epoch) for key in keys))
 
 
 def _hash_key(namespace: str, payload: dict[str, Any]) -> str:

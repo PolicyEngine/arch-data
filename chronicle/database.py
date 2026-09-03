@@ -692,6 +692,16 @@ def _insert_facts(
 ) -> None:
     for fact, constraints in fact_constraints:
         fact_key = build_fact_key(fact, epoch=emit_epoch)
+        source_cell_keys = _lineage_keys_for_epoch(
+            "source_cell",
+            fact.source_cell_keys,
+            emit_epoch,
+        )
+        source_row_keys = _lineage_keys_for_epoch(
+            "source_row",
+            fact.source_row_keys,
+            emit_epoch,
+        )
         if fact.source_record_id is not None:
             connection.execute(
                 """
@@ -714,8 +724,8 @@ def _insert_facts(
                     fact.source.source_table,
                     fact.source.source_file,
                     fact.source.vintage,
-                    len(fact.source_row_keys),
-                    len(fact.source_cell_keys),
+                    len(source_row_keys),
+                    len(source_cell_keys),
                 ),
             )
         _insert_aggregate_fact(connection, fact, fact_key, build_id)
@@ -749,7 +759,7 @@ def _insert_facts(
                     constraint.label,
                 ),
             )
-        for ordinal, source_cell_key in enumerate(fact.source_cell_keys):
+        for ordinal, source_cell_key in enumerate(source_cell_keys):
             connection.execute(
                 """
                 INSERT INTO fact_source_cells (
@@ -761,14 +771,11 @@ def _insert_facts(
                 """,
                 (
                     fact_key,
-                    HASH_DOMAINS["source_cell"].key_for_epoch(
-                        source_cell_key,
-                        emit_epoch,
-                    ),
+                    source_cell_key,
                     ordinal,
                 ),
             )
-        for ordinal, source_row_key in enumerate(fact.source_row_keys):
+        for ordinal, source_row_key in enumerate(source_row_keys):
             connection.execute(
                 """
                 INSERT INTO fact_source_rows (
@@ -780,10 +787,7 @@ def _insert_facts(
                 """,
                 (
                     fact_key,
-                    HASH_DOMAINS["source_row"].key_for_epoch(
-                        source_row_key,
-                        emit_epoch,
-                    ),
+                    source_row_key,
                     ordinal,
                 ),
             )
@@ -1038,15 +1042,28 @@ def _build_id(
 def _canonical_fact_mapping(fact: AggregateFact) -> dict[str, Any]:
     """Return a build-hash payload independent of accepted key epochs."""
     mapping = asdict(fact)
-    mapping["source_cell_keys"] = tuple(
-        HASH_DOMAINS["source_cell"].key_for_epoch(key, Epoch.LEDGER)
-        for key in fact.source_cell_keys
+    mapping["source_cell_keys"] = _lineage_keys_for_epoch(
+        "source_cell",
+        fact.source_cell_keys,
+        Epoch.LEDGER,
     )
-    mapping["source_row_keys"] = tuple(
-        HASH_DOMAINS["source_row"].key_for_epoch(key, Epoch.LEDGER)
-        for key in fact.source_row_keys
+    mapping["source_row_keys"] = _lineage_keys_for_epoch(
+        "source_row",
+        fact.source_row_keys,
+        Epoch.LEDGER,
     )
     return mapping
+
+
+def _lineage_keys_for_epoch(
+    domain_name: str,
+    keys: tuple[str, ...],
+    epoch: Epoch,
+) -> tuple[str, ...]:
+    """Return stable, first-seen lineage identities for database emission."""
+
+    pair = HASH_DOMAINS[domain_name]
+    return tuple(dict.fromkeys(pair.key_for_epoch(key, epoch) for key in keys))
 
 
 def _canonical_source_cell_mapping(cell: SourceCell) -> dict[str, Any]:

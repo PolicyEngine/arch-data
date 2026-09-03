@@ -657,6 +657,7 @@ def _validate_lineage_keys(
     domain: str,
 ) -> None:
     pair = HASH_DOMAINS[domain]
+    seen: set[str] = set()
     for key in keys:
         if not isinstance(key, str):
             errors.append(
@@ -669,7 +670,7 @@ def _validate_lineage_keys(
             )
             continue
         try:
-            pair.infer_key_epoch(key)
+            canonical_key = pair.key_for_epoch(key, Epoch.LEDGER)
         except ValueError as error:
             errors.append(
                 _issue(
@@ -678,6 +679,19 @@ def _validate_lineage_keys(
                     field,
                 )
             )
+            continue
+        if canonical_key in seen:
+            errors.append(
+                _issue(
+                    "duplicate_lineage_key",
+                    f"Duplicate canonical lineage key {canonical_key!r}; each "
+                    "lineage identity may appear only once across accepted "
+                    "Ledger and Chronicle aliases",
+                    field,
+                )
+            )
+            continue
+        seen.add(canonical_key)
 
 
 def _validate_provenance_class(

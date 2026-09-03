@@ -6,7 +6,8 @@
 - Assignment: address all four gate round 1 findings with reproductions and
   regression coverage.
 - Applicable repository instructions: `AGENTS.md`; no `CLAUDE.md` is present.
-- Publication ordering is fixed; three findings remain in progress.
+- Publication ordering and duplicate lineage handling are fixed; two findings
+  remain in progress.
 - No network access or push will be attempted.
 
 ## Done
@@ -19,11 +20,14 @@
 - Made derived publication validate the resolved build identity before uploads
   or metadata output, with omitted/supplied-output regression cases proving no
   uploader call and no metadata truncation.
+- Reject canonical duplicate cell/row lineage aliases during fact validation
+  with the explicit `duplicate_lineage_key` issue code.
+- Deduplicate canonical lineage defensively in both consumer and relational
+  emission while keeping ordinals, relationship counts, and build hashing
+  consistent.
 
 ## Next
 
-- Reject canonical duplicate lineage identities and deduplicate relational and
-  consumer emission defensively.
 - Restore the Statbel generator's isolated direct-file invocation.
 - Preserve non-string bundle identities through coverage canonicalization.
 - Run focused verification, repository-wide Ruff lint, changed-file Ruff format
