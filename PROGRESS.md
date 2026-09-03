@@ -6,7 +6,8 @@
 - Assignment: address all four gate round 1 findings with reproductions and
   regression coverage.
 - Applicable repository instructions: `AGENTS.md`; no `CLAUDE.md` is present.
-- Work is in progress; no network access or push will be attempted.
+- Publication ordering is fixed; three findings remain in progress.
+- No network access or push will be attempted.
 
 ## Done
 
@@ -14,13 +15,17 @@
 - Confirmed the reviewed head matches `HEAD_SHA.txt`.
 - Confirmed runner-owned inputs, logs, and `out.md` are untracked and will not be
   included in implementation commits.
+- Reproduced all four findings on the reviewed implementation.
+- Made derived publication validate the resolved build identity before uploads
+  or metadata output, with omitted/supplied-output regression cases proving no
+  uploader call and no metadata truncation.
 
 ## Next
 
-- Inspect the PR diff and affected publication, validation, emission, generator,
-  and coverage code paths.
-- Reproduce all four findings on the reviewed head and record commands/results.
-- Add regression tests and implement each fix in small named commits.
+- Reject canonical duplicate lineage identities and deduplicate relational and
+  consumer emission defensively.
+- Restore the Statbel generator's isolated direct-file invocation.
+- Preserve non-string bundle identities through coverage canonicalization.
 - Run focused verification, repository-wide Ruff lint, changed-file Ruff format
   check, and the complete pytest suite with its exit code captured directly.
 - Write the final report to `out.md`.

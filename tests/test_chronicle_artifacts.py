@@ -524,6 +524,49 @@ def test_publish_derived_artifacts_uploads_build_directory(tmp_path):
     assert "reports/build_summary.json" in command_log
 
 
+@pytest.mark.parametrize("write_build_artifacts", [False, True])
+def test_publish_derived_artifacts_rejects_unknown_build_before_side_effects(
+    tmp_path,
+    write_build_artifacts,
+):
+    suite = tmp_path / "suite"
+    reports = suite / "reports"
+    reports.mkdir(parents=True)
+    (reports / "database.json").write_text(
+        json.dumps({"build_id": "future.build.v9:invalid"})
+    )
+    (suite / "facts.jsonl").write_text("{}\n")
+    upload_log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(
+        f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {upload_log}\necho ok\n"
+    )
+    wrangler.chmod(0o755)
+    build_artifacts_path = tmp_path / "build_artifacts.jsonl"
+    build_artifacts_path.write_text("sentinel\n")
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "ledger[.]build[.]v1.*chronicle[.]build[.]v2|"
+            "chronicle[.]build[.]v2.*ledger[.]build[.]v1"
+        ),
+    ):
+        publish_derived_artifacts(
+            suite,
+            source_id="irs_soi",
+            package_id="soi-table-1-1",
+            year=2023,
+            build_artifacts_output=(
+                build_artifacts_path if write_build_artifacts else None
+            ),
+            wrangler_command=str(wrangler),
+        )
+
+    assert not upload_log.exists()
+    assert build_artifacts_path.read_text() == "sentinel\n"
+
+
 def test_build_artifact_rows_skips_failed_uploads(tmp_path):
     suite = tmp_path / "suite"
     reports = suite / "reports"

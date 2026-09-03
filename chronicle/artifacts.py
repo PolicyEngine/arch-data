@@ -531,6 +531,10 @@ def publish_derived_artifacts(
             errors=("missing_build_id",),
         )
 
+    # Validate the resolved identity before deriving object keys, invoking the
+    # uploader, or opening the optional registry output.
+    canonicalize_key("build", resolved_build_id)
+
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
         default_prefix=DEFAULT_R2_DERIVED_PREFIX,
