@@ -503,7 +503,7 @@ def _duplicate_key_reports(
     rows: list[dict[str, Any]],
     key: str,
 ) -> list[dict[str, Any]]:
-    grouped: dict[str, list[dict[str, Any]]] = {}
+    grouped: dict[Any, list[dict[str, Any]]] = {}
     for row in rows:
         grouped.setdefault(_canonical_key(row[key], key), []).append(row)
     return [
@@ -516,10 +516,14 @@ def _duplicate_key_reports(
                     _canonical_key(legacy_key, "legacy_fact_key")
                     for row in key_rows
                     if (legacy_key := row.get("legacy_fact_key"))
-                }
+                },
+                key=_identity_sort_key,
             ),
         }
-        for key_value, key_rows in sorted(grouped.items())
+        for key_value, key_rows in sorted(
+            grouped.items(),
+            key=lambda item: _identity_sort_key(item[0]),
+        )
         if len(key_rows) > 1
     ]
 
@@ -541,13 +545,21 @@ def _unique_count(rows: list[dict[str, Any]], key: str) -> int:
     return len({_canonical_key(row[key], key) for row in rows if key in row})
 
 
-def _canonical_key(value: str, field_name: str) -> str:
+def _canonical_key(value: Any, field_name: str) -> Any:
     """Return a stable identity for either accepted naming epoch."""
 
     domain_name = _KEY_DOMAINS.get(field_name)
-    if domain_name is None:
+    if domain_name is None or not isinstance(value, str):
         return value
     return canonicalize_key(domain_name, value)
+
+
+def _identity_sort_key(value: Any) -> tuple[int, str]:
+    """Sort identity scalars deterministically without comparing their types."""
+
+    if isinstance(value, str):
+        return (0, value)
+    return (1, f"{type(value).__name__}:{value!r}")
 
 
 def _source_name(row: dict[str, Any]) -> str | None:

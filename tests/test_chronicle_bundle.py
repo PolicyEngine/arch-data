@@ -1279,3 +1279,47 @@ def test_bundle_coverage_canonicalizes_cross_epoch_identities():
             "legacy_fact_keys": [ledger_row["legacy_fact_key"]],
         }
     ]
+
+
+def test_bundle_coverage_preserves_non_string_identity_scalars(tmp_path):
+    identity_fields = (
+        "aggregate_fact_key",
+        "semantic_fact_key",
+        "legacy_fact_key",
+        "source_release_key",
+        "source_series_key",
+        "observed_measure_key",
+        "dimension_set_key",
+        "universe_constraint_set_key",
+    )
+    rows = [_fixture_consumer_rows()[0]]
+    for value in (None, 7):
+        row = json.loads(json.dumps(rows[0]))
+        for field_name in identity_fields:
+            row[field_name] = value
+        rows.append(row)
+    path = tmp_path / "consumer_facts.jsonl"
+    path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows))
+
+    loaded = load_bundle_jsonl(path)
+    coverage = build_bundle_coverage(loaded)
+
+    for field_name in identity_fields:
+        assert [row[field_name] for row in loaded] == [
+            rows[0][field_name],
+            None,
+            7,
+        ]
+    assert coverage["unique_counts"] == {
+        "aggregate_fact_key": 3,
+        "semantic_fact_key": 3,
+        "source_release_key": 3,
+        "source_series_key": 3,
+        "observed_measure_key": 3,
+        "dimension_set_key": 3,
+        "universe_constraint_set_key": 3,
+    }
+    assert coverage["duplicates"] == {
+        "aggregate_fact_keys": [],
+        "semantic_fact_keys": [],
+    }
