@@ -98,8 +98,7 @@ jobs:
             fi
             if git diff --quiet "origin/$MAIN_BRANCH"...HEAD; then
               git commit \
-                -m "Update OpenTimestamps anchors for release manifests" \
-                -m "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+                -m "Update OpenTimestamps anchors for release manifests"
             else
               git commit --amend --no-edit
             fi
