@@ -17,6 +17,7 @@ import hashlib
 import json
 from pathlib import Path
 import posixpath
+import sys
 from typing import Any
 import xml.etree.ElementTree as ET
 from zipfile import ZipFile
@@ -25,7 +26,12 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 import yaml
 
-from chronicle.epoch import schema_id
+
+PACKAGE_DIR = Path(__file__).resolve().parent
+REPO_ROOT = PACKAGE_DIR.parents[2]
+sys.path.insert(0, str(REPO_ROOT))
+
+from chronicle.epoch import schema_id  # noqa: E402
 
 
 PACKAGE_ID = "statbel-fiscal-income-distribution-2023"
@@ -40,8 +46,6 @@ INCOME_YEAR = 2023
 ASSESSMENT_YEAR = 2024
 CENT = Decimal("0.01")
 
-PACKAGE_DIR = Path(__file__).resolve().parent
-REPO_ROOT = PACKAGE_DIR.parents[2]
 DATA_DIR = REPO_ROOT / "db" / "data" / "statbel" / "fiscal_income_distribution_2023"
 CSV_FILENAME = "statbel_fiscal_income_distribution_2023.csv"
 CSV_PATH = DATA_DIR / CSV_FILENAME

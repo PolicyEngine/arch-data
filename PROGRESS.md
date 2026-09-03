@@ -6,8 +6,8 @@
 - Assignment: address all four gate round 1 findings with reproductions and
   regression coverage.
 - Applicable repository instructions: `AGENTS.md`; no `CLAUDE.md` is present.
-- Publication ordering and duplicate lineage handling are fixed; two findings
-  remain in progress.
+- Publication ordering, duplicate lineage handling, and the Statbel direct-file
+  entry point are fixed; one finding remains in progress.
 - No network access or push will be attempted.
 
 ## Done
@@ -25,10 +25,12 @@
 - Deduplicate canonical lineage defensively in both consumer and relational
   emission while keeping ordinals, relationship counts, and build hashing
   consistent.
+- Bootstrap the Statbel generator from its own checkout before importing the
+  epoch registry; cover direct-file execution with an isolated subprocess whose
+  `PYTHONPATH` and site packages cannot mask cross-worktree resolution.
 
 ## Next
 
-- Restore the Statbel generator's isolated direct-file invocation.
 - Preserve non-string bundle identities through coverage canonicalization.
 - Run focused verification, repository-wide Ruff lint, changed-file Ruff format
   check, and the complete pytest suite with its exit code captured directly.

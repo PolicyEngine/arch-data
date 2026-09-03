@@ -8,7 +8,10 @@ from decimal import Decimal
 from functools import lru_cache
 import hashlib
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 import yaml
@@ -18,9 +21,6 @@ from chronicle.source_package import (
     SOURCE_PACKAGE_ALIASES,
     load_source_package,
     validate_source_package,
-)
-from packages.statbel.fiscal_income_distribution_2023.build_package import (
-    SOURCE_PACKAGE_SCHEMA_VERSION as FISCAL_DISTRIBUTION_SCHEMA_VERSION,
 )
 
 
@@ -134,8 +134,48 @@ def test_statbel_fiscal_distribution_generator_keeps_ledger_schema_bytes():
         ).read_text()
     )
 
-    assert FISCAL_DISTRIBUTION_SCHEMA_VERSION == "ledger.source_package.v1"
-    assert payload["schema_version"] == FISCAL_DISTRIBUTION_SCHEMA_VERSION
+    assert payload["schema_version"] == "ledger.source_package.v1"
+
+
+def test_statbel_fiscal_distribution_generator_runs_as_direct_file(tmp_path):
+    relative_script = Path(
+        "packages/statbel/fiscal_income_distribution_2023/build_package.py"
+    )
+    checkout = tmp_path / "checkout"
+    script = checkout / relative_script
+    script.parent.mkdir(parents=True)
+    script.write_bytes((REPO_ROOT / relative_script).read_bytes())
+
+    chronicle_dir = checkout / "chronicle"
+    chronicle_dir.mkdir()
+    for filename in ("__init__.py", "epoch.py"):
+        (chronicle_dir / filename).write_bytes(
+            (REPO_ROOT / "chronicle" / filename).read_bytes()
+        )
+
+    openpyxl_dir = script.parent / "openpyxl"
+    openpyxl_dir.mkdir()
+    (openpyxl_dir / "__init__.py").write_text("")
+    (openpyxl_dir / "utils.py").write_text(
+        "def get_column_letter(index):\n    return str(index)\n"
+    )
+    (script.parent / "yaml.py").write_text("")
+
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = ""
+    result = subprocess.run(
+        [sys.executable, "-S", str(script)],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "FileNotFoundError: Missing staged Statbel workbooks" in result.stderr
+    assert "ModuleNotFoundError" not in result.stderr
 
 
 def test_statbel_fiscal_distribution_artifact_pins_and_r2_keys():
