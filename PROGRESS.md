@@ -6,8 +6,9 @@
 - Assignment: address all four gate round 1 findings with reproductions and
   regression coverage.
 - Applicable repository instructions: `AGENTS.md`; no `CLAUDE.md` is present.
-- All four gate round 1 findings are fixed with regression coverage; final
-  repository verification is in progress.
+- All four gate round 1 findings are fixed with regression coverage.
+- Final lint, format, and full-suite verification are complete and passing.
+- The required final report is written to runner output path `out.md`.
 - No network access or push will be attempted.
 
 ## Done
@@ -30,9 +31,15 @@
   `PYTHONPATH` and site packages cannot mask cross-worktree resolution.
 - Preserve null and integer identity values during bundle coverage
   canonicalization and sort mixed scalar identities deterministically.
+- Passed repository-wide Ruff lint.
+- Passed Ruff formatting for all 12 changed Python files.
+- Passed the complete test suite with direct exit code 0: 792 passed, 1 skipped,
+  and 14 warnings in 1364.36 seconds.
+- Completed two independent read-only final reviews with no actionable findings.
+- Wrote the reproduction, fix, test, commit, and verification report to
+  `out.md` without adding runner-owned root artifacts to Git.
 
 ## Next
 
-- Run focused verification, repository-wide Ruff lint, changed-file Ruff format
-  check, and the complete pytest suite with its exit code captured directly.
-- Write the final report to `out.md`.
+- No implementation work remains. Hand off the committed fix lane and `out.md`.
+- Do not push; publication is outside this lane's instructions.
