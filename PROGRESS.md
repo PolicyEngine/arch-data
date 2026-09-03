@@ -1,74 +1,51 @@
-# Epoch dual-domain acceptance progress
+# Lane C5 progress
 
 ## State
 
-- Branch: `epoch-dual-domain` from `origin/main` at `ff3efd3`.
-- Assignment: chronicle#143 mechanism 1, step 1 (dual-domain acceptance; emit unchanged).
-- Approved role: `ledger-contract-maintainer`.
-- Implementation, adversarial review, and local verification are complete.
-- Publication is externally blocked. Direct `git push` and the required
-  `gh pr create --body-file` cannot reach GitHub from the sandbox, and the
-  installed GitHub connector cancels write mutations despite reporting admin
-  permission for the active account.
+- Branch: `be-2025-vintages` from `origin/main` at `5c15bfd`.
+- Worktree inputs are staged under `.lane-raw/` and must remain uncommitted.
+- Lane C5 is complete, validated, independently reviewed, and ready for handoff.
+- The requested staged C2 report is absent, but root `LANE_C2_REPORT.md` is byte-identical
+  to the sibling lane's staged copy (SHA-256 `4590e0dc...50f06e7`) and is the pattern used.
 
 ## Done
 
-- Read `AGENTS.md`, `.github/chronicle-agents.yml`,
-  `docs/chronicle-governance.md`, and `docs/adr-chronicle-fact-identity-v2.md`.
-- Confirmed the worktree began clean at the requested base commit.
-- Retrieved and read Max's first-comment migration spec through the GitHub API.
-- Completed the initial inventory of hashed domains, schema ids, validators,
-  emitters, tests, and role-path implications.
-- Confirmed that the live facts-only consumer artifact is v2→v3; retired
-  target-profile and resolved-target v1 contracts must not be reintroduced.
-- Added the central frozen Ledger/Chronicle epoch registry with Ledger as the
-  single emission default.
-- Wired fact, source-cell, source-row, source-column, source-row-value, and all
-  eight consumer-contract hash builders to the registry with invariant digest
-  suffixes across epochs.
-- Added dual-epoch lineage validation, consumer-row schema normalization,
-  artifact loading (including declared row-schema pins), mixed-epoch acceptance,
-  and clear unknown-domain errors.
-- Pinned all existing fixture and consumer-schema bytes by SHA-256; focused
-  identity/artifact/schema verification passes (96 tests).
-- Made bundle ingestion validate Chronicle-only and mixed-epoch rows, with
-  cross-epoch duplicate accounting and unknown-domain rejection.
-- Added Chronicle relational emission/load coverage with valid SQLite foreign
-  keys, invariant build/build-artifact digests, and Ledger-default output.
-- Made source-package and offline-fetch readers accept both registered schema
-  ids while scaffolds and administrative generators still emit Ledger ids.
-- Addressed adversarial audit findings in governance schema validation,
-  source-cell/suite lineage resolution, explicit Ledger-canonical build hashing,
-  the Statbel package generator, and `validate-facts` CLI coverage.
-- Preserved the bundle reader's historical permissive row-shape boundary while
-  adding a non-mutating dual-epoch identifier gate; the two full-build bundle
-  regressions and Chronicle/mixed/unknown-domain cases pass.
-- Passed the complete test suite: 783 passed, 1 skipped, 14 warnings.
-- Passed repository-wide Ruff lint and formatting for every changed Python file.
-  The exact repository-wide format check still identifies eight untouched
-  baseline files, all byte-identical to `origin/main`.
-- Built the sdist and wheel offline with uv from cached build dependencies, then
-  installed the wheel into a clean venv and passed the epoch import smoke.
-- Passed independent `ledger-contract` and `ledger-boundary` judge reviews.
-- Confirmed no changes under `releases/`, frozen fixture directories, frozen
-  schema directories, or `.github/chronicle-agents.yml`.
-- Removed the generated `.gitnexus/` index and incomplete ignored local `.venv/`.
-- Committed `out.md` with the complete verification, scope, governance,
-  residual-risk, and downstream-consumer handoff report.
-- Prepared the completed PR-template body ending in the required Claude Code
-  attribution.
-- Attempted `git push origin epoch-dual-domain`; it failed because the sandbox
-  cannot resolve or connect to GitHub.
-- Attempted the exact required `gh pr create --body-file` flow; it failed because
-  `api.github.com` is unreachable.
-- Confirmed the installed GitHub connector sees `MaxGhenis` with admin
-  permission on `PolicyEngine/chronicle`, but both branch and blob creation were
-  cancelled by the connector before mutation.
+- Read the repository Chronicle boundary rules in `AGENTS.md`.
+- Read `.lane-raw/SOURCES.md` and confirmed all five named publisher artifacts are present.
+- Confirmed the worktree is otherwise clean apart from `.lane-raw/` and the shared `.venv` link.
+- Verified all five staged artifact SHA-256 pins exactly.
+- Mapped FPB workbook cells: 990 facts across T01/T06/T07/T11/T17/T24, with
+  2022–2025 observations and 2026–2031 `source_projection` facts.
+- Confirmed PDF boundary evidence: printed page 19 calls 2026 the first projection year;
+  annex table units appear on printed pages 45, 48, 49, 53, 58, and 65.
+- Chosen Eurostat layout: two vintage-specific source-package aliases share new manifest
+  entries, preserving the prior package YAMLs, raw bytes, and fact outputs unchanged.
+- Reproduced the Statbel curator logic: 18 NUTS1 × sex × age-band cells totaling 11,825,551.
+- Added the hash-pinned FPB workbook and publication PDF plus the
+  `fpb-economic-outlook-2026-2031-june-2026` package alias.
+- Built 990 line-specific publisher facts (99 per year): 396 observations for
+  2022–2025 and 594 `source_projection` facts for 2026–2031.
+- Passed FPB `validate-package` and `build-suite`: 990 facts, full cell lineage,
+  zero acceptance errors, and pinned 2025 cells 320578 / 77771 / 5602 million euro.
+- Re-ran the Statbel 2026 curator logic on the 2025 ZIP and added the hash-pinned
+  raw capture plus its deterministic 18-row curated CSV.
+- Passed Statbel 2025 `validate-package` and `build-suite`: 18 facts totaling
+  11,825,551, 66 constraints, full lineage, and zero acceptance errors.
+- Added the Eurostat `gov_10a_taxag` 2025 and `spr_exp_func` 2024 manifest
+  entries plus vintage-specific package aliases, without modifying either
+  prior artifact or prior package specification.
+- Passed both new Eurostat package validations and suite builds: 12 tax facts
+  and 9 ESSPROS facts, full lineage, and zero acceptance errors.
+- Extended Belgium and Eurostat regressions for FPB table counts/cells and
+  assertion boundary, vintage non-overlap, prior-output digests, Statbel pins,
+  and the declared 0.25% Statbel/FPB population comparison tolerance.
+- Passed 43 focused tests and the full merged-bundle regression: 157,177 facts,
+  148 packages, zero aggregate-key duplicates, and expected goldens throughout.
+- Recorded pins, counts, boundary evidence, curator commands, validation tails,
+  and consumer fact families in `LANE_C5_REPORT.md`.
+- Passed independent `ledger-source-fidelity` and `ledger-boundary` reviews with
+  no required corrections.
 
 ## Next
 
-- Restore outbound GitHub access or authorize GitHub connector write mutations.
-- Push `epoch-dual-domain` and open the requested PR against `main` after
-  regenerating the already reviewed body-file content.
-- Record the PR URL in `out.md`, commit that final state, and push it.
-- Do not merge the PR and do not comment on issue #143.
+- None; ready for handoff. No push was performed.

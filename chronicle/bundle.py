@@ -16,7 +16,9 @@ from chronicle.source_package import (
     validate_source_package,
 )
 from chronicle.suite import BuildSuiteReport, build_source_suite
-from policyengine_chronicle.schema import normalize_consumer_fact_row_epochs
+from policyengine_chronicle.schema import (
+    validate_consumer_fact_row_epochs,
+)
 
 BUNDLE_SCHEMA_VERSION = schema_id("bundle")
 BUNDLE_COVERAGE_SCHEMA_VERSION = schema_id("bundle_coverage")
@@ -644,7 +646,7 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
         # Bundle assembly historically consumes suite output without applying
         # the stricter consumer-artifact schema. Keep that boundary intact,
         # while still rejecting identifiers outside the two accepted epochs.
-        normalize_consumer_fact_row_epochs(row, line_number, path)
+        validate_consumer_fact_row_epochs(row, line_number, path)
         rows.append(row)
     return rows
 

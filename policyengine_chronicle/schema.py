@@ -163,6 +163,72 @@ def normalize_consumer_fact_row_epochs(
     return normalized
 
 
+def validate_consumer_fact_row_epochs(
+    row: Any,
+    line_number: int,
+    path: Any,
+) -> None:
+    """Check every epoch-bearing identifier of a row without copying it.
+
+    This is :func:`normalize_consumer_fact_row_epochs` minus the deep copy and
+    the rewrite: it raises the same error for the same identifier and leaves
+    the caller's row untouched, so a bundle build can validate ~150k rows
+    without materializing a canonical copy of each.
+    """
+
+    if not isinstance(row, dict):
+        return
+    schema_version = row.get("schema_version")
+    if isinstance(schema_version, str):
+        try:
+            SCHEMA_IDS["consumer_fact"].infer_identifier_epoch(schema_version)
+        except ValueError as error:
+            raise _epoch_validation_error(
+                line_number=line_number,
+                path=path,
+                location="schema_version",
+                error=error,
+            ) from error
+    for field_name, domain_name in _TOP_LEVEL_KEY_DOMAINS.items():
+        if field_name in row:
+            _normalize_key(
+                row[field_name],
+                domain_name=domain_name,
+                line_number=line_number,
+                path=path,
+                location=field_name,
+            )
+    concept_alignment = row.get("concept_alignment")
+    if (
+        isinstance(concept_alignment, dict)
+        and "concept_alignment_key" in concept_alignment
+    ):
+        _normalize_key(
+            concept_alignment["concept_alignment_key"],
+            domain_name="concept_alignment",
+            line_number=line_number,
+            path=path,
+            location="concept_alignment/concept_alignment_key",
+        )
+    lineage = row.get("lineage")
+    if isinstance(lineage, dict):
+        for field_name, domain_name in (
+            ("source_cell_keys", "source_cell"),
+            ("source_row_keys", "source_row"),
+        ):
+            keys = lineage.get(field_name)
+            if not isinstance(keys, list):
+                continue
+            for index, key in enumerate(keys):
+                _normalize_key(
+                    key,
+                    domain_name=domain_name,
+                    line_number=line_number,
+                    path=path,
+                    location=f"lineage/{field_name}/{index}",
+                )
+
+
 def validate_consumer_fact_row(
     row: Any,
     line_number: int,
@@ -197,4 +263,5 @@ __all__ = [
     "consumer_fact_schema",
     "normalize_consumer_fact_row_epochs",
     "validate_consumer_fact_row",
+    "validate_consumer_fact_row_epochs",
 ]

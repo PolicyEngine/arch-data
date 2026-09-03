@@ -18,6 +18,7 @@ from policyengine_chronicle.schema import (
     CONSUMER_FACT_SCHEMA_SHA256,
     consumer_fact_schema,
     normalize_consumer_fact_row_epochs,
+    validate_consumer_fact_row_epochs,
     validate_consumer_fact_row,
 )
 
@@ -219,3 +220,18 @@ def test_unknown_extra_field_is_rejected():
 
     with pytest.raises(ValueError, match="surprise_field"):
         validate_consumer_fact_row(row, 1, "sample.jsonl")
+
+
+def test_validate_only_epoch_check_matches_normalizer_and_never_copies():
+    row = _chronicle_epoch_row(_fixture_row(1))
+    original = json.loads(json.dumps(row))
+    assert validate_consumer_fact_row_epochs(row, 2, _SAMPLE_PATH) is None
+    assert row == original
+    bad = _fixture_row(1)
+    bad["lineage"]["source_cell_keys"] = ["bogus.domain.v9:" + "a" * 24]
+    with pytest.raises(ValueError) as normalizer_error:
+        normalize_consumer_fact_row_epochs(bad, 3, _SAMPLE_PATH)
+    with pytest.raises(ValueError) as validator_error:
+        validate_consumer_fact_row_epochs(bad, 3, _SAMPLE_PATH)
+    assert str(validator_error.value) == str(normalizer_error.value)
+    assert bad["lineage"]["source_cell_keys"] == ["bogus.domain.v9:" + "a" * 24]

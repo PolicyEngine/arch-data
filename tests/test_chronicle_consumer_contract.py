@@ -895,3 +895,14 @@ def test_export_consumer_facts_cli_preserves_decimal_values(tmp_path, capsys):
     assert json.loads(capsys.readouterr().out)["valid"]
     assert row["value"] == "1.25"
     assert row["value_type"] == "decimal"
+
+
+def test_contract_reports_malformed_lineage_keys_instead_of_raising(tmp_path):
+    fact = replace(_soi_agi_fact(), source_cell_keys=("bogus.domain.v9:" + "a" * 24,))
+    report = validate_consumer_fact_contract([fact])
+    codes = {issue.code for issue in report.errors}
+    assert "malformed_lineage_key" in codes
+    with pytest.raises(
+        ValueError, match="Cannot export invalid Chronicle consumer-contract facts"
+    ):
+        write_consumer_facts_jsonl([fact], tmp_path / "facts.jsonl")

@@ -267,6 +267,31 @@ def validate_consumer_fact_contract(
     errors: list[ConsumerFactContractIssue] = []
     for index, fact in enumerate(facts):
         fact_key = build_fact_key(fact)
+        for lineage_field, domain_name in (
+            ("source_cell_keys", "source_cell"),
+            ("source_row_keys", "source_row"),
+        ):
+            pair = HASH_DOMAINS[domain_name]
+            for key in getattr(fact, lineage_field):
+                try:
+                    pair.infer_key_epoch(key)
+                except ValueError as error:
+                    errors.append(
+                        ConsumerFactContractIssue(
+                            code="malformed_lineage_key",
+                            message=str(error),
+                            fact_index=index,
+                            fact_key=fact_key,
+                            field=f"lineage/{lineage_field}",
+                        )
+                    )
+        if any(
+            issue.code == "malformed_lineage_key" and issue.fact_index == index
+            for issue in errors
+        ):
+            # The remaining checks build the row, which canonicalizes lineage
+            # keys and would raise on the same malformed key.
+            continue
         filter_constraints = _filter_derived_constraints(fact)
         source_filter_variables = _source_filter_variables(fact, filter_constraints)
         if filter_constraints and not fact.constraints:
