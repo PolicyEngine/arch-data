@@ -568,6 +568,7 @@ def test_status_prefers_bitcoin_info_with_leftover_pending_attestations(
         ("transient", TRANSIENT_VERIFY_OUTPUT, "Temporary failure in name resolution"),
         ("resolved", RESOLVED_VERIFY_OUTPUT, "Got 1 attestation(s) from"),
     ],
+    ids=["mixed", "transient", "resolved"],
 )
 def test_run_reaches_upgrade_despite_verify_calendar_chatter(
     repo: dict,
