@@ -32,7 +32,7 @@ record_sets:
   geography_level: country
   geography_name: United Kingdom
   geography_vintage: current
-  entity: person
+  entity: tax_unit
   entity_role: taxpayer
   domain: capital_gains_tax
   groupby_dimension: geography
@@ -263,7 +263,7 @@ record_sets:
   geography_level: country
   geography_name: United Kingdom
   geography_vintage: current
-  entity: person
+  entity: tax_unit
   entity_role: taxpayer
   domain: capital_gains_tax
   groupby_dimension: geography

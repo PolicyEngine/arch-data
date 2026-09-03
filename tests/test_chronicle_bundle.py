@@ -82,7 +82,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "fact_count": 188876,
         "geography_count": 12539,
         "period_count": 249,
-        "semantic_duplicate_key_count": 165,
+        "semantic_duplicate_key_count": 163,
         "skipped_source_count": 10,
         "source_count": 45,
         "source_package_count": 160,
@@ -810,13 +810,13 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "household": 40724,
         "institutional_sector": 261,
         "pension_plan": 2,
-        "person": 63042,
+        "person": 62616,
         "return": 14600,
         "social_protection_scheme": 36,
-        "tax_unit": 40069,
+        "tax_unit": 40495,
     }
     assert not coverage["duplicates"]["aggregate_fact_keys"]
-    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 165
+    assert len(coverage["duplicates"]["semantic_fact_keys"]) == 163
     assert summary["warnings"] == [
         {
             "code": "duplicate_semantic_fact_key",

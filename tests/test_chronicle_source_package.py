@@ -194,12 +194,15 @@ def test_hmrc_packages_preserve_provenance_and_definition_year_metadata():
 def test_hmrc_cgt_reuses_one_publisher_series_across_definition_years():
     """CGT years are facts in one package, not competing hardcoded targets."""
     package = load_source_package("hmrc-cgt-statistics-2026")
+    package_facts = package.build_facts(2026)
     facts = [
         fact
-        for fact in package.build_facts(2026)
+        for fact in package_facts
         if fact.measure.concept == "hmrc.cgt_tax_total"
     ]
 
+    assert {fact.entity.name for fact in package_facts} == {"tax_unit"}
+    assert {fact.entity.role for fact in package_facts} == {"taxpayer"}
     assert {fact.period.type for fact in facts} == {"tax_year"}
     assert {fact.period.value for fact in facts} >= {2021, 2022, 2023, 2024}
     assert (
@@ -256,6 +259,7 @@ def test_hmrc_cgt_size_of_gain_package_builds_microcosm_visible_band_facts():
     assert validate_facts(facts).valid
     assert validate_consumer_fact_contract(facts).valid
     assert len(facts) == 51
+    assert {fact.entity.name for fact in facts} == {"person"}
 
     first_band_gains = values_by_record[
         "hmrc.cgt_size_of_gain_2026.table2_2a.ty2023."
@@ -434,6 +438,7 @@ def test_hmrc_cgt_table3_preserves_joint_gain_and_income_bands():
 
     assert len(facts) == 290
     assert {fact.period.value for fact in facts} == {2023, 2024}
+    assert {fact.entity.name for fact in facts} == {"person"}
     assert top_gain_top_income.value == 37_479_000_000
     assert {fact.filters.get("cgt_taxable_income_band") for fact in facts} >= {
         "income_100000_to_125139",
@@ -472,6 +477,8 @@ def test_hmrc_cgt_table5_preserves_country_and_region_facts():
 
     assert len(facts) == 84
     assert {fact.period.value for fact in facts} == {2023, 2024}
+    assert {fact.entity.name for fact in facts} == {"tax_unit"}
+    assert {fact.entity.role for fact in facts} == {"taxpayer"}
     assert london_gains.value == 34_717_000_000
     assert london_gains.geography.level == "region"
 
@@ -500,6 +507,7 @@ def test_hmrc_cgt_table6_preserves_age_band_facts():
 
     assert len(facts) == 60
     assert {fact.period.value for fact in facts} == {2023, 2024}
+    assert {fact.entity.name for fact in facts} == {"person"}
     assert age_55_to_64.value == 144_000
     assert {
         (constraint.variable, constraint.operator, constraint.value)
@@ -530,7 +538,7 @@ def test_hmrc_cgt_2026_repeated_publisher_margins_agree():
         rows_by_semantic_key.setdefault(row["semantic_fact_key"], []).append(row)
     duplicate_rows = [rows for rows in rows_by_semantic_key.values() if len(rows) > 1]
 
-    assert len(duplicate_rows) == 44
+    assert len(duplicate_rows) == 42
     assert all(len({row["value"] for row in rows}) == 1 for rows in duplicate_rows)
 
 
