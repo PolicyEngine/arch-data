@@ -57,8 +57,9 @@ The load-bearing rule:
 The store is facts-only, and the line is who asserted the value. Everything a
 publisher asserted — including the publisher's own projections — is a fact,
 except publisher-authored values at microdata grain, which are content and
-never facts; only the publisher's own published aggregates over its microdata
-are facts (see `docs/adr-chronicle-raw-microdata-identity.md`).
+never facts; only the values a publisher asserted and published over that
+microdata are facts, whether the microdata's own publisher or another (see
+`docs/adr-chronicle-raw-microdata-identity.md`).
 Everything PolicyEngine computes (aged, uprated, forecast, or reconciled
 levels) is a downstream build artifact and never enters the store; Microcosm
 owns aging as a named, versioned model over Chronicle growth-factor facts. A

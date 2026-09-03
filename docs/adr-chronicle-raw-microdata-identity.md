@@ -3,9 +3,10 @@
 Status: accepted 2026-09-02. Enforcement lands in two steps and this ADR's
 guarantees are prospective until they merge: chronicle#221 (PR #227: manifest
 classification, the access-aware refusals in `validate-package`,
-`fetch-artifact`, `publish-raw`, and the source-package byte reader, the redistribution
-allowlist, artifact-bound licence evidence, untracked staging for public
-microdata bytes) and chronicle#238 (asserting principal and root-artifact
+`fetch-artifact`, `publish-raw`, and the source-package byte reader, the
+redistribution allowlist, artifact-bound licence evidence, untracked staging
+for public microdata bytes) and chronicle#238 (asserting principal and
+root-artifact
 lineage on fact provenance). Until #227 merges, no microdata release may be
 pointed at any Chronicle command: today they materialize, upload, and parse
 every input. Until #238 merges, the derived-fact prohibition is a review
@@ -18,10 +19,10 @@ stores none of their content. "Content" means any parsed representation:
 microdata records, rows, columns, row values, or cells, and any fact computed
 from them by Chronicle or by a PolicyEngine-side consumer (Microcosm,
 PolicyEngine, Thesis, or any system that builds from a Chronicle
-registration). A value that a third party asserted and published, whether the
-microdata's own publisher or another, is an ordinary fact. Custody of a public-use file's bytes
-under artifact-bound redistribution evidence is not content; custody of
-licensed or restricted bytes is never taken at all.
+registration). A value that a third party asserted and published, whether
+the microdata's own publisher or another, is an ordinary fact. Custody of a
+public-use file's bytes under artifact-bound redistribution evidence is not
+content; custody of licensed or restricted bytes is never taken at all.
 
 1. **Classification is explicit.** Every manifest created or modified after
    this ADR declares `kind`, either `publisher_table` or
@@ -135,8 +136,9 @@ licensed or restricted bytes is never taken at all.
 
 - `docs/adr-chronicle-facts-only.md` is amended: "anything a publisher
   asserted is a fact" now excludes publisher-authored values at microdata
-  grain, which are content; only the publisher's published aggregates over
-  its microdata are facts. README's boundary block says the same.
+  grain, which are content; only the values a publisher asserted and
+  published over that microdata are facts, whether the microdata's own
+  publisher or another. README's boundary block says the same.
 - Manifests gain `kind`, `licence`, `access`, `licence_evidence`,
   `hash_source`, `attested_by`, and per-source `verified_at` /
   `attestation_evidence` / `pinned_from`; validators refuse the combinations
