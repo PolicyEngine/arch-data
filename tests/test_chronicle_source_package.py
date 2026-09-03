@@ -511,6 +511,29 @@ def test_hmrc_cgt_table6_preserves_age_band_facts():
     }
 
 
+def test_hmrc_cgt_2026_repeated_publisher_margins_agree():
+    """Cross-table totals retain distinct lineage without conflicting values."""
+    aliases = (
+        "hmrc-cgt-statistics-2026",
+        "hmrc-cgt-size-of-gain-2026",
+        "hmrc-cgt-gain-by-income-2026",
+        "hmrc-cgt-country-region-2026",
+        "hmrc-cgt-age-2026",
+    )
+    facts = [
+        fact
+        for alias in aliases
+        for fact in load_source_package(alias).build_facts(2026)
+    ]
+    rows_by_semantic_key = {}
+    for row in consumer_fact_rows(facts):
+        rows_by_semantic_key.setdefault(row["semantic_fact_key"], []).append(row)
+    duplicate_rows = [rows for rows in rows_by_semantic_key.values() if len(rows) > 1]
+
+    assert len(duplicate_rows) == 44
+    assert all(len({row["value"] for row in rows}) == 1 for rows in duplicate_rows)
+
+
 def test_every_source_package_record_set_declares_provenance_class():
     missing: list[str] = []
     malformed: list[str] = []
