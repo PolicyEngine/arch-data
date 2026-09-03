@@ -12,7 +12,7 @@
         "total" : false
       },
       "str:field:UC_Households:F_UC_HH_DATE:DATE_NAME" : {
-        "map" : [ [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202505" ] ],
+        "map" : [ [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202504" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202505" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202506" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202507" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202508" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202509" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202510" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202511" ], [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202512" ] ],
         "total" : false
       }
     },
@@ -35,8 +35,48 @@
     "label" : "Month",
     "items" : [ {
       "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202504" ],
+      "labels" : [ "April 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
       "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202505" ],
       "labels" : [ "May 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202506" ],
+      "labels" : [ "June 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202507" ],
+      "labels" : [ "July 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202508" ],
+      "labels" : [ "August 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202509" ],
+      "labels" : [ "September 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202510" ],
+      "labels" : [ "October 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202511" ],
+      "labels" : [ "November 2025" ],
+      "annotationKeys" : [ "r" ]
+    }, {
+      "type" : "RecodeItem",
+      "uris" : [ "str:value:UC_Households:F_UC_HH_DATE:DATE_NAME:C_UC_HH_DATE:202512" ],
+      "labels" : [ "December 2025" ],
       "annotationKeys" : [ "r" ]
     } ]
   }, {
@@ -147,7 +187,7 @@
   } ],
   "cubes" : {
     "str:count:UC_Households:V_F_UC_HOUSEHOLDS" : {
-      "values" : [ [ [ 14412, 16068, 15172, 14715, 13056, 13219, 13164, 12811, 12816, 12623, 12011, 11513, 11404, 11038, 10147, 9831, 9297, 8231, 6310, 4735, 318722, 132, 0 ] ] ],
+      "values" : [ [ [ 14451, 16186, 15215, 14719, 13072, 13263, 13196, 12875, 12805, 12625, 11988, 11468, 11447, 10962, 10143, 9770, 9280, 8123, 6155, 4643, 310045, 96, 0 ] ], [ [ 14448, 16082, 15167, 14728, 13051, 13211, 13141, 12795, 12812, 12619, 12016, 11505, 11399, 11034, 10153, 9834, 9300, 8220, 6294, 4726, 318822, 96, 0 ] ], [ [ 14436, 16082, 15161, 14635, 13014, 13169, 13167, 12754, 12750, 12712, 12063, 11483, 11400, 11078, 10153, 9955, 9333, 8337, 6427, 4939, 331339, 100, 0 ] ], [ [ 14388, 16012, 15157, 14515, 13041, 13156, 13144, 12767, 12787, 12597, 12131, 11470, 11434, 11064, 10323, 9888, 9433, 8360, 6583, 5022, 341629, 110, 0 ] ], [ [ 14270, 16000, 15070, 14387, 13058, 13042, 13190, 12664, 12778, 12540, 12156, 11605, 11300, 11203, 10314, 9893, 9418, 8521, 6683, 5132, 351483, 112, 0 ] ], [ [ 14285, 15930, 15064, 14249, 13144, 13021, 13203, 12613, 12832, 12515, 12148, 11721, 11232, 11312, 10372, 9846, 9469, 8512, 6696, 5216, 360300, 100, 0 ] ], [ [ 14282, 15817, 15016, 14196, 13175, 12987, 13073, 12569, 12786, 12532, 12091, 11824, 11137, 11326, 10416, 9853, 9491, 8586, 6717, 5292, 367473, 97, 0 ] ], [ [ 14269, 15700, 14972, 14203, 13189, 12927, 12939, 12516, 12703, 12545, 12137, 11828, 11131, 11285, 10490, 9899, 9456, 8674, 6907, 5356, 374570, 94, 0 ] ], [ [ 14170, 15660, 14930, 14238, 13242, 12879, 12858, 12508, 12657, 12633, 12074, 11898, 11115, 11229, 10591, 9965, 9493, 8735, 6978, 5381, 378281, 96, 0 ] ] ],
       "precision" : 0
     }
   },
