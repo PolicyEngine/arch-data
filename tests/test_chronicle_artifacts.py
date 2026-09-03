@@ -538,9 +538,7 @@ def test_publish_derived_artifacts_rejects_unknown_build_before_side_effects(
     (suite / "facts.jsonl").write_text("{}\n")
     upload_log = tmp_path / "wrangler.log"
     wrangler = tmp_path / "wrangler"
-    wrangler.write_text(
-        f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {upload_log}\necho ok\n"
-    )
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {upload_log}\necho ok\n")
     wrangler.chmod(0o755)
     build_artifacts_path = tmp_path / "build_artifacts.jsonl"
     build_artifacts_path.write_text("sentinel\n")
