@@ -55,7 +55,7 @@ def test_chronicle_governance_files_define_required_review_surface():
 
     for clause in MICRODATA_BOUNDARY_CLAUSES:
         assert clause in boundary_verdict
-    governance_doc = (REPO_ROOT / "docs" / "chronicle-governance.md").read_text()
+    governance_doc = (ROOT / "docs" / "chronicle-governance.md").read_text()
     for clause in MICRODATA_BOUNDARY_CLAUSES:
         assert clause in governance_doc
 
