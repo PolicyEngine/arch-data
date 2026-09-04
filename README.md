@@ -386,7 +386,8 @@ uv run chronicle inventory-artifacts --root db/data
 uv run chronicle publish-raw --root db/data
 
 # Register a licensed or restricted release by identity alone. No bytes are
-# fetched, stored, or uploaded, and no R2 key is recorded:
+# fetched, stored, or uploaded, and no R2 key is recorded. The checksum is the
+# consumer's: name the attester and where the pin was read from:
 uv run chronicle register-artifact \
   --source-id dwp \
   --package-id dwp-frs-2023-24 \
@@ -399,7 +400,16 @@ uv run chronicle register-artifact \
   --licence "UK Data Service End User Licence" \
   --access licensed \
   --doi 10.5255/UKDA-SN-9367-2 \
-  --verified-at 2026-09-02
+  --hash-source consumer_pin \
+  --attested-by PolicyEngine/microcosm \
+  --pinned-from-repository PolicyEngine/microcosm \
+  --pinned-from-path packages/microcosm-build/src/microcosm/build/uk/source_stages.json \
+  --pinned-from-commit 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
+
+# A public microdata release is archived only against a reviewed checksum and
+# licence evidence binding the file to an allowlisted term; its bytes are
+# staged outside the repository and uploaded from there. See
+# docs/agent-source-package-harness.md, "Hash-Only Registrations".
 ```
 
 To coordinate broad PE source migration without jumping straight to semantic

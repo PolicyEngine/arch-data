@@ -103,6 +103,16 @@ and no object is written to either bucket — so the DWP Family Resources Survey
 tabs, which would otherwise route to `raw/uk/dwp/...`, occupy no key. See
 `docs/adr-chronicle-raw-microdata-identity.md`.
 
+A public release's key exists only once the fetch has verified the bytes
+against the reviewed `--expected-sha256` its `licence_evidence` covers. Its
+bytes never enter the repository: they are staged under
+`$CHRONICLE_MICRODATA_STAGING_DIR` (default
+`~/.cache/policyengine-chronicle/microdata-staging`), keyed like the R2 object,
+and uploaded from there. The source-artifact cache under
+`~/.cache/policyengine-chronicle/source-artifacts` is a Chronicle store too:
+the byte reader refuses a licensed or restricted entry before it would read,
+fetch into, or serve from that cache.
+
 Derived artifacts are reproducible and may be replaced by a new build, but a
 specific `{build_id}` path should be immutable once published.
 
