@@ -304,14 +304,53 @@ def _git(repo: Path, *args: str) -> str:
     ).stdout.strip()
 
 
-def _committed_fixture_checkout(destination: Path) -> tuple[Path, str]:
+def _committed_fixture_checkout(
+    destination: Path,
+    *,
+    origin: str = "https://github.com/PolicyEngine/microcosm.git",
+) -> tuple[Path, str]:
     checkout = _fixture_copy(destination)
     _git(checkout, "init", "-q")
+    _git(checkout, "remote", "add", "origin", origin)
     _git(checkout, "config", "user.email", "t@example.com")
     _git(checkout, "config", "user.name", "t")
     _git(checkout, "add", ".")
     _git(checkout, "commit", "-q", "-m", "consumer pins")
     return checkout, _git(checkout, "rev-parse", "HEAD")
+
+
+@pytest.mark.parametrize("explicit", [False, True], ids=("automatic", "explicit"))
+def test_emit_refuses_an_unrelated_repository_with_matching_consumer_blobs(
+    tmp_path, capsys, explicit
+):
+    origin = "https://github.com/unrelated/lookalike-consumer.git"
+    checkout, commit = _committed_fixture_checkout(
+        tmp_path / "unrelated", origin=origin
+    )
+    assert _git(checkout, "cat-file", "blob", f"{commit}:{UK_STAGES}") == (
+        checkout / UK_STAGES
+    ).read_text().strip()
+    root = tmp_path / "data"
+    argv = [
+        "--microcosm-root",
+        str(checkout),
+        "--root",
+        str(root),
+        "--release",
+        "dwp-frs-2023-24:adult",
+        "--json",
+        "emit",
+    ]
+    if explicit:
+        argv += ["--microcosm-commit", commit]
+
+    exit_code, out, err = _run(argv, capsys)
+
+    assert exit_code == 1, out
+    assert "repository identity" in err
+    assert "PolicyEngine/microcosm" in err
+    assert "unrelated/lookalike-consumer" in err
+    assert not root.exists()
 
 
 @pytest.mark.parametrize("staged", [False, True], ids=("dirty", "staged"))

@@ -41,6 +41,10 @@
   the 2023 table and manifest over the 2022 filename. Both cases failed the
   no-write assertion (`finding1-red.log`); fix not yet applied.
 
+- Finding 3 reproduced red in automatic and explicit commit modes: an unrelated
+  repository with matching consumer blobs emitted Microcosm provenance. Both
+  variants incorrectly returned success (`finding3-red.log`).
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
