@@ -52,6 +52,7 @@ from chronicle.registration import (
     resolve_vintage_key,
     validate_file_entry,
     validate_manifest_files,
+    validate_package_directory,
 )
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
@@ -1032,6 +1033,14 @@ class SourceArtifactSpec:
                 "artifact is identity only, so no source package reads, caches, "
                 "fetches, or parses it through another manifest "
                 "(docs/adr-chronicle-raw-microdata-identity.md)."
+            )
+        collision_errors = validate_package_directory(manifests)
+        if collision_errors:
+            raise ManifestAccessError(
+                f"{self.resource_directory} is not a valid package directory: "
+                f"{'; '.join(collision_errors)}. No source artifact bytes will "
+                "be read until every manifest agrees on shared filenames and "
+                "digests."
             )
 
     def _artifact_content(

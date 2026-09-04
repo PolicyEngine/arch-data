@@ -590,9 +590,7 @@ def test_publish_refuses_an_unpinned_public_alias_of_hash_only_bytes(
     (package / "public-alias.tab").write_bytes(LICENSED_BYTES)
     uploads = _record_uploads(monkeypatch)
 
-    report = publish_source_artifacts(
-        package, manifest_filename="manifest_tables.yaml"
-    )
+    report = publish_source_artifacts(package, manifest_filename="manifest_tables.yaml")
 
     assert not report.valid
     assert uploads == []
@@ -1088,15 +1086,11 @@ def test_byte_reader_refuses_a_public_filename_collision_before_reading(
     resource_dir.mkdir(parents=True)
     _write(
         resource_dir / "manifest.yaml",
-        _table_manifest(
-            files={2023: _public_table_entry("adult.tab", LICENSED_BYTES)}
-        ),
+        _table_manifest(files={2023: _public_table_entry("adult.tab", LICENSED_BYTES)}),
     )
     _write(
         resource_dir / "manifest_tables.yaml",
-        _table_manifest(
-            files={2023: _public_table_entry("ADULT.TAB", PUBLIC_BYTES)}
-        ),
+        _table_manifest(files={2023: _public_table_entry("ADULT.TAB", PUBLIC_BYTES)}),
     )
     (resource_dir / "adult.tab").write_bytes(LICENSED_BYTES)
     reads = []
@@ -1173,10 +1167,7 @@ def test_byte_reader_refuses_an_unpinned_public_alias_of_hash_only_bytes(
         {
             "provider": "r2",
             "bucket": "ledger-raw",
-            "key": (
-                "raw/dwp/dwp-frs-2023-24/2023/"
-                f"{LICENSED_SHA}/adult.tab"
-            ),
+            "key": (f"raw/dwp/dwp-frs-2023-24/2023/{LICENSED_SHA}/adult.tab"),
             "uri": (
                 "r2://other-bucket/raw/dwp/dwp-frs-2023-24/2023/"
                 f"{LICENSED_SHA}/adult.tab"
