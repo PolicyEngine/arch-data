@@ -1598,6 +1598,12 @@ def _validated_recorded_r2(
             "locate its object: provider, bucket and key, or a uri that "
             "supplies them."
         )
+    if provider != "r2":
+        raise RecordedR2LocatorError(
+            f"{where}: provider={provider!r} does not identify R2. A block "
+            "under storage.r2 must use provider='r2' and an r2:// URI, not "
+            f"{provider}://."
+        )
 
     segments = key.split("/")
     if (
@@ -2012,6 +2018,15 @@ def _publish_raw_manifest_entry(
             package_path=manifest_path,
         ),
     )
+    recorded_key = recorded_r2.key if recorded_r2 is not None else None
+    if recorded_key and recorded_key != location.key:
+        # Validate the full source/package/year route before the preserved-
+        # bucket shortcut below. A bucket rename does not make a misrouted
+        # object valid history.
+        return refuse(
+            "recorded_r2_key_disagrees_with_country_prefix:"
+            f"recorded={recorded_key}:expected={location.key}"
+        )
     recorded_bucket = recorded_r2.bucket if recorded_r2 is not None else None
     if recorded_r2 is not None and recorded_bucket != location.bucket:
         # The recorded bucket is preserved history and, per the identity check
@@ -2044,12 +2059,6 @@ def _publish_raw_manifest_entry(
                 ),
             ),
             None,
-        )
-    recorded_key = recorded_r2.key if recorded_r2 is not None else None
-    if recorded_key and recorded_key != location.key:
-        return refuse(
-            "recorded_r2_key_disagrees_with_country_prefix:"
-            f"recorded={recorded_key}:expected={location.key}"
         )
     upload = _upload_r2_object(
         location,

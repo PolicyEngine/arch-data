@@ -233,10 +233,16 @@ Running the same operations against a checkout of the previous head:
   `manifest_<package>` extensions. Both sweeps now share `_manifest_files`, so
   only `None` means absent and every other non-mapping value is reported. All
   106 artifact tests pass.
+- Reproduced finding 3 as a green preserved-bucket skip for a key routed to the
+  wrong package/year, and finding 6 as both a fetch reaching I/O and a green
+  publish skip for a self-consistent `s3://` block under `storage.r2`.
+- Raw publish now compares the recorded key with the canonical
+  source/package/year key before any bucket-change skip. Recorded R2 validation
+  also requires `provider='r2'` (and therefore an `r2://` effective URI). The
+  focused canonical-key/provider tests, including the existing URI-only and
+  stale-country cases, pass without uploads or manifest rewrites on refusal.
 
 ### Next
 
-- Reproduce and fix R2 canonical-location/provider validation (findings 3 and
-  6).
 - Reproduce and fix findings 9-10, then run the required lint, format, full-test,
   and tracked-USDA sweep verification.

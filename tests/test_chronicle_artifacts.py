@@ -2119,3 +2119,99 @@ def test_sweeps_treat_a_null_files_block_as_absent(tmp_path):
 
     assert inventory.valid
     assert published.valid
+
+
+# ---------------------------------------------------------------------------
+# Sol gate round 3: canonical R2 locators before bucket-cutover skips
+# ---------------------------------------------------------------------------
+
+
+def test_publish_checks_the_canonical_key_before_a_preserved_bucket_skip(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "table"
+    source = _publish(tmp_path, "table.xlsx", b"publisher table")
+    fetch_source_artifact(
+        str(source),
+        source_id="irs_soi",
+        package_id="soi-table",
+        year=2024,
+        output_dir=package,
+    )
+    manifest_path = package / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    spec = manifest["files"][2024]
+    wrong_key = f"raw/irs_soi/other-package/2023/{spec['sha256']}/{spec['filename']}"
+    spec["storage"] = {
+        "r2": {
+            "provider": "r2",
+            "bucket": "ledger-raw",
+            "key": wrong_key,
+            "uri": f"r2://ledger-raw/{wrong_key}",
+        }
+    }
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    before = manifest_path.read_bytes()
+    monkeypatch.setenv("CHRONICLE_R2_RAW_BUCKET", "chronicle-raw")
+    log = tmp_path / "wrangler.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+
+    report = publish_source_artifacts(package, wrangler_command=str(wrangler))
+
+    assert not report.valid
+    assert report.entries[0].upload is None
+    assert report.entries[0].skipped is None
+    assert (
+        report.entries[0]
+        .errors[0]
+        .startswith("recorded_r2_key_disagrees_with_country_prefix:")
+    )
+    assert not log.exists()
+    assert manifest_path.read_bytes() == before
+
+
+def _make_recorded_locator_use_s3(package):
+    manifest_path = package / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    r2 = manifest["files"][2022]["storage"]["r2"]
+    r2["provider"] = "s3"
+    r2["uri"] = f"s3://{r2['bucket']}/{r2['key']}"
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    return manifest_path
+
+
+def test_fetch_refuses_a_self_consistent_non_r2_locator_before_io(
+    tmp_path, monkeypatch
+):
+    package, source, _report = _recorded_package(tmp_path)
+    manifest_path = _make_recorded_locator_use_s3(package)
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("a non-R2 storage.r2 locator must be refused before I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(RecordedR2LocatorError, match="provider.*r2"):
+        _fetch_local(package, source, upload_r2=False)
+
+    assert manifest_path.read_bytes() == before
+
+
+def test_publish_refuses_a_self_consistent_non_r2_locator(tmp_path, monkeypatch):
+    package, _source, _report = _recorded_package(tmp_path)
+    manifest_path = _make_recorded_locator_use_s3(package)
+    before = manifest_path.read_bytes()
+    monkeypatch.setenv("CHRONICLE_R2_RAW_BUCKET", "chronicle-raw")
+    log = tmp_path / "publish.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+
+    report = publish_source_artifacts(package, wrangler_command=str(wrangler))
+
+    assert not report.valid
+    assert report.entries[0].upload is None
+    assert report.entries[0].skipped is None
+    assert report.entries[0].errors[0].startswith("recorded_r2_locator_invalid:")
+    assert "provider" in report.entries[0].errors[0]
+    assert not log.exists()
+    assert manifest_path.read_bytes() == before
