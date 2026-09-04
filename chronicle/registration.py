@@ -157,9 +157,14 @@ class StrictManifestLoader(yaml.SafeLoader):
                 f"expected a mapping node, but found {node.id}",
                 node.start_mark,
             )
-        self.flatten_mapping(node)
-        mapping: dict[Any, Any] = {}
-        for key_node, value_node in node.value:
+        # Duplicates are judged among the keys the document spells out, before
+        # ``<<`` merges are expanded: an explicit key that overrides a merged
+        # default is valid YAML (the explicit key wins), while two explicit
+        # spellings of one key are the silent shadowing this loader refuses.
+        explicit: set[Any] = set()
+        for key_node, _value_node in node.value:
+            if key_node.tag == "tag:yaml.org,2002:merge":
+                continue
             key = self.construct_object(key_node, deep=deep)
             try:
                 hash(key)
@@ -170,13 +175,18 @@ class StrictManifestLoader(yaml.SafeLoader):
                     f"found unhashable key ({exc})",
                     key_node.start_mark,
                 ) from exc
-            if key in mapping:
+            if key in explicit:
                 raise yaml.constructor.ConstructorError(
                     "while constructing a mapping",
                     node.start_mark,
                     f"found duplicate key {key!r}",
                     key_node.start_mark,
                 )
+            explicit.add(key)
+        self.flatten_mapping(node)
+        mapping: dict[Any, Any] = {}
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
             mapping[key] = self.construct_object(value_node, deep=deep)
         return mapping
 
