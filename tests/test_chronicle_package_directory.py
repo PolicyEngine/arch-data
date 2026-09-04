@@ -573,6 +573,35 @@ def test_publish_raw_never_uploads_what_a_sibling_manifest_registers_hash_only(
     assert _snapshot(package) == before
 
 
+def test_publish_refuses_an_unpinned_public_alias_of_hash_only_bytes(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "data" / "dwp" / "frs_2023_24"
+    public = _public_table_entry("public-alias.tab", LICENSED_BYTES)
+    public.pop("sha256")
+    _write(
+        package / "manifest_tables.yaml",
+        _table_manifest(files={2023: public}),
+    )
+    _write(
+        package / "manifest_release.yaml",
+        _hash_only_manifest(sha256=LICENSED_SHA),
+    )
+    (package / "public-alias.tab").write_bytes(LICENSED_BYTES)
+    uploads = _record_uploads(monkeypatch)
+
+    report = publish_source_artifacts(
+        package, manifest_filename="manifest_tables.yaml"
+    )
+
+    assert not report.valid
+    assert uploads == []
+    assert any(
+        error.startswith(f"sha256_collision_across_manifests:{LICENSED_SHA}")
+        for error in report.errors
+    )
+
+
 def test_publish_strictly_validates_a_sibling_before_any_upload(tmp_path, monkeypatch):
     root = tmp_path / "data"
     package = root / "dwp" / "frs_2023_24"
@@ -1015,6 +1044,43 @@ def test_byte_reader_strictly_validates_a_sibling_manifest(tmp_path, monkeypatch
 
     with pytest.raises(ManifestAccessError, match="manifest_release.yaml"):
         spec.assert_parseable(2023)
+
+
+def test_byte_reader_refuses_an_unpinned_public_alias_of_hash_only_bytes(
+    tmp_path, monkeypatch
+):
+    _isolated_reader(tmp_path, monkeypatch)
+    package_name = f"chronicle_test_{uuid.uuid4().hex}"
+    resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
+    resource_dir.mkdir(parents=True)
+    public = _public_table_entry("public-alias.tab", LICENSED_BYTES)
+    public.pop("sha256")
+    _write(
+        resource_dir / "manifest_tables.yaml",
+        _table_manifest(files={2023: public}),
+    )
+    _write(
+        resource_dir / "manifest_release.yaml",
+        _hash_only_manifest(sha256=LICENSED_SHA),
+    )
+    (resource_dir / "public-alias.tab").write_bytes(LICENSED_BYTES)
+    monkeypatch.syspath_prepend(str(tmp_path / "pkgroot"))
+    spec = SourceArtifactSpec(
+        source_name="dwp",
+        source_table="Family Resources Survey",
+        resource_package=package_name,
+        resource_directory="data/dwp/frs",
+        manifest="manifest_tables.yaml",
+        vintage="2023_24",
+        extracted_at="2026-09-04",
+        extraction_method="none",
+        parser="delimited_text_full_rows",
+        delimiter="\t",
+        artifact_year=2023,
+    )
+
+    with pytest.raises(ManifestAccessError, match=LICENSED_SHA):
+        spec._artifact_content(2023)
 
 
 def test_the_stray_default_manifest_rule_reaches_register_before_any_write(tmp_path):
