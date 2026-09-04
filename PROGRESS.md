@@ -454,13 +454,11 @@ Running the same operations against a checkout of the previous head:
   publisher bytes. Raw publish now completes one root-wide read/identity/entry
   preflight and returns every refusal before its first uploader call or
   manifest rewrite. The three red cases plus the existing entry-, sibling-,
-  and tracked-cutover preflight controls pass (9 tests).
+  and tracked-cutover preflight controls pass (9 tests). Fix commit:
+  `4991e8f`. The complete artifact module passes with 154 tests (12 warnings).
 
 ### Next
 
-1. Finish the #227 port/adversarial audit, including normalized-alias edge
-   cases and multi-owner write consistency.
-2. Run the complete artifact
-   module and requested lint/format/full-suite verification.
-3. Write the external `-o out.md` report with the per-finding command,
+1. Run the requested lint/format/full-suite verification.
+2. Write the external `-o out.md` report with the per-finding command,
    observation, fix, regression, commit, and port provenance.
