@@ -3,8 +3,8 @@
 ## State
 
 - Detached lane rebased from `28647088` onto `origin/ops-rename-slice1`
-  (`ba8147a7`). Integration checks pass; the full baseline is running on code commit
-  `426651e`. No findings fixed yet.
+  (`ba8147a7`). Integration and the full baseline pass on code commit `426651e`.
+  The four finding regressions are next.
 - Evidence report: `/tmp/chronicle-227-fix/out.md`.
 - Prior PR #227 journal preserved beside the report as `pr227-prior-progress.md`.
   The #226 journal below is retained verbatim.
@@ -28,9 +28,13 @@
   integration. Reproduction and any correction are deferred until the baseline
   has completed, keeping the tested code fixed throughout that run.
 
+- Required post-rebase full baseline completed before touching the findings:
+  `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p no:cacheprovider`
+  exited 0 with **1,587 passed, 7 skipped, 42 warnings** in **1,430.28 seconds**
+  (23:50). Log: `/tmp/chronicle-227-fix/baseline-full.log`.
+
 ## Next
 
-- Record the full baseline counts and direct exit code.
 - Reproduce and resolve the source-entry integration concern.
 - Reproduce each finding before fixing it, then run the final required gates.
 
