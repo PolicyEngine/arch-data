@@ -1130,3 +1130,128 @@ shim._scratch_root = _record_the_mode
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert observed.read_text(encoding="utf-8") == oct(stat.S_IRWXU)
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
+
+
+def _sparse_patterns(root: pathlib.Path, *patterns: str) -> None:
+    info = root / ".git" / "info"
+    info.mkdir(parents=True, exist_ok=True)
+    (info / "sparse-checkout").write_text("".join(f"{p}\n" for p in patterns), encoding="utf-8")
+
+
+@pytest.mark.parametrize("scope", ["local", "worktree"])
+def test_a_sparse_checkout_is_refused_before_it_can_pass(tmp_path, scope):
+    """A clone configured for sparse checkout cannot produce the commit.
+
+    With ``core.sparseCheckout`` on and a patterns file in the shared git
+    directory keeping the protected paths but dropping an unprotected tracked
+    file, ``git worktree add`` materialises a strict subset of the commit; the
+    omitted entry is marked skip-worktree, so ``git status`` and the ignored
+    listing both stay empty, and on the push invocation (no ``--base-ref``)
+    the gate reads only the state files and the release tree and said OK
+    (peer review, round 1). The key is refused by the configuration audit
+    before any checkout happens, in both scopes it can be set in; and the
+    checkout assertions refuse a skip-worktree entry and an index shorter
+    than the commit, so the second line holds even if the first is bypassed.
+    """
+
+    def prepare(root: pathlib.Path) -> None:
+        (root / "notes.txt").write_text("unprotected, tracked\n", encoding="utf-8")
+
+    clone, base, candidate = _replay_latest_release(tmp_path, prepare=prepare)
+    _sparse_patterns(clone, "/ledger/", "/releases/")
+    if scope == "worktree":
+        _git(clone, "config", "extensions.worktreeConfig", "true")
+        _git(clone, "config", "--worktree", "core.sparseCheckout", "true")
+    else:
+        _git(clone, "config", "core.sparseCheckout", "true")
+
+    completed = _run_shim(clone, commit=candidate, temporary_root=tmp_path / "tmp")
+    assert completed.returncode == 1, completed.stdout + completed.stderr
+    assert completed.stdout == ""
+    assert completed.stderr.startswith(REFUSED)
+    assert "core.sparsecheckout" in completed.stderr.lower()
+    assert "subset of the commit" in completed.stderr
+    _assert_nothing_left_behind(clone, tmp_path / "tmp")
+
+
+def test_a_checkout_that_is_not_the_whole_commit_is_refused(tmp_path):
+    """The second line: a skip-worktree entry, however it arose, refuses.
+
+    The audit is bypassed here by injecting the sparse configuration through
+    the shim's own frozen global file after the audit ran, so the checkout
+    itself is sparse; the index assertion names the omitted entry.
+    """
+
+    def prepare(root: pathlib.Path) -> None:
+        (root / "notes.txt").write_text("unprotected, tracked\n", encoding="utf-8")
+
+    clone, base, candidate = _replay_latest_release(tmp_path, prepare=prepare)
+    _sparse_patterns(clone, "/ledger/", "/releases/")
+    injection = """
+_real_audit = shim._audit_repository_config
+def _audit_then_sparse(clone_root, env):
+    _real_audit(clone_root, env)
+    subprocess.run(["git", "config", "-f", env["GIT_CONFIG_GLOBAL"], "core.sparseCheckout", "true"], check=True, env=env)
+shim._audit_repository_config = _audit_then_sparse
+"""
+    completed = _run_shim(
+        clone,
+        commit=candidate,
+        temporary_root=tmp_path / "tmp",
+        injection=injection,
+        workspace=tmp_path / "workspace",
+    )
+    assert completed.returncode == 1, completed.stdout + completed.stderr
+    assert completed.stdout == ""
+    assert completed.stderr.startswith(REFUSED)
+    assert "skip-worktree" in completed.stderr or "indexes" in completed.stderr
+    _assert_nothing_left_behind(clone, tmp_path / "tmp")
+
+
+def test_git_runs_post_checkout_on_worktree_add_when_hooks_are_not_redirected(tmp_path):
+    """Positive control for the hook test above (peer review, round 1).
+
+    Without the shim's ``core.hooksPath`` redirection, ``git worktree add``
+    does run ``post-checkout``; so the absence of the marker in the shim's run
+    is the shim's doing and not git's.
+    """
+
+    clone, base, candidate = _replay_latest_release(tmp_path)
+    marker = tmp_path / "the-hook-ran"
+    hook = clone / ".git" / "hooks" / "post-checkout"
+    hook.parent.mkdir(parents=True, exist_ok=True)
+    hook.write_text(f"#!/bin/sh\nprintf 'ran' > {marker}\n", encoding="utf-8")
+    hook.chmod(0o755)
+    _git(clone, "worktree", "add", "--detach", str(tmp_path / "plain"), candidate)
+    assert marker.exists(), "git did not run post-checkout on worktree add; the hook test would be vacuous"
+    _git(clone, "worktree", "remove", "--force", str(tmp_path / "plain"))
+
+
+def test_the_documented_variable_list_covers_the_installed_manual(tmp_path):
+    """The tuple is held to git's own documentation where it is installed.
+
+    Every ``GIT_`` name the installed ``git(1)`` manual page mentions must be
+    in the tuple; the prefix rule drops them all regardless, so this is a
+    check that the list has not fallen behind the git on the machine. Skips,
+    never passes, where the manual page cannot be found.
+    """
+
+    import gzip
+
+    completed = subprocess.run(
+        ["git", "--man-path"], capture_output=True, text=True, check=False
+    )
+    if completed.returncode != 0 or not completed.stdout.strip():
+        pytest.skip("git --man-path is unavailable")
+    man = pathlib.Path(completed.stdout.strip()) / "man1"
+    candidates = [man / "git.1", man / "git.1.gz"]
+    page = next((c for c in candidates if c.exists()), None)
+    if page is None:
+        pytest.skip(f"git(1) manual page not installed under {man}")
+    raw = gzip.decompress(page.read_bytes()) if page.suffix == ".gz" else page.read_bytes()
+    text = raw.decode("utf-8", "replace").replace("\\-", "-").replace("\\_", "_")
+    mentioned = set(re.findall(r"\bGIT_[A-Z0-9_]+\b", text))
+    mentioned.discard("GIT_")
+    documented = set(_documented_git_variables())
+    missing = sorted(name for name in mentioned if name not in documented and not name.endswith("_"))
+    assert missing == [], f"documented in git(1) but not in the tuple: {missing}"

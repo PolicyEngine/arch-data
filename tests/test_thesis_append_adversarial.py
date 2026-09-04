@@ -13,6 +13,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 import os
 import subprocess
 import sys
@@ -406,6 +407,19 @@ def test_workflow_has_a_base_owned_trusted_pr_gate():
     assert workflow.count('case "$base_gate_help" in') == 2
     assert workflow.count("*--commit*)") == 2
     assert workflow.count('echo "note: the base gate at') == 2
+    # Shell `case` takes the first matching arm, so the order of the arms is
+    # part of the contract: the `--commit` arm must come before the fallback
+    # in each block, and the `--commit` invocation must sit inside its arm
+    # (peer review of #241, round 1).
+    for block in workflow.split('case "$base_gate_help" in')[1:]:
+        body = block.split("esac", 1)[0]
+        commit_arm = body.index("*--commit*)")
+        fallback = re.search(r"^\s*\*\)\s*$", body, re.M)
+        assert fallback is not None
+        fallback_arm = fallback.start()
+        assert commit_arm < fallback_arm
+        assert "--commit " in body[commit_arm:fallback_arm]
+        assert "--commit " not in body[fallback_arm:]
 
 
 def test_duplicate_identity_without_supersedes_is_rejected():

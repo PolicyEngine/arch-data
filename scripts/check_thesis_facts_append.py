@@ -91,7 +91,7 @@ OBJECT_ID = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})")
 
 # Every environment variable beginning with GIT_ that git(1) documents in its
 # ENVIRONMENT VARIABLES section, read from the Git 2.53.0 manual page on the
-# machine this was written on (`git help --man git`). There are 72 of them.
+# machine this was written on (`git help --man git`). There are 73 of them.
 #
 # The shim does not drop these names one by one: it drops every variable whose
 # name begins with GIT_, which is necessarily a superset of any list. The tuple
@@ -124,6 +124,7 @@ DOCUMENTED_GIT_VARIABLES = (
     "GIT_DIR",
     "GIT_DISCOVERY_ACROSS_FILESYSTEM",
     "GIT_EDITOR",
+    "GIT_EXEC_PATH",
     "GIT_EXTERNAL_DIFF",
     "GIT_EXTERNAL_DIFF_TRUST_EXIT_CODE",
     "GIT_FLUSH",
@@ -189,6 +190,19 @@ GATE_CONFIG_KEYS = ("safe.directory", "core.hookspath")
 # at 120000, a gitlink at 160000, a subtree at 040000 -- means the path is not
 # a file whose bytes this commit fixes, so no comparison below is about it.
 PROTECTED_TREE_MODES = ("100644", "100755")
+
+# The five settings receipt spells on every one of its own working-tree reads,
+# spelled on the shim's two scans for the same reason: a read that gains a
+# cache in a later git is a read this program would otherwise silently begin
+# to trust (peer review, round 1). ``core.fsmonitor`` is also refused by the
+# configuration audit.
+SCAN_SETTINGS = (
+    "-c", "core.untrackedCache=false",
+    "-c", "core.fsmonitor=false",
+    "-c", "core.trustctime=true",
+    "-c", "core.checkStat=default",
+    "-c", "feature.manyFiles=false",
+)
 
 # The two ways a run can end without a verdict of "OK", kept apart on purpose.
 # "failed" is the gate's verdict about a tree it was given; "refused" is this
@@ -332,10 +346,12 @@ def _gate_environment(
 def _frozen_environment(environment: dict[str, str]) -> Iterator[None]:
     """Make ``environment`` the process environment for the enclosed block.
 
-    The gate runs git without passing an environment, so it inherits this
-    process's. Replacing ``os.environ`` for the duration is what puts the
-    gate's own git calls under the same frozen environment as the shim's, and
-    the original is restored however the block ends.
+    The pinned receipt passes an environment to every git child it starts,
+    and builds that environment out of ``os.environ`` (see
+    ``_gate_environment``). Replacing ``os.environ`` for the duration is
+    therefore what puts the gate's own git calls under the same frozen
+    environment as the shim's, and the original is restored however the
+    block ends.
     """
 
     saved = dict(os.environ)
@@ -390,7 +406,12 @@ def _refused_config_key(key: str) -> str | None:
     * any ``filter.*`` driver names programs git runs on a file's contents on
       the way in and on the way out;
     * any ``include`` or ``includeIf`` pulls in a file whose contents this
-      audit has not read, and could set any of the above.
+      audit has not read, and could set any of the above;
+    * ``core.sparseCheckout`` (and ``core.sparseCheckoutCone``) makes a
+      checkout materialise only the paths a patterns file in the shared git
+      directory selects, marking the rest skip-worktree so ``git status``
+      stays clean over a working tree that is a strict subset of the commit
+      (peer review of this pull request, round 1).
 
     Git compares a key's section and variable case-insensitively and its
     subsection case-sensitively, which is what the folding here reproduces.
@@ -407,6 +428,8 @@ def _refused_config_key(key: str) -> str | None:
         return "moves the hook directory"
     if section == "core" and variable == "fsmonitor":
         return "names a filesystem monitor program"
+    if section == "core" and variable in {"sparsecheckout", "sparsecheckoutcone"}:
+        return "makes a checkout materialise a subset of the commit"
     return None
 
 
@@ -582,7 +605,10 @@ def _protected_entries(
 
     The two state files the chain specification names, plus everything under
     the release root, which is where the manifests, the producer signatures,
-    the RFC 3161 receipts and the trust anchors live. A commit that carries no
+    the RFC 3161 receipts and the trust anchors live, plus everything else
+    under the state files' directory, so the byte comparison covers the whole
+    of the gate's data surface (``ledger/**`` and ``releases/manifests/**``)
+    and not only the paths the gate reads (peer review, round 1). A commit that carries no
     entry at one of the two state paths is refused here: the gate would refuse
     it too, but this says which of the two is missing and says it before any
     file is read.
@@ -599,10 +625,11 @@ def _protected_entries(
             if entry[3] not in seen:
                 seen.add(entry[3])
                 entries.append(entry)
-    for entry in _tree_entries(checkout, oid, f"{chain.release_root_relative}/", env):
-        if entry[3] not in seen:
-            seen.add(entry[3])
-            entries.append(entry)
+    for prefix in (chain.release_root_relative, chain.state_relative.parent):
+        for entry in _tree_entries(checkout, oid, f"{prefix}/", env):
+            if entry[3] not in seen:
+                seen.add(entry[3])
+                entries.append(entry)
     return entries
 
 
@@ -681,6 +708,7 @@ def _assert_exact_checkout(
 
     status = _git(
         [
+            *SCAN_SETTINGS,
             "-c",
             "status.showUntrackedFiles=all",
             "status",
@@ -696,7 +724,7 @@ def _assert_exact_checkout(
         raise ShimRefusal(f"the isolated checkout of {oid} is not clean: {first}")
 
     ignored = _git(
-        ["ls-files", "--others", "--ignored", "--exclude-standard"],
+        [*SCAN_SETTINGS, "ls-files", "--others", "--ignored", "--exclude-standard"],
         cwd=checkout,
         env=env,
     ).decode("utf-8", "replace")
@@ -704,6 +732,41 @@ def _assert_exact_checkout(
         first = ignored.strip().splitlines()[0]
         raise ShimRefusal(
             f"the isolated checkout of {oid} carries an ignored file: {first}"
+        )
+    # The checkout must be the whole commit, not a selection of it: a sparse
+    # checkout leaves the omitted entries in the index marked skip-worktree,
+    # which a clean ``status`` does not reveal (peer review, round 1). Every
+    # index entry must be an ordinary tracked file, and there must be exactly
+    # as many of them as the commit has entries.
+    tagged = _git(
+        [*SCAN_SETTINGS, "ls-files", "-v", "-z"],
+        cwd=checkout,
+        env=env,
+    )
+    index_entries = 0
+    for record in tagged.split(b"\0"):
+        if not record:
+            continue
+        index_entries += 1
+        tag = record[:1]
+        if tag != b"H":
+            path = os.fsdecode(record[2:])
+            reason = {
+                b"S": "skip-worktree",
+                b"h": "assume-unchanged",
+                b"M": "unmerged",
+            }.get(tag, f"tagged {tag.decode('ascii', 'replace')!r}")
+            raise ShimRefusal(
+                f"the isolated checkout of {oid} has an index entry that is "
+                f"not an ordinary tracked file ({reason}): {path}"
+            )
+    tree_entries = sum(
+        1 for record in _git(["ls-tree", "-r", "-z", oid], cwd=checkout, env=env).split(b"\0") if record
+    )
+    if index_entries != tree_entries:
+        raise ShimRefusal(
+            f"the isolated checkout of {oid} indexes {index_entries} entries "
+            f"where the commit has {tree_entries}"
         )
 
     entries = _protected_entries(checkout, oid, env)
