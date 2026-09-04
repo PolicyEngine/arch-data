@@ -1754,7 +1754,7 @@ def test_fetch_refuses_invalid_r2_identity_before_publisher_io(
 
     monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
 
-    with pytest.raises(ValueError, match="R2 key parts cannot be empty"):
+    with pytest.raises(ValueError, match="canonical R2 key segment"):
         fetch_source_artifact(
             "https://publisher.test/table.csv",
             source_id=source_id,
@@ -3333,26 +3333,22 @@ def test_matching_directory_entry_refuses_multiple_normalized_aliases():
     returning the first spelling would silently ignore the other bytes."""
     from types import SimpleNamespace
 
+    from chronicle.registration import matching_directory_entry
+
     entries = [
         SimpleNamespace(name="TABLE.CSV"),
         SimpleNamespace(name="other.csv"),
         SimpleNamespace(name="table.csv"),
     ]
-    directory = SimpleNamespace(
-        is_dir=lambda: True, iterdir=lambda: iter(entries)
-    )
+    directory = SimpleNamespace(is_dir=lambda: True, iterdir=lambda: iter(entries))
 
     with pytest.raises(ValueError, match="TABLE.CSV.*table.csv|table.csv.*TABLE.CSV"):
         matching_directory_entry(directory, "table.csv")
 
-    assert (
-        matching_directory_entry(directory, "other.csv").name == "other.csv"
-    )
+    assert matching_directory_entry(directory, "other.csv").name == "other.csv"
 
 
-def test_publish_and_inventory_report_duplicate_artifact_aliases(
-    tmp_path, monkeypatch
-):
+def test_publish_and_inventory_report_duplicate_artifact_aliases(tmp_path, monkeypatch):
     """A duplicate-alias defect surfaces as an entry error, not a crash and
     not a silent first-match read."""
     output_dir = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
@@ -3360,13 +3356,9 @@ def test_publish_and_inventory_report_duplicate_artifact_aliases(
     _fetch_local(output_dir, source, upload_r2=False)
 
     def duplicate_alias(_directory, filename):
-        raise ValueError(
-            f"{filename!r} matches two physical spellings in the package."
-        )
+        raise ValueError(f"{filename!r} matches two physical spellings in the package.")
 
-    monkeypatch.setattr(
-        "chronicle.artifacts.matching_directory_entry", duplicate_alias
-    )
+    monkeypatch.setattr("chronicle.artifacts.matching_directory_entry", duplicate_alias)
 
     inventory = inventory_source_artifacts(output_dir)
     published = publish_source_artifacts(output_dir)

@@ -874,6 +874,51 @@ class SourceArtifactSpec:
             raw_r2_uri=raw_r2.get("uri"),
         )
 
+    def _resource_root(self) -> Any:
+        """Resolve the resource directory, refusing an escape from the package.
+
+        ``resource_directory`` is joined under ``files(resource_package)``; an
+        absolute value would discard that root entirely, a ``..`` or ``.``
+        component would step outside it, and a symlinked ancestor would follow
+        the link out of the package tree. Every byte and manifest read goes
+        through here, so the containment check runs before any I/O.
+        """
+        raw = self.resource_directory
+        parts = str(raw).split("/")
+        if (
+            not isinstance(raw, str)
+            or not raw
+            or raw.startswith("/")
+            or "\\" in raw
+            or any(
+                not part or part in (".", "..") or part != part.strip()
+                for part in parts
+            )
+        ):
+            raise ValueError(
+                f"resource_directory must be a relative path of plain segments "
+                f"inside the resource package, not {raw!r}."
+            )
+        root = files(self.resource_package)
+        directory = root.joinpath(raw)
+        if isinstance(root, Path):
+            current = root
+            for part in parts:
+                current = current / part
+                if current.is_symlink():
+                    raise ValueError(
+                        f"resource_directory component {current} is a symbolic "
+                        "link. Chronicle will not read source-package data "
+                        "through it."
+                    )
+            resolved_root = root.resolve()
+            if not Path(directory).resolve().is_relative_to(resolved_root):
+                raise ValueError(
+                    f"resource_directory {raw!r} escapes the resource package "
+                    f"root {resolved_root}."
+                )
+        return directory
+
     def _resource_entry(
         self,
         value: Any,
@@ -900,7 +945,7 @@ class SourceArtifactSpec:
                 "source artifact bytes."
             )
 
-        directory = files(self.resource_package).joinpath(self.resource_directory)
+        directory = self._resource_root()
         existing = matching_directory_entry(directory, name)
         if existing is None:
             return directory.joinpath(name)

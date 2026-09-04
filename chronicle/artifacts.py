@@ -83,16 +83,29 @@ def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
     """
     selected_name = _manifest_path(Path(), manifest_filename).name
     if selected_name != DEFAULT_MANIFEST_FILENAME:
-        return sorted(
-            path
-            for path in root.rglob("*")
-            if path.is_file() and path.name == selected_name
+        candidates = [path for path in root.rglob("*") if path.name == selected_name]
+    else:
+        candidates = [
+            path for path in root.rglob("*") if is_manifest_filename(path.name)
+        ]
+    for path in candidates:
+        _require_regular_manifest_file(path)
+    return sorted(candidates)
+
+
+def _require_regular_manifest_file(path: Path) -> None:
+    """Refuse a manifest-named entry that is not a regular, non-symlink file.
+
+    ``is_file`` follows symlinks, so a dangling symlink, a symlink to a
+    directory, or any other non-regular entry would silently vanish from a
+    sweep and from sibling-registry checks; a registry entry that cannot be
+    read as a manifest is a defect to surface, never to skip.
+    """
+    if path.is_symlink() or not path.is_file():
+        raise MalformedManifestError(
+            f"{path} carries a manifest name but is not a regular file; "
+            "Chronicle will not sweep past it or register beside it."
         )
-    return sorted(
-        path
-        for path in root.rglob("*")
-        if path.is_file() and is_manifest_filename(path.name)
-    )
 
 
 def _manifest_path(output: Path, manifest_filename: str) -> Path:
@@ -274,6 +287,11 @@ class ManifestNameError(SourceArtifactManifestError, ValueError):
 
 class ArtifactFilenameError(SourceArtifactManifestError, ValueError):
     """An artifact filename is not a bare, non-manifest package filename."""
+
+
+class IdentitySegmentError(SourceArtifactManifestError, ValueError):
+    """A registration identity (source_id / package_id) is not one canonical
+    R2 key segment."""
 
 
 class AmbiguousManifestError(SourceArtifactManifestError):
@@ -783,8 +801,8 @@ def fetch_source_artifact(
     # not upload. Validate them before reading the publisher so a malformed
     # registration identity cannot overwrite package-local bytes and fail only
     # when the prospective R2 key is constructed below.
-    _clean_key_part(source_id)
-    _clean_key_part(package_id)
+    _require_identity_segment(source_id, what="source_id")
+    _require_identity_segment(package_id, what="package_id")
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
         default_prefix=DEFAULT_R2_PREFIX,
@@ -794,7 +812,15 @@ def fetch_source_artifact(
     # Read and validate the entry being written before anything is fetched: a
     # manifest Chronicle cannot read, or a recorded block that names two
     # different objects, is a refusal that need not touch the publisher.
-    _refuse_a_stray_default_manifest(output, manifest_path)
+    try:
+        _refuse_a_stray_default_manifest(output, manifest_path)
+    except SourceArtifactManifestError:
+        raise
+    except ValueError as error:
+        # package_manifest_paths refuses non-regular manifest-named entries
+        # with a plain ValueError; surface it as the manifest error the CLI
+        # reports rather than a traceback.
+        raise MalformedManifestError(str(error)) from error
     existing_manifest = _read_manifest(manifest_path)
     _manifest_files(existing_manifest, manifest_path)
     _assert_manifest_identifies(
@@ -817,7 +843,10 @@ def fetch_source_artifact(
     owners = _manifest_file_owners(manifests, filename=artifact_filename)
     _assert_shared_owner_identities_agree(owners, filename=artifact_filename)
 
-    existing_target = matching_directory_entry(output, artifact_filename)
+    try:
+        existing_target = matching_directory_entry(output, artifact_filename)
+    except ValueError as error:
+        raise ArtifactFilenameError(str(error)) from error
     if existing_target is not None:
         if existing_target.is_symlink():
             raise ArtifactFilenameError(
@@ -2408,10 +2437,14 @@ def _publish_raw_manifest_entry(
             ),
             None,
         )
-    artifact_path = (
-        matching_directory_entry(manifest_path.parent, filename)
-        or manifest_path.parent / filename
-    )
+    try:
+        artifact_path = (
+            matching_directory_entry(manifest_path.parent, filename)
+            or manifest_path.parent / filename
+        )
+    except ValueError:
+        errors.append(f"duplicate_artifact_spellings:{filename}")
+        artifact_path = manifest_path.parent / filename
     sha256_expected = spec.get("sha256")
     sha256_actual = None
     size_bytes = None
@@ -2636,10 +2669,14 @@ def _inventory_entry(
             r2=r2,
             errors=(f"manifest_named_filename:{filename}",),
         )
-    artifact_path = (
-        matching_directory_entry(manifest_path.parent, filename)
-        or manifest_path.parent / filename
-    )
+    try:
+        artifact_path = (
+            matching_directory_entry(manifest_path.parent, filename)
+            or manifest_path.parent / filename
+        )
+    except ValueError:
+        errors.append(f"duplicate_artifact_spellings:{filename}")
+        artifact_path = manifest_path.parent / filename
     symlink = bool(filename) and artifact_path.is_symlink()
     exists = bool(filename) and not symlink and artifact_path.is_file()
     sha256_expected = spec.get("sha256")
@@ -2704,6 +2741,33 @@ def _clean_key_part(value: str) -> str:
     if not cleaned:
         raise ValueError("R2 key parts cannot be empty.")
     return cleaned.replace(" ", "_")
+
+
+def _require_identity_segment(value: Any, *, what: str) -> str:
+    """Require a registration identity to be one canonical key segment.
+
+    ``_clean_key_part`` normalizes what it is given (strips, folds spaces to
+    underscores) because it also renders legacy recorded values; a NEW
+    registration identity must already be canonical, or two spellings such as
+    ``foo bar`` and ``foo_bar`` would collide in one R2 namespace and a
+    separator would shift the key's path shape.
+    """
+    if (
+        not isinstance(value, str)
+        or not value
+        or value in (".", "..")
+        or value != value.strip()
+        or any(character.isspace() for character in value)
+        or "/" in value
+        or "\\" in value
+        or _clean_key_part(value) != value
+    ):
+        raise IdentitySegmentError(
+            f"{what} must be one canonical R2 key segment (no whitespace, "
+            f"slashes, or '..'), not {value!r}; R2 key parts cannot be empty "
+            "or rewritten."
+        )
+    return value
 
 
 def _clean_relative_key_parts(value: str) -> tuple[str, ...]:

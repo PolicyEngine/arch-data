@@ -69,11 +69,17 @@ def package_manifest_paths(package_dir: Path) -> list[Path]:
     directory = Path(package_dir)
     if not directory.is_dir():
         return []
-    return sorted(
-        path
-        for path in directory.iterdir()
-        if path.is_file() and is_manifest_filename(path.name)
-    )
+    manifests = []
+    for path in sorted(directory.iterdir()):
+        if not is_manifest_filename(path.name):
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(
+                f"{path} carries a manifest name but is not a regular file; "
+                "Chronicle will not register beside it or sweep past it."
+            )
+        manifests.append(path)
+    return manifests
 
 
 def validate_package_directory(
@@ -118,14 +124,19 @@ def matching_directory_entry(directory: Any, filename: Any) -> Any | None:
     if not is_bare_filename(filename) or not directory.is_dir():
         return None
     wanted = filename_key(filename)
-    return next(
-        (
-            path
-            for path in sorted(directory.iterdir(), key=lambda item: item.name)
-            if filename_key(path.name) == wanted
-        ),
-        None,
-    )
+    matches = [
+        path
+        for path in sorted(directory.iterdir(), key=lambda item: item.name)
+        if filename_key(path.name) == wanted
+    ]
+    if len(matches) > 1:
+        names = ", ".join(repr(path.name) for path in matches)
+        raise ValueError(
+            f"{filename!r} matches more than one physical entry ({names}); "
+            "the package holds conflicting spellings of one artifact identity "
+            "and must be repaired by hand."
+        )
+    return matches[0] if matches else None
 
 
 class StrictManifestLoader(yaml.SafeLoader):
