@@ -636,3 +636,11 @@ the per-finding reproduction/fix/test/commit/port map.
   reads, uploads, or registry writes.
 - Both failing-first tree groups now pass: direct exit 0, 7 passed,
   78 deselected, 12 warnings. Safe nested directories remain publishable.
+
+### Finding 6: exact physical artifact spelling
+
+- Publish and inventory now turn a single normalized alias with different
+  physical spelling into `artifact_spelling_mismatch`, and neither reads
+  bytes after alias errors. Duplicate-alias refusal also stops before reads.
+- Case/Unicode regressions plus duplicate/symlink controls exit 0: 6 passed,
+  12 warnings. Missing filenames retain their separate missing-name error.

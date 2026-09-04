@@ -2491,6 +2491,8 @@ def _publish_raw_manifest_entry(
             matching_directory_entry(manifest_path.parent, filename)
             or manifest_path.parent / filename
         )
+        if filename and artifact_path.name != filename:
+            errors.append(f"artifact_spelling_mismatch:{filename}:{artifact_path.name}")
     except ValueError:
         errors.append(f"duplicate_artifact_spellings:{filename}")
         artifact_path = manifest_path.parent / filename
@@ -2499,6 +2501,8 @@ def _publish_raw_manifest_entry(
     size_bytes = None
     if not filename:
         errors.append("missing_filename")
+    elif errors:
+        pass
     elif artifact_path.is_symlink():
         errors.append(f"artifact_path_is_symlink:{filename}")
     elif not artifact_path.is_file():
@@ -2723,16 +2727,20 @@ def _inventory_entry(
             matching_directory_entry(manifest_path.parent, filename)
             or manifest_path.parent / filename
         )
+        if filename and artifact_path.name != filename:
+            errors.append(f"artifact_spelling_mismatch:{filename}:{artifact_path.name}")
     except ValueError:
         errors.append(f"duplicate_artifact_spellings:{filename}")
         artifact_path = manifest_path.parent / filename
     symlink = bool(filename) and artifact_path.is_symlink()
-    exists = bool(filename) and not symlink and artifact_path.is_file()
+    exists = bool(filename) and not errors and not symlink and artifact_path.is_file()
     sha256_expected = spec.get("sha256")
     sha256_actual = None
     size_bytes = None
     if not filename:
         errors.append("missing_filename")
+    elif errors:
+        pass
     elif symlink:
         errors.append(f"artifact_path_is_symlink:{filename}")
     elif not exists:
