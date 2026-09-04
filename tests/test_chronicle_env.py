@@ -10,8 +10,11 @@ variable in the rename window from the ambient environment first.
 from __future__ import annotations
 
 import importlib
+import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -277,6 +280,40 @@ def test_supabase_schema_default_is_unchanged():
     assert default_chronicle_schema() == "ledger"
     assert db.supabase_client.chronicle_schema() == "ledger"
     assert db.supabase_client.targets_schema() == "targets"
+
+
+@pytest.mark.parametrize(
+    "schema_env",
+    ["CHRONICLE_SCHEMA", "POLICYENGINE_LEDGER_SCHEMA", "LEDGER_SCHEMA"],
+)
+def test_supabase_schema_compatibility_aliases_honor_import_time_environment(
+    schema_env,
+):
+    """Deprecated exports retain the environment snapshot existing importers use."""
+    environment = os.environ.copy()
+    for name in (*env_names("CHRONICLE_SCHEMA"), "POLICYENGINE_TARGETS_SCHEMA"):
+        environment.pop(name, None)
+    environment[schema_env] = "chronicle_import_probe"
+    environment["POLICYENGINE_TARGETS_SCHEMA"] = "targets_import_probe"
+    script = (
+        "import json; "
+        "from db.supabase_client import LEDGER_SCHEMA, TARGETS_SCHEMA; "
+        "print(json.dumps([LEDGER_SCHEMA, TARGETS_SCHEMA]))"
+    )
+
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=Path(__file__).resolve().parents[1],
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert json.loads(completed.stdout) == [
+        "chronicle_import_probe",
+        "targets_import_probe",
+    ]
 
 
 def test_supabase_schema_is_not_bound_at_import(monkeypatch):
