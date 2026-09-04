@@ -100,13 +100,8 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
     The name is a filename, not a path: it selects among the manifests a
     package directory keeps, and must not reach outside it.
     """
-    name = manifest_filename.strip()
-    if (
-        not name
-        or name in (".", "..")
-        or name != Path(name).name
-        or any(character in name for character in "*?[]")
-    ):
+    name = str(manifest_filename)
+    if not is_bare_filename(name) or any(character in name for character in "*?[]"):
         raise ManifestNameError(
             "Manifest must name a file inside the package directory, not "
             f"{manifest_filename!r}."
@@ -158,11 +153,30 @@ def _package_manifests(
     fetch selected. A malformed sibling is therefore a pre-I/O refusal: until
     Chronicle can read every owner, it cannot safely overwrite shared bytes.
     """
+    paths = package_manifest_paths(output)
+    by_name: dict[str, Path] = {}
+    for path in paths:
+        key = filename_key(path.name)
+        previous = by_name.get(key)
+        if previous is not None and previous != path:
+            raise AmbiguousManifestError(
+                f"{previous} and {path} have the same normalized manifest name "
+                f"{key!r}. Physically distinct manifest aliases can hide one "
+                "another's registrations; keep exactly one spelling."
+            )
+        by_name[key] = path
+    selected_alias = by_name.get(filename_key(manifest_path.name))
+    if selected_alias is not None and selected_alias != manifest_path:
+        raise AmbiguousManifestError(
+            f"{manifest_path} and existing {selected_alias} have the same "
+            "normalized manifest name. Selecting one spelling would hide the "
+            "other's registrations; address the existing manifest or remove "
+            "the duplicate."
+        )
+
     manifests: dict[str, dict[str, Any]] = {str(manifest_path): existing_manifest}
-    for path in package_manifest_paths(output):
-        if path == manifest_path or filename_key(path.name) == filename_key(
-            manifest_path.name
-        ):
+    for path in paths:
+        if path == manifest_path:
             continue
         sibling = _read_manifest(path)
         _manifest_files(sibling, path)
@@ -796,6 +810,26 @@ def fetch_source_artifact(
     owners = _manifest_file_owners(manifests, filename=artifact_filename)
     _assert_shared_owner_identities_agree(owners, filename=artifact_filename)
 
+    existing_target = matching_directory_entry(output, artifact_filename)
+    if existing_target is not None:
+        if existing_target.is_symlink():
+            raise ArtifactFilenameError(
+                f"{existing_target} is a symbolic link. Chronicle will not "
+                "fetch through a package-local link or overwrite its target."
+            )
+        if existing_target.name != artifact_filename:
+            raise ArtifactFilenameError(
+                f"{existing_target} has the same normalized filename as "
+                f"{artifact_filename!r}. Chronicle will not create a "
+                "physically distinct alias; pass --filename "
+                f"{existing_target.name!r}."
+            )
+        if not existing_target.is_file():
+            raise ArtifactFilenameError(
+                f"{existing_target} exists but is not a regular file. "
+                "Chronicle will not overwrite it with publisher bytes."
+            )
+
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
     content, _inferred_filename = _read_artifact(source_url)
 
@@ -1047,6 +1081,7 @@ def publish_source_artifacts(
     """Upload manifest-declared raw source artifacts and record R2 locations."""
     r2_bucket = r2_bucket or default_r2_raw_bucket()
     root_path = Path(root)
+    _manifest_path(Path(), manifest_filename)
     if not root_path.exists():
         return RawArtifactPublishReport(
             root=str(root_path),
@@ -1148,6 +1183,7 @@ def inventory_source_artifacts(
 ) -> ArtifactInventoryReport:
     """Inventory manifest-declared source artifacts under a root directory."""
     root_path = Path(root)
+    _manifest_path(Path(), manifest_filename)
     errors: list[str] = []
     entries: list[ArtifactInventoryEntry] = []
     if not root_path.exists():
@@ -2228,6 +2264,23 @@ def _publish_raw_manifest_entry(
             ),
             None,
         )
+    if is_manifest_filename(filename):
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(manifest_path.parent),
+                sha256=None,
+                size_bytes=None,
+                r2_location=None,
+                upload=None,
+                errors=(f"manifest_named_filename:{filename}",),
+            ),
+            None,
+        )
     artifact_path = (
         matching_directory_entry(manifest_path.parent, filename)
         or manifest_path.parent / filename
@@ -2424,6 +2477,20 @@ def _inventory_entry(
             source_url=spec.get("source_url"),
             r2=r2,
             errors=(f"non_canonical_filename:{filename}",),
+        )
+    if is_manifest_filename(filename):
+        return ArtifactInventoryEntry(
+            manifest_path=str(manifest_path),
+            year=str(year),
+            filename=filename,
+            local_path=str(manifest_path.parent),
+            exists=False,
+            sha256_expected=spec.get("sha256"),
+            sha256_actual=None,
+            size_bytes=None,
+            source_url=spec.get("source_url"),
+            r2=r2,
+            errors=(f"manifest_named_filename:{filename}",),
         )
     artifact_path = (
         matching_directory_entry(manifest_path.parent, filename)

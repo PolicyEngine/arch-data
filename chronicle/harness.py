@@ -1389,22 +1389,30 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
         return 0 if report.valid else 1
     if args.command == "inventory-artifacts":
-        report = inventory_artifact_files(
-            args.root,
-            manifest_filename=args.manifest,
-        )
+        try:
+            report = inventory_artifact_files(
+                args.root,
+                manifest_filename=args.manifest,
+            )
+        except SourceArtifactManifestError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
         print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
         return 0 if report.valid else 1
     if args.command == "publish-raw":
-        report = publish_raw_artifact_files(
-            args.root,
-            manifest_filename=args.manifest,
-            source_id=args.source_id,
-            package_id=args.package_id,
-            r2_bucket=args.r2_bucket,
-            r2_prefix=args.r2_prefix,
-            wrangler_command=args.wrangler_command,
-        )
+        try:
+            report = publish_raw_artifact_files(
+                args.root,
+                manifest_filename=args.manifest,
+                source_id=args.source_id,
+                package_id=args.package_id,
+                r2_bucket=args.r2_bucket,
+                r2_prefix=args.r2_prefix,
+                wrangler_command=args.wrangler_command,
+            )
+        except SourceArtifactManifestError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
         print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
         return 0 if report.valid else 1
     if args.command == "bootstrap-r2":

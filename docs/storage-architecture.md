@@ -69,8 +69,10 @@ raw/nz/ird/ird-working-for-families-statistics-sept-2025/2024/{sha256}/working-f
 The implemented country segments are `nz` and `uk`. US objects deliberately
 retain the legacy shape `raw/{source_id}/...`; migrating those keys requires a
 separate consumer audit. The fetch and raw-publish commands infer the country
-from the package publisher directory. Raw publication refuses to replace a
-manifest-recorded key that disagrees with the inferred country path.
+from the package publisher directory for new objects. A manifest-recorded raw
+object is preserved as history when its content-addressed checksum and filename
+tail identify the local bytes, including legacy routes that predate the country
+prefix and publisher-explicit routes such as Statbel's 2023 snapshots.
 
 New UK and New Zealand derived build artifacts use the same country segment
 and build-scoped keys so different builds can coexist and be audited:
