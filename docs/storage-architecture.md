@@ -90,6 +90,16 @@ derived/nz/ird/ird-working-for-families-statistics-sept-2025/2024/{build_id}/chr
 
 Legacy US derived keys likewise remain `derived/{source_id}/...`.
 
+The derived prefix defaults to `derived` and can be configured with
+`CHRONICLE_R2_DERIVED_PREFIX`, using the same legacy environment fallback as
+the bucket. Publisher and consumer validation must share this route configuration:
+facts citing a configured derived bucket or prefix are refused. The archived
+`ledger-derived`, `chronicle-derived`, and `derived/` routes remain derived.
+An explicit `publish-derived --r2-bucket ... --r2-prefix ...` combination must
+use a recognized derived bucket or prefix; configure a custom route through
+the environment before publishing it. This keeps custom build locations
+identifiable at the publisher-fact boundary.
+
 Derived artifacts are reproducible and may be replaced by a new build, but a
 specific `{build_id}` path should be immutable once published.
 

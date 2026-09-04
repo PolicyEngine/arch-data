@@ -492,32 +492,8 @@ def _is_derived_source_record_id(source_record_id: str) -> bool:
 
 
 def _points_at_derived(bucket: str, key: str) -> bool:
-    """Whether an R2 bucket/key pair addresses derived build output.
-
-    Resolve publication configuration at validation time: an operator may use
-    a bucket or prefix with no ``derived`` marker in its spelling. Archived
-    rename-window routes remain derived after the active destination changes.
-    """
-    derived_buckets = {
-        "ledger-derived",
-        "chronicle-derived",
-        artifacts.DEFAULT_R2_DERIVED_BUCKET,
-        artifacts.default_r2_derived_bucket(),
-    }
-    derived_prefixes = {
-        "derived",
-        artifacts.resolve_r2_prefix(
-            prefix=None,
-            default_prefix=artifacts.DEFAULT_R2_DERIVED_PREFIX,
-        ),
-        artifacts.resolve_r2_prefix(
-            prefix=None,
-            default_prefix=artifacts.default_r2_derived_prefix(),
-        ),
-    }
-    return bucket in derived_buckets or any(
-        key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
-    )
+    """Use the same derived routes publication is permitted to address."""
+    return artifacts.is_derived_r2_route(bucket, key)
 
 
 def _derived_source_provenance_issue(fact: AggregateFact) -> str | None:

@@ -665,3 +665,15 @@ the per-finding reproduction/fix/test/commit/port map.
 - Seven failing-first defect cases plus the valid URI-only control now pass:
   direct exit 0, 8 passed, 83 deselected, 12 warnings. Together with `d5e9952`,
   both consumers named in finding 2 now enforce immutable provenance.
+
+### Finding 1: publication route enforcement
+
+- Publication and the consumer guard now share `is_derived_r2_route` and the
+  lazy prefix resolver. Derived key generation honors all three environment
+  spellings for the configured prefix.
+- A both-custom explicit bucket/prefix combination must identify a configured
+  or archived derived route, otherwise publication refuses it before build
+  reads. The storage architecture documents the shared route configuration.
+- Four failing-first route integration cases now pass: direct exit 0,
+  4 passed, 87 deselected, 16 warnings. All nine findings are implemented;
+  focused integration verification and full final checks remain.

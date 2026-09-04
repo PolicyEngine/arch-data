@@ -268,6 +268,35 @@ def default_r2_derived_prefix() -> str:
     return env_value("CHRONICLE_R2_DERIVED_PREFIX", default=DEFAULT_R2_DERIVED_PREFIX)
 
 
+def is_derived_r2_route(bucket: str, key: str) -> bool:
+    """Whether an R2 bucket/key pair addresses derived build output.
+
+    Resolve publication configuration at validation time: an operator may use
+    a bucket or prefix with no ``derived`` marker in its spelling. Archived
+    rename-window routes remain derived after the active destination changes.
+    """
+    derived_buckets = {
+        "ledger-derived",
+        "chronicle-derived",
+        DEFAULT_R2_DERIVED_BUCKET,
+        default_r2_derived_bucket(),
+    }
+    derived_prefixes = {
+        "derived",
+        resolve_r2_prefix(
+            prefix=None,
+            default_prefix=DEFAULT_R2_DERIVED_PREFIX,
+        ),
+        resolve_r2_prefix(
+            prefix=None,
+            default_prefix=default_r2_derived_prefix(),
+        ),
+    }
+    return bucket in derived_buckets or any(
+        key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
+    )
+
+
 class SourceArtifactManifestError(RuntimeError):
     """A manifest refuses the write a fetch is about to make.
 
@@ -1032,6 +1061,30 @@ def publish_derived_artifacts(
             else None,
             errors=(f"r2_identity_invalid:{error}",),
         )
+    try:
+        resolved_r2_prefix = resolve_r2_prefix(
+            prefix=r2_prefix,
+            default_prefix=default_r2_derived_prefix(),
+            source_id=source_id,
+        )
+        if not is_derived_r2_route(r2_bucket, resolved_r2_prefix):
+            raise ValueError(
+                "Set CHRONICLE_R2_DERIVED_BUCKET or CHRONICLE_R2_DERIVED_PREFIX "
+                "to identify a custom derived route before publishing to it."
+            )
+    except ValueError as error:
+        return DerivedArtifactPublishReport(
+            input_dir=str(input_path),
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            build_id=build_id or "",
+            entries=(),
+            build_artifacts_path=str(build_artifacts_output)
+            if build_artifacts_output
+            else None,
+            errors=(f"derived_route_invalid:{error}",),
+        )
     if not input_path.exists():
         return DerivedArtifactPublishReport(
             input_dir=str(input_path),
@@ -1109,11 +1162,6 @@ def publish_derived_artifacts(
             errors=("malformed_build_id",),
         )
 
-    resolved_r2_prefix = resolve_r2_prefix(
-        prefix=r2_prefix,
-        default_prefix=DEFAULT_R2_DERIVED_PREFIX,
-        source_id=source_id,
-    )
     entries: list[DerivedArtifactUploadEntry] = []
     errors: list[str] = []
     for artifact_path in artifact_paths:
@@ -1574,7 +1622,7 @@ def build_derived_r2_key(
     """Build the canonical R2 key for a derived build artifact."""
     resolved_prefix = resolve_r2_prefix(
         prefix=prefix,
-        default_prefix=DEFAULT_R2_DERIVED_PREFIX,
+        default_prefix=default_r2_derived_prefix(),
         source_id=source_id,
     )
     return posixpath.join(
@@ -2746,10 +2794,7 @@ def _inventory_entry(
         errors.append(f"recorded_r2_locator_invalid:{error}")
     if recorded_r2 is not None and (
         recorded_r2.filename != filename
-        or (
-            spec.get("sha256") is not None
-            and recorded_r2.sha256 != spec["sha256"]
-        )
+        or (spec.get("sha256") is not None and recorded_r2.sha256 != spec["sha256"])
     ):
         errors.append("recorded_r2_identity_mismatch")
     if errors:
