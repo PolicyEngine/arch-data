@@ -294,3 +294,45 @@ Running the same operations against a checkout of the previous head:
   explicit failure, with zero uploads. No tracked manifest was changed.
 - The external `-o out.md` report records every failing-first command and
   observation, regression test, fix commit, and exact #227 port provenance.
+
+## Review fixes (Sol gate round 2, eight findings)
+
+### State
+
+- Detached HEAD began at `c36f3fc8`, the supplied head of PR #226; base is
+  `main` at `9da02431`. The worktree was clean at intake.
+- Scope is the eight supplied findings: cutover compatibility, shared-file
+  revision ownership, artifact/manifest path safety, duplicate YAML keys,
+  malformed revision history, and import-time Supabase alias compatibility.
+- No tracked `db/data/**` manifest will be modified. The whole-tree cutover
+  regression will operate on a temporary copy and use a non-writing uploader.
+- PR #227 is available read-only at
+  `/Users/maxghenis/PolicyEngine/_worktrees/chronicle-227-fix` at `5557cb9e`.
+  Applicable non-microdata hunks will be ported with the same function names
+  and shapes so its later rebase stays straightforward.
+
+### Done
+
+- Read the existing `PROGRESS.md`, the Bucket Cutover and Publisher Revisions
+  sections of `docs/storage-architecture.md`, and all six requested code/test
+  files: `chronicle/artifacts.py`, `chronicle/harness.py`,
+  `chronicle/source_package.py`, `db/supabase_client.py`,
+  `tests/test_chronicle_artifacts.py`, and `tests/test_chronicle_env.py`.
+- Read the GitNexus debugging/refactoring workflow guidance. No GitNexus MCP
+  graph tools are exposed in this session, so dependency tracing will use
+  repository search, focused tests, and the stacked PR's committed diffs.
+- Confirmed the baseline gaps in the named code: `_read_manifest` still uses
+  `yaml.safe_load`; `_root_manifest_paths` passes a non-default value to
+  `rglob`; manifest-declared filenames reach direct path joins and reads;
+  fetch updates only its selected manifest; `_superseding_storage` converts a
+  non-list `previous_r2` to an empty history; and the Supabase compatibility
+  constants are hard-coded defaults.
+
+### Next
+
+1. Audit and port the exact non-microdata #227 hunks, preserving names/shapes.
+2. Add focused failing regressions before each fix and capture every red
+   command/observation for the external `-o out.md` report.
+3. Commit each coherent red-test and implementation step, updating this log.
+4. Run focused tests, lint/format checks on changed files, and the full suite
+   with the directly captured exit code and counts.
