@@ -707,6 +707,24 @@ def _consumer_fact_row(
     return _clean_consumer_row(row)
 
 
+def _require_ledger_emit(emit_epoch: Epoch, boundary: str) -> None:
+    """Refuse a non-Ledger emit at an artifact boundary.
+
+    Mechanism 1 of the rename accepts both epochs on read and emits unchanged:
+    the only packaged, sha-pinned consumer-fact schema is the Ledger one, and a
+    Chronicle-named row would violate the schema its own manifest pins. Emitting
+    Chronicle names is a separate, consumer-gated cutover that lands with a
+    pinned successor schema.
+    """
+
+    if emit_epoch is not Epoch.LEDGER:
+        raise ValueError(
+            f"{boundary}: emitting {emit_epoch.value!r}-epoch identifiers needs a "
+            "packaged successor consumer-fact schema; until one is pinned, "
+            "artifacts are emitted Ledger-named (mechanism 1: emit unchanged)."
+        )
+
+
 def write_consumer_facts_jsonl(
     facts: list[AggregateFact],
     path: str | Path,
@@ -714,6 +732,7 @@ def write_consumer_facts_jsonl(
     emit_epoch: Epoch = EMIT_EPOCH,
 ) -> ConsumerFactExportReport:
     """Write consumer-contract fact rows to JSON Lines."""
+    _require_ledger_emit(emit_epoch, "write_consumer_facts_jsonl")
     rows = consumer_fact_rows(facts, emit_epoch=emit_epoch)
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)

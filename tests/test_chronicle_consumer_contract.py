@@ -284,19 +284,20 @@ def test_consumer_row_defensively_deduplicates_lineage_aliases(emit_epoch):
     ]
 
 
-def test_chronicle_epoch_writer_reports_successor_schema(tmp_path):
+def test_chronicle_epoch_writer_is_refused_until_a_schema_is_pinned(tmp_path):
     output = tmp_path / "consumer_facts.jsonl"
 
-    report = write_consumer_facts_jsonl(
-        [_soi_agi_fact()],
-        output,
-        emit_epoch=Epoch.CHRONICLE,
-    )
-    row = json.loads(output.read_text())
-
-    assert report.schema_version == SCHEMA_IDS["consumer_fact"].chronicle
+    with pytest.raises(ValueError, match="successor consumer-fact schema"):
+        write_consumer_facts_jsonl(
+            [_soi_agi_fact()],
+            output,
+            emit_epoch=Epoch.CHRONICLE,
+        )
+    assert not output.exists()
+    # Row-level emission under the successor epoch stays available to readers
+    # and to the database, which is not schema-pinned.
+    row = consumer_fact_row(_soi_agi_fact(), emit_epoch=Epoch.CHRONICLE)
     assert row["schema_version"] == SCHEMA_IDS["consumer_fact"].chronicle
-    assert row["aggregate_fact_key"].startswith("chronicle.aggregate_fact.v3:")
 
 
 def test_aggregate_fact_key_ignores_lineage_labels_and_evidence_notes():
@@ -902,6 +903,10 @@ def test_contract_reports_malformed_lineage_keys_instead_of_raising(tmp_path):
     report = validate_consumer_fact_contract([fact])
     codes = {issue.code for issue in report.errors}
     assert "malformed_lineage_key" in codes
+    numeric = replace(_soi_agi_fact(), source_cell_keys=(123,))  # type: ignore[arg-type]
+    assert "malformed_lineage_key" in {
+        issue.code for issue in validate_consumer_fact_contract([numeric]).errors
+    }
     with pytest.raises(
         ValueError, match="Cannot export invalid Chronicle consumer-contract facts"
     ):

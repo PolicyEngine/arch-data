@@ -138,7 +138,11 @@ def test_artifact_is_reproducible(tmp_path):
         assert (first / name).read_bytes() == (second / name).read_bytes()
 
 
-def test_chronicle_epoch_artifact_loads_end_to_end(tmp_path):
+def test_chronicle_epoch_artifact_emission_is_refused_until_a_schema_is_pinned(
+    tmp_path,
+):
+    """Mechanism 1 emits unchanged: an artifact whose rows the pinned v1 schema
+    would reject cannot be built until a successor schema is packaged."""
     facts_path = tmp_path / "chronicle-consumer-facts.jsonl"
     rows = consumer_fact_rows(
         [_fact(value=100, period_value=2021)], emit_epoch=Epoch.CHRONICLE
@@ -146,21 +150,13 @@ def test_chronicle_epoch_artifact_loads_end_to_end(tmp_path):
     _write_rows(facts_path, rows)
     out_dir = tmp_path / "chronicle-artifact"
 
-    report = build_consumer_artifact(
-        out_dir,
-        facts_path=facts_path,
-        emit_epoch=Epoch.CHRONICLE,
-    )
-    artifact = load_consumer_artifact(out_dir)
-
-    assert report.schema_version == "policyengine_chronicle.consumer_artifact.v3"
-    assert artifact.manifest["schema_version"] == (
-        "policyengine_chronicle.consumer_artifact.v3"
-    )
-    assert artifact.rows[0]["schema_version"] == "chronicle.consumer_fact.v2"
-    assert artifact.rows[0]["aggregate_fact_key"].startswith(
-        "chronicle.aggregate_fact.v3:"
-    )
+    with pytest.raises(ValueError, match="successor consumer-fact schema"):
+        build_consumer_artifact(
+            out_dir,
+            facts_path=facts_path,
+            emit_epoch=Epoch.CHRONICLE,
+        )
+    assert not (out_dir / "manifest.json").exists()
 
 
 def test_mixed_epoch_rows_load_in_one_artifact(tmp_path):

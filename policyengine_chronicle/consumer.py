@@ -84,6 +84,13 @@ def build_consumer_artifact(
         shutil.rmtree(output_path)
     output_path.mkdir(parents=True)
 
+    if emit_epoch is not Epoch.LEDGER:
+        raise ValueError(
+            "build_consumer_artifact: emitting "
+            f"{emit_epoch.value!r}-epoch identifiers needs a packaged successor "
+            "consumer-fact schema; until one is pinned, artifacts are emitted "
+            "Ledger-named (mechanism 1: emit unchanged)."
+        )
     rows = _load_consumer_rows(_resolve_facts_path(facts_path), validate_schema=True)
     facts_out = output_path / "consumer_facts.jsonl"
     with facts_out.open("w") as file:

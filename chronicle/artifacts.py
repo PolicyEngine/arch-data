@@ -532,8 +532,23 @@ def publish_derived_artifacts(
         )
 
     # Validate the resolved identity before deriving object keys, invoking the
-    # uploader, or opening the optional registry output.
-    canonicalize_key("build", resolved_build_id)
+    # uploader, or opening the optional registry output; a malformed id is an
+    # input failure like the ones above, reported rather than raised.
+    try:
+        canonicalize_key("build", resolved_build_id)
+    except ValueError:
+        return DerivedArtifactPublishReport(
+            input_dir=str(input_path),
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            build_id=resolved_build_id,
+            entries=(),
+            build_artifacts_path=str(build_artifacts_output)
+            if build_artifacts_output
+            else None,
+            errors=("malformed_build_id",),
+        )
 
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,

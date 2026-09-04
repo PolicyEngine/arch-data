@@ -53,6 +53,11 @@ class EpochPair:
         )
 
     def infer_key_epoch(self, key: str) -> Epoch:
+        if not isinstance(key, str):
+            raise ValueError(
+                f"unsupported key {key!r}; keys are strings with prefix "
+                f"{self.ledger!r} or {self.chronicle!r}"
+            )
         prefix, separator, _digest = key.partition(":")
         if not separator:
             raise ValueError(

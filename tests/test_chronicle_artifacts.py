@@ -543,24 +543,19 @@ def test_publish_derived_artifacts_rejects_unknown_build_before_side_effects(
     build_artifacts_path = tmp_path / "build_artifacts.jsonl"
     build_artifacts_path.write_text("sentinel\n")
 
-    with pytest.raises(
-        ValueError,
-        match=(
-            "ledger[.]build[.]v1.*chronicle[.]build[.]v2|"
-            "chronicle[.]build[.]v2.*ledger[.]build[.]v1"
+    report = publish_derived_artifacts(
+        suite,
+        source_id="irs_soi",
+        package_id="soi-table-1-1",
+        year=2023,
+        build_artifacts_output=(
+            build_artifacts_path if write_build_artifacts else None
         ),
-    ):
-        publish_derived_artifacts(
-            suite,
-            source_id="irs_soi",
-            package_id="soi-table-1-1",
-            year=2023,
-            build_artifacts_output=(
-                build_artifacts_path if write_build_artifacts else None
-            ),
-            wrangler_command=str(wrangler),
-        )
+        wrangler_command=str(wrangler),
+    )
 
+    assert report.errors == ("malformed_build_id",)
+    assert report.entries == ()
     assert not upload_log.exists()
     assert build_artifacts_path.read_text() == "sentinel\n"
 
