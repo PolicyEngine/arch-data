@@ -15,8 +15,10 @@ repository guard in ``tests/test_chronicle_manifest_kind.py``.
 
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -747,6 +749,195 @@ def test_register_refuses_while_the_bytes_are_present(tmp_path):
 
     with pytest.raises(HashOnlyRegistrationError, match="while its bytes"):
         _register(output_dir)
+
+
+def test_register_refuses_a_normalized_alias_of_local_bytes(tmp_path, monkeypatch):
+    """Simulate a case-sensitive directory while running on folded APFS."""
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    actual_path = output_dir / "ADULT.TAB"
+    content = b"licensed microdata must not live here"
+    actual_path.write_bytes(content)
+    requested_path = output_dir / "adult.tab"
+    real_exists = Path.exists
+
+    def case_sensitive_exists(path: Path) -> bool:
+        if path == requested_path:
+            return False
+        return real_exists(path)
+
+    monkeypatch.setattr(Path, "exists", case_sensitive_exists)
+
+    with pytest.raises(HashOnlyRegistrationError, match="ADULT.TAB"):
+        _register(output_dir, filename="adult.tab")
+
+    assert actual_path.read_bytes() == content
+    assert not (output_dir / "manifest.yaml").exists()
+
+
+@pytest.mark.parametrize(
+    "document",
+    ["[]\n", "false\n", "0\n", "''\n"],
+    ids=["empty-list", "false", "zero", "empty-string"],
+)
+def test_register_refuses_a_falsy_non_mapping_manifest(tmp_path, document):
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    manifest_path = output_dir / "manifest.yaml"
+    manifest_path.write_text(document)
+    original = manifest_path.read_bytes()
+
+    with pytest.raises(HashOnlyRegistrationError, match="must be a mapping"):
+        _register(output_dir)
+
+    assert manifest_path.read_bytes() == original
+
+
+@pytest.mark.parametrize(
+    ("field", "blank"),
+    [("source_id", None), ("source_id", "   "), ("package_id", "")],
+)
+def test_register_replaces_blank_manifest_identity_fields(tmp_path, field, blank):
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    payload = {
+        "source_id": "dwp",
+        "package_id": "dwp-frs-2023-24",
+        "kind": "microdata_release",
+        "files": {},
+    }
+    payload[field] = blank
+    (output_dir / "manifest.yaml").write_text(yaml.safe_dump(payload, sort_keys=False))
+
+    report = _register(output_dir)
+    manifest = _manifest(output_dir)
+
+    assert report.source_id == "dwp"
+    assert report.package_id == "dwp-frs-2023-24"
+    assert manifest["source_id"] == "dwp"
+    assert manifest["package_id"] == "dwp-frs-2023-24"
+
+
+def test_register_replaces_a_blank_manifest_level_access_route(tmp_path):
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    (output_dir / "manifest.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "dwp",
+                "package_id": "dwp-frs-2023-24",
+                "kind": "microdata_release",
+                "source_page": None,
+                "files": {},
+            },
+            sort_keys=False,
+        )
+    )
+    source_page = "https://publisher.example/frs"
+
+    _register(output_dir, doi=None, source_page=source_page)
+    manifest = _manifest(output_dir)
+    entry = manifest["files"][2023][0]
+
+    assert manifest["source_page"] == source_page
+    assert "missing_access_route" not in validate_file_entry(
+        entry,
+        kind="microdata_release",
+        manifest=manifest,
+        local_file_exists=False,
+    )
+
+
+@pytest.mark.parametrize("outside_exists", [True, False], ids=["existing", "dangling"])
+def test_register_refuses_a_symlinked_manifest_target_before_writing(
+    tmp_path, outside_exists
+):
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    outside = tmp_path / "outside.yaml"
+    original = yaml.safe_dump(
+        {
+            "source_id": "dwp",
+            "package_id": "dwp-frs-2023-24",
+            "kind": "microdata_release",
+            "files": {},
+        },
+        sort_keys=False,
+    ).encode()
+    if outside_exists:
+        outside.write_bytes(original)
+    manifest_path = output_dir / "manifest.yaml"
+    manifest_path.symlink_to(outside)
+
+    with pytest.raises(HashOnlyRegistrationError, match="symbolic link"):
+        _register(output_dir)
+
+    assert manifest_path.is_symlink()
+    if outside_exists:
+        assert outside.read_bytes() == original
+    else:
+        assert not outside.exists()
+
+
+def test_registration_persists_with_atomic_replace_under_an_exclusive_lock(
+    tmp_path, monkeypatch
+):
+    events: list[tuple[str, int | None]] = []
+    real_flock = fcntl.flock
+    real_replace = os.replace
+
+    def observed_flock(fd, operation):
+        events.append(("flock", operation))
+        return real_flock(fd, operation)
+
+    def observed_replace(source, destination):
+        assert events and events[-1] == ("flock", fcntl.LOCK_EX)
+        events.append(("replace", None))
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(fcntl, "flock", observed_flock)
+    monkeypatch.setattr(os, "replace", observed_replace)
+
+    report = _register(tmp_path / "pkg")
+
+    assert report.valid
+    assert events == [
+        ("flock", fcntl.LOCK_EX),
+        ("replace", None),
+        ("flock", fcntl.LOCK_UN),
+    ]
+
+
+def test_atomic_registration_failure_preserves_the_original_manifest(
+    tmp_path, monkeypatch
+):
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    manifest_path = output_dir / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "dwp",
+                "package_id": "dwp-frs-2023-24",
+                "kind": "microdata_release",
+                "files": {},
+            },
+            sort_keys=False,
+        )
+    )
+    original = manifest_path.read_bytes()
+
+    monkeypatch.setattr(
+        os,
+        "replace",
+        lambda _source, _destination: (_ for _ in ()).throw(OSError("replace failed")),
+    )
+
+    with pytest.raises(OSError, match="replace failed"):
+        _register(output_dir)
+
+    assert manifest_path.read_bytes() == original
+    assert not list(output_dir.glob(".manifest.yaml.*.tmp"))
 
 
 def test_register_refuses_a_publisher_table_manifest(tmp_path):
