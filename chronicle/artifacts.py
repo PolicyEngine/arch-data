@@ -12,6 +12,7 @@ import posixpath
 import re
 import shlex
 import sqlite3
+import stat
 import subprocess
 from typing import Any, Mapping
 from urllib.parse import unquote, urlparse
@@ -980,6 +981,26 @@ def fetch_source_artifact(
     )
 
 
+def _derived_artifact_paths(input_path: Path) -> list[Path]:
+    """Preflight every build-tree entry before reading or publishing any file."""
+    if not stat.S_ISDIR(input_path.lstat().st_mode):
+        raise ValueError(f"derived_root_not_regular_directory:{input_path}")
+    artifacts: list[Path] = []
+
+    def visit(directory: Path) -> None:
+        for path in sorted(directory.iterdir()):
+            mode = path.lstat().st_mode
+            if stat.S_ISDIR(mode):
+                visit(path)
+            elif stat.S_ISREG(mode):
+                artifacts.append(path)
+            else:
+                raise ValueError(f"derived_entry_not_regular_file:{path}")
+
+    visit(input_path)
+    return sorted(artifacts)
+
+
 def publish_derived_artifacts(
     input_dir: str | Path,
     *,
@@ -1020,6 +1041,22 @@ def publish_derived_artifacts(
             if build_artifacts_output
             else None,
             errors=(f"input_dir_is_not_directory:{input_path}",),
+        )
+
+    try:
+        artifact_paths = _derived_artifact_paths(input_path)
+    except (OSError, ValueError) as error:
+        return DerivedArtifactPublishReport(
+            input_dir=str(input_path),
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            build_id=build_id or "",
+            entries=(),
+            build_artifacts_path=str(build_artifacts_output)
+            if build_artifacts_output
+            else None,
+            errors=(str(error),),
         )
 
     resolved_build_id = build_id or infer_build_id(input_path)
@@ -1063,7 +1100,6 @@ def publish_derived_artifacts(
     )
     entries: list[DerivedArtifactUploadEntry] = []
     errors: list[str] = []
-    artifact_paths = sorted(path for path in input_path.rglob("*") if path.is_file())
     for artifact_path in artifact_paths:
         relative_path = artifact_path.relative_to(input_path).as_posix()
         if relative_path == "build_artifacts.jsonl":

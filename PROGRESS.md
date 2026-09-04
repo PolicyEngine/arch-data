@@ -627,3 +627,12 @@ the per-finding reproduction/fix/test/commit/port map.
   publication. Exact command and observations are in the external report.
 - Full source-package module completed: direct exit 0, 157 passed, 13 warnings
   in 192.07 seconds, including both source-reader fixes.
+
+### Finding 3: complete derived tree preflight
+
+- Derived publication now walks the root and every descendant with `lstat`,
+  allowing only directories and regular files. It refuses symlinks/FIFOs,
+  including an excluded registry filename, before build-ID inference, file
+  reads, uploads, or registry writes.
+- Both failing-first tree groups now pass: direct exit 0, 7 passed,
+  78 deselected, 12 warnings. Safe nested directories remain publishable.
