@@ -848,27 +848,23 @@ def test_documented_bucket_cutover_sweep_accepts_the_tracked_registry(
         ]
     )
     report = json.loads(capsys.readouterr().out)
-    expected_counts = {
-        "manifest_count": 161,
-        "artifact_count": 194,
-        "uploaded_count": 0,
-        "skipped_count": 194,
-        "failed_count": 0,
-        "r2_link_count": 194,
-    }
+    counts = report["counts"]
 
-    observed = (
-        exit_code,
-        report["valid"],
-        report["counts"],
-        len(report["errors"]),
+    # The tracked registry grows as packages land, so the sweep is pinned by
+    # its invariants rather than by today's exact counts: every artifact is a
+    # preserved-bucket skip with an R2 link, nothing uploads or fails, no
+    # manifest-level error, exit 0. The floors keep the test meaningful.
+    observed = (exit_code, report["valid"], len(report["errors"]))
+    assert observed == (0, True, 0), json.dumps(
+        {"observed": observed, "counts": counts}, sort_keys=True
     )
-    assert observed == (
-        0,
-        True,
-        expected_counts,
-        0,
-    ), json.dumps(observed, sort_keys=True)
+    assert counts["uploaded_count"] == 0, counts
+    assert counts["failed_count"] == 0, counts
+    assert (
+        counts["skipped_count"] == counts["artifact_count"] == counts["r2_link_count"]
+    ), counts
+    assert counts["artifact_count"] >= 194, counts
+    assert counts["manifest_count"] >= 161, counts
     assert all(entry["skipped"] or entry["upload"] for entry in report["entries"])
     assert uploads == []
     assert {
