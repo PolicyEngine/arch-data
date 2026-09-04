@@ -408,3 +408,23 @@ def test_derived_publication_propagates_configured_prefix(
     assert len(uploaded) == 1
     assert uploaded[0].key.startswith("builds/")
     assert _points_at_derived(uploaded[0].bucket, uploaded[0].key)
+
+
+@pytest.mark.parametrize("field", ["source_id", "package_id"])
+@pytest.mark.parametrize("declaration", [None, 123, "historical name"])
+def test_raw_publication_preserves_history_without_new_identity_requirements(
+    tmp_path, monkeypatch, field, declaration
+):
+    package, manifest_path, manifest = _package(tmp_path)
+    spec = manifest["files"][2024]
+    key = f"historical/route/{spec['sha256']}/table.csv"
+    spec["storage"] = {"r2": {"provider": "r2", "uri": f"r2://archive/{key}"}}
+    manifest[field] = declaration
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    before = manifest_path.read_text()
+    _no_upload(monkeypatch)
+    report = publish_source_artifacts(package)
+    assert report.valid
+    assert report.entries[0].skipped
+    assert report.entries[0].r2_location.uri == f"r2://archive/{key}"
+    assert manifest_path.read_text() == before

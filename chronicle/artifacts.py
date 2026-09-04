@@ -1016,6 +1016,22 @@ def publish_derived_artifacts(
     """Upload a deterministic build output directory to the derived R2 bucket."""
     r2_bucket = r2_bucket or default_r2_derived_bucket()
     input_path = Path(input_dir)
+    try:
+        _require_identity_segment(source_id, what="source_id")
+        _require_identity_segment(package_id, what="package_id")
+    except SourceArtifactManifestError as error:
+        return DerivedArtifactPublishReport(
+            input_dir=str(input_path),
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            build_id=build_id or "",
+            entries=(),
+            build_artifacts_path=str(build_artifacts_output)
+            if build_artifacts_output
+            else None,
+            errors=(f"r2_identity_invalid:{error}",),
+        )
     if not input_path.exists():
         return DerivedArtifactPublishReport(
             input_dir=str(input_path),
@@ -1190,16 +1206,24 @@ def publish_source_artifacts(
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
 
-        manifest_source_id = str(source_id or manifest.get("source_id") or "")
-        manifest_package_id = str(package_id or manifest.get("package_id") or "")
+        manifest_source_id = (
+            source_id if source_id is not None else manifest.get("source_id")
+        )
+        manifest_package_id = (
+            package_id if package_id is not None else manifest.get("package_id")
+        )
 
         for package_manifest_name, package_manifest in package_manifests.items():
             package_manifest_path = Path(package_manifest_name)
-            package_source_id = str(
-                source_id or package_manifest.get("source_id") or ""
+            package_source_id = (
+                source_id
+                if source_id is not None
+                else package_manifest.get("source_id")
             )
-            package_id_value = str(
-                package_id or package_manifest.get("package_id") or ""
+            package_id_value = (
+                package_id
+                if package_id is not None
+                else package_manifest.get("package_id")
             )
             package_files = _manifest_files(package_manifest, package_manifest_path)
             for year, spec in package_files.items():
@@ -1213,6 +1237,7 @@ def publish_source_artifacts(
                     r2_prefix=r2_prefix,
                     wrangler_command=wrangler_command,
                     preflight_only=True,
+                    manifest_identity=package_manifest,
                 )
                 if entry.errors:
                     preflight_failures.append(entry)
@@ -1256,6 +1281,7 @@ def publish_source_artifacts(
                 r2_bucket=r2_bucket,
                 r2_prefix=r2_prefix,
                 wrangler_command=wrangler_command,
+                manifest_identity=manifest,
             )
             entries.append(entry)
             if updated_spec is not None and isinstance(spec, dict):
@@ -2446,12 +2472,38 @@ def _publish_raw_manifest_entry(
     r2_prefix: str | None,
     wrangler_command: str,
     preflight_only: bool = False,
+    manifest_identity: dict[str, Any] | None = None,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
     if not isinstance(spec, dict):
         spec = {}
         errors.append("malformed_file_spec")
     filename = str(spec.get("filename") or "")
+    artifact_path = manifest_path.parent
+    sha256_actual = None
+    size_bytes = None
+
+    def refuse(reason: str | None = None) -> tuple[RawArtifactPublishEntry, None]:
+        """Report the entry unpublished, with nothing uploaded or rewritten."""
+        if reason is not None:
+            errors.append(reason)
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(artifact_path),
+                sha256=sha256_actual,
+                size_bytes=size_bytes,
+                r2_location=None,
+                upload=None,
+                errors=tuple(errors),
+            ),
+            None,
+        )
+
     if filename and not is_bare_filename(filename):
         return (
             RawArtifactPublishEntry(
@@ -2487,6 +2539,27 @@ def _publish_raw_manifest_entry(
             None,
         )
     try:
+        recorded_r2 = _validated_recorded_r2(
+            spec, manifest_path=manifest_path, year=year
+        )
+    except SourceArtifactManifestError as error:
+        # A block that does not name one object cannot be treated as history,
+        # and publishing under it would ship whichever field was read.
+        return refuse(f"recorded_r2_locator_invalid:{error}")
+    if recorded_r2 is None:
+        try:
+            _require_identity_segment(source_id, what="source_id")
+            _require_identity_segment(package_id, what="package_id")
+            _assert_manifest_identifies(
+                manifest_identity or {},
+                manifest_path,
+                source_id=source_id,
+                package_id=package_id,
+            )
+        except SourceArtifactManifestError as error:
+            return refuse(f"r2_identity_invalid:{error}")
+
+    try:
         artifact_path = (
             matching_directory_entry(manifest_path.parent, filename)
             or manifest_path.parent / filename
@@ -2514,38 +2587,9 @@ def _publish_raw_manifest_entry(
         if sha256_expected and sha256_actual != sha256_expected:
             errors.append("checksum_mismatch")
 
-    def refuse(reason: str | None = None) -> tuple[RawArtifactPublishEntry, None]:
-        """Report the entry unpublished, with nothing uploaded or rewritten."""
-        if reason is not None:
-            errors.append(reason)
-        return (
-            RawArtifactPublishEntry(
-                manifest_path=str(manifest_path),
-                source_id=source_id,
-                package_id=package_id,
-                year=str(year),
-                filename=filename,
-                local_path=str(artifact_path),
-                sha256=sha256_actual,
-                size_bytes=size_bytes,
-                r2_location=None,
-                upload=None,
-                errors=tuple(errors),
-            ),
-            None,
-        )
-
     if errors:
         return refuse()
 
-    try:
-        recorded_r2 = _validated_recorded_r2(
-            spec, manifest_path=manifest_path, year=year
-        )
-    except SourceArtifactManifestError as error:
-        # A block that does not name one object cannot be treated as history,
-        # and publishing under it would ship whichever field was read.
-        return refuse(f"recorded_r2_locator_invalid:{error}")
     if recorded_r2 is not None and (recorded_r2.sha256, recorded_r2.filename) != (
         sha256_actual or "",
         Path(filename).name,

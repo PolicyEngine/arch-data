@@ -644,3 +644,14 @@ the per-finding reproduction/fix/test/commit/port map.
   bytes after alias errors. Duplicate-alias refusal also stops before reads.
 - Case/Unicode regressions plus duplicate/symlink controls exit 0: 6 passed,
   12 warnings. Missing filenames retain their separate missing-name error.
+
+### Finding 4: canonical identities on new publication paths
+
+- Derived publication validates source/package identifiers before inference or
+  artifact reads. Raw publication preserves original argument/declaration types
+  until new-key validation, rejects noncanonical identifiers and contradictory
+  declarations before reading artifacts, and retains root-wide preflight.
+- Identity regressions plus declaration controls exit 0: 44 passed,
+  41 deselected, 12 warnings. Six historical-identity controls and the full
+  tracked-registry cutover test also pass: 7 passed, 12 warnings. Recorded
+  objects keep their original routes even when old manifests omit package_id.
