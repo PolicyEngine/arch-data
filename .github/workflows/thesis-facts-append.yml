@@ -1,6 +1,6 @@
 name: Thesis facts append gate
 
-# Deterministic review for every change to the observation chronicle. Resolver
+# Deterministic review for every change to the observation ledger. Resolver
 # appends arrive as pull requests targeting codex/thesis-ledger-facts; this
 # gate enforces the immutable frozen prefix, an append-only diff against the
 # PR base, the witnessed release chain, per-row schema and binding requirements,
@@ -97,17 +97,57 @@ jobs:
 
           # Provision the BASE commit's own hash-locked environment and run
           # the base gate with it: the gate scripts may import packaged
-          # dependencies (vidimus), and installing from the base's uv.lock
+          # dependencies, and installing from the base's uv.lock
           # keeps the PR unable to influence what code judges it.
           uv sync --locked --no-dev --project "$base_gate"
 
-          cd "$RUNNER_TEMP"
-          PYTHONPATH="$base_gate/scripts" \
-            PYTHONNOUSERSITE=1 \
+          # The gate judges the commit named here, which it checks out for
+          # itself into a private directory. The object id is always an
+          # argument and is never inferred from whatever the checkout at
+          # --root happens to be sitting at, so nothing that writes into that
+          # working tree between the fetch above and the run below can change
+          # what is judged. --root only says which clone the id is resolved in.
+          # The judge is the BASE commit's copy of the script, and --commit was
+          # introduced by a pull request into this branch. There is no ordering
+          # of that merge and the default branch's copy of this file in which
+          # both sides are new at once: a new copy of this file invoking an old
+          # base gate fails on the unknown argument, and an old copy invoking a
+          # new base gate fails on the missing required one. So ask the base
+          # gate what it accepts. The question is put to base-owned code about
+          # its own interface, not to anything the candidate controls, and the
+          # help text is captured rather than piped so that a base gate which
+          # cannot run at all stops the step instead of being read as an old
+          # one. Delete the second branch below once no base reachable from
+          # this branch predates --commit.
+          base_gate_help="$(
             uv run --locked --no-dev --project "$base_gate" \
-            python "$base_gate/scripts/check_thesis_facts_append.py" \
-              --root "$candidate" \
-              --base-ref "$BASE_SHA"
+              python "$base_gate/scripts/check_thesis_facts_append.py" --help
+          )"
+
+          cd "$RUNNER_TEMP"
+          case "$base_gate_help" in
+            *--commit*)
+              PYTHONPATH="$base_gate/scripts" \
+                PYTHONNOUSERSITE=1 \
+                uv run --locked --no-dev --project "$base_gate" \
+                python "$base_gate/scripts/check_thesis_facts_append.py" \
+                  --root "$candidate" \
+                  --commit "$MERGE_SHA" \
+                  --base-ref "$BASE_SHA"
+              ;;
+            *)
+              echo "note: the base gate at $BASE_SHA predates --commit, so it" \
+                "judges the working tree at $candidate rather than an isolated" \
+                "checkout of $MERGE_SHA. This is the base's own guarantee and" \
+                "the only one available against that base." >&2
+              PYTHONPATH="$base_gate/scripts" \
+                PYTHONNOUSERSITE=1 \
+                uv run --locked --no-dev --project "$base_gate" \
+                python "$base_gate/scripts/check_thesis_facts_append.py" \
+                  --root "$candidate" \
+                  --base-ref "$BASE_SHA"
+              ;;
+          esac
 
   append-gate:
     name: Append gate
@@ -123,7 +163,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-      - name: Enforce append-only chronicle invariants
+      - name: Enforce append-only ledger invariants
         run: |
           set -euo pipefail
           if [ "${{ github.event_name }}" = "pull_request" ]; then
@@ -139,20 +179,50 @@ jobs:
             test "$(git -C "$base_gate" rev-parse HEAD)" = "$base_sha"
 
             # Base gate runs from the BASE commit's own hash-locked env so
-            # gate imports (vidimus) resolve without the PR influencing them.
+            # gate dependencies resolve without the PR influencing them.
             uv sync --locked --no-dev --project "$base_gate"
 
-            cd "$RUNNER_TEMP"
-            PYTHONPATH="$base_gate/scripts" \
-              PYTHONNOUSERSITE=1 \
+            workspace_sha="$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"
+            [[ "$workspace_sha" =~ ^[0-9a-f]{40,64}$ ]]
+
+            # As in the trusted job above: the commit is named, not inferred,
+            # and the base gate is asked what it accepts for the same reason.
+            base_gate_help="$(
               uv run --locked --no-dev --project "$base_gate" \
-              python "$base_gate/scripts/check_thesis_facts_append.py" \
-                --root "$GITHUB_WORKSPACE" \
-                --base-ref "$base_sha"
+                python "$base_gate/scripts/check_thesis_facts_append.py" --help
+            )"
+
+            cd "$RUNNER_TEMP"
+            case "$base_gate_help" in
+              *--commit*)
+                PYTHONPATH="$base_gate/scripts" \
+                  PYTHONNOUSERSITE=1 \
+                  uv run --locked --no-dev --project "$base_gate" \
+                  python "$base_gate/scripts/check_thesis_facts_append.py" \
+                    --root "$GITHUB_WORKSPACE" \
+                    --commit "$workspace_sha" \
+                    --base-ref "$base_sha"
+                ;;
+              *)
+                echo "note: the base gate at $base_sha predates --commit, so" \
+                  "it judges the workspace rather than an isolated checkout" \
+                  "of $workspace_sha." >&2
+                PYTHONPATH="$base_gate/scripts" \
+                  PYTHONNOUSERSITE=1 \
+                  uv run --locked --no-dev --project "$base_gate" \
+                  python "$base_gate/scripts/check_thesis_facts_append.py" \
+                    --root "$GITHUB_WORKSPACE" \
+                    --base-ref "$base_sha"
+                ;;
+            esac
           else
+            # The push path names the pushed commit explicitly too. The
+            # argument is required, so there is no spelling of this run in
+            # which the commit is taken from the checkout instead.
             uv sync --locked --no-dev
             uv run --locked --no-dev \
-              python scripts/check_thesis_facts_append.py
+              python scripts/check_thesis_facts_append.py \
+                --commit "$GITHUB_SHA"
           fi
 
       - name: Install uv
@@ -166,10 +236,12 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --all-extras
 
-      - name: Chronicle observation invariants
+      - name: Ledger observation invariants
         run: >
           uv run pytest
-          tests/test_policyengine_chronicle.py
+          tests/test_policyengine_ledger.py
           tests/test_release_chain.py
           tests/test_thesis_append_adversarial.py
+          tests/test_thesis_append_shim_isolation.py
+          tests/test_receipt_shim_transparency.py
           -q
