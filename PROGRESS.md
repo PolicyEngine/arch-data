@@ -722,3 +722,29 @@ the per-finding reproduction/fix/test/commit/port map.
 - Restart the full suite at code commit `19d037f` with UV offline, offline
   OpenTimestamps client selection, and live Supabase credentials removed from
   the child environment. This keeps the required full run free of network.
+
+### Final state, done, and next (peer round 4)
+
+**State:** complete. All nine findings and the peer-review follow-ups are fixed
+in small detached-HEAD commits. Final code commit: `19d037f`; the completed
+full run included the subsequent journal commit `9fa6a1d`.
+
+**Done:**
+
+- Full `uv run pytest -q -p no:cacheprovider` returned direct exit 0:
+  **1,238 passed, 7 skipped, 42 warnings in 1,468.40s (24m 28s)**.
+  The child environment used the permitted UV cache, `UV_OFFLINE=1`, an offline
+  OpenTimestamps client command, and no live Supabase URL/service/secret keys.
+  Exact invocation and output are in `/tmp/chronicle-226-round4/out.md` and
+  `/tmp/chronicle-226-round4/full-pytest.log`.
+- Final whole-repository Ruff lint exited 0. Formatting checks on every changed
+  Python file exited 0: 8 files already formatted. Final focused integration
+  also exited 0: 434 passed, 40 warnings.
+- No tracked `db/data/**` changes, GitHub/network access, pushes, branches,
+  stashes, or edits to PR #227's worktree. Shared helper names remain intact.
+- The external report contains each finding's red command and observed failure,
+  fix, regression names, and commit SHA, plus the final verification and
+  deliberate boundaries. It records the corrected CLI-test invocation and the
+  interrupted first full run without counting either as passing verification.
+
+**Next:** none in this fix lane. No push or branch operation is authorized.
