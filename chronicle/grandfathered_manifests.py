@@ -9,10 +9,13 @@ here: a grandfathered manifest that is modified in any way -- by
 freeze and must declare its kind. A kindless manifest that is not on this list
 is an error, never a publisher table by default.
 
-The list is frozen at the freeze commit: entries are removed once a manifest
-declares its kind, and never added. ``tests/test_chronicle_manifest_kind.py``
-checks that every kindless manifest in the tree is listed here with its frozen
-digest, so a new kindless manifest cannot land.
+The pre-rule snapshot is the rebased parent ``ba8147a7``: its 168 kindless
+publisher manifests are frozen using their exact Git blob bytes. This includes
+upstream publisher packages inherited when the explicit-kind rule was rebased.
+After that snapshot, entries are removed once a manifest declares its kind,
+and never added. ``tests/test_chronicle_manifest_kind.py`` checks that every
+kindless manifest in the tree is listed here with its frozen digest, so a new
+kindless manifest cannot land.
 """
 
 from __future__ import annotations
@@ -154,8 +157,17 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
         "db/data/dwp/uc_households_children_april_december_2025/manifest.yaml": (
             "9b44c346294f84fcfb5e199f8b555d052dae828cecb7de2a633a46c34d215b62"
         ),
+        "db/data/dwp/uc_households_children_child_entitlement_april_december_2025/manifest.yaml": (
+            "fbd89ef7a56dd1dad0a4084afd55577faa39bb42c6373c2241bb8b06d76feb39"
+        ),
         "db/data/dwp/uc_households_family_type_april_december_2025/manifest.yaml": (
             "6a55f6c3219c1f8bbea56800bfa9a324f61bec446008bc412949c4f66f0ea812"
+        ),
+        "db/data/dwp/uc_households_family_type_child_entitlement_april_december_2025/manifest.yaml": (
+            "9434749696fc564e92f65544d524d99e661d61e3a63e9d0a893980cb2b45d075"
+        ),
+        "db/data/dwp/uc_households_family_type_payment_indicator_april_december_2025/manifest.yaml": (
+            "35970ad9e77107eb65115a4b2e2c652297ed3b65bce3187e0e3279f0a0ff1ed5"
         ),
         "db/data/dwp/uc_households_housing_entitlement_april_december_2025/manifest.yaml": (
             "867b596a4224ab1e73a03c6951106f49e0eb1d5821aa397a292e8bafaf9c3dba"
@@ -163,11 +175,11 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
         "db/data/dwp/uc_households_lcwra_entitlement_april_december_2025/manifest.yaml": (
             "6a0164ef778d320dbbe61e414a68066bc1b64fe42ebf5bbb6571a4d47fd7f1af"
         ),
-        "db/data/dwp/uc_payment_distribution_may_2025/manifest.yaml": (
-            "fb54f10c9829ab08b1304cf50644dff46d5241cc156edb91b081becec34558cb"
+        "db/data/dwp/uc_payment_distribution_april_december_2025/manifest.yaml": (
+            "36cc979e797b7974e97b3aeb07a30076fafb64c520a06f5de4ac9224c1f21fb6"
         ),
-        "db/data/dwp/uc_scotland_youngest_child_may_2025/manifest.yaml": (
-            "0c0d3dcb13bdb4ad391dd7198ee3b75f4e185b0000f149092ea92b767c5cb110"
+        "db/data/dwp/uc_scotland_youngest_child_april_december_2025/manifest.yaml": (
+            "d6805cd57fca758c78960d86fbfb558d20a1242755cbd9582dd9309ac1818f19"
         ),
         "db/data/dwp/uc_two_child_limit_2025/manifest.yaml": (
             "068959db08a1a970caaafed86caa1cb48e5aafc1cbd800af98fed09c309a03d4"
@@ -219,6 +231,9 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
         ),
         "db/data/hmrc/cgt_statistics_2026/manifest.yaml": (
             "939a93e7e9f7a437ea58331e0f804408b1a4481e6229bc91f41e5685d09fa4b0"
+        ),
+        "db/data/hmrc/child_benefit_august_2025/manifest.yaml": (
+            "21e66ea3ece23f1ddb1148e39063bfaac0b48535faa4a042e48c2bd6e8119c92"
         ),
         "db/data/hmrc/salary_sacrifice_reform_2029_headcounts/manifest.yaml": (
             "00e2c4d343532b946ce0c6959468554e0a9bd4059a1c7f171d0a9888f2516464"
@@ -319,6 +334,9 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
         "db/data/nbb/national_accounts_household_disposable_income_2024/manifest.yaml": (
             "699eb899809e669017d7cd6fdf0e19eb5ca1561228ff01145981883fcae02684"
         ),
+        "db/data/nisra/census2021_household_composition_country/manifest.yaml": (
+            "866e89b3a2ff72c978b580ccb429cac583f1a3f3e269ed1da67a76330b2739c8"
+        ),
         "db/data/nisra/census2021_households_lgd/manifest.yaml": (
             "6457db483b85c04378432f4f56311e5fe77852c27c35155f59435cbd5a3c2bc6"
         ),
@@ -333,6 +351,9 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
         ),
         "db/data/nrs/census2022_households_ukpc24/manifest.yaml": (
             "c6bbbc5e23dcd3e3fe61152844debd416f91111e7c8c4e9cea4b5fe9fc54c7e9"
+        ),
+        "db/data/nrs/census2022_uv113_household_composition_country/manifest.yaml": (
+            "f355baacdd659c19979fb230fd16bfa43c37114e8e5e985b3cbd9d73ee85a44e"
         ),
         "db/data/nrs/census2022_uv404_tenure_council_area/manifest.yaml": (
             "cbe62456a64cd1b2404fd79b97a730b7400fdf7ee1eef31077cc5d1fbd7bdfea"
@@ -355,6 +376,9 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
         "db/data/onem_rva/unemployment_2024/manifest.yaml": (
             "bcc298a74823509123de5cb4ace444c22f67516f009b2d9ade4adbae9b74fe2e"
         ),
+        "db/data/ons/census2021_ts003_household_composition_country/manifest.yaml": (
+            "a7144fe39fc97ffb73277e106d60d9f0abb98a7d5efff746f559ba00ba9f8a88"
+        ),
         "db/data/ons/census2021_ts041_households_lad/manifest.yaml": (
             "08b60f70f9548def4f821b0326bf1a4ae1a05fafcc703900a8221cb9689d4e7b"
         ),
@@ -365,7 +389,7 @@ GRANDFATHERED_KINDLESS_MANIFESTS: Mapping[str, str] = MappingProxyType(
             "67be94cefa57786109e29793d76bb21af374aa8325ac98c9fdbd493bd2cb7c26"
         ),
         "db/data/ons/families_households_2025/manifest.yaml": (
-            "d9ca199ec60bcf584757065e918d20d25baa010499b7ba779814a7a79c4c2d3b"
+            "4d01fab8bb69f0b6fc25b822d2711eb1d65df25c11035e1fb73994c7d0aab676"
         ),
         "db/data/ons/households_by_type_country_2025/manifest.yaml": (
             "11cb033bd19846de333c20f025773019db105fd3ca2b9bbc9cfffb9cb6def7c6"

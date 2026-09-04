@@ -1,3 +1,31 @@
+# PR #227 Astra gate round 3
+
+## State
+
+- Detached lane rebased from `28647088` onto `origin/ops-rename-slice1`
+  (`ba8147a7`). Integration checks pass; the full baseline is next. No findings fixed yet.
+- Evidence report: `/tmp/chronicle-227-fix/out.md`.
+- Prior PR #227 journal preserved beside the report as `pr227-prior-progress.md`.
+  The #226 journal below is retained verbatim.
+
+## Done
+
+- Replayed the PR #227 commits onto the new base without branches, stash, push,
+  or GitHub network. Reconciled final module versions against both branch heads.
+- Restored shared vintage validation, nonregular manifest refusals, canonical
+  identities, exact resource spelling, environment aliases, and both test sets.
+
+- Rebase integration checks passed: 537 artifact/peer/registration/package tests,
+  27 source-path tests, and 160 consumer/env/kind/vintage tests. Ruff passes.
+- Rebased the exact kindless freeze onto `ba8147a7` (168 publisher manifests),
+  without editing data files. Both public staged releases and shared table-file
+  revisions retain their distinct storage behavior.
+
+## Next
+
+- Run and record the full baseline suite from the integration commit.
+- Reproduce each finding before fixing it, then run the final required gates.
+
 # Operational rename, slice 1 (chronicle#143, mechanism 3)
 
 Lane C5's handoff notes previously lived here; its durable record is

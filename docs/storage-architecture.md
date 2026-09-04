@@ -69,8 +69,10 @@ raw/nz/ird/ird-working-for-families-statistics-sept-2025/2024/{sha256}/working-f
 The implemented country segments are `nz` and `uk`. US objects deliberately
 retain the legacy shape `raw/{source_id}/...`; migrating those keys requires a
 separate consumer audit. The fetch and raw-publish commands infer the country
-from the package publisher directory. Raw publication refuses to replace a
-manifest-recorded key that disagrees with the inferred country path.
+from the package publisher directory for new objects. A manifest-recorded raw
+object is preserved as history when its content-addressed checksum and filename
+tail identify the local bytes, including legacy routes that predate the country
+prefix and publisher-explicit routes such as Statbel's 2023 snapshots.
 
 New UK and New Zealand derived build artifacts use the same country segment
 and build-scoped keys so different builds can coexist and be audited:
@@ -87,6 +89,19 @@ derived/nz/ird/ird-working-for-families-statistics-sept-2025/2024/{build_id}/chr
 ```
 
 Legacy US derived keys likewise remain `derived/{source_id}/...`.
+
+The derived prefix defaults to `derived` and can be configured with
+`CHRONICLE_R2_DERIVED_PREFIX`, using the same legacy environment fallback as
+the bucket. Publisher and consumer validation must share this route configuration:
+facts citing a configured derived bucket or prefix are refused. The archived
+`ledger-derived`, `chronicle-derived`, and `derived/` routes remain derived.
+An explicit `publish-derived --r2-bucket ... --r2-prefix ...` combination must
+use a recognized derived bucket or prefix; configure a custom route through
+the environment before publishing it. This keeps custom build locations
+identifiable at the publisher-fact boundary.
+
+Derived artifacts are reproducible and may be replaced by a new build, but a
+specific `{build_id}` path should be immutable once published.
 
 A registered microdata release uses the same content-addressed key as any
 other raw artifact, and it exists only when the release's `access` class is
@@ -112,9 +127,6 @@ and uploaded from there. The source-artifact cache under
 `~/.cache/policyengine-chronicle/source-artifacts` is a Chronicle store too:
 the byte reader refuses a licensed or restricted entry before it would read,
 fetch into, or serve from that cache.
-
-Derived artifacts are reproducible and may be replaced by a new build, but a
-specific `{build_id}` path should be immutable once published.
 
 ## Publisher Revisions
 
@@ -189,18 +201,24 @@ Most packages keep one `manifest.yaml`. A publisher directory that feeds
 several source packages keeps one manifest each —
 `db/data/irs_soi/ira_contributions/` holds
 `manifest_traditional_source_package.yaml` beside
-`manifest_roth_source_package.yaml` — and the entry being revised lives in
-exactly one of them. `fetch-artifact --manifest <filename>` selects it;
-defaulting to `manifest.yaml` there would write a third manifest neither
-package reads, and the recorded block would never be compared at all. The name
-must be a filename inside `--out-dir`, not a path.
+`manifest_roth_source_package.yaml`. `fetch-artifact --manifest <filename>`
+selects the entry whose publisher metadata the fetch updates; defaulting to
+`manifest.yaml` there would write a third manifest neither package reads. A
+physical artifact can also be owned by several entries in that directory (the
+tracked USDA SNAP archive spans two manifests, and SSA extracts have semantic
+aliases within one). Chronicle compares every such owner before overwriting the
+file. A changed archive is refused by default; `--record-revision` updates every
+owner to the new checksum and preserves each owner's own R2 block in
+`storage.previous_r2`. The manifest selector must be a filename inside
+`--out-dir`, not a path.
 
 ### What a recorded block has to say
 
-A `storage.r2` block's `provider`, `bucket`, `key` and `uri` all describe one
-object, so every field that is present is cross-checked against every other:
-the key against the URI's path, the bucket against its authority, the provider
-against its scheme, and the resulting key against the content-addressed
+A `storage.r2` block must explicitly say `provider: r2` and carry an `r2://`
+URI. Its `provider`, `bucket`, `key` and `uri` all describe one object, so every
+additional field that is present is cross-checked against the URI: the key
+against its path, the bucket against its authority, the provider against its
+scheme, and the resulting key against the content-addressed
 `{sha256}/{filename}` shape. A block whose fields disagree does not answer
 "which bytes does this entry claim R2 holds", so it is an error rather than
 something to preserve or publish under. Likewise a manifest that parses as
@@ -228,9 +246,10 @@ The registry should expose:
   authority, legal vintage, and evidence;
 - build metadata, validation status, and derived artifact R2 bucket/key/URI.
 
-The current Supabase migration mirrors the core relational tables and includes
-R2 location fields for raw source artifacts and derived build artifacts, so the
-registry can serve as the shared index over both R2 buckets.
+A deployment migration for the selected Supabase schema must mirror the core
+relational tables and include R2 location fields for raw source artifacts and
+derived build artifacts, so the registry can serve as the shared index over
+both R2 buckets.
 
 ## Build And Publish Flow
 
@@ -274,9 +293,11 @@ The intended flow is:
      --build-artifacts /tmp/chronicle-build-artifacts.jsonl
    ```
 
-The Supabase project must have the checked migration applied and the `chronicle`
-schema exposed in PostgREST/Data API settings before the REST loader can write
-to it. Use `--dry-run` to verify local JSONL files without writing.
+The Supabase project must have a deployment migration for the selected schema
+applied and that schema exposed in PostgREST/Data API settings before the REST
+loader can write to it. The load defaults to `ledger`; set
+`CHRONICLE_SCHEMA=chronicle` or pass `--schema chronicle` to target a migrated
+`chronicle` schema. Use `--dry-run` to verify local JSONL files without writing.
 
 ## Environment Variable Rename Window
 

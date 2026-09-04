@@ -1157,7 +1157,7 @@ def test_source_artifact_spec_refuses_invalid_recorded_r2_before_read(
         recorded["key"] = recorded["key"].replace("table.csv", "other.csv")
         recorded["uri"] = recorded["uri"].replace("table.csv", "other.csv")
     (resource_dir / "manifest.yaml").write_text(
-        yaml.safe_dump({"files": {2024: entry}})
+        yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}})
     )
     (resource_dir / "table.csv").write_bytes(content)
 
@@ -1178,7 +1178,7 @@ def test_source_artifact_spec_checks_recorded_r2_digest_without_declared_checksu
     artifact, resource_dir, _content, entry = recorded_r2_artifact
     del entry["sha256"]
     (resource_dir / "manifest.yaml").write_text(
-        yaml.safe_dump({"files": {2024: entry}})
+        yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}})
     )
     changed_content = b"different publisher bytes"
     cache = tmp_path / "cache"
@@ -1200,7 +1200,7 @@ def test_source_artifact_spec_checks_recorded_r2_digest_without_declared_checksu
 def test_source_artifact_spec_accepts_consistent_recorded_r2(recorded_r2_artifact):
     artifact, resource_dir, content, entry = recorded_r2_artifact
     (resource_dir / "manifest.yaml").write_text(
-        yaml.safe_dump({"files": {2024: entry}})
+        yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}})
     )
     (resource_dir / "table.csv").write_bytes(content)
 
@@ -1226,7 +1226,7 @@ def test_source_artifact_spec_refuses_non_regular_resource_before_open(
         os.mkfifo(resource)
     if resource_kind == "artifact":
         (resource_dir / "manifest.yaml").write_text(
-            yaml.safe_dump({"files": {2024: entry}})
+            yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}})
         )
 
     def unexpected_read(_artifact_path, _spec):
@@ -1253,7 +1253,7 @@ def test_source_artifact_spec_reads_regular_importlib_zip_resources(
         archive.writestr("data/publisher/package/table.csv", content)
         archive.writestr(
             "data/publisher/package/manifest.yaml",
-            yaml.safe_dump({"files": {2024: entry}}),
+            yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}}),
         )
     with ZipFile(buffer) as archive:
         monkeypatch.setattr(
@@ -1267,7 +1267,7 @@ def test_source_artifact_spec_fetches_absent_regular_resource(
 ):
     artifact, resource_dir, content, entry = recorded_r2_artifact
     (resource_dir / "manifest.yaml").write_text(
-        yaml.safe_dump({"files": {2024: entry}})
+        yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}})
     )
     monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(tmp_path / "cache"))
     monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
@@ -1307,13 +1307,14 @@ def test_source_artifact_spec_refuses_unsafe_manifest_filename_before_read(
     (resource_dir / "manifest.yaml").write_text(
         yaml.safe_dump(
             {
+                "kind": "publisher_table",
                 "files": {
                     2024: {
                         "filename": filename,
                         "source_url": outside.as_uri(),
                         "sha256": hashlib.sha256(outside.read_bytes()).hexdigest(),
                     }
-                }
+                },
             },
             sort_keys=False,
         )
@@ -1363,12 +1364,13 @@ def test_source_artifact_spec_refuses_unsafe_manifest_path_before_artifact_read(
     resource_dir = resource_root / "data" / "publisher" / "package"
     resource_dir.mkdir(parents=True)
     payload = {
+        "kind": "publisher_table",
         "files": {
             2024: {
                 "filename": "table.csv",
                 "source_url": "https://example.test/table.csv",
             }
-        }
+        },
     }
     outside_manifest = resource_dir.parent / "outside-manifest.yaml"
     outside_manifest.write_text(yaml.safe_dump(payload, sort_keys=False))

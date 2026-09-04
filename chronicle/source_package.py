@@ -121,6 +121,7 @@ SOURCE_PACKAGE_ALIASES = {
         "hmrc/salary_sacrifice_reform_2029_headcounts"
     ),
     "hmrc-tax-free-childcare-march-2026": Path("hmrc/tax_free_childcare_march_2026"),
+    "hmrc-child-benefit-august-2025": Path("hmrc/child_benefit_august_2025"),
     "ici-fact-book-table-30": Path("ici/fact_book_table_30"),
     "isc-annual-census-2023": Path("isc/annual_census_2023"),
     "isc-annual-census-2024": Path("isc/annual_census_2024"),
@@ -200,11 +201,20 @@ SOURCE_PACKAGE_ALIASES = {
     "dwp-uc-households-lcwra-entitlement-april-december-2025": Path(
         "dwp/uc_households_lcwra_entitlement_april_december_2025"
     ),
-    "dwp-uc-payment-distribution-may-2025": Path(
-        "dwp/uc_payment_distribution_may_2025"
+    "dwp-uc-households-family-type-child-entitlement-april-december-2025": Path(
+        "dwp/uc_households_family_type_child_entitlement_april_december_2025"
     ),
-    "dwp-uc-scotland-youngest-child-may-2025": Path(
-        "dwp/uc_scotland_youngest_child_may_2025"
+    "dwp-uc-households-children-child-entitlement-april-december-2025": Path(
+        "dwp/uc_households_children_child_entitlement_april_december_2025"
+    ),
+    "dwp-uc-households-family-type-payment-indicator-april-december-2025": Path(
+        "dwp/uc_households_family_type_payment_indicator_april_december_2025"
+    ),
+    "dwp-uc-payment-distribution-april-december-2025": Path(
+        "dwp/uc_payment_distribution_april_december_2025"
+    ),
+    "dwp-uc-scotland-youngest-child-april-december-2025": Path(
+        "dwp/uc_scotland_youngest_child_april_december_2025"
     ),
     "dwp-uc-two-child-limit-2025": Path("dwp/uc_two_child_limit_2025"),
     "cbo-revenue-projections-income-by-source-2026-02": Path(
@@ -324,6 +334,9 @@ SOURCE_PACKAGE_ALIASES = {
         "kff/marketplace_effectuated_enrollment"
     ),
     "ons-census2021-ts041-households-lad": Path("ons/census2021_ts041_households_lad"),
+    "ons-census2021-ts003-household-composition-country": Path(
+        "ons/census2021_ts003_household_composition_country"
+    ),
     "ons-census2021-ts041-households-pcon24": Path(
         "ons/census2021_ts041_households_pcon24"
     ),
@@ -340,6 +353,9 @@ SOURCE_PACKAGE_ALIASES = {
     "ons-pipr-rents-by-area-june-2026": Path("ons/pipr_rents_by_area_june_2026"),
     "nrs-census2022-households-ukpc24": Path("nrs/census2022_households_ukpc24"),
     "nrs-pcon24-population-by-age-2024": Path("nrs/pcon24_population_by_age_2024"),
+    "nrs-census2022-uv113-household-composition-country": Path(
+        "nrs/census2022_uv113_household_composition_country"
+    ),
     "nrs-census2022-uv404-tenure-council-area": Path(
         "nrs/census2022_uv404_tenure_council_area"
     ),
@@ -347,6 +363,9 @@ SOURCE_PACKAGE_ALIASES = {
     "nisra-census2021-households-pcon24": Path("nisra/census2021_households_pcon24"),
     "nisra-pcon24-population-by-age-2024": Path("nisra/pcon24_population_by_age_2024"),
     "nisra-census2021-tenure-lgd": Path("nisra/census2021_tenure_lgd"),
+    "nisra-census2021-household-composition-country": Path(
+        "nisra/census2021_household_composition_country"
+    ),
     "ons-uk-population-projections-2024": Path("ons/npp_2024_uk"),
     "scotgov-band-d-council-tax-rates-2026-27": Path(
         "scotgov/band_d_council_tax_rates_2026_27"
@@ -871,19 +890,109 @@ class SourceArtifactSpec:
             raw_r2_uri=raw_r2.get("uri"),
         )
 
+    def _resource_root(self) -> Any:
+        """Resolve the resource directory, refusing an escape from the package.
+
+        ``resource_directory`` is joined under ``files(resource_package)``; an
+        absolute value would discard that root entirely, a ``..`` or ``.``
+        component would step outside it, and a symlinked ancestor would follow
+        the link out of the package tree. Every byte and manifest read goes
+        through here, so the containment check runs before any I/O.
+        """
+        raw = self.resource_directory
+        parts = str(raw).split("/")
+        if (
+            not isinstance(raw, str)
+            or not raw
+            or raw.startswith("/")
+            or "\\" in raw
+            or any(
+                not part or part in (".", "..") or part != part.strip()
+                for part in parts
+            )
+        ):
+            raise ValueError(
+                f"resource_directory must be a relative path of plain segments "
+                f"inside the resource package, not {raw!r}."
+            )
+        root = files(self.resource_package)
+        directory = root.joinpath(raw)
+        if isinstance(root, Path):
+            current = root
+            for part in parts:
+                current = current / part
+                if current.is_symlink():
+                    raise ValueError(
+                        f"resource_directory component {current} is a symbolic "
+                        "link. Chronicle will not read source-package data "
+                        "through it."
+                    )
+            resolved_root = root.resolve()
+            if not Path(directory).resolve().is_relative_to(resolved_root):
+                raise ValueError(
+                    f"resource_directory {raw!r} escapes the resource package "
+                    f"root {resolved_root}."
+                )
+        return directory
+
+    def _resource_entry(
+        self,
+        value: Any,
+        *,
+        what: str,
+        require_manifest_name: bool = False,
+        forbid_manifest_name: bool = False,
+    ) -> Any:
+        """Resolve one safe file entry under the package resource directory."""
+        if not is_bare_filename(value):
+            raise ValueError(
+                f"{what} must be a bare filename inside "
+                f"{self.resource_directory}, not {value!r}."
+            )
+        name = str(value)
+        if require_manifest_name and not is_manifest_filename(name):
+            raise ValueError(
+                f"{what} must be named manifest.yaml or "
+                f"manifest_<package>.yaml, not {name!r}."
+            )
+        if forbid_manifest_name and is_manifest_filename(name):
+            raise ValueError(
+                f"{what} {name!r} is a manifest name and cannot be read as "
+                "source artifact bytes."
+            )
+
+        directory = self._resource_root()
+        existing = matching_directory_entry(directory, name)
+        if existing is None:
+            return directory.joinpath(name)
+        is_symlink = getattr(existing, "is_symlink", None)
+        if callable(is_symlink) and is_symlink():
+            raise ValueError(
+                f"{what} {existing} is a symbolic link. Chronicle will not "
+                "read source-package data through it."
+            )
+        if existing.name != name:
+            raise ValueError(
+                f"{what} {existing} has the same normalized filename as "
+                f"{name!r}. Keep exactly one spelling in the package."
+            )
+        if not existing.is_file():
+            raise ValueError(
+                f"{what} {existing} is not a regular file. Chronicle will "
+                "not open non-regular source-package resources."
+            )
+        return existing
+
     def manifest_resource(self) -> Any:
-        """Return the manifest file this package spec points at."""
-        return files(self.resource_package).joinpath(
-            self.resource_directory,
+        """Return the validated manifest file this package spec points at."""
+        return self._resource_entry(
             self.manifest,
+            what="Source artifact manifest",
+            require_manifest_name=True,
         )
 
     def manifest_payload(self) -> dict[str, Any]:
-        """Load the artifact manifest this package spec points at, strictly.
-
-        A document with duplicate keys is refused rather than read through
-        whichever entry YAML kept.
-        """
+        """Load the artifact manifest strictly as a YAML mapping."""
         with self.manifest_resource().open("r", encoding="utf-8") as file:
             text = file.read()
         try:
@@ -927,7 +1036,7 @@ class SourceArtifactSpec:
     ) -> None:
         """Validate every current-manifest entry before selecting one to read."""
         manifest_label = manifest_name or self.manifest
-        directory = files(self.resource_package).joinpath(self.resource_directory)
+        directory = self._resource_root()
         manifest_path = directory.joinpath(manifest_label)
         kind = manifest_kind(manifest, manifest_path=manifest_path)
         codes: list[str] = list(validate_manifest_files(manifest))
@@ -972,6 +1081,11 @@ class SourceArtifactSpec:
         self._assert_manifest_kind_is_parseable(manifest)
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
         _assert_entry_bytes_readable(spec)
+        self._resource_entry(
+            spec.get("filename"),
+            what="Source artifact filename",
+            forbid_manifest_name=True,
+        )
         self._assert_complete_manifest_valid(manifest)
         self._assert_no_sibling_hash_only_registration(spec, manifest)
         return manifest, spec
@@ -993,13 +1107,16 @@ class SourceArtifactSpec:
         """
         if not isinstance(spec, dict):
             return
-        directory = files(self.resource_package).joinpath(self.resource_directory)
+        directory = self._resource_root()
         manifests: dict[str, dict[str, Any]] = {self.manifest: manifest}
         for item in directory.iterdir():
             if item.name == self.manifest or not is_manifest_filename(item.name):
                 continue
-            if not item.is_file():
-                continue
+            item = self._resource_entry(
+                item.name,
+                what="Sibling source artifact manifest",
+                require_manifest_name=True,
+            )
             try:
                 with item.open("r", encoding="utf-8") as file:
                     payload = load_manifest_document(file.read())
@@ -1068,14 +1185,11 @@ class SourceArtifactSpec:
         year: int,
     ) -> tuple[bytes, str, str, dict[str, str]]:
         manifest, spec = self._parseable_entry(year)
-        if not is_bare_filename(spec.get("filename")):
-            raise ValueError(
-                f"Source artifact filename must be a bare filename inside "
-                f"{self.resource_directory}, not {spec.get('filename')!r}."
-            )
-        artifact_path = files(self.resource_package).joinpath(
-            self.resource_directory,
-            spec["filename"],
+        filename = spec.get("filename")
+        artifact_path = self._resource_entry(
+            filename,
+            what="Source artifact filename",
+            forbid_manifest_name=True,
         )
         manifest_path = Path(self.resource_directory) / self.manifest
         try:
@@ -1090,8 +1204,8 @@ class SourceArtifactSpec:
             raise ManifestAccessError(str(exc)) from exc
         expected_sha = spec.get("sha256")
         if recorded_r2 is not None and (
-            recorded_r2.filename != Path(spec["filename"]).name
-            or (expected_sha and recorded_r2.sha256 != str(expected_sha))
+            recorded_r2.filename != filename
+            or (expected_sha is not None and recorded_r2.sha256 != expected_sha)
         ):
             raise ManifestAccessError(
                 f"{manifest_path} entry {self.artifact_year or year!r} "
@@ -1101,13 +1215,18 @@ class SourceArtifactSpec:
                 f"filename={spec['filename']!r}. No source bytes will be read "
                 "through a locator for another artifact."
             )
+        if recorded_r2 is not None:
+            expected_sha = recorded_r2.sha256
+            # The immutable object supplies the checksum when the manifest
+            # omits it, so a publisher mismatch is refused before cache writes.
+            spec = {**spec, "sha256": expected_sha}
         content = _read_source_artifact_content(artifact_path, spec)
         actual_sha = hashlib.sha256(content).hexdigest()
         if expected_sha:
             _validate_source_artifact_sha(
                 content,
                 expected_sha=str(expected_sha),
-                filename=str(spec["filename"]),
+                filename=str(filename),
             )
         if recorded_r2 is not None and recorded_r2.sha256 != actual_sha:
             raise ManifestAccessError(

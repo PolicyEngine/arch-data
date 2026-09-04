@@ -2707,16 +2707,9 @@ def test_inventory_reports_manifest_level_defects(tmp_path):
     report = inventory_source_artifacts(tmp_path / "data")
 
     assert not report.valid
-    assert any(
-        error.startswith("duplicate_vintage_key:2023") for error in report.errors
-    )
-    assert any(
-        error.startswith("non_canonical_filename:../a.ods") for error in report.errors
-    )
-    # A non-bare name is never resolved to a path outside the package.
-    first = next(entry for entry in report.entries if entry.filename == "../a.ods")
-    assert first.local_path == str(package)
-    assert "missing_file" not in first.errors
+    assert any("duplicate_vintage_key:2023" in error for error in report.errors)
+    # The shared loader refuses the whole document before entry/path inspection.
+    assert report.entries == ()
 
 
 # --------------------------------------------------------------------------

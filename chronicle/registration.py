@@ -197,13 +197,42 @@ class StrictManifestLoader(yaml.SafeLoader):
         return mapping
 
 
-def load_manifest_document(text: str) -> Any:
-    """Parse a manifest document, refusing duplicate keys.
+def validate_manifest_vintages(payload: Any) -> None:
+    """Refuse different keys that identify one logical ``files`` vintage.
 
-    Raises :class:`yaml.YAMLError` (a ``ConstructorError`` naming the
-    duplicate key) for a document YAML would otherwise silently collapse.
+    YAML distinguishes integer ``2024`` from quoted ``"2024"``, but manifest
+    consumers select or report them as the same vintage. Validate the entire
+    manifest, including vintages other than the one a caller requested, before
+    any consumer can read artifact bytes or construct publication routes.
+
+    Leave non-mapping documents and ``files`` blocks to the consumers' existing
+    shape checks. Labels retain their spelling, including leading zeroes.
     """
-    return yaml.load(text, Loader=StrictManifestLoader)  # noqa: S506
+    files = payload.get("files") if isinstance(payload, Mapping) else None
+    if not isinstance(files, Mapping):
+        return
+    seen: dict[str, Any] = {}
+    for vintage in files:
+        identity = str(vintage)
+        if identity in seen:
+            raise yaml.YAMLError(
+                f"duplicate_vintage_key:{identity}: Vintage {identity!r} is recorded under both keys "
+                f"{seen[identity]!r} and {vintage!r}; one vintage has one key. "
+                "Merge the entries by hand first. Chronicle will not choose "
+                "which entry is the record."
+            )
+        seen[identity] = vintage
+
+
+def load_manifest_document(text: str) -> Any:
+    """Parse a manifest document, refusing duplicate keys and vintages.
+
+    Raises :class:`yaml.YAMLError` for keys YAML would silently collapse or
+    for distinct YAML keys that manifest consumers treat as one vintage.
+    """
+    payload = yaml.load(text, Loader=StrictManifestLoader)  # noqa: S506
+    validate_manifest_vintages(payload)
+    return payload
 
 
 class ManifestAccessError(ValueError):
@@ -437,14 +466,8 @@ _MANIFEST_FILENAME_RE = re.compile(r"^manifest(?:_[^/\\]+)?\.ya?ml$", re.IGNOREC
 
 
 def is_manifest_filename(value: Any) -> bool:
-    """Whether ``value`` is a name a package manifest may carry.
-
-    The sweeps address manifests by name (``manifest.yaml`` by default,
-    ``manifest_<package>.yaml`` for a directory that feeds several source
-    packages), so a manifest under any other name is invisible to them, and
-    an artifact under one of these names would overwrite a manifest.
-    """
-    return is_bare_filename(value) and bool(_MANIFEST_FILENAME_RE.match(str(value)))
+    """Whether ``value`` is a package-manifest filename."""
+    return is_bare_filename(value) and bool(_MANIFEST_FILENAME_RE.fullmatch(str(value)))
 
 
 def package_manifest_paths(package_dir: Path) -> list[Path]:
@@ -452,11 +475,17 @@ def package_manifest_paths(package_dir: Path) -> list[Path]:
     directory = Path(package_dir)
     if not directory.is_dir():
         return []
-    return sorted(
-        path
-        for path in directory.iterdir()
-        if path.is_file() and is_manifest_filename(path.name)
-    )
+    manifests = []
+    for path in sorted(directory.iterdir()):
+        if not is_manifest_filename(path.name):
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(
+                f"{path} carries a manifest name but is not a regular file; "
+                "Chronicle will not register beside it or sweep past it."
+            )
+        manifests.append(path)
+    return manifests
 
 
 def iter_directory_entries(
@@ -1373,22 +1402,25 @@ def _prepare_registration_payload(
 def matching_directory_entry(directory: Any, filename: Any) -> Any | None:
     """Return the actual directory entry matching a bare filename's safe key.
 
-    ``directory`` may be a :class:`pathlib.Path` or an importlib-resources
-    Traversable. Scanning its real entries is required on case-sensitive filesystems:
-    Chronicle treats case-folded and Unicode-normalized spellings as one artifact
-    identity even when the filesystem can physically store both spellings.
+    Scanning real entries makes the identity rule the same on case-sensitive
+    and case-folding filesystems, including Unicode-normalized aliases.
     """
     if not is_bare_filename(filename) or not directory.is_dir():
         return None
     wanted = filename_key(filename)
-    return next(
-        (
-            path
-            for path in sorted(directory.iterdir(), key=lambda item: item.name)
-            if filename_key(path.name) == wanted
-        ),
-        None,
-    )
+    matches = [
+        path
+        for path in sorted(directory.iterdir(), key=lambda item: item.name)
+        if filename_key(path.name) == wanted
+    ]
+    if len(matches) > 1:
+        names = ", ".join(repr(path.name) for path in matches)
+        raise ValueError(
+            f"{filename!r} matches more than one physical entry ({names}); "
+            "the package holds conflicting spellings of one artifact identity "
+            "and must be repaired by hand."
+        )
+    return matches[0] if matches else None
 
 
 def _assert_no_local_artifact_bytes(
@@ -1891,6 +1923,7 @@ __all__ = [
     "strict_entry_access",
     "validate_file_entry",
     "validate_manifest_files",
+    "validate_manifest_vintages",
     "validate_package_directory",
     "vintage_key_forms",
 ]

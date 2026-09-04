@@ -27,6 +27,7 @@ def _package(tmp_path, *, filename="table.csv", manifest_name="manifest.yaml"):
     (package / filename).write_bytes(content)
     manifest_path = package / manifest_name
     manifest = {
+        "kind": "publisher_table",
         "source_id": "publisher",
         "package_id": "package",
         "files": {

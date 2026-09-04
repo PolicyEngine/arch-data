@@ -41,7 +41,7 @@ from chronicle.source_package import SourceArtifactSpec, validate_source_package
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FREEZE_SIZE = 161
+FREEZE_SIZE = 168
 
 
 def _tracked_manifests() -> list[Path]:
