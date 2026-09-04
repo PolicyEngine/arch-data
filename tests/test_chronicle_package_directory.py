@@ -736,6 +736,36 @@ def test_inventory_reports_collisions_across_manifests(tmp_path):
     assert not any("table.ods" in code for code in codes)
 
 
+def test_inventory_does_not_read_bytes_for_an_invalid_entry(tmp_path, monkeypatch):
+    package = tmp_path / "data" / "dwp" / "frs_2023_24"
+    entry = _public_table_entry("adult.tab", LICENSED_BYTES)
+    entry["Access"] = "licensed"
+    entry.pop("access")
+    _write(
+        package / "manifest_tables.yaml",
+        _table_manifest(files={2023: entry}),
+    )
+    artifact_path = package / "adult.tab"
+    artifact_path.write_bytes(LICENSED_BYTES)
+    reads = []
+    real_read_bytes = Path.read_bytes
+
+    def record_artifact_read(path):
+        if path == artifact_path:
+            reads.append(path)
+        return real_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", record_artifact_read)
+
+    report = inventory_source_artifacts(
+        package, manifest_filename="manifest_tables.yaml"
+    )
+
+    assert not report.valid
+    assert reads == []
+    assert "misspelled_field:Access" in report.entries[0].errors
+
+
 def test_two_manifests_may_record_one_public_file_as_the_same_bytes(tmp_path):
     """The tracked shape: manifest.yaml and manifest_<package>.yaml both
     record one publisher file with one digest (db/data/usda_snap/...)."""
