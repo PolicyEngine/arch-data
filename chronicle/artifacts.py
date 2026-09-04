@@ -56,11 +56,37 @@ _MANIFEST_FILENAME_RE = re.compile(
 )
 
 
+def is_bare_filename(value: Any) -> bool:
+    """Whether ``value`` names a file inside a directory, with no path."""
+    if value is None:
+        return False
+    text = str(value).strip()
+    if not text or text != str(value) or text in (".", ".."):
+        return False
+    if "/" in text or "\\" in text or "\x00" in text:
+        return False
+    return Path(text).name == text
+
+
+def bare_filename(value: Any, *, what: str = "filename") -> str:
+    """Return ``value`` as a bare filename, refusing any other spelling.
+
+    ``./table.csv``, ``nested/table.csv`` and an absolute path all resolve
+    outside the one-name manifest contract once joined under a package, so
+    fetch validates the spelling before reading publisher bytes.
+    """
+    if not is_bare_filename(value):
+        raise ArtifactFilenameError(
+            f"{what} must be a bare filename inside the package directory, not "
+            f"{value!r}; it may not carry a directory, '.', '..', a trailing "
+            "slash, surrounding whitespace, or an absolute path."
+        )
+    return str(value)
+
+
 def is_manifest_filename(value: Any) -> bool:
     """Whether ``value`` is a package-manifest filename."""
-    if not isinstance(value, str) or not value or value != value.strip():
-        return False
-    return value == Path(value).name and bool(_MANIFEST_FILENAME_RE.fullmatch(value))
+    return is_bare_filename(value) and bool(_MANIFEST_FILENAME_RE.fullmatch(str(value)))
 
 
 def package_manifest_paths(package_dir: Path) -> list[Path]:
@@ -84,21 +110,10 @@ def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
     """
     if manifest_filename != DEFAULT_MANIFEST_FILENAME:
         return sorted(path for path in root.rglob(manifest_filename) if path.is_file())
-    package_dirs = {
-        path.parent
-        for pattern in (
-            "manifest.yaml",
-            "manifest.yml",
-            "manifest_*.yaml",
-            "manifest_*.yml",
-        )
-        for path in root.rglob(pattern)
-        if path.is_file()
-    }
     return sorted(
-        manifest_path
-        for package_dir in package_dirs
-        for manifest_path in package_manifest_paths(package_dir)
+        path
+        for path in root.rglob("*")
+        if path.is_file() and is_manifest_filename(path.name)
     )
 
 
@@ -114,6 +129,13 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
             "Manifest must name a file inside the package directory, not "
             f"{manifest_filename!r}."
         )
+    if not is_manifest_filename(name):
+        raise ManifestNameError(
+            f"Manifest must be named {DEFAULT_MANIFEST_FILENAME} or "
+            f"manifest_<package>.yaml, not {manifest_filename!r}: the sweeps "
+            "address a package's manifests by those names, and a manifest "
+            "under any other name is invisible to them."
+        )
     return output / name
 
 
@@ -122,7 +144,7 @@ def _sibling_manifests(output: Path) -> list[str]:
     return sorted(
         path.name
         for path in package_manifest_paths(output)
-        if path.stem.startswith("manifest_")
+        if path.stem.lower().startswith("manifest_")
     )
 
 
@@ -234,6 +256,10 @@ class ManifestNameError(SourceArtifactManifestError, ValueError):
     """
 
 
+class ArtifactFilenameError(SourceArtifactManifestError, ValueError):
+    """An artifact filename is not a bare, non-manifest package filename."""
+
+
 class AmbiguousManifestError(SourceArtifactManifestError):
     """The default manifest name would create a manifest beside the ones a
     package already keeps (PolicyEngine/chronicle#225)."""
@@ -250,12 +276,13 @@ class MalformedManifestError(SourceArtifactManifestError):
 class RecordedR2LocatorError(SourceArtifactManifestError):
     """A recorded ``storage.r2`` block does not locate exactly one object.
 
-    ``provider``, ``bucket``, ``key`` and ``uri`` all describe the same object,
-    so any that are supplied have to agree, and the key has to carry the
-    ``{sha256}/{filename}`` tail that says which bytes it holds. A block whose
-    fields contradict each other has no single answer to "which bytes does this
-    entry claim R2 holds", and preserving or publishing under it would ship
-    whichever field the reader happened to consult.
+    The provider and URI must explicitly identify R2. ``provider``, ``bucket``,
+    ``key`` and ``uri`` all describe the same object, so any additional fields
+    have to agree, and the key has to carry the ``{sha256}/{filename}`` tail
+    that says which bytes it holds. A block whose fields contradict each other
+    has no single answer to "which bytes does this entry claim R2 holds", and
+    preserving or publishing under it would ship whichever field the reader
+    happened to consult.
     """
 
 
@@ -713,6 +740,19 @@ def fetch_source_artifact(
     r2_bucket = r2_bucket or default_r2_raw_bucket()
     output = Path(output_dir)
     manifest_path = _manifest_path(output, manifest_filename)
+    what = (
+        "--filename" if filename is not None else "The filename inferred from the URL"
+    )
+    artifact_filename = bare_filename(
+        filename if filename is not None else _infer_artifact_filename(source_url),
+        what=what,
+    )
+    if is_manifest_filename(artifact_filename):
+        raise ArtifactFilenameError(
+            f"{what} {artifact_filename!r} is a manifest name. An artifact may "
+            "not be named like a manifest, which it would overwrite; pass "
+            "--filename with the publisher's name for the bytes."
+        )
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
         default_prefix=DEFAULT_R2_PREFIX,
@@ -743,10 +783,7 @@ def fetch_source_artifact(
     )
 
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
-    content, inferred_filename = _read_artifact(source_url)
-    artifact_filename = filename or inferred_filename
-    if not artifact_filename:
-        raise ValueError("Could not infer artifact filename; pass --filename.")
+    content, _inferred_filename = _read_artifact(source_url)
 
     sha256 = hashlib.sha256(content).hexdigest()
     size_bytes = len(content)
@@ -1392,6 +1429,23 @@ def _filename_from_url(source_url: str) -> str:
     return Path(unquote(parsed.path)).name
 
 
+def _infer_artifact_filename(source_url: str) -> str:
+    """Return the filename :func:`_read_artifact` would report, without I/O.
+
+    The name is a pure function of the URL: the last path segment for http(s)
+    and ``file://`` URLs, the basename for a bare path. Resolving it before
+    the read lets every filename guard run before the publisher is touched.
+    """
+    parsed = urlparse(source_url)
+    if parsed.scheme in ("http", "https"):
+        return _filename_from_url(source_url)
+    if parsed.scheme == "file":
+        return Path(unquote(parsed.path)).name
+    if not parsed.scheme:
+        return Path(source_url).name
+    raise ValueError(f"Unsupported source URL scheme: {parsed.scheme}")
+
+
 def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     """Return a manifest's parsed payload, refusing a document it cannot read.
 
@@ -1530,12 +1584,13 @@ def _validated_recorded_r2(
 ) -> RecordedR2Object | None:
     """Return the object a recorded ``storage.r2`` block names, or None.
 
-    Every locator field the block supplies is cross-checked against every
-    other: ``key`` against the URI's path, ``bucket`` against its authority,
-    ``provider`` against its scheme, and the resulting key against the
-    canonical content-addressed shape :func:`build_r2_key` writes. Reading one
-    field and trusting the rest is what lets a block that says two different
-    things survive a preserve or a publish.
+    The block must explicitly record provider ``r2`` and an ``r2://`` URI.
+    Every additional locator field it supplies is cross-checked against that
+    URI: ``key`` against its path, ``bucket`` against its authority, and the
+    resulting key against the canonical content-addressed shape
+    :func:`build_r2_key` writes. Reading one field and trusting the rest is
+    what lets a block that says two different things survive a preserve or a
+    publish.
     """
     storage = _validated_recorded_storage(spec, manifest_path=manifest_path, year=year)
     if "r2" not in storage:
@@ -1562,6 +1617,20 @@ def _validated_recorded_r2(
     bucket = supplied.get("bucket")
     key = supplied.get("key")
     uri = supplied.get("uri")
+    missing_required = [
+        field for field in ("provider", "uri") if not supplied.get(field)
+    ]
+    if missing_required:
+        raise RecordedR2LocatorError(
+            f"{where}: records no {', '.join(missing_required)}. A block under "
+            "storage.r2 must explicitly record provider='r2' and an r2:// URI."
+        )
+    if provider != "r2":
+        raise RecordedR2LocatorError(
+            f"{where}: provider={provider!r} does not identify R2. A block "
+            "under storage.r2 must use provider='r2' and an r2:// URI, not "
+            f"{provider}://."
+        )
     if uri is not None:
         parts = _split_r2_uri(uri)
         if parts is None:
@@ -1598,13 +1667,6 @@ def _validated_recorded_r2(
             "locate its object: provider, bucket and key, or a uri that "
             "supplies them."
         )
-    if provider != "r2":
-        raise RecordedR2LocatorError(
-            f"{where}: provider={provider!r} does not identify R2. A block "
-            "under storage.r2 must use provider='r2' and an r2:// URI, not "
-            f"{provider}://."
-        )
-
     segments = key.split("/")
     if (
         len(segments) < 2

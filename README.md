@@ -449,9 +449,9 @@ uv run chronicle load-supabase-mirror \
   --build-artifacts /tmp/chronicle-build-artifacts.jsonl
 ```
 
-With neither `CHRONICLE_SCHEMA` nor `--schema`, this command writes to `ledger`.
-To load a migrated `chronicle` schema instead, set `CHRONICLE_SCHEMA=chronicle`
-or pass `--schema chronicle`.
+With no schema environment override and no `--schema`, this command
+writes to `ledger`. To load a migrated `chronicle` schema instead, set
+`CHRONICLE_SCHEMA=chronicle` or pass `--schema chronicle`.
 
 Use `--dry-run` first to validate JSONL row counts and file coverage without
 writing to Supabase.

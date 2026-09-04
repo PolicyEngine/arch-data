@@ -254,8 +254,28 @@ Running the same operations against a checkout of the previous head:
   `chronicle`. The storage architecture and source-package harness use the same
   truthful procedure; no documentation names the absent SQL file. Both README
   regression tests pass.
+- Adversarial review tightened the same contracts before final verification.
+  Mixed-case package manifests were reproduced as omissions from both root
+  sweeps and from the stray-default guard; default discovery now filters every
+  recursive filename through the case-insensitive #227 helper. Missing
+  `provider` and missing `uri` locators were each reproduced reaching publisher
+  I/O; `storage.r2` now requires explicit `provider: r2` and an `r2://` URI.
+  The artifact file's 112 tests pass.
+- Clarified that *all* schema environment overrides, including deprecated
+  spellings, precede the `ledger` default. The README test now also requires
+  the create/apply-migration instruction, so deleting the guidance cannot pass
+  vacuously. All 14 mirror tests pass.
+- Completed the remaining non-microdata preflight port from #227. Reproduced
+  four invalid explicit/inferred artifact filenames reaching `_read_artifact`,
+  including `filename=manifest.yaml`, which could overwrite the selected
+  manifest, and reproduced an undiscoverable `custom.yaml` manifest reaching
+  publisher I/O. Ported `is_bare_filename`, `bare_filename`,
+  `_infer_artifact_filename`, the manifest-like artifact refusal from
+  `daafac0`, and c0d9d74's discoverable `_manifest_path` restriction. All 117
+  artifact tests pass after the pre-I/O fix.
 
 ### Next
 
-- Run the required lint, format, full-test, and tracked-USDA sweep verification,
-  then write the final `out.md` report.
+- Commit the adversarial-review corrections, run the required lint, format,
+  full-test, and tracked-USDA sweep verification, then write the final `out.md`
+  report.

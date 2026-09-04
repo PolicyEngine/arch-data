@@ -13,6 +13,7 @@ from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
     AmbiguousManifestError,
     MalformedManifestError,
+    ManifestNameError,
     RecordedR2LocatorError,
     SourceArtifactManifestError,
     SourceArtifactRevisionError,
@@ -350,6 +351,9 @@ def test_publish_source_artifacts_refuses_stale_country_key(tmp_path):
             ),
         }
     }
+    artifact["storage"]["r2"]["uri"] = (
+        f"r2://ledger-raw/{artifact['storage']['r2']['key']}"
+    )
     manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
     log = tmp_path / "wrangler.log"
     wrangler = tmp_path / "wrangler"
@@ -1351,6 +1355,26 @@ def test_fetch_artifact_cli_refuses_a_stray_default_manifest(tmp_path, capsys):
     assert not (package / "manifest.yaml").exists()
 
 
+def test_fetch_refuses_a_stray_default_beside_a_case_variant_named_manifest(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "ira_contributions"
+    package.mkdir(parents=True)
+    named_manifest = package / "MANIFEST_TRADITIONAL.YML"
+    named_manifest.write_text("source_id: irs_soi\nfiles: {}\n")
+    source = _publish(tmp_path, "22in05ira.xlsx", b"traditional IRA table")
+
+    def unexpected_read(_source_url):
+        raise AssertionError("a case-variant named manifest did not block I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(AmbiguousManifestError, match="MANIFEST_TRADITIONAL.YML"):
+        _fetch_local(package, source)
+
+    assert not (package / "manifest.yaml").exists()
+
+
 def test_a_same_bytes_rename_is_refused_by_name_not_as_a_revision(tmp_path):
     """Identical bytes under another filename are neither a revision nor a
     re-fetch: the entry's filename must keep agreeing with its recorded key."""
@@ -1385,6 +1409,66 @@ def test_a_manifest_name_must_stay_inside_the_package(tmp_path, manifest_filenam
 
     with pytest.raises(ValueError, match="inside the package directory"):
         _fetch_local(package, source, manifest_filename=manifest_filename)
+
+    assert not package.exists()
+
+
+@pytest.mark.parametrize(
+    ("source_url", "filename", "message"),
+    [
+        pytest.param("publisher.csv", "manifest.yaml", "manifest name", id="default"),
+        pytest.param(
+            "publisher.csv", "MANIFEST_NAMED.YML", "manifest name", id="named"
+        ),
+        pytest.param(
+            "publisher.csv", "nested/publisher.csv", "bare filename", id="nested"
+        ),
+        pytest.param(
+            "https://publisher.test/manifest.yaml",
+            None,
+            "manifest name",
+            id="inferred",
+        ),
+    ],
+)
+def test_artifact_filename_is_refused_before_publisher_io(
+    tmp_path, monkeypatch, source_url, filename, message
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text("source_id: irs_soi\npackage_id: soi-table\nfiles: {}\n")
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("an invalid artifact filename reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(SourceArtifactManifestError, match=message):
+        fetch_source_artifact(
+            source_url,
+            source_id="irs_soi",
+            package_id="soi-table",
+            year=2024,
+            output_dir=package,
+            filename=filename,
+        )
+
+    assert manifest_path.read_bytes() == before
+
+
+def test_manifest_name_must_be_discoverable_before_publisher_io(tmp_path, monkeypatch):
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table"
+    source = _publish(tmp_path, "table.csv", b"publisher table")
+
+    def unexpected_read(_source_url):
+        raise AssertionError("an undiscoverable manifest name reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(ManifestNameError, match="invisible"):
+        _fetch_local(package, source, manifest_filename="custom.yaml")
 
     assert not package.exists()
 
@@ -1587,9 +1671,11 @@ def _flatten_the_key(storage):
     [
         pytest.param(_contradict_key, "contradicts uri", id="key-vs-uri"),
         pytest.param(_contradict_bucket, "contradicts uri", id="bucket-vs-uri"),
-        pytest.param(_contradict_provider, "contradicts uri", id="provider-vs-uri"),
+        pytest.param(
+            _contradict_provider, "does not identify R2", id="provider-vs-uri"
+        ),
         pytest.param(_mangle_uri, "is not provider://bucket/key", id="uri-shape"),
-        pytest.param(_drop_the_locator, "records no key", id="no-locator"),
+        pytest.param(_drop_the_locator, "records no uri", id="no-locator"),
         pytest.param(
             _flatten_the_key, "is not content-addressed", id="not-content-addressed"
         ),
@@ -2001,6 +2087,7 @@ def _write_sweep_manifests(root):
         "manifest.yml",
         "manifest_named.yaml",
         "manifest_named.yml",
+        "Manifest_Mixed.YAML",
     )
     for index, manifest_name in enumerate(manifest_names):
         package = root / f"package-{index}"
@@ -2036,13 +2123,14 @@ def test_inventory_default_sweep_discovers_every_package_manifest(tmp_path):
     report = inventory_source_artifacts(root)
 
     assert report.valid
-    assert report.counts["manifest_count"] == 4
-    assert report.counts["artifact_count"] == 4
+    assert report.counts["manifest_count"] == 5
+    assert report.counts["artifact_count"] == 5
     assert {entry.manifest_path.rsplit("/", 1)[-1] for entry in report.entries} == {
         "manifest.yaml",
         "manifest.yml",
         "manifest_named.yaml",
         "manifest_named.yml",
+        "Manifest_Mixed.YAML",
     }
 
 
@@ -2055,10 +2143,10 @@ def test_publish_default_sweep_discovers_every_package_manifest(tmp_path):
     report = publish_source_artifacts(root, wrangler_command=str(wrangler))
 
     assert report.valid
-    assert report.counts["manifest_count"] == 4
-    assert report.counts["artifact_count"] == 4
-    assert report.counts["uploaded_count"] == 4
-    assert len(log.read_text().splitlines()) == 4
+    assert report.counts["manifest_count"] == 5
+    assert report.counts["artifact_count"] == 5
+    assert report.counts["uploaded_count"] == 5
+    assert len(log.read_text().splitlines()) == 5
 
 
 @pytest.mark.parametrize(
@@ -2193,6 +2281,28 @@ def test_fetch_refuses_a_self_consistent_non_r2_locator_before_io(
     monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
 
     with pytest.raises(RecordedR2LocatorError, match="provider.*r2"):
+        _fetch_local(package, source, upload_r2=False)
+
+    assert manifest_path.read_bytes() == before
+
+
+@pytest.mark.parametrize("missing_field", ["provider", "uri"])
+def test_fetch_refuses_an_incomplete_r2_locator_before_io(
+    tmp_path, monkeypatch, missing_field
+):
+    package, source, _report = _recorded_package(tmp_path)
+    manifest_path = package / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    manifest["files"][2022]["storage"]["r2"].pop(missing_field)
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("an incomplete storage.r2 locator reached I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(RecordedR2LocatorError, match=missing_field):
         _fetch_local(package, source, upload_r2=False)
 
     assert manifest_path.read_bytes() == before

@@ -328,6 +328,7 @@ def test_readme_supabase_cutover_documents_the_runtime_schema_default():
     section = _readme_supabase_cutover_section()
 
     assert f"writes to `{DEFAULT_CHRONICLE_SCHEMA}`" in section
+    assert "With no schema environment override and no `--schema`" in section
     assert "`CHRONICLE_SCHEMA=chronicle`" in section
     assert "`--schema chronicle`" in section
 
@@ -338,6 +339,7 @@ def test_readme_supabase_cutover_only_names_checked_in_migrations():
     migration_paths = re.findall(r"`([^`\n]+[.]sql)`", section)
     missing = [path for path in migration_paths if not (repository / path).is_file()]
 
+    assert "create and apply a Supabase/Postgres migration" in section
     assert missing == []
 
 

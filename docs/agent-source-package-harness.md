@@ -705,8 +705,8 @@ uv run chronicle load-supabase-mirror \
 
 The live load requires `POLICYENGINE_SUPABASE_URL` and
 `POLICYENGINE_SUPABASE_SERVICE_KEY`, the deployment migration applied, and the
-selected schema exposed by the Supabase Data API. With neither
-`CHRONICLE_SCHEMA` nor `--schema`, the selected schema is `ledger`; set
+selected schema exposed by the Supabase Data API. With no schema environment
+override and no `--schema`, the selected schema is `ledger`; set
 `CHRONICLE_SCHEMA=chronicle` or pass `--schema chronicle` to load a migrated
 `chronicle` schema.
 

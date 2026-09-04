@@ -172,10 +172,11 @@ must be a filename inside `--out-dir`, not a path.
 
 ### What a recorded block has to say
 
-A `storage.r2` block's `provider`, `bucket`, `key` and `uri` all describe one
-object, so every field that is present is cross-checked against every other:
-the key against the URI's path, the bucket against its authority, the provider
-against its scheme, and the resulting key against the content-addressed
+A `storage.r2` block must explicitly say `provider: r2` and carry an `r2://`
+URI. Its `provider`, `bucket`, `key` and `uri` all describe one object, so every
+additional field that is present is cross-checked against the URI: the key
+against its path, the bucket against its authority, the provider against its
+scheme, and the resulting key against the content-addressed
 `{sha256}/{filename}` shape. A block whose fields disagree does not answer
 "which bytes does this entry claim R2 holds", so it is an error rather than
 something to preserve or publish under. Likewise a manifest that parses as
