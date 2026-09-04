@@ -47,6 +47,7 @@ from chronicle.registration import (
     iter_file_specs,
     load_manifest_document,
     manifest_kind,
+    matching_directory_entry,
     resolve_vintage_key,
     validate_file_entry,
     validate_manifest_files,
@@ -918,24 +919,25 @@ class SourceArtifactSpec:
         """
         self._assert_manifest_kind_is_parseable(self.manifest_payload())
 
-    def _assert_complete_manifest_valid(self, manifest: dict[str, Any]) -> None:
+    def _assert_complete_manifest_valid(
+        self, manifest: dict[str, Any], *, manifest_name: str | None = None
+    ) -> None:
         """Validate every current-manifest entry before selecting one to read."""
-        manifest_path = self.manifest_resource()
+        manifest_label = manifest_name or self.manifest
+        directory = files(self.resource_package).joinpath(self.resource_directory)
+        manifest_path = directory.joinpath(manifest_label)
         kind = manifest_kind(manifest, manifest_path=manifest_path)
         codes: list[str] = list(validate_manifest_files(manifest))
         files_by_year = manifest.get("files")
-        directory = files(self.resource_package).joinpath(self.resource_directory)
         if isinstance(files_by_year, dict):
             for key, value in files_by_year.items():
                 for entry in iter_file_specs(value, kind=kind):
-                    name = entry.get("filename") if isinstance(entry, dict) else None
-                    exists = (
-                        bool(name)
-                        and is_bare_filename(name)
-                        and directory.joinpath(str(name)).is_file()
+                    entry_name = (
+                        entry.get("filename") if isinstance(entry, dict) else None
                     )
+                    exists = matching_directory_entry(directory, entry_name) is not None
                     codes.extend(
-                        f"{key!r}/{name}: {code}"
+                        f"{key!r}/{entry_name}: {code}"
                         for code in validate_file_entry(
                             entry,
                             kind=kind,
@@ -945,7 +947,7 @@ class SourceArtifactSpec:
                     )
         if codes:
             raise ManifestAccessError(
-                f"{self.resource_directory}/{self.manifest} is not a valid "
+                f"{self.resource_directory}/{manifest_label} is not a valid "
                 f"{kind} manifest: {'; '.join(codes)}. No source artifact "
                 "bytes will be read until the complete manifest is valid."
             )
@@ -986,7 +988,7 @@ class SourceArtifactSpec:
                 continue
             try:
                 with item.open("r", encoding="utf-8") as file:
-                    payload = load_manifest_document(file.read()) or {}
+                    payload = load_manifest_document(file.read())
             except (OSError, yaml.YAMLError) as exc:
                 raise ManifestAccessError(
                     f"{self.resource_directory}/{item.name} cannot be read "
@@ -994,12 +996,15 @@ class SourceArtifactSpec:
                     f"{spec.get('filename')!r} hash-only cannot be decided; "
                     "fix the manifest before parsing beside it."
                 ) from exc
+            if payload is None:
+                payload = {}
             if not isinstance(payload, dict):
                 raise ManifestAccessError(
                     f"{self.resource_directory}/{item.name} is not a YAML "
                     "mapping, so whether it registers "
                     f"{spec.get('filename')!r} hash-only cannot be decided."
                 )
+            self._assert_complete_manifest_valid(payload, manifest_name=item.name)
             siblings[item.name] = payload
         for name, key, entry in hash_only_registrations(
             siblings, filename=spec.get("filename"), sha256=spec.get("sha256")

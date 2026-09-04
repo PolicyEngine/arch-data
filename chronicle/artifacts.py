@@ -56,6 +56,7 @@ from chronicle.registration import (
     iter_manifest_entries,
     load_manifest_document,
     manifest_kind as normalize_manifest_kind,
+    matching_directory_entry,
     normalize_access,
     package_manifest_paths,
     recorded_r2,
@@ -2014,11 +2015,7 @@ def _assert_manifest_valid_for_fetch(
                 name = (
                     file_spec.get("filename") if isinstance(file_spec, dict) else None
                 )
-                exists = (
-                    bool(name)
-                    and is_bare_filename(name)
-                    and (package_dir / str(name)).exists()
-                )
+                exists = matching_directory_entry(package_dir, name) is not None
                 for code in validate_file_entry(
                     file_spec,
                     kind=kind,
@@ -2098,9 +2095,10 @@ def _release_fetch_evidence(
             "--licence-evidence-issuer, --licence-evidence-scope and a durable "
             "--licence-evidence-url; the evidence covers --expected-sha256."
         )
-    if (package_dir / filename).exists():
+    local_entry = matching_directory_entry(package_dir, filename)
+    if local_entry is not None:
         raise ManifestAccessError(
-            f"{package_dir / filename} exists beside the manifest. Public "
+            f"{local_entry} exists beside the manifest. Public "
             "microdata bytes are staged outside the package tree and uploaded "
             "from there; a repository never holds them. Remove the file first."
         )
@@ -2861,6 +2859,7 @@ def _publish_raw_manifest_entry(
         )
     kind = kind or safe_manifest_kind(manifest, manifest_path=manifest_path)[0]
     access = safe_entry_access(spec)
+    local_entry = matching_directory_entry(manifest_path.parent, filename)
     if is_hash_only(access):
         # Refuse before touching bytes: no Chronicle store holds a licensed or
         # restricted artifact, so there is nothing here to upload. The entry is
@@ -2871,9 +2870,7 @@ def _publish_raw_manifest_entry(
                 spec,
                 kind=kind,
                 manifest=manifest,
-                local_file_exists=(manifest_path.parent / filename).exists()
-                if filename
-                else False,
+                local_file_exists=local_entry is not None,
             )
         )
         if not skip_hash_only:
@@ -2885,7 +2882,7 @@ def _publish_raw_manifest_entry(
                 package_id=package_id,
                 year=str(year),
                 filename=filename,
-                local_path=str(manifest_path.parent / filename),
+                local_path=str(local_entry or manifest_path.parent / filename),
                 sha256=spec.get("sha256"),
                 size_bytes=spec.get("size_bytes"),
                 r2_location=None,
@@ -2900,9 +2897,7 @@ def _publish_raw_manifest_entry(
             spec,
             kind=kind,
             manifest=manifest,
-            local_file_exists=(manifest_path.parent / filename).exists()
-            if filename
-            else False,
+            local_file_exists=local_entry is not None,
         )
     )
     release = kind == MICRODATA_RELEASE_KIND
@@ -2920,7 +2915,7 @@ def _publish_raw_manifest_entry(
             filename=filename,
         )
     else:
-        artifact_path = manifest_path.parent / filename
+        artifact_path = local_entry or manifest_path.parent / filename
     sha256_actual = None
     size_bytes = None
     if not filename:
@@ -3107,7 +3102,10 @@ def _inventory_entry(
     bare = bool(filename) and is_bare_filename(filename)
     # A name that is not bare is reported by validate_file_entry and never
     # resolved to a path, which could lie outside the package directory.
-    in_tree = bare and (manifest_path.parent / filename).exists()
+    local_entry = (
+        matching_directory_entry(manifest_path.parent, filename) if bare else None
+    )
+    in_tree = local_entry is not None
     access = safe_entry_access(spec)
     hash_only = is_hash_only(access)
     release = kind == MICRODATA_RELEASE_KIND
@@ -3153,7 +3151,7 @@ def _inventory_entry(
         )
         exists = artifact_path.exists()
     else:
-        artifact_path = (
+        artifact_path = local_entry or (
             manifest_path.parent / filename if bare else manifest_path.parent
         )
         exists = in_tree

@@ -329,6 +329,9 @@ def test_bare_filename_refuses_every_alias(alias):
 def test_bare_filename_accepts_a_plain_name_and_keys_case_folded():
     assert bare_filename("adult.tab") == "adult.tab"
     assert filename_key("ADULT.TAB") == filename_key("adult.tab")
+    assert filename_key("cafe\N{COMBINING ACUTE ACCENT}.tab") == filename_key(
+        "caf\N{LATIN SMALL LETTER E WITH ACUTE}.tab"
+    )
     assert filename_key("./Adult.tab") == "adult.tab"
 
 

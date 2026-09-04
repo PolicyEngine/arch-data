@@ -1364,13 +1364,23 @@ def _prepare_registration_payload(
     return payload, replaced
 
 
-def _matching_directory_entry(output: Path, filename: Any) -> Path | None:
-    """Return the actual directory entry matching ``filename``'s safe key."""
-    if not output.is_dir():
+def matching_directory_entry(directory: Any, filename: Any) -> Any | None:
+    """Return the actual directory entry matching a bare filename's safe key.
+
+    ``directory`` may be a :class:`pathlib.Path` or an importlib-resources
+    Traversable. Scanning its real entries is required on case-sensitive filesystems:
+    Chronicle treats case-folded and Unicode-normalized spellings as one artifact
+    identity even when the filesystem can physically store both spellings.
+    """
+    if not is_bare_filename(filename) or not directory.is_dir():
         return None
     wanted = filename_key(filename)
     return next(
-        (path for path in output.iterdir() if filename_key(path.name) == wanted),
+        (
+            path
+            for path in sorted(directory.iterdir(), key=lambda item: item.name)
+            if filename_key(path.name) == wanted
+        ),
         None,
     )
 
@@ -1381,7 +1391,7 @@ def _assert_no_local_artifact_bytes(
     access_class: str,
 ) -> None:
     """Refuse any actual path alias of a hash-only artifact filename."""
-    local_path = _matching_directory_entry(output, artifact_name)
+    local_path = matching_directory_entry(output, artifact_name)
     if local_path is None:
         return
     requested = "" if local_path.name == artifact_name else f" ({artifact_name!r})"
@@ -1406,7 +1416,7 @@ def _registration_manifest_errors(
         )
         exists = (
             is_bare_filename(existing_name)
-            and _matching_directory_entry(output, existing_name) is not None
+            and matching_directory_entry(output, existing_name) is not None
         )
         errors.extend(
             f"{existing_key!r}/{existing_name}: {code}"
@@ -1848,6 +1858,7 @@ __all__ = [
     "iter_directory_entries",
     "iter_file_specs",
     "iter_manifest_entries",
+    "matching_directory_entry",
     "manifest_kind",
     "normalize_access",
     "normalize_hash_source",
