@@ -345,6 +345,32 @@ def test_emit_refuses_an_explicit_commit_whose_blob_differs_from_loaded_manifest
     assert not root.exists()
 
 
+def test_emit_refuses_a_tree_object_as_an_explicit_commit(tmp_path, capsys):
+    checkout, _commit = _committed_fixture_checkout(tmp_path / "consumer")
+    tree = _git(checkout, "rev-parse", "HEAD^{tree}")
+    root = tmp_path / "data"
+
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(checkout),
+            "--root",
+            str(root),
+            "--release",
+            "dwp-frs-2023-24:adult",
+            "emit",
+            "--microcosm-commit",
+            tree,
+        ],
+        capsys,
+    )
+
+    assert exit_code == 1
+    assert "not a commit" in err
+    assert tree in err
+    assert not root.exists()
+
+
 @pytest.mark.parametrize("explicit", [False, True], ids=("automatic", "explicit"))
 def test_emit_accepts_a_commit_whose_blob_matches_the_loaded_manifest(
     tmp_path, capsys, explicit
