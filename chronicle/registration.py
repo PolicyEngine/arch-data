@@ -47,6 +47,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 from typing import Any
+import unicodedata
 
 import yaml
 
@@ -116,6 +117,63 @@ _REGISTRATION_FIELD_ORDER: tuple[str, ...] = (
     "pinned_from",
     "notes",
 )
+
+
+#: Every field a manifest file entry may carry, for the misspelling check.
+_ENTRY_FIELDS: frozenset[str] = frozenset(
+    {*_REGISTRATION_FIELD_ORDER, "storage", "size_bytes", "source_url"}
+)
+
+
+class StrictManifestLoader(yaml.SafeLoader):
+    """A YAML loader that refuses a mapping with duplicate keys.
+
+    PyYAML keeps the last of two equal keys, so ``files:`` recorded twice, or
+    a vintage recorded as ``2023`` and again as ``2_023`` (the same integer),
+    would read as one entry and the shadowed entry would be dropped by the
+    next write. A manifest is the record the byte boundary is decided from,
+    so a document the loader cannot represent faithfully is malformed.
+    """
+
+    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
+        if not isinstance(node, yaml.MappingNode):
+            raise yaml.constructor.ConstructorError(
+                None,
+                None,
+                f"expected a mapping node, but found {node.id}",
+                node.start_mark,
+            )
+        self.flatten_mapping(node)
+        mapping: dict[Any, Any] = {}
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            try:
+                hash(key)
+            except TypeError as exc:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    f"found unhashable key ({exc})",
+                    key_node.start_mark,
+                ) from exc
+            if key in mapping:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    f"found duplicate key {key!r}",
+                    key_node.start_mark,
+                )
+            mapping[key] = self.construct_object(value_node, deep=deep)
+        return mapping
+
+
+def load_manifest_document(text: str) -> Any:
+    """Parse a manifest document, refusing duplicate keys.
+
+    Raises :class:`yaml.YAMLError` (a ``ConstructorError`` naming the
+    duplicate key) for a document YAML would otherwise silently collapse.
+    """
+    return yaml.load(text, Loader=StrictManifestLoader)  # noqa: S506
 
 
 class ManifestAccessError(ValueError):
@@ -333,12 +391,13 @@ def bare_filename(value: Any, *, what: str = "filename") -> str:
 def filename_key(value: Any) -> str:
     """Return the comparison key for a filename.
 
-    Case-folded, because the package directories these commands run in are as
-    often as not on a case-insensitive filesystem, where ``ADULT.TAB`` and
-    ``adult.tab`` are one file. Treating them as one artifact path is the safe
-    rule everywhere.
+    Case-folded and Unicode-normalised (NFC), because the package directories
+    these commands run in are as often as not on a filesystem that folds
+    both: ``ADULT.TAB`` and ``adult.tab`` are one file, and so are the
+    composed and decomposed spellings of an accented name. Treating them as
+    one artifact path is the safe rule everywhere.
     """
-    return Path(str(value)).name.casefold()
+    return unicodedata.normalize("NFC", Path(str(value)).name).casefold()
 
 
 #: The names a package directory's manifests may carry: ``manifest.yaml`` or
@@ -588,6 +647,7 @@ def validate_manifest_files(manifest: Mapping[str, Any] | None) -> tuple[str, ..
             if other != key and other in files:
                 errors.append(f"duplicate_vintage_key:{key}")
 
+    release = manifest.get("kind") == MICRODATA_RELEASE_KIND
     # Same file, one package directory: group every entry by its resolved name.
     by_name: dict[str, list[tuple[Any, Mapping[str, Any]]]] = {}
     for key, _index, entry in iter_manifest_entries(manifest):
@@ -637,6 +697,15 @@ def validate_manifest_files(manifest: Mapping[str, Any] | None) -> tuple[str, ..
             # Several vintages, or an explicit reissue, may register the same
             # filename with different bytes: no file exists to collide.
             continue
+        if release:
+            # A public release's bytes are staged content-addressed outside
+            # the tree, so one filename may hold different bytes under
+            # different vintages; under one vintage a revision is recorded in
+            # storage.previous_r2, not as a second entry.
+            for digests in seen.values():
+                if len(digests) > 1:
+                    errors.append(f"filename_collision:{name}")
+            continue
         digests = {_text(entry.get("sha256")) or "" for _key, entry in entries}
         if len(digests) > 1:
             # Public entries share one path in the tree and one current object
@@ -663,13 +732,25 @@ def validate_file_entry(
     if isinstance(spec, ListSpecRejected):
         return ("list_file_spec_requires_microdata_release_kind",)
     if not isinstance(spec, Mapping):
-        return ()
+        return ("malformed_file_spec",)
 
     errors: list[str] = []
+    for field in spec:
+        if (
+            isinstance(field, str)
+            and field not in _ENTRY_FIELDS
+            and field.strip().casefold() in _ENTRY_FIELDS
+        ):
+            # A field the writer meant but the reader would ignore: ``Access``
+            # is not ``access``, and an entry whose access class sits under
+            # the wrong key is not public by omission.
+            errors.append(f"misspelled_field:{field}")
     filename = spec.get("filename")
-    if filename is not None and not is_bare_filename(filename):
+    if not _text(filename):
+        errors.append("missing_filename")
+    elif not is_bare_filename(filename):
         errors.append(f"non_canonical_filename:{filename}")
-    elif filename is not None and is_manifest_filename(filename):
+    elif is_manifest_filename(filename):
         errors.append(f"manifest_named_filename:{filename}")
 
     declared_access = spec.get("access")
@@ -733,6 +814,16 @@ def _hash_only_entry_errors(
         errors.append("r2_location_for_hash_only_entry")
     if recorded_previous_r2(spec):
         errors.append("r2_history_for_hash_only_entry")
+    storage = spec.get("storage")
+    if storage is not None and storage != {}:
+        # No Chronicle store holds these bytes, so there is nothing a storage
+        # block could truthfully record, whatever its shape.
+        errors.append("storage_for_hash_only_entry")
+    hash_source = _text(spec.get("hash_source"))
+    if hash_source in HASH_SOURCES and hash_source not in HASH_ONLY_HASH_SOURCES:
+        # Chronicle never fetched a hash-only entry's bytes: its checksum is
+        # always the consumer's.
+        errors.append(f"hash_source_not_allowed_for_hash_only_entry:{hash_source}")
     return errors
 
 
@@ -792,7 +883,15 @@ def _attestation_errors(spec: Mapping[str, Any]) -> list[str]:
         errors.extend(_pinned_from_errors(spec.get("pinned_from")))
         if verified_at:
             errors.append("verified_at_forbidden_for_consumer_pin")
+    if hash_source != HASH_SOURCE_CHRONICLE_FETCH and _is_chronicle(attested_by):
+        # A consumer's checksum is attested by the consumer; Chronicle only
+        # attests what it fetched and hashed itself.
+        errors.append("attested_by_chronicle_for_consumer_hash_source")
     return errors
+
+
+def _is_chronicle(attester: str | None) -> bool:
+    return bool(attester) and attester.strip().casefold() == CHRONICLE_ATTESTER
 
 
 def _pinned_from_errors(pinned_from: Any) -> list[str]:
@@ -1071,12 +1170,30 @@ def register_hash_only_artifact(
             f"{type(files).__name__}. Chronicle will not write into a manifest "
             "it cannot read."
         )
-    manifest_errors = validate_manifest_files(payload)
+    manifest_errors = list(validate_manifest_files(payload))
+    for existing_key, _index, existing in iter_manifest_entries(payload):
+        existing_name = (
+            existing.get("filename") if isinstance(existing, Mapping) else None
+        )
+        exists = (
+            is_bare_filename(existing_name) and (output / str(existing_name)).exists()
+        )
+        manifest_errors.extend(
+            f"{existing_key!r}/{existing_name}: {code}"
+            for code in validate_file_entry(
+                existing,
+                kind=existing_kind,
+                manifest=payload,
+                local_file_exists=exists,
+            )
+        )
     if manifest_errors:
+        # An invalid entry is never replaced or reclassified in passing: the
+        # registration would carry the defect forward or conceal it.
         raise HashOnlyRegistrationError(
-            f"{manifest_path} is not a valid manifest: "
-            f"{', '.join(manifest_errors)}. Fix it by hand before registering "
-            "into it."
+            f"{manifest_path} is not a valid {existing_kind} manifest: "
+            f"{'; '.join(manifest_errors)}. Fix it by hand before registering "
+            "into it; inventory-artifacts reports the same codes."
         )
     _assert_no_archived_identity(
         payload, manifest_path, artifact_name, access_class, sha256=checksum
@@ -1201,6 +1318,13 @@ def _hash_only_attestation(
         raise HashOnlyRegistrationError(
             f"A {source} registration must name the consumer that attests the "
             "checksum; pass --attested-by."
+        )
+    if _is_chronicle(attester):
+        raise HashOnlyRegistrationError(
+            f"A {source} registration is attested by the consumer whose pin it "
+            f"transcribes, never by {CHRONICLE_ATTESTER!r}: Chronicle holds no "
+            "bytes for it and verified nothing. Pass --attested-by with the "
+            "consumer's name."
         )
     fields: dict[str, Any] = {"hash_source": source, "attested_by": attester}
     if source == HASH_SOURCE_CONSUMER_ATTESTED:
@@ -1372,10 +1496,20 @@ def _existing_entries(files: Any, key: Any) -> list[Any]:
 
 
 def _load_manifest(manifest_path: Path) -> dict[str, Any]:
-    """Load a manifest mapping, or an empty mapping when absent."""
+    """Load a manifest mapping, or an empty mapping when absent.
+
+    Read strictly: a document with duplicate keys, or one that is not a
+    mapping, is a refusal rather than something to record into.
+    """
     if not manifest_path.exists():
         return {}
-    payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8")) or {}
+    try:
+        payload = load_manifest_document(manifest_path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        raise HashOnlyRegistrationError(
+            f"{manifest_path} is not valid YAML: {exc}"
+        ) from exc
+    payload = payload or {}
     if not isinstance(payload, dict):
         raise HashOnlyRegistrationError(f"Manifest must be a mapping: {manifest_path}")
     return payload
@@ -1420,6 +1554,8 @@ __all__ = [
     "HashOnlyRegistrationError",
     "ListSpecRejected",
     "MANIFEST_KINDS",
+    "StrictManifestLoader",
+    "load_manifest_document",
     "MICRODATA_RELEASE_KIND",
     "ManifestAccessError",
     "ManifestKindError",

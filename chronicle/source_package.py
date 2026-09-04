@@ -44,6 +44,7 @@ from chronicle.registration import (
     is_hash_only,
     is_manifest_filename,
     is_microdata_release,
+    load_manifest_document,
     resolve_vintage_key,
 )
 from chronicle.sources.cells import (
@@ -870,9 +871,20 @@ class SourceArtifactSpec:
         )
 
     def manifest_payload(self) -> dict[str, Any]:
-        """Load the artifact manifest this package spec points at."""
+        """Load the artifact manifest this package spec points at, strictly.
+
+        A document with duplicate keys is refused rather than read through
+        whichever entry YAML kept.
+        """
         with self.manifest_resource().open("r", encoding="utf-8") as file:
-            return yaml.safe_load(file) or {}
+            text = file.read()
+        try:
+            payload = load_manifest_document(text)
+        except yaml.YAMLError as exc:
+            raise ValueError(
+                f"{self.resource_directory}/{self.manifest} is not valid YAML: {exc}"
+            ) from exc
+        return payload or {}
 
     def assert_parseable_manifest(self) -> None:
         """Refuse to parse a manifest that registers a microdata release.
@@ -927,7 +939,7 @@ class SourceArtifactSpec:
                 continue
             try:
                 with item.open("r", encoding="utf-8") as file:
-                    payload = yaml.safe_load(file) or {}
+                    payload = load_manifest_document(file.read()) or {}
             except (OSError, yaml.YAMLError) as exc:
                 raise ManifestAccessError(
                     f"{self.resource_directory}/{item.name} cannot be read "

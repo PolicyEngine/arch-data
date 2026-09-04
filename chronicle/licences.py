@@ -18,11 +18,13 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any
+from urllib.parse import urlparse
 
 __all__ = [
     "LICENCE_EVIDENCE_FIELDS",
     "REDISTRIBUTABLE_LICENCES",
     "RedistributableLicence",
+    "is_durable_url",
     "is_redistributable_licence",
     "licence_evidence_errors",
 ]
@@ -132,6 +134,20 @@ def licence_evidence_errors(
         errors.append(f"licence_not_redistributable:{evidence['licence'].strip()}")
     if evidence["sha256"].strip() != str(sha256 or "").strip():
         errors.append("licence_evidence_sha256_mismatch")
-    if not evidence["url"].strip().startswith(("http://", "https://")):
+    if not is_durable_url(evidence["url"]):
         errors.append("licence_evidence_url_not_durable")
     return errors
+
+
+def is_durable_url(value: Any) -> bool:
+    """Whether ``value`` is an http(s) URL with a host and no whitespace.
+
+    A bare scheme, a padded string, or a URL with a space is not a location
+    a reviewer can follow back to the publisher's statement.
+    """
+    if not isinstance(value, str) or value != value.strip() or not value:
+        return False
+    if any(character.isspace() for character in value):
+        return False
+    parsed = urlparse(value)
+    return parsed.scheme in ("http", "https") and bool(parsed.netloc)

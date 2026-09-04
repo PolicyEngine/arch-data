@@ -54,6 +54,7 @@ from chronicle.registration import (
     iter_directory_entries,
     iter_file_specs,
     iter_manifest_entries,
+    load_manifest_document,
     manifest_kind as normalize_manifest_kind,
     normalize_access,
     package_manifest_paths,
@@ -1791,7 +1792,7 @@ def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     if not manifest_path.exists():
         return {}
     try:
-        payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        payload = load_manifest_document(manifest_path.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
         raise MalformedManifestError(
             f"{manifest_path} is not valid YAML: {exc}"
