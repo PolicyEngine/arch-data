@@ -57,11 +57,64 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
     """
     name = manifest_filename.strip()
     if not name or name in (".", "..") or name != Path(name).name:
-        raise ValueError(
+        raise ManifestNameError(
             "Manifest must name a file inside the package directory, not "
             f"{manifest_filename!r}."
         )
     return output / name
+
+
+def _sibling_manifests(output: Path) -> list[str]:
+    """Return the ``manifest_*.yaml`` files a package directory keeps."""
+    if not output.is_dir():
+        return []
+    return sorted(
+        path.name
+        for pattern in ("manifest_*.yaml", "manifest_*.yml")
+        for path in output.glob(pattern)
+        if path.is_file()
+    )
+
+
+def _refuse_a_stray_default_manifest(output: Path, manifest_path: Path) -> None:
+    """Refuse to create ``manifest.yaml`` beside a package's named manifests.
+
+    A publisher directory that feeds several source packages keeps one
+    ``manifest_<package>.yaml`` per package and no ``manifest.yaml``. A fetch
+    that omits ``--manifest`` there would create a third manifest none of the
+    packages read, and would bypass the revision guard of the one it should
+    have addressed (PolicyEngine/chronicle#225).
+    """
+    if manifest_path.name != DEFAULT_MANIFEST_FILENAME or manifest_path.exists():
+        return
+    siblings = _sibling_manifests(output)
+    if not siblings:
+        return
+    raise AmbiguousManifestError(
+        f"{output} keeps {', '.join(siblings)} and no {DEFAULT_MANIFEST_FILENAME}; "
+        "pass --manifest to name the manifest this fetch records into rather "
+        f"than creating {DEFAULT_MANIFEST_FILENAME} beside them."
+    )
+
+
+def _manifest_files(payload: dict[str, Any], manifest_path: Path) -> dict[str, Any]:
+    """Return a manifest's ``files`` block, refusing one that is not a mapping.
+
+    ``inventory-artifacts`` and ``publish-raw`` report the same document as
+    ``files must be a mapping``; a fetch must refuse it before reading the
+    publisher, or the write fails only after the local artifact has been
+    overwritten and any upload has run.
+    """
+    files = payload.get("files")
+    if files is None:
+        return {}
+    if not isinstance(files, dict):
+        raise MalformedManifestError(
+            f"{manifest_path} files must be a mapping; it parses as a "
+            f"{type(files).__name__}. Chronicle will not overwrite a manifest "
+            "it cannot read."
+        )
+    return files
 
 
 def default_r2_raw_bucket() -> str:
@@ -95,6 +148,19 @@ class SourceArtifactRevisionError(SourceArtifactManifestError):
     release revision (docs/adr-chronicle-fact-identity-v2.md), registered with
     ``fetch-artifact --record-revision``.
     """
+
+
+class ManifestNameError(SourceArtifactManifestError, ValueError):
+    """A manifest name is not a bare filename inside the package directory.
+
+    Also a :class:`ValueError` for callers that validated the name that way
+    before the CLI learned to report it as an ordinary manifest refusal.
+    """
+
+
+class AmbiguousManifestError(SourceArtifactManifestError):
+    """The default manifest name would create a manifest beside the ones a
+    package already keeps (PolicyEngine/chronicle#225)."""
 
 
 class MalformedManifestError(SourceArtifactManifestError):
@@ -366,16 +432,24 @@ class RawArtifactPublishEntry:
     r2_location: ArtifactStorageLocation | None
     upload: ArtifactCommandResult | None
     errors: tuple[str, ...] = ()
+    skipped: str | None = None
+
+    @property
+    def uploaded(self) -> bool:
+        """Whether this run uploaded the artifact."""
+        return self.upload is not None and self.upload.ok
 
     @property
     def valid(self) -> bool:
-        """Whether this raw artifact uploaded and was registered."""
-        return not self.errors and self.upload is not None and self.upload.ok
+        """Whether this raw artifact is published: uploaded now, or already
+        held by the recorded object in a preserved bucket (``skipped``)."""
+        return not self.errors and (self.skipped is not None or self.uploaded)
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable entry."""
         return {
             "valid": self.valid,
+            "skipped": self.skipped,
             "manifest_path": self.manifest_path,
             "source_id": self.source_id,
             "package_id": self.package_id,
@@ -410,7 +484,10 @@ class RawArtifactPublishReport:
         return {
             "manifest_count": len(manifest_paths),
             "artifact_count": len(self.entries),
-            "uploaded_count": sum(1 for entry in self.entries if entry.valid),
+            "uploaded_count": sum(1 for entry in self.entries if entry.uploaded),
+            "skipped_count": sum(
+                1 for entry in self.entries if entry.skipped is not None
+            ),
             "failed_count": sum(1 for entry in self.entries if not entry.valid),
             "r2_link_count": sum(
                 1 for entry in self.entries if entry.r2_location is not None
@@ -569,8 +646,11 @@ def fetch_source_artifact(
     # Read and validate the entry being written before anything is fetched: a
     # manifest Chronicle cannot read, or a recorded block that names two
     # different objects, is a refusal that need not touch the publisher.
+    _refuse_a_stray_default_manifest(output, manifest_path)
+    existing_manifest = _read_manifest(manifest_path)
+    _manifest_files(existing_manifest, manifest_path)
     recorded_identity = _recorded_identity(
-        _manifest_file_spec(_read_manifest(manifest_path), year),
+        _manifest_file_spec(existing_manifest, year),
         manifest_path=manifest_path,
         year=year,
     )
@@ -1513,9 +1593,21 @@ def _assert_recorded_identity_holds_these_bytes(
     record_revision: bool,
 ) -> None:
     """Refuse a publisher revision that has not been opted into."""
-    if record_revision or identity is None:
+    if identity is None or identity.holds(sha256=sha256, filename=filename):
         return
-    if identity.holds(sha256=sha256, filename=filename):
+    if identity.sha256 == sha256:
+        # The recorded object holds exactly these bytes under another name. A
+        # rename is not a publisher revision, so --record-revision does not
+        # apply, and silently adopting the new name would leave the entry's
+        # filename disagreeing with the key its own storage block records.
+        raise SourceArtifactRevisionError(
+            f"{manifest_path} entry {year!r} already records these exact bytes "
+            f"(sha256={sha256}) as filename={identity.filename}; this fetch "
+            f"names them {Path(filename).name}. A rename is not a release "
+            "revision, so --record-revision does not apply. Re-run with "
+            f"--filename {identity.filename} to keep the recorded identity."
+        )
+    if record_revision:
         return
     raise SourceArtifactRevisionError(
         _revision_error_message(
@@ -1764,13 +1856,37 @@ def _publish_raw_manifest_entry(
         ),
     )
     recorded_bucket = recorded_r2.bucket if recorded_r2 is not None else None
-    if recorded_bucket and recorded_bucket != location.bucket:
-        # The recorded bucket is preserved history. Publishing the same bytes
-        # into a renamed bucket is a backfill copy, not a restatement, so the
-        # manifest must not be rewritten to point at the new bucket.
-        return refuse(
-            "recorded_r2_bucket_is_preserved_history:"
-            f"recorded={recorded_bucket}:requested={location.bucket}"
+    if recorded_r2 is not None and recorded_bucket != location.bucket:
+        # The recorded bucket is preserved history and, per the identity check
+        # above, its object holds exactly these bytes: the artifact is already
+        # published. Restating it under the configured bucket would rewrite
+        # where the bytes were first published (a backfill copy is not a
+        # restatement), so the entry is reported as skipped with nothing
+        # uploaded or rewritten. After the bucket-default flip every entry
+        # published before it takes this path, and the sweep stays green.
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(artifact_path),
+                sha256=sha256_actual,
+                size_bytes=size_bytes,
+                r2_location=ArtifactStorageLocation(
+                    provider="r2",
+                    bucket=recorded_r2.bucket,
+                    key=recorded_r2.key,
+                ),
+                upload=None,
+                errors=(),
+                skipped=(
+                    "recorded_r2_bucket_is_preserved_history:"
+                    f"recorded={recorded_bucket}:requested={location.bucket}"
+                ),
+            ),
+            None,
         )
     recorded_key = recorded_r2.key if recorded_r2 is not None else None
     if recorded_key and recorded_key != location.key:

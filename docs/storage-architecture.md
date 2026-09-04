@@ -141,6 +141,7 @@ files:
           sha256: <original sha256>
           size_bytes: <size of the original bytes>
           fetched_at: "2026-06-11T14:22:05+00:00"
+          source_url: https://www.irs.gov/pub/irs-soi/22in05ira.xlsx
           superseded_at: "2026-09-02T17:04:11+00:00"
 ```
 
@@ -318,8 +319,10 @@ deleted, and manifests keep the `storage.r2` URIs they already recorded as
 historical truth. A backfill copies bytes into the new bucket; it never rewrites
 where those bytes were first published. `publish-raw` and `fetch-artifact`
 enforce that: a recorded block that addresses the bytes in hand is preserved
-whichever bucket is configured, and `publish-raw` refuses to restate it under a
-different one. Bytes that the recorded object does not hold are not that
+whichever bucket is configured, and `publish-raw` reports such an entry as
+`skipped` (already published under the recorded bucket) rather than restating
+it under a different one, so a sweep over a fully published tree stays green
+after the flip. Bytes that the recorded object does not hold are not that
 object's history at all; see [Publisher Revisions](#publisher-revisions).
 
 The cutover therefore has one irreversible-looking step that is in fact additive
@@ -410,7 +413,10 @@ export CHRONICLE_R2_DERIVED_BUCKET=chronicle-derived
 
 New raw publications land in the new bucket from that point. Manifests written
 before the flip keep pointing at `ledger-raw`, which is why the old bucket stays
-readable.
+readable. A `publish-raw --root db/data` sweep after the flip reports every
+already-published entry as `skipped` with its recorded `ledger-raw` location
+(`skipped_count` in the report) and exits 0; only bytes that no recorded object
+holds are uploaded, into `chronicle-raw`.
 
 ### 6. Set the ledger-era buckets read-only
 

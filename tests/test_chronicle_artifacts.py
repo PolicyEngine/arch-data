@@ -11,6 +11,7 @@ import yaml
 
 from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
+    AmbiguousManifestError,
     MalformedManifestError,
     RecordedR2LocatorError,
     SourceArtifactRevisionError,
@@ -246,6 +247,7 @@ def test_publish_source_artifacts_uploads_manifest_entries(tmp_path):
         "failed_count": 0,
         "manifest_count": 1,
         "r2_link_count": 1,
+        "skipped_count": 0,
         "uploaded_count": 1,
     }
     assert storage["bucket"] == "ledger-raw"
@@ -740,11 +742,15 @@ def test_publish_derived_uses_the_configured_bucket(tmp_path, monkeypatch):
     assert "chronicle-derived/derived/irs_soi/" in log.read_text()
 
 
-def test_publish_raw_refuses_to_restate_a_recorded_bucket(tmp_path, monkeypatch):
+def test_publish_raw_skips_an_object_already_held_by_a_preserved_bucket(
+    tmp_path, monkeypatch
+):
     """A recorded storage.r2 bucket is preserved history, not a publish target.
 
     Archived witness records pin raw R2 URLs by hash, so backfilling the same
-    bytes into a renamed bucket must not rewrite the manifest.
+    bytes into a renamed bucket must not rewrite the manifest. The entry is
+    already published, so the sweep reports it skipped and stays green: after
+    the bucket-default flip every entry published before it takes this path.
     """
     monkeypatch.setenv("CHRONICLE_R2_RAW_BUCKET", "chronicle-raw")
     output_dir = tmp_path / "db" / "data" / "irs_soi" / "soi-table-1-1"
@@ -777,17 +783,26 @@ def test_publish_raw_refuses_to_restate_a_recorded_bucket(tmp_path, monkeypatch)
     wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
     wrangler.chmod(0o755)
 
+    before = manifest_path.read_bytes()
     report = publish_source_artifacts(output_dir, wrangler_command=str(wrangler))
-    unchanged = yaml.safe_load(manifest_path.read_text())
+    entry = report.entries[0]
 
-    assert not report.valid
-    assert (
-        report.entries[0]
-        .errors[0]
-        .startswith("recorded_r2_bucket_is_preserved_history:")
+    assert report.valid
+    assert entry.errors == ()
+    assert entry.upload is None
+    assert entry.skipped == (
+        "recorded_r2_bucket_is_preserved_history:"
+        "recorded=ledger-raw:requested=chronicle-raw"
     )
+    assert entry.r2_location is not None
+    assert entry.r2_location.bucket == "ledger-raw"
+    assert entry.r2_location.key == recorded_key
+    assert entry.to_dict()["skipped"] == entry.skipped
+    assert report.counts["skipped_count"] == 1
+    assert report.counts["uploaded_count"] == 0
+    assert report.counts["failed_count"] == 0
     assert not log.exists()
-    assert unchanged["files"][2023]["storage"]["r2"]["bucket"] == "ledger-raw"
+    assert manifest_path.read_bytes() == before
 
 
 def test_fetch_artifact_keeps_an_already_recorded_bucket(tmp_path, monkeypatch):
@@ -1287,17 +1302,76 @@ def test_a_revision_is_refused_in_the_manifest_that_records_it(tmp_path):
     assert (package / TRADITIONAL_MANIFEST).read_bytes() == recorded
     assert (package / "22in05ira.xlsx").read_bytes() == b"traditional IRA table"
 
-    # Without the flag the same fetch addresses a manifest that has no entry to
-    # protect -- which is exactly why the flag exists.
-    report = _fetch_local(
+    # Without the flag the same fetch would address a manifest.yaml that no
+    # package reads and that protects nothing: the #225 path. It is refused,
+    # naming the manifests the directory keeps, and nothing is written.
+    with pytest.raises(AmbiguousManifestError) as stray:
+        _fetch_local(
+            package,
+            traditional,
+            package_id="soi-ira-traditional-contributions-2022",
+        )
+
+    assert TRADITIONAL_MANIFEST in str(stray.value)
+    assert "--manifest" in str(stray.value)
+    assert not (package / "manifest.yaml").exists()
+    assert (package / TRADITIONAL_MANIFEST).read_bytes() == recorded
+    assert (package / "22in05ira.xlsx").read_bytes() == b"traditional IRA table"
+
+
+def test_fetch_artifact_cli_refuses_a_stray_default_manifest(tmp_path, capsys):
+    package = tmp_path / "db" / "data" / "irs_soi" / "ira_contributions"
+    traditional = _publish(tmp_path, "22in05ira.xlsx", b"traditional IRA table")
+    _fetch_local(
         package,
         traditional,
         package_id="soi-ira-traditional-contributions-2022",
+        manifest_filename=TRADITIONAL_MANIFEST,
     )
+    argv = [
+        "fetch-artifact",
+        "--url",
+        str(traditional),
+        "--source-id",
+        "irs_soi",
+        "--package-id",
+        "soi-ira-traditional-contributions-2022",
+        "--year",
+        "2022",
+        "--out-dir",
+        str(package),
+    ]
 
-    assert report.valid
-    assert report.manifest_path.endswith("manifest.yaml")
-    assert (package / TRADITIONAL_MANIFEST).read_bytes() == recorded
+    assert harness_main(argv) == 1
+
+    err = capsys.readouterr().err
+    assert err.startswith("error: ")
+    assert TRADITIONAL_MANIFEST in err
+    assert not (package / "manifest.yaml").exists()
+
+
+def test_a_same_bytes_rename_is_refused_by_name_not_as_a_revision(tmp_path):
+    """Identical bytes under another filename are neither a revision nor a
+    re-fetch: the entry's filename must keep agreeing with its recorded key."""
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    source = _publish(tmp_path, "22in05ira.xlsx", b"IRA table 5")
+    _fetch_local(package, source, filename="table-5.xlsx", upload_r2=False)
+    recorded = (package / "manifest.yaml").read_bytes()
+
+    for record_revision in (False, True):
+        with pytest.raises(SourceArtifactRevisionError) as raised:
+            _fetch_local(
+                package, source, upload_r2=False, record_revision=record_revision
+            )
+        message = str(raised.value)
+        assert "rename is not a release revision" in message
+        assert "filename=table-5.xlsx" in message
+        assert "names them 22in05ira.xlsx" in message
+        assert "--filename table-5.xlsx" in message
+
+    assert (package / "manifest.yaml").read_bytes() == recorded
+    assert not (package / "22in05ira.xlsx").exists()
+    assert (package / "table-5.xlsx").read_bytes() == b"IRA table 5"
 
 
 @pytest.mark.parametrize(
@@ -1312,6 +1386,36 @@ def test_a_manifest_name_must_stay_inside_the_package(tmp_path, manifest_filenam
         _fetch_local(package, source, manifest_filename=manifest_filename)
 
     assert not package.exists()
+
+
+def test_fetch_artifact_cli_reports_a_manifest_name_outside_the_package(
+    tmp_path, capsys
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    source = _publish(tmp_path, "table.xlsx", b"table")
+    argv = [
+        "fetch-artifact",
+        "--url",
+        str(source),
+        "--source-id",
+        "irs_soi",
+        "--package-id",
+        "soi-table-5",
+        "--year",
+        "2022",
+        "--out-dir",
+        str(package),
+        "--manifest",
+        "../manifest.yaml",
+    ]
+
+    assert harness_main(argv) == 1
+
+    err = capsys.readouterr().err
+    assert err.startswith("error: ")
+    assert "inside the package directory" in err
+    assert not package.exists()
+    assert not (tmp_path / "db" / "data" / "irs_soi" / "manifest.yaml").exists()
 
 
 def test_fetch_artifact_cli_targets_the_named_manifest(tmp_path, capsys):
@@ -1567,6 +1671,31 @@ def test_a_malformed_manifest_is_refused_before_anything_is_fetched(tmp_path, do
     manifest_path.write_text(document)
 
     with pytest.raises(MalformedManifestError):
+        _fetch_local(package, tmp_path / "publisher" / "never-read.xlsx")
+
+    assert manifest_path.read_text() == document
+    assert list(package.iterdir()) == [manifest_path]
+
+
+@pytest.mark.parametrize(
+    "document",
+    [
+        "files:\n- not a mapping\n",
+        "files: 3\n",
+        "source_id: irs_soi\nfiles: text\n",
+    ],
+)
+def test_a_non_mapping_files_block_is_refused_before_anything_is_fetched(
+    tmp_path, document
+):
+    """The same document inventory-artifacts and publish-raw report as
+    'files must be a mapping'; a fetch must not overwrite the artifact first."""
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(document)
+
+    with pytest.raises(MalformedManifestError, match="files must be a mapping"):
         _fetch_local(package, tmp_path / "publisher" / "never-read.xlsx")
 
     assert manifest_path.read_text() == document
