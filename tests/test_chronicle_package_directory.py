@@ -390,6 +390,53 @@ def _mixed_directory(tmp_path: Path) -> Path:
     return root
 
 
+def _named_manifest_tree(tmp_path: Path) -> Path:
+    root = tmp_path / "data"
+    for index, manifest_name in enumerate(
+        ("manifest_tables.yaml", "manifest_release.yml", "MANIFEST_UPPER.YAML")
+    ):
+        package = root / "dwp" / f"package_{index}"
+        content = f"public table {index}".encode()
+        filename = f"table_{index}.ods"
+        package.mkdir(parents=True)
+        (package / filename).write_bytes(content)
+        _write(
+            package / manifest_name,
+            _table_manifest(
+                files={2020 + index: _public_table_entry(filename, content)}
+            ),
+        )
+    return root
+
+
+def test_default_inventory_discovers_named_yaml_and_yml_manifests(tmp_path):
+    root = _named_manifest_tree(tmp_path)
+
+    report = inventory_source_artifacts(root)
+    explicit = inventory_source_artifacts(
+        root, manifest_filename="manifest_tables.yaml"
+    )
+
+    assert report.valid
+    assert report.counts["manifest_count"] == 3
+    assert report.counts["artifact_count"] == 3
+    assert explicit.counts["manifest_count"] == 1
+    assert explicit.counts["artifact_count"] == 1
+
+
+def test_default_publish_discovers_named_yaml_and_yml_manifests(tmp_path, monkeypatch):
+    root = _named_manifest_tree(tmp_path)
+    uploads = _record_uploads(monkeypatch)
+
+    report = publish_source_artifacts(root)
+
+    assert report.valid
+    assert report.counts["manifest_count"] == 3
+    assert report.counts["artifact_count"] == 3
+    assert report.counts["uploaded_count"] == 3
+    assert len(uploads) == 3
+
+
 def test_publish_raw_never_uploads_what_a_sibling_manifest_registers_hash_only(
     tmp_path, monkeypatch
 ):

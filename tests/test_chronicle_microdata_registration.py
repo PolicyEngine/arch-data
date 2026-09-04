@@ -1790,6 +1790,60 @@ def test_a_public_release_without_a_recorded_object_is_incomplete(
     assert inventory.entries[0].errors == ("r2_object_not_recorded",)
 
 
+@pytest.mark.parametrize(
+    ("locator", "expected_error"),
+    [
+        pytest.param({}, "recorded_r2_locator_invalid:", id="empty"),
+        pytest.param(
+            {
+                "provider": "r2",
+                "bucket": "ledger-raw",
+                "key": f"raw/census_acs/release/2022/{PUBLIC_SHA}/csv_hus.zip",
+                "uri": (
+                    "r2://ledger-raw/raw/census_acs/release/2022/"
+                    f"{OTHER_SHA}/csv_hus.zip"
+                ),
+            },
+            "recorded_r2_locator_invalid:",
+            id="contradictory",
+        ),
+        pytest.param(
+            {
+                "provider": "r2",
+                "bucket": "ledger-raw",
+                "key": f"raw/census_acs/release/2022/{OTHER_SHA}/other.zip",
+                "uri": (
+                    f"r2://ledger-raw/raw/census_acs/release/2022/{OTHER_SHA}/other.zip"
+                ),
+            },
+            "recorded_r2_identity_mismatch:",
+            id="wrong-entry-identity",
+        ),
+    ],
+)
+def test_inventory_refuses_an_invalid_or_identity_mismatched_r2_locator(
+    tmp_path, monkeypatch, locator, expected_error
+):
+    output_dir = tmp_path / "pkg"
+    _serve(monkeypatch, PUBLIC_BYTES)
+    _fetch_release(output_dir, staging_dir=tmp_path / "unused-staging")
+    manifest = _manifest(output_dir)
+    manifest["files"][2022][0]["storage"] = {"r2": locator}
+    (output_dir / "manifest.yaml").write_text(yaml.safe_dump(manifest, sort_keys=False))
+
+    inventory = inventory_source_artifacts(
+        output_dir, staging_dir=tmp_path / "no-staged-bytes"
+    )
+
+    assert not inventory.valid
+    assert inventory.counts["r2_link_count"] == 0
+    assert inventory.entries[0].r2 is None
+    assert "r2_object_not_recorded" in inventory.entries[0].errors
+    assert any(
+        error.startswith(expected_error) for error in inventory.entries[0].errors
+    )
+
+
 # Finding 8: the fetch refuses bytes the reviewed pin does not cover.
 
 
