@@ -1811,9 +1811,9 @@ def _load_manifest(manifest_path: Path) -> dict[str, Any]:
 
 def _text(value: Any) -> str | None:
     """Return a non-empty stripped string, or None."""
-    if value is None:
+    if not isinstance(value, str):
         return None
-    text = str(value).strip()
+    text = value.strip()
     return text or None
 
 

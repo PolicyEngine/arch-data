@@ -432,9 +432,7 @@ def test_hash_only_entry_reports_each_missing_field(mutation, expected_code):
         "verified-at",
     ),
 )
-def test_required_text_fields_reject_non_string_yaml_values(
-    mutation, expected_code
-):
+def test_required_text_fields_reject_non_string_yaml_values(mutation, expected_code):
     errors = validate_file_entry(
         _attested_entry(**mutation),
         kind="microdata_release",
