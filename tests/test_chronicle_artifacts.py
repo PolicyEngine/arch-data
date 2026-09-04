@@ -1702,8 +1702,20 @@ def test_a_non_mapping_files_block_is_refused_before_anything_is_fetched(
     assert list(package.iterdir()) == [manifest_path]
 
 
-@pytest.mark.parametrize("document", ["", "\n", "{}\n", "# only a comment\n"])
+@pytest.mark.parametrize(
+    "document",
+    [
+        "",
+        "\n",
+        "{}\n",
+        "# only a comment\n",
+        "files:\n",
+        "source_id: irs_soi\nfiles:\n",
+    ],
+)
 def test_an_empty_manifest_still_reads_as_absent(tmp_path, document):
+    """Including a bare ``files:`` line, which parses as an explicit null: the
+    fetch records into a fresh mapping rather than failing after the write."""
     package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
     package.mkdir(parents=True)
     (package / "manifest.yaml").write_text(document)

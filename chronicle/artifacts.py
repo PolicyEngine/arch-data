@@ -107,6 +107,8 @@ def _manifest_files(payload: dict[str, Any], manifest_path: Path) -> dict[str, A
     """
     files = payload.get("files")
     if files is None:
+        # A bare ``files:`` line parses as None: no entries, like an absent
+        # block. The writer normalizes it to a mapping before recording into it.
         return {}
     if not isinstance(files, dict):
         raise MalformedManifestError(
@@ -1684,7 +1686,10 @@ def _upsert_manifest(
     payload.setdefault("dataset", dataset)
     payload.setdefault("source_page", source_page)
     payload.setdefault("table", table)
-    payload.setdefault("files", {})
+    if payload.get("files") is None:
+        # setdefault keeps an explicit null (a bare ``files:`` line); the
+        # entry below needs a mapping to record into.
+        payload["files"] = {}
     file_entry: dict[str, Any] = {
         "filename": filename,
         "source_url": source_url,
