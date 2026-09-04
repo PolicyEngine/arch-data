@@ -1233,8 +1233,9 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # unchanged (218 -> 219).
     # Updated 2026-09-04 to the catalog at 55bbf3d, four resolve_pending.py
     # waves after the previous pin: c2aa68d (2026-08-23, manifest
-    # 0015-fdcfd0e570214f6b), 54dbabc8 (0016), 734beb8 (0017-efa7d60fece304f7)
-    # and 55bbf3d (2026-09-03, 0020-7f669f1e1364c5cc). Recomputed per commit
+    # 0015-fdcfd0e570214f6b), 54dbabc8 (0016-5226191699ae168d), 734beb8
+    # (0017-efa7d60fece304f7) and 55bbf3d (2026-09-03,
+    # 0020-7f669f1e1364c5cc). Recomputed per commit
     # with this test's algorithm, the previous pin was exact at c2aa68d^ and
     # the delta to 55bbf3d is nine mints from first observed identities, all
     # at c2aa68d (bls.ces.home_health_care_services.employment,
