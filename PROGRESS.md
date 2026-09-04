@@ -377,11 +377,29 @@ Running the same operations against a checkout of the previous head:
   all-owner rewrite is slice-1-specific. Fix/docs commit: `7da26a9`. The red
   command now exits 0 with 3 passed; the artifact module exits 0 with 135
   passed.
+- **Finding 1 reproduced and fixed.** The whole-tree regression copies tracked
+  `db/data/**` to `tmp_path`, configures `CHRONICLE_R2_RAW_BUCKET=chronicle-raw`,
+  and installs a successful non-writing uploader. Red command:
+  `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p
+  no:cacheprovider tests/test_chronicle_artifacts.py::test_documented_bucket_cutover_sweep_accepts_the_tracked_registry`
+  exited 1 with the observed tuple `exit=1`, `valid=false`, 156 manifests, 187
+  artifacts, 94 skipped, 93 failed, 94 R2-linked, zero uploaded, and five
+  report errors. Test-only commit: `7f0f473`.
+- A syntactically valid recorded R2 locator whose content-addressed tail
+  matches the package-local checksum and filename is now preserved and skipped
+  before reconstructing today's country/source/package/year route. This
+  accepts 84 pre-country-prefix UK keys, eight explicit Statbel 2023 routes,
+  the shared USDA route, and five fully recorded Eurostat manifests that omit
+  package IDs, while locator contradictions and byte mismatches remain errors.
+  Fix commit: `25deb29`; no #227 hunk applies. The same whole-tree command now
+  exits 0 with 161 manifests, 194 artifacts, 194 skipped/R2-linked, zero
+  uploaded or failed, and no errors. The artifact module exits 0 with 136
+  passed.
 
 ### Next
 
-1. Reproduce and fix recorded-key cutover compatibility (finding 1) with the
-   documented non-writing sweep over a temporary copy of the tracked tree.
+1. Reproduce and fix malformed `storage.previous_r2` handling (finding 7),
+   proving refusal before publisher I/O.
 2. Commit each coherent red-test and implementation step, updating this log.
 3. Run focused tests, lint/format checks on changed files, and the full suite
    with the directly captured exit code and counts.
