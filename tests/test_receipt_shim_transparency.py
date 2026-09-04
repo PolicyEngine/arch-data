@@ -31,15 +31,57 @@ ORIGINAL_HASHES = {
 }
 OPENSSL_QUEUE_ID = re.compile(rb"(?m)^[0-9A-Fa-f]{8,16}(?=:error:)")
 
-BASE_LINE_COUNT = 182
-CANDIDATE_LINE_COUNT = 189
-NEW_RELEASE_STEM = "0012-3a5ef7eeee484370"
 RELEASE_FILE_SUFFIXES = (
     ".json",
     ".producer.sig",
     ".freetsa.tsr",
     ".digicert.tsr",
 )
+
+
+def _release_manifests() -> list[pathlib.Path]:
+    """Every canonical release manifest, in release-index order."""
+
+    return sorted((ROOT / "releases" / "manifests").glob("[0-9]" * 4 + "-*.json"))
+
+
+def _head_release() -> dict:
+    return json.loads(_release_manifests()[-1].read_text(encoding="utf-8"))
+
+
+# The witnessed journal grows on every resolver append, so the numbers this
+# differential replays are read from the committed release chain rather than
+# transcribed into the test. Transcribed numbers went stale the first time the
+# append lane ran and this file is not part of the CI pytest step that would
+# have caught it. What the differential actually asserts -- that the original
+# and the shim emit the same bytes -- does not depend on the numbers at all;
+# they only pin the text the pair is expected to agree on.
+_HEAD_RELEASE = _head_release()
+RELEASE_COUNT = len(_release_manifests())
+NEW_RELEASE_STEM = _release_manifests()[-1].stem
+FIRST_APPEND_RELEASE_STEM = _release_manifests()[1].stem
+RELEASE_INDEX = int(_HEAD_RELEASE["releaseIndex"])
+CANDIDATE_LINE_COUNT = int(_HEAD_RELEASE["state"]["lineCount"])
+BASE_LINE_COUNT = int(_HEAD_RELEASE["append"]["previousLineCount"])
+APPENDED_ROW_COUNT = int(_HEAD_RELEASE["append"]["appendedRowCount"])
+PREFIX_LINE_COUNT = int(
+    json.loads((ROOT / "ledger" / "immutable_prefix.json").read_text(encoding="utf-8"))[
+        "prefixLineCount"
+    ]
+)
+RELEASE_CHAIN_OK = re.compile(
+    rb"release chain OK: "
+    + str(RELEASE_COUNT).encode("ascii")
+    + rb" releases, HEAD="
+    + re.escape(NEW_RELEASE_STEM.encode("ascii"))
+    + rb"\.json, digicert=\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z, "
+    + rb"freetsa=\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\n"
+)
+APPEND_GATE_OK = (
+    f"thesis-facts append check OK: {CANDIDATE_LINE_COUNT} rows, "
+    f"immutable prefix {PREFIX_LINE_COUNT}, "
+    f"+{APPENDED_ROW_COUNT} appended vs base, release {RELEASE_INDEX}\n"
+).encode("utf-8")
 
 Mutation = Callable[[pathlib.Path], None]
 
@@ -162,12 +204,10 @@ def test_live_full_release_chain_is_byte_identical(
     shim = _run_script(SHIM_SCRIPTS / "verify_release_chain.py", *arguments)
     _assert_byte_identical(original, shim, expected_code=0)
     assert shim.stderr == b""
-    assert shim.stdout == (
-        b"release chain OK: 13 releases, "
-        b"HEAD=0012-3a5ef7eeee484370.json, "
-        b"digicert=2026-08-12T14:43:16Z, "
-        b"freetsa=2026-08-12T14:43:16Z\n"
-    )
+    # The two RFC 3161 receipt times are set by the timestamp authorities, so
+    # they are matched by shape rather than transcribed; the release count and
+    # the HEAD manifest name come from the committed chain.
+    assert RELEASE_CHAIN_OK.fullmatch(shim.stdout), shim.stdout
 
 
 def _copy_custody_tree(destination: pathlib.Path) -> pathlib.Path:
@@ -190,19 +230,13 @@ def _append_unwitnessed_row(root: pathlib.Path) -> None:
 
 def _corrupt_producer_signature(root: pathlib.Path) -> None:
     _flip_middle_byte(
-        root
-        / "releases"
-        / "manifests"
-        / "0001-916626696d034b80.producer.sig"
+        root / "releases" / "manifests" / f"{FIRST_APPEND_RELEASE_STEM}.producer.sig"
     )
 
 
 def _corrupt_freetsa_receipt(root: pathlib.Path) -> None:
     _flip_middle_byte(
-        root
-        / "releases"
-        / "manifests"
-        / "0001-916626696d034b80.freetsa.tsr"
+        root / "releases" / "manifests" / f"{FIRST_APPEND_RELEASE_STEM}.freetsa.tsr"
     )
 
 
@@ -212,7 +246,10 @@ def _corrupt_freetsa_receipt(root: pathlib.Path) -> None:
         (
             "unwitnessed-row",
             _append_unwitnessed_row,
-            b"HEAD release lineCount 189 does not match working-tree line count 190",
+            (
+                f"HEAD release lineCount {CANDIDATE_LINE_COUNT} does not match "
+                f"working-tree line count {CANDIDATE_LINE_COUNT + 1}"
+            ).encode("utf-8"),
         ),
         (
             "producer-signature",
@@ -337,16 +374,13 @@ def test_valid_base_ref_append_is_byte_identical(
     original, shim = _run_append_pair(original_oracle, candidate, base)
     _assert_byte_identical(original, shim, expected_code=0)
     assert shim.stderr == b""
-    assert shim.stdout == (
-        b"thesis-facts append check OK: 189 rows, immutable prefix 128, "
-        b"+7 appended vs base, release 12\n"
-    )
+    assert shim.stdout == APPEND_GATE_OK
 
 
 def _rewrite_historical_row(root: pathlib.Path) -> None:
     ledger = root / "ledger" / "official_observations.jsonl"
     rows = ledger.read_bytes().splitlines(keepends=True)
-    rows[128] = b" " + rows[128]
+    rows[PREFIX_LINE_COUNT] = b" " + rows[PREFIX_LINE_COUNT]
     ledger.write_bytes(b"".join(rows))
 
 
@@ -372,17 +406,20 @@ def _remove_new_release_manifest(root: pathlib.Path) -> None:
         (
             "historical-rewrite",
             _rewrite_historical_row,
-            b"change rewrites existing line 129",
+            (f"change rewrites existing line {PREFIX_LINE_COUNT + 1}").encode("utf-8"),
         ),
         (
             "missing-assertion-version",
             _remove_appended_assertion_version,
-            b"appended line 183",
+            f"appended line {BASE_LINE_COUNT + 1}".encode("utf-8"),
         ),
         (
             "missing-release-manifest",
             _remove_new_release_manifest,
-            b"release proposal must add exactly one manifest for index 12",
+            (
+                "release proposal must add exactly one manifest for index "
+                f"{RELEASE_INDEX}"
+            ).encode("utf-8"),
         ),
     ],
 )
