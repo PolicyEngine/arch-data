@@ -17,9 +17,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -37,9 +40,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -57,9 +63,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -77,9 +86,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -97,9 +109,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -117,9 +132,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -137,9 +155,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -157,9 +178,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -177,9 +201,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -197,9 +224,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -217,9 +247,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -237,9 +270,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -257,9 +293,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across
@@ -277,9 +316,12 @@ files:
       credential grants access to them.
     doi: 10.5255/UKDA-SN-9367-2
     study: UK Data Service SN 9367
-    verified_at: '2026-09-02'
-    hash_source: PolicyEngine/microcosm packages/microcosm-build/src/microcosm/build/uk/source_stages.json
-      (frs_spine)
+    hash_source: consumer_pin
+    attested_by: PolicyEngine/microcosm
+    pinned_from:
+      repository: PolicyEngine/microcosm
+      path: packages/microcosm-build/src/microcosm/build/uk/source_stages.json
+      commit: 2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77
     notes: Microcosm's frs_spine stage cites 'UK Data Service SN 9367, DOI 10.5255/UKDA-SN-9367-2';
       its frs_employment, frs_council_tax, frs_education, and frs_legacy_proxies stages
       cite 'SN 9252' for the same 2023_24 tabs. The tabs are the same bytes across

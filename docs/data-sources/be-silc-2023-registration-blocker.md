@@ -63,8 +63,12 @@ no `ledger-raw` key exists for them.
      --microcosm-root ~/PolicyEngine/microcosm \
      --root db/data \
      --release statbel-be-silc-2023 \
-     emit --verified-at <date>
+     emit
    ```
+
+   The registration is a `consumer_pin`: it names PolicyEngine/microcosm as
+   the attester and records the consumer manifest's path and the commit the
+   pins were read from; it carries no `verified_at` of its own.
 
 3. Delete the `blocker` field from the `statbel-be-silc-2023` catalogue entry,
    and delete this document.

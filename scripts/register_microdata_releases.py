@@ -9,14 +9,22 @@ halves of that from the pins Microcosm already reviewed:
     Write hash-only ``kind: microdata_release`` manifests for ``licensed`` and
     ``restricted`` releases. Every checksum, size, filename, and vintage is read
     verbatim from the Microcosm source-stages JSON; nothing is recomputed and
-    nothing is invented. A release Microcosm pins without a checksum is reported
-    as a blocker and never registered.
+    nothing is invented. Each registration is a ``consumer_pin``: it names the
+    consumer as the attester and records the repository, path, and commit the
+    pin was read from, and carries no verification date of its own. A release
+    Microcosm pins without a checksum is reported as a blocker and never
+    registered.
 
 ``plan``
     Print the exact ``chronicle fetch-artifact ... --upload-r2`` commands to run
     from a networked machine for ``public`` releases, whose bytes Chronicle does
-    archive. Publisher URLs are copied verbatim from the Microcosm manifest; a
-    release whose manifest carries no URL prints a ``TODO`` instead of a guess.
+    archive. Every command carries the reviewed identity as arguments: the
+    publisher, the vintage, and -- when Microcosm's pin is of the publisher
+    bytes -- ``--expected-sha256`` and ``--expected-size-bytes``, so the fetch
+    refuses a reissue before archiving it. Publisher URLs are copied verbatim
+    from the Microcosm manifest; a release whose manifest carries no URL, no
+    publisher-bytes checksum, or no licence-evidence URL prints a ``TODO``
+    instead of a guess, and that command cannot run until the TODO is filled.
 
 The catalogue below is the only authored content: it maps a Microcosm artifact
 onto Chronicle's ``{source_id, package_id, year, sha256, filename}`` identity
@@ -27,7 +35,7 @@ Usage::
 
     python scripts/register_microdata_releases.py emit \\
         --microcosm-root ~/PolicyEngine/microcosm \\
-        --root db/data --verified-at 2026-09-02
+        --root db/data
 
     python scripts/register_microdata_releases.py plan \\
         --microcosm-root ~/PolicyEngine/microcosm --root db/data
@@ -40,19 +48,39 @@ from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
+import re
 import shlex
+import subprocess
 import sys
 from typing import Any
 
 # Allow `python scripts/register_microdata_releases.py` from a checkout.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from chronicle.artifacts import default_r2_raw_bucket  # noqa: E402
 from chronicle.registration import (  # noqa: E402
     ACCESS_PUBLIC,
+    HASH_SOURCE_CONSUMER_PIN,
     MICRODATA_RELEASE_KIND,
     HashOnlyRegistrationError,
     register_hash_only_artifact,
 )
+
+#: The consumer whose reviewed pins every registration here transcribes.
+CONSUMER_REPOSITORY = "PolicyEngine/microcosm"
+
+#: Placeholders a planned command prints where Microcosm pins nothing. Each is
+#: refused by fetch-artifact as written, so a command carrying one cannot run
+#: until a reviewer replaces it.
+TODO_PUBLISHER_URL = "TODO_PUBLISHER_URL"
+TODO_REVIEWED_SHA256 = "TODO_REVIEWED_SHA256"
+TODO_EVIDENCE_URL = "TODO_EVIDENCE_URL"
+
+#: Allowlisted licence identifier for a public-use file of a U.S. federal
+#: statistical agency (chronicle/licences.py).
+US_GOVERNMENT_WORK = "US-Government-Work"
+
+_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 #: Microcosm's per-artifact ``kind`` mapped onto Chronicle's access class.
 #:
@@ -118,6 +146,12 @@ class Release:
     #: archive member, and such a hash must never be presented as the checksum
     #: a fetch should reproduce.
     pinned_sha_is_publisher_bytes: bool = True
+    #: Licence evidence for a public release: who issued the file under the
+    #: allowlisted term, the scope statement, and the durable evidence URL.
+    #: A missing URL prints a TODO in the plan; it is never guessed.
+    licence_evidence_issuer: str | None = None
+    licence_evidence_scope: str | None = None
+    licence_evidence_url: str | None = None
     #: Set when Microcosm pins the release without a checksum.
     blocker: str | None = None
 
@@ -165,6 +199,16 @@ FRS_NOTES = (
     "2023_24 tabs. The tabs are the same bytes across all five stages (identical "
     "SHA-256), so the registration carries the study reference that also carries "
     "a DOI. " + HASH_PROVENANCE
+)
+
+CENSUS_SCOPE = (
+    "Public-use microdata file published by the U.S. Census Bureau, a federal "
+    "agency; a work of the United States Government under 17 U.S.C. §105."
+)
+FED_SCOPE = (
+    "Public data set published by the Board of Governors of the Federal "
+    "Reserve System, a federal agency; a work of the United States Government "
+    "under 17 U.S.C. §105."
 )
 
 CATALOGUE: tuple[Release, ...] = (
@@ -270,7 +314,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2023,
         table="CPS Annual Social and Economic Supplement 2023 public-use files",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         source_page="https://www.census.gov/programs-surveys/cps/data/datasets.html",
     ),
@@ -287,7 +333,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2024,
         table="CPS basic monthly public-use files, January-December 2024",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         source_page="https://www2.census.gov/programs-surveys/cps/datasets/2024/basic/",
         notes=(
@@ -311,7 +359,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2022,
         table="ACS 2022 1-Year PUMS household file",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         url_field="official_household_source",
         source_page="https://www.census.gov/programs-surveys/acs",
@@ -335,7 +385,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2022,
         table="ACS 2022 1-Year PUMS person file",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         url_field="official_person_source",
         source_page="https://www.census.gov/programs-surveys/acs",
@@ -356,9 +408,12 @@ CATALOGUE: tuple[Release, ...] = (
         year=2024,
         table="ACS 2024 1-Year PUMS household file",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         url_field="url",
+        vintage="2024",
         source_page="https://www2.census.gov/programs-surveys/acs/data/pums/2024/1-Year/",
     ),
     Release(
@@ -371,9 +426,12 @@ CATALOGUE: tuple[Release, ...] = (
         year=2024,
         table="ACS 2024 1-Year PUMS person file",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         url_field="url",
+        vintage="2024",
         source_page="https://www2.census.gov/programs-surveys/acs/data/pums/2024/1-Year/",
     ),
     Release(
@@ -390,7 +448,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2022,
         table="Survey of Consumer Finances 2022 summary extract",
         publisher="Board of Governors of the Federal Reserve System",
-        licence="Federal Reserve Board public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="Board of Governors of the Federal Reserve System",
+        licence_evidence_scope=FED_SCOPE,
         access=ACCESS_PUBLIC,
         source_page="https://www.federalreserve.gov/econres/scfindex.htm",
     ),
@@ -408,7 +468,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2022,
         table="Survey of Consumer Finances 2022 full public data set",
         publisher="Board of Governors of the Federal Reserve System",
-        licence="Federal Reserve Board public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="Board of Governors of the Federal Reserve System",
+        licence_evidence_scope=FED_SCOPE,
         access=ACCESS_PUBLIC,
         source_page="https://www.federalreserve.gov/econres/scfindex.htm",
         notes=(
@@ -431,7 +493,9 @@ CATALOGUE: tuple[Release, ...] = (
         year=2023,
         table="Survey of Income and Program Participation 2023 public-use file",
         publisher="U.S. Census Bureau",
-        licence="U.S. Census Bureau public-use file; U.S. Government work, no copyright",
+        licence=US_GOVERNMENT_WORK,
+        licence_evidence_issuer="U.S. Census Bureau",
+        licence_evidence_scope=CENSUS_SCOPE,
         access=ACCESS_PUBLIC,
         source_page="https://www.census.gov/programs-surveys/sipp.html",
         pinned_sha_is_publisher_bytes=False,
@@ -586,22 +650,84 @@ def resolve(
     return resolved
 
 
-def hash_source(release: Release) -> str:
-    """Return the provenance pointer recorded on a registration."""
-    return f"PolicyEngine/microcosm {release.manifest} ({release.selector.stage})"
+def pin_commit(microcosm_root: Path, relative: str) -> str:
+    """Return the commit the consumer's pin is read from, read-only.
+
+    The pin is the manifest blob, so the commit recorded is the last one that
+    changed that file: it addresses exactly the bytes the registration
+    transcribes, and it is stable across later, unrelated commits so repeated
+    ``emit`` runs stay byte-identical.
+    """
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(microcosm_root),
+                "log",
+                "-1",
+                "--format=%H",
+                "--",
+                relative,
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise CatalogueError(
+            f"Cannot read the commit of {relative} in {microcosm_root}: {exc}. "
+            "Pass --microcosm-commit with the reviewed commit."
+        ) from exc
+    commit = completed.stdout.strip()
+    if not _COMMIT_RE.match(commit):
+        raise CatalogueError(
+            f"{microcosm_root} records no commit for {relative}; pass "
+            "--microcosm-commit with the reviewed commit."
+        )
+    return commit
+
+
+def parse_pin_commits(values: Sequence[str]) -> dict[str, str]:
+    """Parse ``--microcosm-commit`` values into ``{manifest path or '*': commit}``."""
+    commits: dict[str, str] = {}
+    for value in values:
+        path, separator, commit = value.rpartition("=")
+        key = path if separator else "*"
+        if not _COMMIT_RE.match(commit):
+            raise CatalogueError(
+                f"--microcosm-commit must name a 40-hex commit, not {value!r}."
+            )
+        if key in commits and commits[key] != commit:
+            raise CatalogueError(
+                f"--microcosm-commit names two commits for {key!r}; pass one."
+            )
+        commits[key] = commit
+    return commits
+
+
+def pinned_from(release: Release, commit: str) -> dict[str, str]:
+    """Return the ``pinned_from`` block a consumer_pin registration records."""
+    return {
+        "repository": CONSUMER_REPOSITORY,
+        "path": release.manifest,
+        "commit": commit,
+    }
 
 
 def emit(
     resolved: Sequence[ResolvedRelease],
     *,
     root: Path,
-    verified_at: str,
+    pin_commits: Mapping[str, str],
     allow_reissue: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     """Write hash-only manifests for every registrable non-public release.
 
-    Returns ``(registrations, blockers)``. A release Microcosm pins without a
-    checksum is a blocker, not a registration: no hash is ever invented.
+    ``pin_commits`` maps each consumer manifest path to the commit its pins
+    are read from. Returns ``(registrations, blockers)``. A release Microcosm
+    pins without a checksum is a blocker, not a registration: no hash is ever
+    invented.
     """
     registrations: list[dict[str, Any]] = []
     blockers: list[dict[str, str]] = []
@@ -636,6 +762,9 @@ def emit(
             licence=release.licence,
             access=release.access,
             vintage=item.vintage,
+            hash_source=HASH_SOURCE_CONSUMER_PIN,
+            attested_by=CONSUMER_REPOSITORY,
+            pinned_from=pinned_from(release, pin_commits[release.manifest]),
             size_bytes=item.size_bytes,
             source_page=release.source_page,
             access_route=release.access_route,
@@ -643,8 +772,6 @@ def emit(
             study=release.study,
             table=release.table,
             publisher=release.publisher,
-            verified_at=verified_at,
-            hash_source=hash_source(release),
             notes=release.notes or HASH_PROVENANCE,
             allow_reissue=allow_reissue,
         )
@@ -668,7 +795,7 @@ def fetch_command(
     todos: list[str] = []
     url = item.url
     if url is None:
-        url = "TODO_PUBLISHER_URL"
+        url = TODO_PUBLISHER_URL
         todos.append(
             f"{release.release_id}: Microcosm records no publisher URL "
             f"(field {release.url_field!r}); read it off {release.source_page}."
@@ -689,11 +816,23 @@ def fetch_command(
         "--url",
         url,
     ]
+    if item.filename:
+        argv += ["--filename", item.filename]
     if release.source_page:
         argv += ["--source-page", release.source_page]
+    vintage = item.vintage
+    if not vintage:
+        todos.append(
+            f"{release.release_id}: Microcosm records no vintage; add "
+            "Release.vintage to the catalogue before running this command."
+        )
     argv += [
         "--table",
         release.table,
+        "--publisher",
+        release.publisher,
+        "--vintage",
+        vintage or "TODO_VINTAGE",
         "--access",
         ACCESS_PUBLIC,
         "--licence",
@@ -702,22 +841,46 @@ def fetch_command(
         # several files share one vintage and no source package parses it.
         "--kind",
         MICRODATA_RELEASE_KIND,
-        "--upload-r2",
-        "--r2-bucket",
-        r2_bucket,
     ]
+    # The reviewed identity travels as arguments, never as a comment: the
+    # fetch refuses bytes that hash differently before archiving anything.
     if item.sha256 and release.pinned_sha_is_publisher_bytes:
+        argv += ["--expected-sha256", item.sha256]
+        if item.size_bytes:
+            argv += ["--expected-size-bytes", str(item.size_bytes)]
+    else:
+        argv += ["--expected-sha256", TODO_REVIEWED_SHA256]
+        if item.sha256:
+            todos.append(
+                f"{release.release_id}: Microcosm's pinned sha256 {item.sha256} "
+                "is NOT the publisher artifact's checksum. A public release is "
+                "archived only against a reviewed checksum its licence evidence "
+                "covers; review the publisher bytes and replace "
+                f"{TODO_REVIEWED_SHA256} before running this command."
+            )
+        else:
+            todos.append(
+                f"{release.release_id}: Microcosm pins no checksum for this "
+                "release. A public release is archived only against a reviewed "
+                f"checksum; replace {TODO_REVIEWED_SHA256} before running this "
+                "command."
+            )
+    argv += [
+        "--licence-evidence-issuer",
+        release.licence_evidence_issuer or release.publisher,
+        "--licence-evidence-scope",
+        release.licence_evidence_scope or "TODO_EVIDENCE_SCOPE",
+        "--licence-evidence-url",
+        release.licence_evidence_url or TODO_EVIDENCE_URL,
+    ]
+    if not release.licence_evidence_url:
         todos.append(
-            f"{release.release_id}: expect sha256 {item.sha256}"
-            + (f" and size {item.size_bytes}" if item.size_bytes else "")
-            + " — fail the registration if the fetched bytes differ."
+            f"{release.release_id}: no durable licence-evidence URL is "
+            f"catalogued; replace {TODO_EVIDENCE_URL} with the publisher's "
+            "statement that this file is issued under "
+            f"{release.licence} before running this command."
         )
-    elif item.sha256:
-        todos.append(
-            f"{release.release_id}: Microcosm's pinned sha256 {item.sha256} is "
-            "NOT the publisher artifact's checksum — do not use it to verify "
-            "this fetch. See the note below."
-        )
+    argv += ["--upload-r2", "--r2-bucket", r2_bucket]
     if release.notes:
         todos.append(f"{release.release_id}: {release.notes}")
     return shlex.join(argv), todos
@@ -777,11 +940,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write hash-only manifests for licensed and restricted releases",
     )
     emit_parser.add_argument(
-        "--verified-at",
-        required=True,
+        "--microcosm-commit",
+        action="append",
+        default=None,
+        metavar="[PATH=]COMMIT",
         help=(
-            "Date the pins were verified against Microcosm, as YYYY-MM-DD. "
-            "Required so repeated runs are byte-stable."
+            "Commit the consumer pins are read from, recorded as "
+            "pinned_from.commit on every registration. A bare COMMIT applies "
+            "to every consumer manifest; PATH=COMMIT (repeatable) names the "
+            "commit for one manifest path. Defaults to the last commit that "
+            "changed each consumer manifest, read from the checkout's git "
+            "history."
         ),
     )
     emit_parser.add_argument(
@@ -796,8 +965,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     plan_parser.add_argument(
         "--r2-bucket",
-        default="ledger-raw",
-        help="Raw bucket the fetch should upload to.",
+        default=None,
+        help=(
+            "Raw bucket the fetch should upload to. Defaults to "
+            "$CHRONICLE_R2_RAW_BUCKET, else the ledger-era default."
+        ),
     )
     return parser
 
@@ -823,10 +995,34 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "emit":
         try:
+            declared = parse_pin_commits(args.microcosm_commit or ())
+        except CatalogueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        # Only a registrable release needs its pin's commit: a public release
+        # is fetched, not transcribed, and a blocked one is never registered.
+        registrable = sorted(
+            {
+                item.release.manifest
+                for item in resolved
+                if item.release.access != ACCESS_PUBLIC and not item.release.blocker
+            }
+        )
+        try:
+            pin_commits = {
+                manifest: declared.get(manifest)
+                or declared.get("*")
+                or pin_commit(microcosm_root, manifest)
+                for manifest in registrable
+            }
+        except CatalogueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        try:
             registrations, blockers = emit(
                 resolved,
                 root=args.root,
-                verified_at=args.verified_at,
+                pin_commits=pin_commits,
                 allow_reissue=args.allow_reissue,
             )
         except HashOnlyRegistrationError as exc:
@@ -850,7 +1046,11 @@ def main(argv: list[str] | None = None) -> int:
             )
         return 0
 
-    commands, todos = plan(resolved, root=args.root, r2_bucket=args.r2_bucket)
+    commands, todos = plan(
+        resolved,
+        root=args.root,
+        r2_bucket=args.r2_bucket or default_r2_raw_bucket(),
+    )
     if args.json:
         print(json.dumps({"commands": commands, "todos": todos}, indent=2))
         return 0
