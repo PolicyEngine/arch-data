@@ -395,11 +395,21 @@ Running the same operations against a checkout of the previous head:
   exits 0 with 161 manifests, 194 artifacts, 194 skipped/R2-linked, zero
   uploaded or failed, and no errors. The artifact module exits 0 with 136
   passed.
+- **Finding 7 reproduced and fixed.** Red command:
+  `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p
+  no:cacheprovider tests/test_chronicle_artifacts.py::test_fetch_refuses_non_list_previous_r2_before_publisher_io`
+  exited 1 with 3 failures: mapping, scalar, and null `previous_r2` values all
+  reached the publisher-I/O sentinel. Test-only commit: `e418813`.
+  `_validated_recorded_storage` now rejects every present non-list history
+  before `_read_artifact`, so `_superseding_storage` cannot replace malformed
+  provenance. Fix commit: `8b7ab22`; no #227 hunk applies. The focused command
+  now exits 0 with 3 passed (5 passed including ordinary and shared revision
+  history controls).
 
 ### Next
 
-1. Reproduce and fix malformed `storage.previous_r2` handling (finding 7),
-   proving refusal before publisher I/O.
+1. Reproduce and fix import-time Supabase compatibility aliases (finding 8)
+   for Chronicle/current and both legacy schema environment spellings.
 2. Commit each coherent red-test and implementation step, updating this log.
 3. Run focused tests, lint/format checks on changed files, and the full suite
    with the directly captured exit code and counts.
