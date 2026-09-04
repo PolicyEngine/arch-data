@@ -14,12 +14,14 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
+import uuid
 
 import pytest
 import yaml
 
 from chronicle.artifacts import (
     AmbiguousManifestError,
+    _package_manifests,
     inventory_source_artifacts,
     publish_source_artifacts,
 )
@@ -245,6 +247,60 @@ def test_fetch_refuses_to_overwrite_a_file_a_sibling_manifest_records(
     )
     assert report.valid
     assert (package / "table.ods").read_bytes() == original
+
+
+def test_fetch_strictly_validates_a_sibling_before_any_publisher_read(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "db" / "data" / "dwp" / "frs_2023_24"
+    _write(package / "manifest_tables.yaml", _table_manifest())
+    _write(
+        package / "manifest.yaml",
+        _table_manifest(
+            files={
+                2023: {
+                    "filename": "adult.tab",
+                    "Access": "licensed",
+                    "sha256": LICENSED_SHA,
+                }
+            }
+        ),
+    )
+    before = _snapshot(package)
+    reads = _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    with pytest.raises(ManifestAccessError, match="misspelled_field:Access"):
+        _fetch_table(
+            tmp_path / "adult.tab",
+            package,
+            source_id="dwp",
+            package_id="dwp-frs-2023-24",
+            filename="adult.tab",
+            manifest_filename="manifest_tables.yaml",
+            upload_r2=True,
+        )
+
+    assert reads == []
+    assert _snapshot(package) == before
+
+
+def test_package_manifests_refuses_distinct_normalized_name_aliases(
+    tmp_path, monkeypatch
+):
+    """Portable simulation of two case-distinct files on a sensitive volume."""
+    package = tmp_path / "package"
+    selected = package / "MANIFEST.YAML"
+    sibling = tmp_path / "case-distinct-entry" / "manifest.yaml"
+    _write(selected, _table_manifest())
+    _write(sibling, _hash_only_manifest())
+    monkeypatch.setattr(
+        "chronicle.artifacts.package_manifest_paths",
+        lambda _output: [selected, sibling],
+    )
+
+    with pytest.raises(AmbiguousManifestError, match="normalized manifest name"):
+        _package_manifests(package, selected, _table_manifest())
 
 
 @pytest.mark.parametrize(
@@ -524,6 +580,45 @@ def test_register_targets_the_named_manifest(tmp_path, capsys):
 # --------------------------------------------------------------------------
 # The source-package byte reader
 # --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("defect", ["selected_access_spelling", "same_manifest_pin"])
+def test_byte_reader_validates_the_complete_selected_manifest(
+    tmp_path, monkeypatch, defect
+):
+    _isolated_reader(tmp_path, monkeypatch)
+    package_name = f"chronicle_test_{uuid.uuid4().hex}"
+    resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
+    resource_dir.mkdir(parents=True)
+    selected = _public_table_entry("adult.tab", LICENSED_BYTES)
+    files: dict[int, dict] = {2023: selected}
+    if defect == "selected_access_spelling":
+        selected["Access"] = "licensed"
+        selected.pop("access")
+    else:
+        files[2022] = _attested_entry(
+            filename="other.tab",
+            sha256=LICENSED_SHA,
+            source_url="https://ukdataservice.example/other.tab",
+        )
+    _write(resource_dir / "manifest.yaml", _table_manifest(files=files))
+    monkeypatch.syspath_prepend(str(tmp_path / "pkgroot"))
+    spec = SourceArtifactSpec(
+        source_name="dwp",
+        source_table="Family Resources Survey",
+        resource_package=package_name,
+        resource_directory="data/dwp/frs",
+        manifest="manifest.yaml",
+        vintage="2023_24",
+        extracted_at="2026-09-02",
+        extraction_method="none",
+        parser="delimited_text_full_rows",
+        delimiter="\t",
+        artifact_year=2023,
+    )
+
+    with pytest.raises(ManifestAccessError):
+        spec.assert_parseable(2023)
 
 
 def test_byte_reader_refuses_a_file_a_sibling_manifest_registers_hash_only(

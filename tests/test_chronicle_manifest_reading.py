@@ -162,6 +162,21 @@ def test_a_misspelled_field_is_reported_not_ignored(field, code):
     assert code in codes, codes
 
 
+def test_an_unknown_entry_field_is_reported_not_ignored():
+    """An ordinary typo must not turn gated bytes into inferred public bytes."""
+    codes = validate_file_entry(
+        {
+            "filename": "adult.tab",
+            "acess": "licensed",
+        },
+        kind="publisher_table",
+        manifest={},
+        local_file_exists=False,
+    )
+
+    assert "unknown_field:acess" in codes, codes
+
+
 @pytest.mark.parametrize(
     "storage",
     [
