@@ -1,0 +1,424 @@
+"""Hermetic tests for ``scripts/register_microdata_releases.py``.
+
+The catalogue is resolved against ``tests/fixtures/microcosm``: synthetic
+consumer manifests in Microcosm's two shapes (staged ``source_stages.json``
+files and the flat ACS runtime manifest) that carry the reviewed pins
+verbatim beside decoy artifacts the selectors must ignore. Nothing here reads
+a checkout outside the repository, and nothing skips: a resolution failure is
+a failure.
+
+``emit`` must reproduce the two committed hash-only manifests byte for byte
+from the fixture, and ``plan`` must print exactly the golden commands in
+``tests/fixtures/microcosm/golden_plan.json`` -- every reviewed identity as an
+argument, every unknown as a ``TODO`` that the real CLI refuses to run.
+"""
+
+from __future__ import annotations
+
+import argparse
+import contextlib
+import json
+import shlex
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+import yaml
+
+from chronicle.harness import main as harness_main
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "microcosm"
+GOLDEN_PLAN = FIXTURE_ROOT / "golden_plan.json"
+FRS_MANIFEST = REPO_ROOT / "db" / "data" / "dwp" / "frs_2023_24" / "manifest.yaml"
+SPI_MANIFEST = (
+    REPO_ROOT / "db" / "data" / "hmrc" / "spi_public_use_tape_2022_23" / "manifest.yaml"
+)
+UK_STAGES = "packages/microcosm-build/src/microcosm/build/uk/source_stages.json"
+UK_HMRC_STAGES = (
+    "packages/microcosm-build/src/microcosm/build/uk/hmrc_income_source_stages.json"
+)
+#: The commits the committed registrations were transcribed from: the last
+#: commit that changed each consumer manifest.
+PIN_COMMITS = {
+    UK_STAGES: "2fb2e2f8a99c37725bd6e7a15ff4c2595c912b77",
+    UK_HMRC_STAGES: "de7451bd19ca46d2967e73cdf393908d29e72542",
+}
+PIN_COMMIT_ARGS = [
+    arg
+    for path, commit in PIN_COMMITS.items()
+    for arg in ("--microcosm-commit", f"{path}={commit}")
+]
+
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+import register_microdata_releases as script  # noqa: E402
+
+
+def _run(argv: list[str], capsys) -> tuple[int, str, str]:
+    exit_code = script.main(argv)
+    captured = capsys.readouterr()
+    return exit_code, captured.out, captured.err
+
+
+def _harness_parser(monkeypatch) -> argparse.ArgumentParser:
+    """Capture the real ``chronicle`` harness parser."""
+    captured: dict[str, argparse.ArgumentParser] = {}
+
+    def capture(self, args=None, namespace=None):
+        captured["parser"] = self
+        raise SystemExit(0)
+
+    monkeypatch.setattr(argparse.ArgumentParser, "parse_args", capture)
+    with contextlib.suppress(SystemExit):
+        harness_main(["--help"])
+    monkeypatch.undo()
+    return captured["parser"]
+
+
+# --------------------------------------------------------------------------
+# The fixture checkout
+# --------------------------------------------------------------------------
+
+
+def test_fixture_checkout_holds_every_catalogued_manifest():
+    catalogued = sorted({release.manifest for release in script.CATALOGUE})
+    assert catalogued
+    for relative in catalogued:
+        path = FIXTURE_ROOT / relative
+        assert path.exists(), relative
+        payload = json.loads(path.read_text())
+        assert payload["snapshot_of"]["repository"] == "PolicyEngine/microcosm"
+
+
+def test_selection_ignores_decoys_and_resolves_every_catalogue_entry():
+    resolved = script.resolve(FIXTURE_ROOT, script.CATALOGUE)
+    by_id = {item.release.release_id: item for item in resolved}
+    frs = yaml.safe_load(FRS_MANIFEST.read_text())["files"][2023]
+    committed = {entry["filename"]: entry for entry in frs}
+
+    assert len(by_id) == len(script.CATALOGUE)
+    for tab in script.FRS_TABS:
+        item = by_id[f"dwp-frs-2023-24:{tab}"]
+        expected = committed[f"{tab}.tab"]
+        assert item.stage["stage"] == "frs_spine"
+        assert item.artifact["kind"] == "licensed_microdata"
+        assert (item.filename, item.sha256, item.size_bytes, item.vintage) == (
+            f"{tab}.tab",
+            expected["sha256"],
+            expected["size_bytes"],
+            expected["vintage"],
+        )
+    spi = by_id["hmrc-spi-public-use-tape-2022-23:put2223uk"]
+    spi_committed = yaml.safe_load(SPI_MANIFEST.read_text())["files"][2022][0]
+    assert (spi.filename, spi.sha256, spi.size_bytes, spi.vintage) == (
+        "put2223uk.tab",
+        spi_committed["sha256"],
+        spi_committed["size_bytes"],
+        spi_committed["vintage"],
+    )
+    assert spi.url is None
+    silc = by_id["statbel-be-silc-2023"]
+    assert (silc.sha256, silc.size_bytes, silc.filename) == (None, None, None)
+    assert by_id["census-cps-basic-monthly-2024"].url is None
+    assert by_id["census-sipp-2023"].url is None
+    assert by_id["federal-reserve-scf-2022-full"].sha256 is None
+    assert by_id["census-acs-pums-2024-household"].filename == "csv_hus.zip"
+
+
+def test_selection_accepts_agreeing_duplicates_and_refuses_conflicts():
+    payload = json.loads((FIXTURE_ROOT / UK_STAGES).read_text())
+    selector = script.ArtifactSelector(
+        kind="licensed_microdata", match={"table": "adult"}
+    )
+    stage, artifact = script.select_artifact(payload, selector, release_id="x")
+    # adult.tab is listed by two stages with identical bytes; the first wins.
+    assert stage["stage"] == "frs_spine"
+
+    conflicting = json.loads(json.dumps(payload))
+    conflicting["stages"][1]["artifacts"][0]["sha256"] = "f" * 64
+    with pytest.raises(script.CatalogueError, match="conflicting values"):
+        script.select_artifact(conflicting, selector, release_id="x")
+
+    with pytest.raises(script.CatalogueError, match="no Microcosm artifact matches"):
+        script.select_artifact(
+            payload,
+            script.ArtifactSelector(kind="licensed_microdata", match={"table": "nope"}),
+            release_id="x",
+        )
+
+
+def test_resolve_refuses_a_missing_consumer_manifest(tmp_path):
+    with pytest.raises(script.CatalogueError, match="manifest not found"):
+        script.resolve(tmp_path / "no-such-checkout", script.CATALOGUE[:1])
+
+
+# --------------------------------------------------------------------------
+# emit
+# --------------------------------------------------------------------------
+
+
+def test_emit_from_the_fixture_reproduces_the_committed_manifests_byte_for_byte(
+    tmp_path, capsys
+):
+    root = tmp_path / "data"
+
+    exit_code, out, err = _run(
+        [
+            "--microcosm-root",
+            str(FIXTURE_ROOT),
+            "--root",
+            str(root),
+            "--json",
+            "emit",
+            *PIN_COMMIT_ARGS,
+        ],
+        capsys,
+    )
+    payload = json.loads(out)
+
+    assert exit_code == 0, err
+    assert len(payload["registrations"]) == 15
+    assert [blocker["release"] for blocker in payload["blockers"]] == [
+        "statbel-be-silc-2023"
+    ]
+    assert "No hash is invented" in payload["blockers"][0]["reason"]
+    assert all(r["hash_source"] == "consumer_pin" for r in payload["registrations"])
+    assert all(r["r2_location"] is None for r in payload["registrations"])
+    written = sorted(
+        path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()
+    )
+    assert written == [
+        "dwp/frs_2023_24/manifest.yaml",
+        "hmrc/spi_public_use_tape_2022_23/manifest.yaml",
+    ]
+    assert (root / "dwp/frs_2023_24/manifest.yaml").read_bytes() == (
+        FRS_MANIFEST.read_bytes()
+    )
+    assert (root / "hmrc/spi_public_use_tape_2022_23/manifest.yaml").read_bytes() == (
+        SPI_MANIFEST.read_bytes()
+    )
+
+
+def test_emit_is_idempotent_over_the_committed_manifests(tmp_path, capsys):
+    root = tmp_path / "data"
+    for manifest in (FRS_MANIFEST, SPI_MANIFEST):
+        target = root / manifest.relative_to(REPO_ROOT / "db" / "data")
+        target.parent.mkdir(parents=True)
+        target.write_bytes(manifest.read_bytes())
+
+    exit_code, out, _err = _run(
+        [
+            "--microcosm-root",
+            str(FIXTURE_ROOT),
+            "--root",
+            str(root),
+            "--json",
+            "emit",
+            *PIN_COMMIT_ARGS,
+        ],
+        capsys,
+    )
+
+    assert exit_code == 0
+    assert all(r["replaced"] for r in json.loads(out)["registrations"])
+    assert (
+        root / "dwp/frs_2023_24/manifest.yaml"
+    ).read_bytes() == FRS_MANIFEST.read_bytes()
+
+
+def test_emit_refuses_a_pin_that_drifted_from_the_committed_one(tmp_path, capsys):
+    root = tmp_path / "data"
+    target = root / "dwp" / "frs_2023_24" / "manifest.yaml"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(FRS_MANIFEST.read_bytes())
+    checkout = tmp_path / "consumer"
+    for path in FIXTURE_ROOT.rglob("*.json"):
+        copy = checkout / path.relative_to(FIXTURE_ROOT)
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        copy.write_bytes(path.read_bytes())
+    stages = json.loads((checkout / UK_STAGES).read_text())
+    for stage in stages["stages"]:
+        for artifact in stage["artifacts"]:
+            if artifact.get("table") == "adult":
+                artifact["sha256"] = "f" * 64
+    (checkout / UK_STAGES).write_text(json.dumps(stages))
+
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(checkout),
+            "--root",
+            str(root),
+            "emit",
+            *PIN_COMMIT_ARGS,
+        ],
+        capsys,
+    )
+
+    assert exit_code == 1
+    assert "pass --allow-reissue" in err
+    assert target.read_bytes() == FRS_MANIFEST.read_bytes()
+
+
+def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(FIXTURE_ROOT),
+            "--root",
+            str(tmp_path / "data"),
+            "emit",
+        ],
+        capsys,
+    )
+    assert exit_code == 1
+    assert "pass --microcosm-commit" in err
+    assert not (tmp_path / "data").exists()
+
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(FIXTURE_ROOT),
+            "--root",
+            str(tmp_path / "data"),
+            "emit",
+            "--microcosm-commit",
+            "not-a-commit",
+        ],
+        capsys,
+    )
+    assert exit_code == 2
+    assert "40-hex commit" in err
+
+
+def test_pin_commit_reads_the_last_commit_that_changed_the_file(tmp_path):
+    repo = tmp_path / "consumer"
+    (repo / "build").mkdir(parents=True)
+    git = ["git", "-C", str(repo)]
+    subprocess.run([*git, "init", "-q"], check=True)
+    subprocess.run([*git, "config", "user.email", "t@example.com"], check=True)
+    subprocess.run([*git, "config", "user.name", "t"], check=True)
+    (repo / "build" / "stages.json").write_text("{}")
+    subprocess.run([*git, "add", "."], check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "pin"], check=True)
+    pinned = subprocess.run(
+        [*git, "rev-parse", "HEAD"], capture_output=True, text=True, check=True
+    ).stdout.strip()
+    (repo / "other.txt").write_text("unrelated")
+    subprocess.run([*git, "add", "."], check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "unrelated"], check=True)
+
+    assert script.pin_commit(repo, "build/stages.json") == pinned
+    with pytest.raises(script.CatalogueError, match="records no commit"):
+        script.pin_commit(repo, "build/missing.json")
+
+
+# --------------------------------------------------------------------------
+# plan
+# --------------------------------------------------------------------------
+
+
+def test_plan_matches_the_golden_commands_exactly(capsys):
+    exit_code, out, _err = _run(
+        ["--microcosm-root", str(FIXTURE_ROOT), "--root", "db/data", "--json", "plan"],
+        capsys,
+    )
+    golden = json.loads(GOLDEN_PLAN.read_text())
+
+    assert exit_code == 0
+    assert json.loads(out) == golden
+    assert len(golden["commands"]) == 9
+
+
+def test_every_planned_command_parses_with_the_reviewed_identity_as_arguments(
+    monkeypatch,
+):
+    parser = _harness_parser(monkeypatch)
+    golden = json.loads(GOLDEN_PLAN.read_text())
+
+    for command in golden["commands"]:
+        argv = shlex.split(command)
+        assert argv[:3] == ["uv", "run", "chronicle"]
+        namespace = parser.parse_args(argv[3:])
+        assert namespace.command == "fetch-artifact"
+        assert namespace.access == "public"
+        assert namespace.kind == "microdata_release"
+        assert namespace.licence == "US-Government-Work"
+        assert namespace.publisher
+        assert namespace.vintage
+        assert namespace.expected_sha256
+        assert namespace.licence_evidence_issuer
+        assert namespace.licence_evidence_scope
+        assert namespace.licence_evidence_url
+        assert namespace.upload_r2 is True
+
+
+def test_plan_prints_a_todo_and_never_a_guess(capsys):
+    golden = json.loads(GOLDEN_PLAN.read_text())
+    by_release = {
+        shlex.split(command)[shlex.split(command).index("--package-id") + 1]: command
+        for command in golden["commands"]
+    }
+
+    # Every reviewed publisher checksum travels as an argument.
+    assert (
+        "--expected-sha256 d2e000250782adfbdd7f29c82b66d866591a30f0d330496698ec19f9c784ce11"
+        in by_release["census-cps-asec-2023"]
+    )
+    assert "--expected-size-bytes 150165063" in by_release["census-cps-asec-2023"]
+    # Unknowns are TODOs the CLI refuses: no URL, no publisher-bytes checksum,
+    # no catalogued evidence URL.
+    assert "--url TODO_PUBLISHER_URL" in by_release["census-cps-basic-monthly-2024"]
+    assert "--url TODO_PUBLISHER_URL" in by_release["census-sipp-2023"]
+    for package_id in (
+        "census-cps-basic-monthly-2024",
+        "census-acs-pums-2022-1yr",
+        "federal-reserve-scf-2022",
+        "census-sipp-2023",
+    ):
+        assert any(
+            "--expected-sha256 TODO_REVIEWED_SHA256" in command
+            for package, command in by_release.items()
+            if package == package_id
+        )
+    assert all("TODO_EVIDENCE_URL" in command for command in golden["commands"])
+    assert not any("TODO_VINTAGE" in command for command in golden["commands"])
+    # The derived-h5 hash Microcosm pins for ACS 2022 never masquerades as
+    # the publisher checksum.
+    assert (
+        "0b319b496f19a6913066f9c5ea572edfda3d78a187be6f375846617d0b441bd4"
+        not in "\n".join(golden["commands"])
+    )
+
+
+def test_a_planned_command_with_a_todo_is_refused_before_anything_is_read(
+    tmp_path, monkeypatch, capsys
+):
+    golden = json.loads(GOLDEN_PLAN.read_text())
+    reads: list[str] = []
+
+    def unexpected_read(source_url):
+        reads.append(source_url)
+        raise AssertionError("a planned command with a TODO must not read")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+    monkeypatch.setattr(
+        "chronicle.artifacts._upload_r2_object",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("no upload")),
+    )
+
+    for command in golden["commands"]:
+        argv = shlex.split(command)[3:]
+        out_index = argv.index("--out-dir") + 1
+        argv[out_index] = str(tmp_path / argv[out_index])
+        exit_code = harness_main([*argv, "--staging-dir", str(tmp_path / "staging")])
+        captured = capsys.readouterr()
+        assert exit_code == 1
+        assert captured.out == ""
+        assert "error:" in captured.err
+
+    assert reads == []
+    assert not (tmp_path / "db").exists()
+    assert not (tmp_path / "staging").exists()
