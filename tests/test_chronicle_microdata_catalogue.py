@@ -185,32 +185,22 @@ def test_resolve_refuses_a_missing_consumer_manifest(tmp_path):
 
 
 def test_emit_from_the_fixture_reproduces_the_committed_manifests_byte_for_byte(
-    tmp_path, capsys
+    tmp_path,
 ):
     root = tmp_path / "data"
-
-    exit_code, out, err = _run(
-        [
-            "--microcosm-root",
-            str(FIXTURE_ROOT),
-            "--root",
-            str(root),
-            "--json",
-            "emit",
-            *PIN_COMMIT_ARGS,
-        ],
-        capsys,
+    registrations, blockers = script.emit(
+        script.resolve(FIXTURE_ROOT, script.CATALOGUE),
+        root=root,
+        pin_commits=PIN_COMMITS,
     )
-    payload = json.loads(out)
 
-    assert exit_code == 0, err
-    assert len(payload["registrations"]) == 15
-    assert [blocker["release"] for blocker in payload["blockers"]] == [
-        "statbel-be-silc-2023"
-    ]
-    assert "No hash is invented" in payload["blockers"][0]["reason"]
-    assert all(r["hash_source"] == "consumer_pin" for r in payload["registrations"])
-    assert all(r["r2_location"] is None for r in payload["registrations"])
+    # The pure emitter receives already-verified pin commits; CLI-level tests
+    # below exercise the mandatory commit/blob verification itself.
+    assert len(registrations) == 15
+    assert [blocker["release"] for blocker in blockers] == ["statbel-be-silc-2023"]
+    assert "No hash is invented" in blockers[0]["reason"]
+    assert all(r["hash_source"] == "consumer_pin" for r in registrations)
+    assert all(r["r2_location"] is None for r in registrations)
     written = sorted(
         path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()
     )
@@ -226,34 +216,26 @@ def test_emit_from_the_fixture_reproduces_the_committed_manifests_byte_for_byte(
     )
 
 
-def test_emit_is_idempotent_over_the_committed_manifests(tmp_path, capsys):
+def test_emit_is_idempotent_over_the_committed_manifests(tmp_path):
     root = tmp_path / "data"
     for manifest in (FRS_MANIFEST, SPI_MANIFEST):
         target = root / manifest.relative_to(REPO_ROOT / "db" / "data")
         target.parent.mkdir(parents=True)
         target.write_bytes(manifest.read_bytes())
 
-    exit_code, out, _err = _run(
-        [
-            "--microcosm-root",
-            str(FIXTURE_ROOT),
-            "--root",
-            str(root),
-            "--json",
-            "emit",
-            *PIN_COMMIT_ARGS,
-        ],
-        capsys,
+    registrations, _blockers = script.emit(
+        script.resolve(FIXTURE_ROOT, script.CATALOGUE),
+        root=root,
+        pin_commits=PIN_COMMITS,
     )
 
-    assert exit_code == 0
-    assert all(r["replaced"] for r in json.loads(out)["registrations"])
+    assert all(r["replaced"] for r in registrations)
     assert (
         root / "dwp/frs_2023_24/manifest.yaml"
     ).read_bytes() == FRS_MANIFEST.read_bytes()
 
 
-def test_emit_refuses_a_pin_that_drifted_from_the_committed_one(tmp_path, capsys):
+def test_emit_refuses_a_pin_that_drifted_from_the_committed_one(tmp_path):
     root = tmp_path / "data"
     target = root / "dwp" / "frs_2023_24" / "manifest.yaml"
     target.parent.mkdir(parents=True)
@@ -270,20 +252,10 @@ def test_emit_refuses_a_pin_that_drifted_from_the_committed_one(tmp_path, capsys
                 artifact["sha256"] = "f" * 64
     (checkout / UK_STAGES).write_text(json.dumps(stages))
 
-    exit_code, _out, err = _run(
-        [
-            "--microcosm-root",
-            str(checkout),
-            "--root",
-            str(root),
-            "emit",
-            *PIN_COMMIT_ARGS,
-        ],
-        capsys,
-    )
+    resolved = script.resolve(checkout, script.CATALOGUE)
 
-    assert exit_code == 1
-    assert "pass --allow-reissue" in err
+    with pytest.raises(script.HashOnlyRegistrationError, match="--allow-reissue"):
+        script.emit(resolved, root=root, pin_commits=PIN_COMMITS)
     assert target.read_bytes() == FRS_MANIFEST.read_bytes()
 
 
@@ -373,6 +345,77 @@ def test_emit_refuses_an_explicit_commit_whose_blob_differs_from_loaded_manifest
     assert not root.exists()
 
 
+@pytest.mark.parametrize("explicit", [False, True], ids=("automatic", "explicit"))
+def test_emit_accepts_a_commit_whose_blob_matches_the_loaded_manifest(
+    tmp_path, capsys, explicit
+):
+    checkout, commit = _committed_fixture_checkout(tmp_path / "consumer")
+    root = tmp_path / "data"
+    argv = [
+        "--microcosm-root",
+        str(checkout),
+        "--root",
+        str(root),
+        "--release",
+        "dwp-frs-2023-24:adult",
+        "--json",
+        "emit",
+    ]
+    if explicit:
+        argv += ["--microcosm-commit", commit]
+
+    exit_code, out, err = _run(argv, capsys)
+
+    assert exit_code == 0, err
+    assert len(json.loads(out)["registrations"]) == 1
+    manifest = yaml.safe_load((root / "dwp/frs_2023_24/manifest.yaml").read_text())
+    assert manifest["files"][2023][0]["pinned_from"]["commit"] == commit
+
+
+def test_commit_validation_uses_the_snapshot_resolve_actually_parsed(tmp_path):
+    checkout, commit = _committed_fixture_checkout(tmp_path / "consumer")
+    manifest_path = checkout / UK_STAGES
+    committed_bytes = manifest_path.read_bytes()
+    manifest_path.write_bytes(committed_bytes + b"\n")
+    release = next(
+        release
+        for release in script.CATALOGUE
+        if release.release_id == "dwp-frs-2023-24:adult"
+    )
+    item = script.resolve(checkout, (release,))[0]
+    # Restoring the worktree after resolution must not change which bytes are
+    # verified: registration values came from the earlier in-memory snapshot.
+    manifest_path.write_bytes(committed_bytes)
+
+    with pytest.raises(script.CatalogueError, match="do not match"):
+        script.assert_manifest_matches_commit(
+            checkout,
+            UK_STAGES,
+            commit,
+            loaded_bytes=item.manifest_bytes,
+        )
+
+
+def test_commit_blob_lookup_is_relative_to_a_nested_microcosm_root(tmp_path):
+    repository = tmp_path / "repository"
+    checkout = _fixture_copy(repository / "vendor" / "microcosm")
+    _git(repository, "init", "-q")
+    _git(repository, "config", "user.email", "t@example.com")
+    _git(repository, "config", "user.name", "t")
+    _git(repository, "add", ".")
+    _git(repository, "commit", "-q", "-m", "nested consumer checkout")
+    commit = _git(repository, "rev-parse", "HEAD")
+    loaded = (checkout / UK_STAGES).read_bytes()
+
+    assert script.pin_commit(checkout, UK_STAGES) == commit
+    script.assert_manifest_matches_commit(
+        checkout,
+        UK_STAGES,
+        commit,
+        loaded_bytes=loaded,
+    )
+
+
 def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
     # The fixture inside this repository is committed, so a run against it
     # would read a Chronicle commit as if it were the consumer's. Outside any
@@ -420,12 +463,10 @@ def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
     assert not (tmp_path / "data").exists()
 
 
-def test_emit_from_a_checkout_outside_git_registers_with_the_given_commit(
-    tmp_path, capsys
-):
+def test_emit_refuses_an_unreadable_explicit_commit_before_writing(tmp_path, capsys):
     outside = _fixture_copy(tmp_path / "outside-git")
 
-    exit_code, out, err = _run(
+    exit_code, _out, err = _run(
         [
             "--microcosm-root",
             str(outside),
@@ -438,11 +479,9 @@ def test_emit_from_a_checkout_outside_git_registers_with_the_given_commit(
         capsys,
     )
 
-    assert exit_code == 0, err
-    assert len(json.loads(out)["registrations"]) == 15
-    assert (tmp_path / "data" / "dwp/frs_2023_24/manifest.yaml").read_bytes() == (
-        FRS_MANIFEST.read_bytes()
-    )
+    assert exit_code == 1
+    assert "Cannot read consumer manifest" in err
+    assert not (tmp_path / "data").exists()
 
 
 def test_pin_commit_reads_the_last_commit_that_changed_the_file(tmp_path):

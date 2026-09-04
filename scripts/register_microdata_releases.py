@@ -217,7 +217,6 @@ CATALOGUE: tuple[Release, ...] = (
             release_id=f"dwp-frs-2023-24:{tab}",
             manifest=UK_STAGES,
             selector=ArtifactSelector(
-                stage="frs_spine",
                 kind="licensed_microdata",
                 match={"table": tab},
             ),
@@ -517,14 +516,23 @@ class CatalogueError(RuntimeError):
     """Raised when the catalogue cannot be resolved against Microcosm."""
 
 
-def load_manifest(microcosm_root: Path, relative: str) -> dict[str, Any]:
-    """Load one Microcosm JSON manifest, read-only."""
+def _load_manifest_snapshot(
+    microcosm_root: Path, relative: str
+) -> tuple[dict[str, Any], bytes]:
+    """Read and parse one immutable-in-memory consumer-manifest snapshot."""
     path = microcosm_root / relative
     if not path.exists():
         raise CatalogueError(f"Microcosm manifest not found: {path}")
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    content = path.read_bytes()
+    payload = json.loads(content)
     if not isinstance(payload, dict):
         raise CatalogueError(f"Microcosm manifest must be an object: {path}")
+    return payload, content
+
+
+def load_manifest(microcosm_root: Path, relative: str) -> dict[str, Any]:
+    """Load one Microcosm JSON manifest, read-only."""
+    payload, _content = _load_manifest_snapshot(microcosm_root, relative)
     return payload
 
 
@@ -594,6 +602,7 @@ class ResolvedRelease:
     release: Release
     stage: Mapping[str, Any]
     artifact: Mapping[str, Any]
+    manifest_bytes: bytes = field(repr=False)
 
     @property
     def filename(self) -> str | None:
@@ -634,29 +643,36 @@ def resolve(
     releases: Sequence[Release],
 ) -> list[ResolvedRelease]:
     """Resolve every catalogue entry against the Microcosm checkout."""
-    payloads: dict[str, dict[str, Any]] = {}
+    snapshots: dict[str, tuple[dict[str, Any], bytes]] = {}
     resolved: list[ResolvedRelease] = []
     for release in releases:
-        if release.manifest not in payloads:
-            payloads[release.manifest] = load_manifest(microcosm_root, release.manifest)
+        if release.manifest not in snapshots:
+            snapshots[release.manifest] = _load_manifest_snapshot(
+                microcosm_root, release.manifest
+            )
+        payload, content = snapshots[release.manifest]
         stage, artifact = select_artifact(
-            payloads[release.manifest],
+            payload,
             release.selector,
             release_id=release.release_id,
         )
         resolved.append(
-            ResolvedRelease(release=release, stage=stage, artifact=artifact)
+            ResolvedRelease(
+                release=release,
+                stage=stage,
+                artifact=artifact,
+                manifest_bytes=content,
+            )
         )
     return resolved
 
 
 def pin_commit(microcosm_root: Path, relative: str) -> str:
-    """Return the commit the consumer's pin is read from, read-only.
+    """Return the last commit that changed a consumer manifest, read-only.
 
-    The pin is the manifest blob, so the commit recorded is the last one that
-    changed that file: it addresses exactly the bytes the registration
-    transcribes, and it is stable across later, unrelated commits so repeated
-    ``emit`` runs stay byte-identical.
+    The caller separately verifies that this candidate commit's blob is the
+    exact byte snapshot it parsed. Keeping discovery and verification separate
+    lets explicit commit overrides pass through the same mandatory check.
     """
     try:
         completed = subprocess.run(
@@ -686,6 +702,51 @@ def pin_commit(microcosm_root: Path, relative: str) -> str:
             "--microcosm-commit with the reviewed commit."
         )
     return commit
+
+
+def assert_manifest_matches_commit(
+    microcosm_root: Path,
+    relative: str,
+    commit: str,
+    *,
+    loaded_bytes: bytes,
+) -> None:
+    """Require ``loaded_bytes`` to equal ``relative``'s blob at ``commit``."""
+    relative_path = Path(relative)
+    if not relative or relative_path.is_absolute() or ".." in relative_path.parts:
+        raise CatalogueError(
+            f"Consumer manifest path must stay inside {microcosm_root}: {relative!r}."
+        )
+    object_name = f"{commit}:./{relative_path.as_posix()}"
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(microcosm_root),
+                "cat-file",
+                "blob",
+                object_name,
+            ],
+            capture_output=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        detail = ""
+        if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
+            detail = exc.stderr.decode(errors="replace").strip()
+        suffix = f" ({detail})" if detail else ""
+        raise CatalogueError(
+            f"Cannot read consumer manifest {relative} at commit {commit} from "
+            f"{microcosm_root}{suffix}. The recorded commit must contain the "
+            "exact reviewed blob."
+        ) from exc
+    if completed.stdout != loaded_bytes:
+        raise CatalogueError(
+            f"Consumer manifest bytes loaded from {microcosm_root / relative} do "
+            f"not match {relative} at commit {commit}. Refusing to record that "
+            "commit for dirty, staged, or otherwise different bytes."
+        )
 
 
 def parse_pin_commits(values: Sequence[str]) -> dict[str, str]:
@@ -1009,12 +1070,31 @@ def main(argv: list[str] | None = None) -> int:
             }
         )
         try:
-            pin_commits = {
-                manifest: declared.get(manifest)
-                or declared.get("*")
-                or pin_commit(microcosm_root, manifest)
-                for manifest in registrable
-            }
+            snapshots: dict[str, bytes] = {}
+            for item in resolved:
+                manifest = item.release.manifest
+                if manifest not in registrable:
+                    continue
+                if manifest in snapshots and snapshots[manifest] != item.manifest_bytes:
+                    raise CatalogueError(
+                        f"Consumer manifest {manifest} changed during resolution."
+                    )
+                snapshots[manifest] = item.manifest_bytes
+
+            pin_commits: dict[str, str] = {}
+            for manifest in registrable:
+                commit = (
+                    declared.get(manifest)
+                    or declared.get("*")
+                    or pin_commit(microcosm_root, manifest)
+                )
+                assert_manifest_matches_commit(
+                    microcosm_root,
+                    manifest,
+                    commit,
+                    loaded_bytes=snapshots[manifest],
+                )
+                pin_commits[manifest] = commit
         except CatalogueError as exc:
             print(str(exc), file=sys.stderr)
             return 1
