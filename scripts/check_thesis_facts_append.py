@@ -190,6 +190,13 @@ GATE_CONFIG_KEYS = ("safe.directory", "core.hookspath")
 # a file whose bytes this commit fixes, so no comparison below is about it.
 PROTECTED_TREE_MODES = ("100644", "100755")
 
+# The two ways a run can end without a verdict of "OK", kept apart on purpose.
+# "failed" is the gate's verdict about a tree it was given; "refused" is this
+# shim declining to give it one, because the precondition the verdict would be
+# stated against could not be established.
+VERDICT_REFUSAL_PREFIX = "thesis-facts append check failed: "
+REFUSAL_PREFIX = "thesis-facts append check refused: "
+
 
 class ShimRefusal(RuntimeError):
     """The shim will not hand the gate a tree it cannot vouch for.
@@ -213,13 +220,18 @@ def _git(
     that did not answer means the precondition was not established.
     """
 
-    completed = subprocess.run(
-        ["git", *arguments],
-        cwd=cwd,
-        env=env,
-        check=False,
-        capture_output=True,
-    )
+    try:
+        completed = subprocess.run(
+            ["git", *arguments],
+            cwd=cwd,
+            env=env,
+            check=False,
+            capture_output=True,
+        )
+    except OSError as exc:
+        raise ShimRefusal(
+            f"git could not be run in {cwd}: {exc.strerror or exc}"
+        ) from exc
     if completed.returncode != 0:
         detail = completed.stderr.decode("utf-8", "replace").strip()
         raise ShimRefusal(
@@ -273,14 +285,19 @@ def _gate_environment(
     can check the documentation has not outgrown the rule.
 
     The environment is used two ways, and both are needed. The shim's own git
-    calls receive it as ``env=``. The gate's git calls are made by
-    ``receipt.append_gate`` without an explicit environment, so they inherit
-    the process's, and ``main`` therefore replaces ``os.environ`` with this
-    mapping for exactly the duration of the gate call (see
-    ``_frozen_environment``). Running the gate in a child process with ``env=``
-    would work equally well for the environment, but would put a process
-    boundary between the gate's exception text and this program's stderr, and
-    that text is what the byte-equivalence proof compares.
+    calls receive it as ``env=``. The gate builds the environment for its own
+    git calls out of ``os.environ`` -- on the pinned receipt,
+    ``release_chain._git_environment`` returns ``os.environ`` with
+    ``GIT_NO_REPLACE_OBJECTS`` set and four pathspec variables removed, and its
+    docstring says in as many words that it is not a sanitizer and that a
+    caller which does not control the environment it invokes the package in has
+    a problem outside that function's scope. So ``main`` replaces ``os.environ``
+    with this mapping for exactly the duration of the gate call (see
+    ``_frozen_environment``); that is the control the package asks its callers
+    for. Running the gate in a child process with ``env=`` would work equally
+    well for the environment, but would put a process boundary between the
+    gate's exception text and this program's stderr, and that text is what the
+    byte-equivalence proof compares.
 
     ``safe.directory`` names the clone. If the clone were owned by another user
     the linked worktree's own path would not be covered, and git would refuse
@@ -501,21 +518,26 @@ def _isolated_checkout(
             f"{oid!r} is not a full object id, so it will not be checked out"
         )
     checkout = scratch_root / "checkout"
-    completed = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(clone_root),
-            "worktree",
-            "add",
-            "--detach",
-            str(checkout),
-            oid,
-        ],
-        env=env,
-        check=False,
-        capture_output=True,
-    )
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(clone_root),
+                "worktree",
+                "add",
+                "--detach",
+                str(checkout),
+                oid,
+            ],
+            env=env,
+            check=False,
+            capture_output=True,
+        )
+    except OSError as exc:
+        raise ShimRefusal(
+            f"git could not be run to check {oid} out: {exc.strerror or exc}"
+        ) from exc
     if completed.returncode != 0:
         detail = completed.stderr.decode("utf-8", "replace").strip()
         raise ShimRefusal(
@@ -647,8 +669,11 @@ def _assert_exact_checkout(
     verdict.
     """
 
-    head = _git(["rev-parse", "HEAD"], cwd=checkout, env=env)
-    head = head.decode("utf-8", "replace").strip()
+    head = (
+        _git(["rev-parse", "HEAD"], cwd=checkout, env=env)
+        .decode("utf-8", "replace")
+        .strip()
+    )
     if head != oid:
         raise ShimRefusal(
             f"the isolated checkout is at {head}, not the named commit {oid}"
@@ -730,20 +755,25 @@ def _worktree_removed(
 ) -> bool:
     """Try once to deregister this checkout, and report whether git did."""
 
-    completed = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(clone_root),
-            "worktree",
-            "remove",
-            "--force",
-            str(checkout),
-        ],
-        env=env,
-        check=False,
-        capture_output=True,
-    )
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(clone_root),
+                "worktree",
+                "remove",
+                "--force",
+                str(checkout),
+            ],
+            env=env,
+            check=False,
+            capture_output=True,
+        )
+    except OSError:
+        # Cleanup runs in a finally, so it never raises over whatever brought
+        # the run here; a failure to remove is reported at the end instead.
+        return False
     return completed.returncode == 0
 
 
@@ -855,6 +885,12 @@ def main() -> int:
     )
     args = parser.parse_args()
     clone_root = args.root.resolve()
+    if not clone_root.is_dir():
+        print(
+            f"{REFUSAL_PREFIX}--root {clone_root} is not a directory",
+            file=sys.stderr,
+        )
+        return 1
 
     scratch_root: pathlib.Path | None = None
     environment: dict[str, str] | None = None
@@ -885,10 +921,10 @@ def main() -> int:
         finally:
             _remove_checkout(clone_root, scratch_root, checkout, environment)
     except ShimRefusal as exc:
-        print(f"thesis-facts append check refused: {exc}", file=sys.stderr)
+        print(f"{REFUSAL_PREFIX}{exc}", file=sys.stderr)
         return 1
     except AppendError as exc:
-        print(f"thesis-facts append check failed: {exc}", file=sys.stderr)
+        print(f"{VERDICT_REFUSAL_PREFIX}{exc}", file=sys.stderr)
         return 1
     print(summary)
     print(f"candidate commit {commit} tree {tree}")

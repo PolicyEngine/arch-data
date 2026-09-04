@@ -665,6 +665,7 @@ ENVIRONMENT_SPY = """\
 import json
 import os
 import pathlib
+import sys as _sys
 
 RECORDING = __RECORDING__
 
@@ -677,10 +678,13 @@ _records = []
 def _spy(*args, **kwargs):
     argv = args[0] if args else kwargs.get("args")
     given = kwargs.get("env")
+    # A call that passes no environment gets the process's, so what the child
+    # actually receives is os.environ at the moment of the call either way.
     effective = dict(given) if given is not None else dict(os.environ)
     _records.append(
         {
             "argv": [str(item) for item in argv],
+            "caller": _sys._getframe(1).f_globals.get("__name__", "?"),
             "explicit": given is not None,
             "git": {
                 name: value
@@ -712,9 +716,17 @@ def test_no_inherited_git_variable_reaches_any_child(tmp_path):
     The caller's environment is loaded with every GIT_ name git(1) documents,
     plus GIT_CONFIG_COUNT, which git-config(1) documents and git(1) does not --
     the shim drops by prefix rather than by list, so a name outside the list is
-    dropped too. The gate's own git calls pass no environment and therefore
-    inherit the process's, which is why what is recorded for a call without an
-    explicit environment is os.environ at the moment of the call.
+    dropped too.
+
+    Both halves of the run are checked, told apart by which module made the
+    call. The shim passes its environment explicitly. The gate builds its own
+    from ``os.environ`` and says in as many words that it is not a sanitizer and
+    that a caller which does not control the environment it invokes the package
+    in has a problem outside that function's scope. Controlling ``os.environ``
+    for the duration of the gate call is how the shim answers that, and this is
+    the test that it works: whichever module made the call, and whether or not
+    an environment was passed, what the child receives carries exactly the three
+    variables and none of the hostile values.
     """
 
     clone, base, candidate = _replay_latest_release(tmp_path)
@@ -745,8 +757,18 @@ def test_no_inherited_git_variable_reaches_any_child(tmp_path):
     records = json.loads(recording.read_text(encoding="utf-8"))
     git_calls = [record for record in records if record["argv"][0] == "git"]
     assert git_calls, records
-    assert any(record["explicit"] for record in git_calls)
-    assert any(not record["explicit"] for record in git_calls)
+
+    by_shim = [
+        record
+        for record in git_calls
+        if record["caller"] == "check_thesis_facts_append"
+    ]
+    by_gate = [
+        record for record in git_calls if record["caller"].startswith("receipt.")
+    ]
+    assert by_shim, [record["caller"] for record in git_calls]
+    assert by_gate, [record["caller"] for record in git_calls]
+
     for record in git_calls:
         assert set(record["git"]) == {
             "GIT_NO_REPLACE_OBJECTS",
