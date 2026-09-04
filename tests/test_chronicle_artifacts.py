@@ -1398,6 +1398,42 @@ def test_fetch_artifact_cli_refuses_a_stray_default_manifest(tmp_path, capsys):
     assert not (package / "manifest.yaml").exists()
 
 
+@pytest.mark.parametrize("existing_name", ["manifest.yml", "MANIFEST_TABLES.YML"])
+def test_fetch_refuses_a_stray_default_beside_supported_manifest_spelling(
+    tmp_path, monkeypatch, existing_name
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "ira_contributions"
+    package.mkdir(parents=True)
+    existing = package / existing_name
+    existing.write_text(
+        yaml.safe_dump(
+            {
+                "manifest_kind": "publisher_table",
+                "source_id": "irs_soi",
+                "package_id": "soi-ira-traditional-contributions-2022",
+                "files": {},
+            }
+        )
+    )
+    recorded = existing.read_bytes()
+    publisher = _publish(tmp_path, "22in05ira.xlsx", b"traditional IRA table")
+
+    def unexpected_read(_source_url):
+        raise AssertionError("publisher bytes were read before manifest refusal")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(AmbiguousManifestError, match=existing_name):
+        _fetch_local(
+            package,
+            publisher,
+            package_id="soi-ira-traditional-contributions-2022",
+        )
+
+    assert existing.read_bytes() == recorded
+    assert not (package / "manifest.yaml").exists()
+
+
 def test_a_same_bytes_rename_is_refused_by_name_not_as_a_revision(tmp_path):
     """Identical bytes under another filename are neither a revision nor a
     re-fetch: the entry's filename must keep agreeing with its recorded key."""
