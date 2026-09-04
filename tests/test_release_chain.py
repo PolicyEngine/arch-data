@@ -339,10 +339,22 @@ def _run_gate(
     environment: ReleaseEnvironment,
     base_ref: str,
 ) -> subprocess.CompletedProcess[str]:
+    """Commit whatever the fixture just wrote and judge that commit.
+
+    The gate judges a commit it checks out for itself, so a fixture that has
+    only written into a working tree has not yet stated a candidate. Each of
+    these tests takes its base ref before it writes, so committing here makes
+    the base the parent of what is judged.
+    """
+
+    _git(environment.repo, "add", "-A")
+    _git(environment.repo, "commit", "-q", "--allow-empty", "-m", "candidate")
     return _run(
         [
             sys.executable,
             str(environment.repo / "scripts" / "check_thesis_facts_append.py"),
+            "--commit",
+            _git(environment.repo, "rev-parse", "HEAD"),
             "--base-ref",
             base_ref,
             "--release-anchor-dir",
@@ -714,9 +726,7 @@ def test_verifier_rejects_wrong_producer_key_signature(
     full_chain_environment: ReleaseEnvironment,
 ):
     head = next(
-        (full_chain_environment.repo / "releases" / "manifests").glob(
-            "0001-*.json"
-        )
+        (full_chain_environment.repo / "releases" / "manifests").glob("0001-*.json")
     )
     wrong_key = _generate_producer_keypair(full_chain_environment.tsa / "wrong-key")
     _sign_producer_payload(
@@ -735,9 +745,7 @@ def test_verifier_rejects_producer_signature_over_different_bytes(
     full_chain_environment: ReleaseEnvironment,
 ):
     head = next(
-        (full_chain_environment.repo / "releases" / "manifests").glob(
-            "0001-*.json"
-        )
+        (full_chain_environment.repo / "releases" / "manifests").glob("0001-*.json")
     )
     different = full_chain_environment.tsa / "different-producer-payload.json"
     different.write_bytes(b'{"different":true}\n')
@@ -757,9 +765,7 @@ def test_verifier_rejects_non_raw_producer_signature_size(
     full_chain_environment: ReleaseEnvironment,
 ):
     head = next(
-        (full_chain_environment.repo / "releases" / "manifests").glob(
-            "0001-*.json"
-        )
+        (full_chain_environment.repo / "releases" / "manifests").glob("0001-*.json")
     )
     producer_signature_path_for_manifest(head).write_bytes(b"not-64-bytes")
 
@@ -872,9 +878,7 @@ def test_cutter_rejects_wrong_second_tsa_without_partial_files(
             ),
         )
 
-    manifest_directory = (
-        pregenesis_environment.repo / "releases" / "manifests"
-    )
+    manifest_directory = pregenesis_environment.repo / "releases" / "manifests"
     assert not manifest_directory.exists() or not any(manifest_directory.iterdir())
 
 
@@ -940,9 +944,7 @@ def test_cutter_self_verification_rejects_wrong_signing_key_without_outputs(
             anchor_dir=pregenesis_environment.anchors,
         )
 
-    manifest_directory = (
-        pregenesis_environment.repo / "releases" / "manifests"
-    )
+    manifest_directory = pregenesis_environment.repo / "releases" / "manifests"
     assert not manifest_directory.exists() or not any(manifest_directory.iterdir())
 
 
@@ -951,9 +953,7 @@ def test_cutter_refuses_concurrent_signature_overwrite(
 ):
     now = datetime.now(timezone.utc) - timedelta(seconds=1)
     ledger = (
-        pregenesis_environment.repo
-        / "ledger"
-        / "official_observations.jsonl"
+        pregenesis_environment.repo / "ledger" / "official_observations.jsonl"
     ).read_bytes()
     immutable_prefix = (
         pregenesis_environment.repo / "ledger" / "immutable_prefix.json"
@@ -970,9 +970,7 @@ def test_cutter_refuses_concurrent_signature_overwrite(
         now=now,
     )
     filename = manifest_filename(manifest["releaseIndex"], raw)
-    manifest_path = (
-        pregenesis_environment.repo / "releases" / "manifests" / filename
-    )
+    manifest_path = pregenesis_environment.repo / "releases" / "manifests" / filename
     signature_path = producer_signature_path_for_manifest(manifest_path)
     sentinel = b"concurrent-writer-owned-this-path"
     local_request = _local_timestamp_requester(pregenesis_environment)
@@ -1011,9 +1009,7 @@ def test_cutter_no_sign_reserves_omitted_signature_during_tsa_requests(
 ):
     now = datetime.now(timezone.utc) - timedelta(seconds=1)
     ledger = (
-        pregenesis_environment.repo
-        / "ledger"
-        / "official_observations.jsonl"
+        pregenesis_environment.repo / "ledger" / "official_observations.jsonl"
     ).read_bytes()
     immutable_prefix = (
         pregenesis_environment.repo / "ledger" / "immutable_prefix.json"
@@ -1030,9 +1026,7 @@ def test_cutter_no_sign_reserves_omitted_signature_during_tsa_requests(
         now=now,
     )
     filename = manifest_filename(manifest["releaseIndex"], raw)
-    manifest_path = (
-        pregenesis_environment.repo / "releases" / "manifests" / filename
-    )
+    manifest_path = pregenesis_environment.repo / "releases" / "manifests" / filename
     signature_path = producer_signature_path_for_manifest(manifest_path)
     sentinel = b"concurrent-omitted-signature"
     local_request = _local_timestamp_requester(pregenesis_environment)
@@ -1069,9 +1063,7 @@ def test_cutter_no_tsa_reserves_omitted_receipts_during_signing(
 ):
     now = datetime.now(timezone.utc) - timedelta(seconds=1)
     ledger = (
-        pregenesis_environment.repo
-        / "ledger"
-        / "official_observations.jsonl"
+        pregenesis_environment.repo / "ledger" / "official_observations.jsonl"
     ).read_bytes()
     immutable_prefix = (
         pregenesis_environment.repo / "ledger" / "immutable_prefix.json"
@@ -1088,9 +1080,7 @@ def test_cutter_no_tsa_reserves_omitted_receipts_during_signing(
         now=now,
     )
     filename = manifest_filename(manifest["releaseIndex"], raw)
-    manifest_path = (
-        pregenesis_environment.repo / "releases" / "manifests" / filename
-    )
+    manifest_path = pregenesis_environment.repo / "releases" / "manifests" / filename
     receipt_path = manifest_path.with_name(f"{manifest_path.stem}.freetsa.tsr")
     signature_path = producer_signature_path_for_manifest(manifest_path)
     sentinel = b"concurrent-omitted-receipt"
@@ -1151,9 +1141,7 @@ def test_cutter_rolls_back_signature_with_batch_on_postwrite_failure(
             requester=_local_timestamp_requester(pregenesis_environment),
         )
 
-    manifest_directory = (
-        pregenesis_environment.repo / "releases" / "manifests"
-    )
+    manifest_directory = pregenesis_environment.repo / "releases" / "manifests"
     assert calls == 3
     assert not manifest_directory.exists() or not any(manifest_directory.iterdir())
 
@@ -1171,9 +1159,7 @@ def test_cutter_rollback_preserves_concurrent_replacement(
         nonlocal calls, replacement_path
         calls += 1
         if calls == 3:
-            manifest_directory = (
-                pregenesis_environment.repo / "releases" / "manifests"
-            )
+            manifest_directory = pregenesis_environment.repo / "releases" / "manifests"
             replacement_path = next(manifest_directory.glob("*.producer.sig"))
             replacement_path.unlink()
             # The replacement must be a DIRECTORY: a rewritten regular file's
@@ -1277,9 +1263,7 @@ def test_batch_write_detects_parent_swap_during_verification(tmp_path: Path):
 
     assert (root / "releases").is_symlink()
     assert not (external_releases / "manifests" / target.name).exists()
-    assert not (
-        displaced_releases / "manifests" / target.name
-    ).exists()
+    assert not (displaced_releases / "manifests" / target.name).exists()
 
 
 def test_batch_rollback_preserves_replacement_manifest_directory(tmp_path: Path):
