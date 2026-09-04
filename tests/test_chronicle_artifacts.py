@@ -1534,6 +1534,129 @@ def test_fetch_artifact_cli_targets_the_named_manifest(tmp_path, capsys):
     assert TRADITIONAL_MANIFEST in capsys.readouterr().err
 
 
+@pytest.mark.parametrize(
+    ("existing_name", "requested_name"),
+    [
+        pytest.param("manifest.yml", "manifest.yaml", id="yml-default"),
+        pytest.param("Manifest.yaml", "manifest.yaml", id="case-variant-default"),
+        pytest.param(
+            "manifest_monthly_source_package.yaml",
+            "manifest_monthy_source_package.yaml",
+            id="mistyped-named-manifest",
+        ),
+    ],
+)
+def test_fetch_refuses_to_create_any_manifest_beside_an_existing_registry(
+    tmp_path, monkeypatch, existing_name, requested_name
+):
+    package = tmp_path / "db" / "data" / "usda_snap" / "fy69_to_current"
+    package.mkdir(parents=True)
+    existing = package / existing_name
+    existing.write_text(
+        "source_id: usda_snap\npackage_id: usda-snap-fy69-to-current\nfiles: {}\n"
+    )
+    before = existing.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("ambiguous manifest creation reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(AmbiguousManifestError, match=existing_name):
+        fetch_source_artifact(
+            "https://example.test/snap.zip",
+            source_id="usda_snap",
+            package_id="usda-snap-fy69-to-current",
+            year=2024,
+            output_dir=package,
+            manifest_filename=requested_name,
+        )
+
+    assert existing.read_bytes() == before
+    assert not (package / requested_name).exists()
+
+
+def test_fetch_refuses_a_symlinked_manifest_before_publisher_io(tmp_path, monkeypatch):
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table"
+    package.mkdir(parents=True)
+    outside_manifest = tmp_path / "outside-manifest.yaml"
+    outside_manifest.write_text(
+        "source_id: irs_soi\npackage_id: soi-table\nfiles: {}\n"
+    )
+    manifest_path = package / "manifest.yaml"
+    manifest_path.symlink_to(outside_manifest)
+    before = outside_manifest.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("a symlinked manifest reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(MalformedManifestError, match="symlink"):
+        fetch_source_artifact(
+            "https://example.test/table.xlsx",
+            source_id="irs_soi",
+            package_id="soi-table",
+            year=2024,
+            output_dir=package,
+        )
+
+    assert manifest_path.is_symlink()
+    assert outside_manifest.read_bytes() == before
+
+
+@pytest.mark.parametrize(
+    "manifest_filename",
+    [
+        pytest.param("../manifest.yaml", id="parent"),
+        pytest.param("manifest_*.yaml", id="star-glob"),
+        pytest.param("manifest_?.yml", id="question-glob"),
+        pytest.param("manifest_[ab].yaml", id="character-class-glob"),
+    ],
+)
+def test_sweep_manifest_selector_must_be_a_literal_supported_filename(
+    tmp_path, manifest_filename
+):
+    root = tmp_path / "requested-root"
+    package = root / "package"
+    package.mkdir(parents=True)
+    content = b"publisher table"
+    (package / "table.csv").write_bytes(content)
+    (package / "manifest_a.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": {
+                    2024: {
+                        "filename": "table.csv",
+                        "sha256": hashlib.sha256(content).hexdigest(),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    outside_manifest = root.parent / "manifest.yaml"
+    outside_manifest.write_text("files: {}\n")
+    log = tmp_path / "wrangler.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+    before = {
+        path: path.read_bytes()
+        for path in (package / "manifest_a.yaml", outside_manifest)
+    }
+
+    with pytest.raises(ManifestNameError, match="Manifest"):
+        publish_source_artifacts(
+            root,
+            manifest_filename=manifest_filename,
+            wrangler_command=str(wrangler),
+        )
+
+    assert {path: path.read_bytes() for path in before} == before
+    assert not log.exists()
+
+
 # ---------------------------------------------------------------------------
 # Identity without a recorded R2 object
 # ---------------------------------------------------------------------------
@@ -2273,6 +2396,97 @@ def test_sweeps_treat_a_null_files_block_as_absent(tmp_path):
 
     assert inventory.valid
     assert published.valid
+
+
+# ---------------------------------------------------------------------------
+# Manifest-declared artifact paths
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("path_kind", ["absolute", "parent"])
+def test_sweeps_refuse_non_bare_artifact_filenames_without_reading_them(
+    tmp_path, path_kind
+):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    outside = tmp_path / "data" / "outside.csv"
+    outside.write_bytes(b"outside publisher bytes")
+    filename = str(outside) if path_kind == "absolute" else "../outside.csv"
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": {
+                    2024: {
+                        "filename": filename,
+                        "sha256": hashlib.sha256(outside.read_bytes()).hexdigest(),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+    log = tmp_path / "wrangler.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package, wrangler_command=str(wrangler))
+    expected = f"non_canonical_filename:{filename}"
+
+    assert not inventory.valid
+    assert inventory.entries[0].errors == (expected,)
+    assert inventory.entries[0].local_path == str(package)
+    assert not published.valid
+    assert published.entries[0].errors == (expected,)
+    assert published.entries[0].upload is None
+    assert published.entries[0].local_path == str(package)
+    assert not log.exists()
+    assert manifest_path.read_bytes() == before
+
+
+def test_sweeps_refuse_a_symlinked_artifact_without_reading_it(tmp_path):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    outside = tmp_path / "outside.csv"
+    outside.write_bytes(b"outside publisher bytes")
+    artifact_path = package / "table.csv"
+    artifact_path.symlink_to(outside)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": {
+                    2024: {
+                        "filename": artifact_path.name,
+                        "sha256": hashlib.sha256(outside.read_bytes()).hexdigest(),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+    log = tmp_path / "wrangler.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package, wrangler_command=str(wrangler))
+    expected = "artifact_path_is_symlink:table.csv"
+
+    assert not inventory.valid
+    assert inventory.entries[0].errors == (expected,)
+    assert not inventory.entries[0].exists
+    assert not published.valid
+    assert published.entries[0].errors == (expected,)
+    assert published.entries[0].upload is None
+    assert not log.exists()
+    assert manifest_path.read_bytes() == before
+    assert artifact_path.is_symlink()
 
 
 # ---------------------------------------------------------------------------
