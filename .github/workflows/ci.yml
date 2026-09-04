@@ -37,6 +37,14 @@ jobs:
         run: >
           uv run pytest -q
 
+      # Keep this security-sensitive operational surface explicit even though
+      # the broad Chronicle lint and test commands above also cover it.
+      - name: Lint OpenTimestamps anchoring
+        run: uv run ruff check scripts/ots_anchor.py tests/test_ots_anchor.py
+
+      - name: Test OpenTimestamps anchoring
+        run: uv run pytest -q tests/test_ots_anchor.py
+
       - name: Build source input database
         run: |
           uv run chronicle --db /tmp/chronicle-targets-ci.db init

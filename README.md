@@ -569,3 +569,14 @@ normalized_fact = convert_units(fact, 1000, "count")
   target selection, and calibration execution.
 - [thesis](https://github.com/PolicyEngine/thesis) - Public-facing official
   observations and analysis surfaces backed by Chronicle facts.
+
+## Bitcoin checkpoints for the witnessed journal
+
+The `codex/thesis-ledger-facts` branch's witnessed release manifests are
+additionally anchored through OpenTimestamps. Trusted automation pushes
+proof-only commits to `main`, where the mutable `ots/<stem>.json.ots` proofs
+live, while the immutable manifests and journal remain on the journal
+branch. Each proof binds a manifest's exact bytes into Bitcoin, giving the
+journal state it commits to an external anteriority bound. See
+[`ots/README.md`](ots/README.md) for the limits, cross-branch verification
+command, and publication design.
