@@ -241,8 +241,17 @@ Running the same operations against a checkout of the previous head:
   also requires `provider='r2'` (and therefore an `r2://` effective URI). The
   focused canonical-key/provider tests, including the existing URI-only and
   stale-country cases, pass without uploads or manifest rewrites on refusal.
+- Reproduced finding 9 with the shipped import raising `ImportError` for
+  `LEDGER_SCHEMA`, then restored `LEDGER_SCHEMA` and `TARGETS_SCHEMA` as
+  deprecated aliases of the stable defaults. Runtime queries remain on the
+  lazy functions and still honor post-import environment changes; 55 focused
+  namespace/env/client cases pass (1 skipped for absent real credentials).
+- Reproduced both parts of finding 10: the README did not state that an
+  unqualified mirror load writes to `ledger`, and it named the absent
+  `supabase/migrations/20260504_chronicle_bronze.sql` file.
 
 ### Next
 
-- Reproduce and fix findings 9-10, then run the required lint, format, full-test,
-  and tracked-USDA sweep verification.
+- Fix the README cutover instructions and commit their two regression tests.
+- Run the required lint, format, full-test, and tracked-USDA sweep verification,
+  then write the final `out.md` report.

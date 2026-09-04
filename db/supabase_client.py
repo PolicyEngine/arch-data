@@ -4,6 +4,11 @@ Supabase client for Chronicle.
 Provides connection to PolicyEngine Supabase database for:
 - Source metadata and dataset registries
 - Target inputs
+
+``LEDGER_SCHEMA`` and ``TARGETS_SCHEMA`` remain as deprecated compatibility
+aliases for their default schema names. Runtime code should call
+``chronicle_schema()`` and ``targets_schema()`` so environment overrides are
+resolved at the time of use.
 """
 
 from __future__ import annotations
@@ -15,10 +20,20 @@ from unittest.mock import Mock
 
 from supabase import create_client, Client
 
-from chronicle.env import default_chronicle_schema, env_value
+from chronicle.env import (
+    DEFAULT_CHRONICLE_SCHEMA,
+    default_chronicle_schema,
+    env_value,
+)
 
 TARGETS_SCHEMA_ENV = "POLICYENGINE_TARGETS_SCHEMA"
 DEFAULT_TARGETS_SCHEMA = "targets"
+
+# Deprecated import compatibility. These are deliberately aliases for the
+# defaults, not environment-backed runtime values; query paths below remain on
+# the lazy resolver functions.
+LEDGER_SCHEMA = DEFAULT_CHRONICLE_SCHEMA
+TARGETS_SCHEMA = DEFAULT_TARGETS_SCHEMA
 
 
 def chronicle_schema() -> str:

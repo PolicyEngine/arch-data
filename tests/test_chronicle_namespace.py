@@ -40,6 +40,19 @@ def test_chronicle_supabase_schema_boundaries_are_defaulted():
     assert supabase_client.targets_schema() == "targets"
 
 
+def test_chronicle_supabase_schema_compatibility_aliases_are_defaulted():
+    """The shipped module keeps its pre-rename import surface."""
+    from chronicle.env import DEFAULT_CHRONICLE_SCHEMA
+    from db.supabase_client import (
+        DEFAULT_TARGETS_SCHEMA,
+        LEDGER_SCHEMA,
+        TARGETS_SCHEMA,
+    )
+
+    assert LEDGER_SCHEMA == DEFAULT_CHRONICLE_SCHEMA == "ledger"
+    assert TARGETS_SCHEMA == DEFAULT_TARGETS_SCHEMA == "targets"
+
+
 def test_chronicle_supabase_schema_follows_the_environment(monkeypatch):
     """The renamed variable reaches the client after it has been imported."""
     from db import supabase_client

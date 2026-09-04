@@ -280,24 +280,25 @@ def test_supabase_schema_default_is_unchanged():
 
 
 def test_supabase_schema_is_not_bound_at_import(monkeypatch):
-    """No module-level constant may freeze the schema at import time.
+    """Compatibility constants do not freeze the runtime schema resolver.
 
-    A reload under a set variable is the pre-fix behavior this guards against:
-    it proves nothing about a module that resolved the value once, at
-    collection, and answers with the stale constant forever after.
+    The deprecated names expose only stable defaults for existing importers.
+    Query code calls the functions, which still honor an environment change
+    made after module import.
     """
     import db.supabase_client
 
-    assert not [
-        name
-        for name, value in vars(db.supabase_client).items()
-        if name.isupper() and value == "ledger"
-    ]
+    assert db.supabase_client.LEDGER_SCHEMA == "ledger"
+    assert db.supabase_client.TARGETS_SCHEMA == "targets"
 
     monkeypatch.setenv("CHRONICLE_SCHEMA", "chronicle_probe")
+    monkeypatch.setenv("POLICYENGINE_TARGETS_SCHEMA", "targets_probe")
     unreloaded = importlib.import_module("db.supabase_client")
 
     assert unreloaded.chronicle_schema() == "chronicle_probe"
+    assert unreloaded.targets_schema() == "targets_probe"
+    assert unreloaded.LEDGER_SCHEMA == "ledger"
+    assert unreloaded.TARGETS_SCHEMA == "targets"
 
 
 # ---------------------------------------------------------------------------
