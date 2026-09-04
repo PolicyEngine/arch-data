@@ -43,9 +43,15 @@ and ``2023`` and ``'2023'`` are one vintage key.
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Mapping
+from contextlib import contextmanager
 from dataclasses import dataclass
+import fcntl
+import hashlib
+import os
 from pathlib import Path
 import re
+import stat
+import tempfile
 from typing import Any
 import unicodedata
 
@@ -1091,6 +1097,13 @@ def register_hash_only_artifact(
     that keeps ``manifest_<package>.yaml`` files and no ``manifest.yaml`` is
     refused the default name rather than given a stray third manifest.
     """
+    source_id_text = _text(source_id)
+    package_id_text = _text(package_id)
+    if source_id_text is None or package_id_text is None:
+        raise HashOnlyRegistrationError(
+            "A registration needs non-empty source_id and package_id values; "
+            f"got source_id={source_id!r}, package_id={package_id!r}."
+        )
     access_class = normalize_access(access)
     if stores_bytes(access_class):
         raise HashOnlyRegistrationError(
@@ -1131,40 +1144,6 @@ def register_hash_only_artifact(
         access_class=access_class,
     )
 
-    output = Path(output_dir)
-    local_path = output / artifact_name
-    if local_path.exists():
-        raise HashOnlyRegistrationError(
-            f"Refusing to register {artifact_name!r} hash-only while its bytes "
-            f"are present at {local_path}. A {access_class} artifact's bytes "
-            "must not live in a Chronicle store."
-        )
-
-    manifest_path = _registration_manifest_path(output, manifest_filename)
-    payload = _load_manifest(manifest_path)
-    # Every manifest the directory keeps takes part in the identity checks:
-    # the boundary is the file in the directory, not the manifest naming it.
-    siblings = {
-        str(path): _load_manifest(path)
-        for path in package_manifest_paths(output)
-        if path != manifest_path
-        and filename_key(path.name) != filename_key(manifest_path.name)
-    }
-    try:
-        existing_kind = manifest_kind(payload, manifest_path=manifest_path)
-    except ManifestAccessError as exc:
-        raise HashOnlyRegistrationError(str(exc)) from exc
-    if existing_kind != MICRODATA_RELEASE_KIND and (
-        payload.get("kind") is not None or has_file_entries(payload)
-    ):
-        # A declared kind is fixed, and a frozen kindless manifest with
-        # entries is a publisher table. A manifest with neither is declared
-        # by this write.
-        raise HashOnlyRegistrationError(
-            f"{manifest_path} is a {existing_kind} manifest; hash-only "
-            "registrations belong in a kind: microdata_release manifest."
-        )
-
     entry = _registration_entry(
         filename=artifact_name,
         access=access_class,
@@ -1180,8 +1159,101 @@ def register_hash_only_artifact(
         notes=notes,
         **provenance,
     )
+    output = Path(output_dir)
+    manifest_path = _registration_manifest_path(output, manifest_filename)
+    preparation = {
+        "output": output,
+        "manifest_path": manifest_path,
+        "source_id": source_id_text,
+        "package_id": package_id_text,
+        "year": year,
+        "artifact_name": artifact_name,
+        "checksum": checksum,
+        "access_class": access_class,
+        "entry": entry,
+        "source_page": source_page,
+        "dataset": dataset,
+        "publisher": publisher,
+        "table": table,
+        "allow_reissue": allow_reissue,
+    }
+    # Complete the read/validate/mutate calculation once before creating the
+    # output directory or lock file. Ordinary refusals therefore have no
+    # filesystem side effect. Repeat it under the package-wide lock so a
+    # concurrent registration cannot be lost between read and replacement.
+    _prepare_registration_payload(**preparation)
+    output.mkdir(parents=True, exist_ok=True)
+    with _registration_lock(output):
+        payload, replaced = _prepare_registration_payload(**preparation)
+        document = yaml.safe_dump(payload, sort_keys=False, allow_unicode=True)
+        _atomic_replace_manifest(manifest_path, document)
+
+    return ArtifactRegistrationReport(
+        manifest_path=str(manifest_path),
+        source_id=source_id_text,
+        package_id=package_id_text,
+        year=year,
+        filename=artifact_name,
+        sha256=checksum,
+        size_bytes=size_bytes,
+        vintage=str(vintage),
+        licence=str(licence),
+        access=access_class,
+        registration=registration_id(
+            source_id=source_id_text,
+            package_id=package_id_text,
+            year=year,
+            sha256=checksum,
+            filename=artifact_name,
+        ),
+        replaced=replaced,
+        hash_source=provenance["hash_source"],
+        attested_by=provenance["attested_by"],
+    )
+
+
+def _prepare_registration_payload(
+    *,
+    output: Path,
+    manifest_path: Path,
+    source_id: str,
+    package_id: str,
+    year: int,
+    artifact_name: str,
+    checksum: str,
+    access_class: str,
+    entry: dict[str, Any],
+    source_page: str | None,
+    dataset: str | None,
+    publisher: str | None,
+    table: str | None,
+    allow_reissue: bool,
+) -> tuple[dict[str, Any], bool]:
+    """Return the complete registration write after validating current state.
+
+    This function has no filesystem side effects. The caller runs it once as a
+    preflight and again while holding the package lock, so ordinary refusals
+    precede even lock creation while concurrent registrations still serialize
+    their read/modify/replace sequence.
+    """
+    _assert_registration_target_safe(output, manifest_path)
+    _assert_no_local_artifact_bytes(output, artifact_name, access_class)
+    payload = _load_manifest(manifest_path)
+    siblings = _registration_sibling_manifests(output, manifest_path)
+    try:
+        existing_kind = manifest_kind(payload, manifest_path=manifest_path)
+    except ManifestAccessError as exc:
+        raise HashOnlyRegistrationError(str(exc)) from exc
+    if existing_kind != MICRODATA_RELEASE_KIND and (
+        payload.get("kind") is not None or has_file_entries(payload)
+    ):
+        raise HashOnlyRegistrationError(
+            f"{manifest_path} is a {existing_kind} manifest; hash-only "
+            "registrations belong in a kind: microdata_release manifest."
+        )
+
     route_context = dict(payload)
-    if source_page:
+    if _text(source_page):
         route_context["source_page"] = source_page
     if not _access_route(entry, route_context):
         raise HashOnlyRegistrationError(
@@ -1198,37 +1270,30 @@ def register_hash_only_artifact(
             f"{type(files).__name__}. Chronicle will not write into a manifest "
             "it cannot read."
         )
-    manifest_errors = list(validate_manifest_files(payload))
-    for existing_key, _index, existing in iter_manifest_entries(payload):
-        existing_name = (
-            existing.get("filename") if isinstance(existing, Mapping) else None
+    _assert_registration_manifest_valid(
+        payload,
+        manifest_path,
+        output=output,
+        kind=existing_kind,
+    )
+    for sibling_path, sibling in siblings.items():
+        try:
+            sibling_kind = manifest_kind(sibling, manifest_path=sibling_path)
+        except ManifestAccessError as exc:
+            raise HashOnlyRegistrationError(str(exc)) from exc
+        _assert_registration_manifest_valid(
+            sibling,
+            sibling_path,
+            output=output,
+            kind=sibling_kind,
         )
-        exists = (
-            is_bare_filename(existing_name) and (output / str(existing_name)).exists()
-        )
-        manifest_errors.extend(
-            f"{existing_key!r}/{existing_name}: {code}"
-            for code in validate_file_entry(
-                existing,
-                kind=existing_kind,
-                manifest=payload,
-                local_file_exists=exists,
-            )
-        )
-    if manifest_errors:
-        # An invalid entry is never replaced or reclassified in passing: the
-        # registration would carry the defect forward or conceal it.
-        raise HashOnlyRegistrationError(
-            f"{manifest_path} is not a valid {existing_kind} manifest: "
-            f"{'; '.join(manifest_errors)}. Fix it by hand before registering "
-            "into it; inventory-artifacts reports the same codes."
-        )
+
     _assert_no_archived_identity(
         payload, manifest_path, artifact_name, access_class, sha256=checksum
     )
     for sibling_path, sibling in siblings.items():
         _assert_no_archived_identity(
-            sibling, Path(sibling_path), artifact_name, access_class, sha256=checksum
+            sibling, sibling_path, artifact_name, access_class, sha256=checksum
         )
 
     try:
@@ -1237,27 +1302,25 @@ def register_hash_only_artifact(
         raise HashOnlyRegistrationError(f"{manifest_path}: {exc}") from exc
     key = vintage_key if vintage_key is not None else year
 
-    payload.setdefault("source_id", source_id)
-    payload.setdefault("package_id", package_id)
+    _replace_blank_manifest_text(payload, "source_id", source_id)
+    _replace_blank_manifest_text(payload, "package_id", package_id)
     payload["kind"] = MICRODATA_RELEASE_KIND
-    payload.setdefault("dataset", dataset or f"{source_id}_{package_id}")
-    if publisher:
-        payload.setdefault("publisher", publisher)
-    if source_page:
-        payload.setdefault("source_page", source_page)
-    if table:
-        payload.setdefault("table", table)
+    _replace_blank_manifest_text(
+        payload, "dataset", _text(dataset) or f"{source_id}_{package_id}"
+    )
+    if _text(publisher):
+        _replace_blank_manifest_text(payload, "publisher", publisher)
+    if _text(source_page):
+        _replace_blank_manifest_text(payload, "source_page", source_page)
+    if _text(table):
+        _replace_blank_manifest_text(payload, "table", table)
     if payload.get("files") is None:
-        # setdefault keeps an explicit null (a bare ``files:`` line); the
-        # entry below needs a mapping to record into.
         payload["files"] = {}
 
     entries = _existing_entries(payload["files"], key)
     wanted = filename_key(artifact_name)
-    # Two passes, so re-registering an existing pin stays idempotent even after
-    # a reissue has added a second entry for the same filename. A single pass
-    # would raise on the first filename match with a different checksum before
-    # it could reach the exact match further down the list.
+    # Two passes keep re-registering an existing pin idempotent after a reissue
+    # added another entry for the same filename.
     replaced = False
     for index, existing in enumerate(entries):
         if not isinstance(existing, Mapping):
@@ -1282,38 +1345,204 @@ def register_hash_only_artifact(
                 "bytes are a new publisher release, not a pin replacement; "
                 "pass --allow-reissue to register both."
             )
-        # A reissue sits alongside the pin it supersedes.
         entries.append(entry)
 
     payload["files"][key] = sorted(entries, key=_entry_sort_key)
-    output.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(
-        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
+    for field, expected in (("source_id", source_id), ("package_id", package_id)):
+        if _text(payload.get(field)) != expected:
+            raise HashOnlyRegistrationError(
+                f"Refusing to persist {manifest_path}: final {field} is "
+                f"{payload.get(field)!r}, expected {expected!r}."
+            )
+    _assert_registration_manifest_valid(
+        payload,
+        manifest_path,
+        output=output,
+        kind=MICRODATA_RELEASE_KIND,
+        final=True,
+    )
+    return payload, replaced
+
+
+def _matching_directory_entry(output: Path, filename: Any) -> Path | None:
+    """Return the actual directory entry matching ``filename``'s safe key."""
+    if not output.is_dir():
+        return None
+    wanted = filename_key(filename)
+    return next(
+        (path for path in output.iterdir() if filename_key(path.name) == wanted),
+        None,
     )
 
-    return ArtifactRegistrationReport(
-        manifest_path=str(manifest_path),
-        source_id=str(payload["source_id"]),
-        package_id=str(payload["package_id"]),
-        year=year,
-        filename=artifact_name,
-        sha256=checksum,
-        size_bytes=size_bytes,
-        vintage=str(vintage),
-        licence=str(licence),
-        access=access_class,
-        registration=registration_id(
-            source_id=str(payload["source_id"]),
-            package_id=str(payload["package_id"]),
-            year=year,
-            sha256=checksum,
-            filename=artifact_name,
-        ),
-        replaced=replaced,
-        hash_source=provenance["hash_source"],
-        attested_by=provenance["attested_by"],
+
+def _assert_no_local_artifact_bytes(
+    output: Path,
+    artifact_name: str,
+    access_class: str,
+) -> None:
+    """Refuse any actual path alias of a hash-only artifact filename."""
+    local_path = _matching_directory_entry(output, artifact_name)
+    if local_path is None:
+        return
+    requested = "" if local_path.name == artifact_name else f" ({artifact_name!r})"
+    raise HashOnlyRegistrationError(
+        f"Refusing to register {local_path.name!r}{requested} hash-only while "
+        f"its bytes are present at {local_path}. A {access_class} artifact's "
+        "bytes must not live in a Chronicle store."
     )
+
+
+def _registration_manifest_errors(
+    payload: Mapping[str, Any],
+    *,
+    output: Path,
+    kind: str,
+) -> list[str]:
+    """Return complete entry and manifest-level validation errors."""
+    errors = list(validate_manifest_files(payload))
+    for existing_key, _index, existing in iter_manifest_entries(payload):
+        existing_name = (
+            existing.get("filename") if isinstance(existing, Mapping) else None
+        )
+        exists = (
+            is_bare_filename(existing_name)
+            and _matching_directory_entry(output, existing_name) is not None
+        )
+        errors.extend(
+            f"{existing_key!r}/{existing_name}: {code}"
+            for code in validate_file_entry(
+                existing,
+                kind=kind,
+                manifest=payload,
+                local_file_exists=exists,
+            )
+        )
+    return errors
+
+
+def _assert_registration_manifest_valid(
+    payload: Mapping[str, Any],
+    manifest_path: Path,
+    *,
+    output: Path,
+    kind: str,
+    final: bool = False,
+) -> None:
+    errors = _registration_manifest_errors(payload, output=output, kind=kind)
+    if not errors:
+        return
+    action = "persist" if final else "register into"
+    raise HashOnlyRegistrationError(
+        f"{manifest_path} is not a valid {kind} manifest; refusing to {action} "
+        f"it: {'; '.join(errors)}. Fix it by hand before registering; "
+        "inventory-artifacts reports the same codes."
+    )
+
+
+def _replace_blank_manifest_text(payload: dict[str, Any], key: str, value: Any) -> None:
+    """Fill a missing, null, empty, or whitespace-only manifest field."""
+    replacement = _text(value)
+    if _text(payload.get(key)) is None and replacement is not None:
+        payload[key] = replacement
+
+
+def _registration_sibling_manifests(
+    output: Path, manifest_path: Path
+) -> dict[Path, dict[str, Any]]:
+    """Load every physically distinct sibling after alias validation."""
+    _assert_registration_target_safe(output, manifest_path)
+    return {
+        path: _load_manifest(path)
+        for path in package_manifest_paths(output)
+        if path != manifest_path
+    }
+
+
+def _assert_registration_target_safe(output: Path, manifest_path: Path) -> None:
+    """Refuse symlinked targets and normalized aliases before reading them."""
+    if manifest_path.is_symlink():
+        raise HashOnlyRegistrationError(
+            f"Refusing manifest target {manifest_path}: it is a symbolic link. "
+            "Registration never follows a manifest target outside its package."
+        )
+    by_name: dict[str, Path] = {}
+    for path in package_manifest_paths(output):
+        key = filename_key(path.name)
+        previous = by_name.get(key)
+        if previous is not None and previous != path:
+            raise HashOnlyRegistrationError(
+                f"{previous} and {path} have the same normalized manifest "
+                "name. Keep exactly one physical spelling before registering."
+            )
+        by_name[key] = path
+    alias = by_name.get(filename_key(manifest_path.name))
+    if alias is not None and alias != manifest_path:
+        raise HashOnlyRegistrationError(
+            f"Refusing manifest target {manifest_path}: existing {alias} has "
+            "the same normalized manifest name. Selecting one spelling would "
+            "hide the other."
+        )
+
+
+def _registration_lock_path(output: Path) -> Path:
+    """Return the persistent package-wide lock file outside the package tree."""
+    identity = os.fsencode(str(output.resolve(strict=False)))
+    digest = hashlib.sha256(identity).hexdigest()
+    return (
+        Path(tempfile.gettempdir())
+        / "policyengine-chronicle-manifest-locks"
+        / f"{digest}.lock"
+    )
+
+
+@contextmanager
+def _registration_lock(output: Path) -> Iterator[None]:
+    """Hold the package-wide manifest lock for one read/modify/replace."""
+    lock_path = _registration_lock_path(output)
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("a+b") as lock_file:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+
+def _atomic_replace_manifest(manifest_path: Path, document: str) -> None:
+    """Durably replace a manifest from a same-directory temporary file."""
+    _assert_registration_target_safe(manifest_path.parent, manifest_path)
+    mode = (
+        stat.S_IMODE(manifest_path.stat().st_mode) if manifest_path.exists() else 0o644
+    )
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=manifest_path.parent,
+        prefix=f".{manifest_path.name}.",
+        suffix=".tmp",
+    )
+    temporary_exists = True
+    try:
+        os.fchmod(descriptor, mode)
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="") as temporary:
+            descriptor = -1
+            temporary.write(document)
+            temporary.flush()
+            os.fsync(temporary.fileno())
+        _assert_registration_target_safe(manifest_path.parent, manifest_path)
+        os.replace(temporary_name, manifest_path)
+        temporary_exists = False
+        directory_fd = os.open(manifest_path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+    finally:
+        if descriptor >= 0:
+            os.close(descriptor)
+        if temporary_exists:
+            try:
+                os.unlink(temporary_name)
+            except FileNotFoundError:
+                pass
 
 
 def _hash_only_attestation(
@@ -1462,6 +1691,7 @@ def _registration_manifest_path(output: Path, manifest_filename: Any) -> Path:
             f"{manifest_filename!r}."
         )
     manifest_path = output / name
+    _assert_registration_target_safe(output, manifest_path)
     if name == DEFAULT_MANIFEST_FILENAME and not manifest_path.exists():
         siblings = [
             path.name for path in package_manifest_paths(output) if path.name != name
@@ -1537,7 +1767,8 @@ def _load_manifest(manifest_path: Path) -> dict[str, Any]:
         raise HashOnlyRegistrationError(
             f"{manifest_path} is not valid YAML: {exc}"
         ) from exc
-    payload = payload or {}
+    if payload is None:
+        payload = {}
     if not isinstance(payload, dict):
         raise HashOnlyRegistrationError(f"Manifest must be a mapping: {manifest_path}")
     return payload
