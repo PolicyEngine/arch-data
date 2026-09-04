@@ -28,7 +28,6 @@ from chronicle.env import env_value
 from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
 
 
-
 R2_RAW_BUCKET_ENV = "CHRONICLE_R2_RAW_BUCKET"
 R2_DERIVED_BUCKET_ENV = "CHRONICLE_R2_DERIVED_BUCKET"
 
