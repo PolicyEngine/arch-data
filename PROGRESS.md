@@ -419,11 +419,28 @@ Running the same operations against a checkout of the previous head:
   through `chronicle_schema()` / `targets_schema()`. Fix commit: `f41ad0f`; no
   #227 hunk applies. The focused regression now exits 0 with 3 passed; it and
   the runtime/default namespace controls exit 0 with 11 passed.
+- **Adversarial path-boundary follow-up reproduced and fixed.** Test-only
+  commit `465a34c` showed normalized manifest aliases and a package-local
+  artifact symlink reaching the publisher-read sentinel; invalid sweep names
+  were accepted when the root was absent and escaped the CLI as tracebacks;
+  manifest-named artifacts were not refused; and publish could upload a valid
+  first entry before discovering an invalid later entry. The same audit also
+  reproduced contradictory owners across sibling manifests being ignored by
+  both sweeps.
+- Fix commit `8e766ad` ports #227 commit `235c616`'s corrected
+  `_package_manifests` normalized-alias guard, validates fetch destinations
+  before publisher I/O, rejects manifest-named artifacts in publish and
+  inventory, validates sweep selectors before checking the root, and reports
+  those refusals cleanly from both CLIs. It also corrects the object-key docs
+  to describe compatible recorded history. The six focused path/CLI cases now
+  pass. Complete-package publish preflight and sibling-owner validation remain
+  the next coherent fix.
 
 ### Next
 
-1. Audit the eight findings and #227 port surface for missed CLI/refusal cases,
-   then run focused and full verification.
-2. Commit each coherent red-test and implementation step, updating this log.
-3. Run focused tests, lint/format checks on changed files, and the full suite
-   with the directly captured exit code and counts.
+1. Port #227's complete-manifest preflight shape and apply shared-owner
+   consistency checks to publish and inventory sweeps.
+2. Run the complete artifact module, then the requested lint/format checks and
+   full suite with the directly captured exit code and counts.
+3. Write the external `-o out.md` report with the per-finding command,
+   observation, fix, regression, commit, and port provenance.
