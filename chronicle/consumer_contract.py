@@ -707,32 +707,45 @@ def _consumer_fact_row(
     return _clean_consumer_row(row)
 
 
-def _require_ledger_emit(emit_epoch: Epoch, boundary: str) -> None:
-    """Refuse a non-Ledger emit at an artifact boundary.
+def _require_ledger_emit(emit_epoch: Epoch | str, boundary: str) -> Epoch:
+    """Refuse a non-Ledger emit at an artifact boundary; return the epoch.
 
     Mechanism 1 of the rename accepts both epochs on read and emits unchanged:
-    the only packaged, sha-pinned consumer-fact schema is the Ledger one, and a
-    Chronicle-named row would violate the schema its own manifest pins. Emitting
-    Chronicle names is a separate, consumer-gated cutover that lands with a
-    pinned successor schema.
+    the only packaged, sha-pinned consumer-fact schema is the Ledger one, so
+    every artifact boundary emits Ledger-named rows (the artifact builder
+    canonicalizes whatever epoch it read) and refuses a Chronicle emit until a
+    successor schema is pinned by a separate, consumer-gated cutover.
+
+    ``emit_epoch`` may be the enum member or its string value; anything else is
+    refused with :class:`ValueError` naming the boundary. Callers must check
+    this before touching the filesystem so a refused call leaves existing
+    outputs intact.
     """
 
-    if emit_epoch is not Epoch.LEDGER:
+    try:
+        epoch = Epoch(emit_epoch)
+    except ValueError as error:
         raise ValueError(
-            f"{boundary}: emitting {emit_epoch.value!r}-epoch identifiers needs a "
+            f"{boundary}: unknown emit epoch {emit_epoch!r}; expected "
+            f"{Epoch.LEDGER.value!r} or {Epoch.CHRONICLE.value!r}"
+        ) from error
+    if epoch != Epoch.LEDGER:
+        raise ValueError(
+            f"{boundary}: emitting {epoch.value!r}-epoch identifiers needs a "
             "packaged successor consumer-fact schema; until one is pinned, "
             "artifacts are emitted Ledger-named (mechanism 1: emit unchanged)."
         )
+    return epoch
 
 
 def write_consumer_facts_jsonl(
     facts: list[AggregateFact],
     path: str | Path,
     *,
-    emit_epoch: Epoch = EMIT_EPOCH,
+    emit_epoch: Epoch | str = EMIT_EPOCH,
 ) -> ConsumerFactExportReport:
     """Write consumer-contract fact rows to JSON Lines."""
-    _require_ledger_emit(emit_epoch, "write_consumer_facts_jsonl")
+    emit_epoch = _require_ledger_emit(emit_epoch, "write_consumer_facts_jsonl")
     rows = consumer_fact_rows(facts, emit_epoch=emit_epoch)
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)

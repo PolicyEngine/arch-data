@@ -362,6 +362,32 @@ def test_build_chronicle_db_rejects_unknown_explicit_build_epoch(tmp_path):
         )
 
 
+@pytest.mark.parametrize(
+    ("kwargs", "message"),
+    [
+        ({"build_id": "future.build.v9:unknown"}, "ledger[.]build[.]v1"),
+        ({"emit_epoch": "bogus"}, "unknown emit epoch"),
+    ],
+)
+def test_refused_build_leaves_an_existing_db_untouched(tmp_path, kwargs, message):
+    db_path = tmp_path / "existing.db"
+    build_chronicle_db([], db_path)
+    before = db_path.read_bytes()
+
+    with pytest.raises(ValueError, match=message):
+        build_chronicle_db([], db_path, replace=True, **kwargs)
+
+    assert db_path.read_bytes() == before
+
+
+def test_build_chronicle_db_accepts_epoch_string(tmp_path):
+    report = build_chronicle_db(
+        [], tmp_path / "string-epoch.db", emit_epoch="chronicle"
+    )
+
+    assert report.build_id.startswith("chronicle.build.v2:")
+
+
 def test_build_chronicle_db_rejects_unresolved_source_cell_lineage(tmp_path):
     fact = replace(
         build_soi_table_1_1_facts(2023)[0],

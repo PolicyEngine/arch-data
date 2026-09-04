@@ -506,6 +506,30 @@ Target inputs use a three-table schema:
 These are source-backed inputs. Microcosm owns the contracts that select them,
 the active support-aware subset, and calibrated solver execution.
 
+## Identifier Epochs
+
+Fact identity migrates by epoch, never in place. `chronicle/epoch.py` is the
+single registry of frozen Ledger-era hash domains and schema ids
+(`ledger.aggregate_fact.v2`, `ledger.consumer_fact.v1`, ...) and their
+Chronicle-era successors (`chronicle.aggregate_fact.v3`,
+`chronicle.consumer_fact.v2`, ...). A successor key hashes the same canonical
+payload as its Ledger key; only the prefix differs.
+
+- **Readers accept both epochs.** Every validator, key verifier, bundle loader,
+  and relational reader accepts either form on each identifier independently,
+  so mixed-epoch inputs load. Anything outside both forms is rejected with an
+  error naming both.
+- **Emitters stay Ledger-named.** `EMIT_EPOCH` is the one default a later,
+  consumer-gated cutover flips. Package scaffolds, relational builds, and
+  consumer artifacts emit Ledger identifiers today.
+- **Artifacts canonicalize on emit.** The consumer artifact pins the sha256 of
+  the frozen v1 consumer-fact schema, whose identifiers are Ledger-named, so
+  `build_consumer_artifact` rewrites every row it read to the emit epoch before
+  writing it; an artifact built from mixed-epoch rows is byte-identical to one
+  built from the same rows written Ledger-named. Asking an artifact boundary to
+  emit Chronicle names is refused until a successor schema is packaged and
+  pinned, and the refusal happens before any existing output is touched.
+
 ## Chronicle Facts And Microcosm Targets
 
 Source facts should be structurally normalized before Microcosm considers them

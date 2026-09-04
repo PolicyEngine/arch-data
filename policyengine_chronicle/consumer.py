@@ -16,7 +16,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from chronicle.consumer_contract import _hash_key
+from chronicle.consumer_contract import _hash_key, _require_ledger_emit
 from chronicle.core import (
     ALLOWED_ASSERTIONS,
     ALLOWED_PROVENANCE_CLASSES,
@@ -33,6 +33,7 @@ from chronicle.epoch import (
 )
 from policyengine_chronicle.schema import (
     CONSUMER_FACT_SCHEMA_SHA256,
+    normalize_consumer_fact_row_epochs,
     validate_consumer_fact_row,
 )
 
@@ -66,15 +67,29 @@ def build_consumer_artifact(
     *,
     facts_path: str | Path,
     replace: bool = False,
-    emit_epoch: Epoch = EMIT_EPOCH,
+    emit_epoch: Epoch | str = EMIT_EPOCH,
 ) -> ConsumerArtifactBuildReport:
     """Build a reproducible facts-only artifact from consumer fact rows.
 
     ``facts_path`` is a ``consumer_facts.jsonl`` file or a bundle directory
-    containing one. The artifact contains canonical fact rows and a manifest
-    that pins their schema and content hashes. Target contracts are packaged
-    by the consumer, not Chronicle.
+    containing one. Rows may carry either accepted naming epoch on each
+    identifier (mechanism 1: dual-domain acceptance); the artifact writes every
+    row canonicalized to ``emit_epoch`` so the rows conform to the schema
+    whose sha256 the manifest pins. Target contracts are packaged by the
+    consumer, not Chronicle.
+
+    A refused call (unknown or non-Ledger ``emit_epoch``) raises before the
+    output directory is touched, so an existing artifact survives it.
     """
+    emit_epoch = _require_ledger_emit(emit_epoch, "build_consumer_artifact")
+    resolved_facts_path = _resolve_facts_path(facts_path)
+    rows = [
+        normalize_consumer_fact_row_epochs(row, line_number, resolved_facts_path)
+        for line_number, row in enumerate(
+            _load_consumer_rows(resolved_facts_path, validate_schema=True), start=1
+        )
+    ]
+
     output_path = Path(output_dir)
     if output_path.exists():
         if not replace:
@@ -84,14 +99,6 @@ def build_consumer_artifact(
         shutil.rmtree(output_path)
     output_path.mkdir(parents=True)
 
-    if emit_epoch is not Epoch.LEDGER:
-        raise ValueError(
-            "build_consumer_artifact: emitting "
-            f"{emit_epoch.value!r}-epoch identifiers needs a packaged successor "
-            "consumer-fact schema; until one is pinned, artifacts are emitted "
-            "Ledger-named (mechanism 1: emit unchanged)."
-        )
-    rows = _load_consumer_rows(_resolve_facts_path(facts_path), validate_schema=True)
     facts_out = output_path / "consumer_facts.jsonl"
     with facts_out.open("w") as file:
         for row in rows:

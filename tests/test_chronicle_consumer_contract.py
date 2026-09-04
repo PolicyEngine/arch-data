@@ -300,6 +300,35 @@ def test_chronicle_epoch_writer_is_refused_until_a_schema_is_pinned(tmp_path):
     assert row["schema_version"] == SCHEMA_IDS["consumer_fact"].chronicle
 
 
+@pytest.mark.parametrize(
+    ("emit_epoch", "message"),
+    [
+        ("chronicle", "successor consumer-fact schema"),
+        ("bogus", "unknown emit epoch"),
+    ],
+)
+def test_write_consumer_facts_jsonl_refuses_epoch_strings_before_writing(
+    tmp_path, emit_epoch, message
+):
+    facts_path = tmp_path / "refused.jsonl"
+
+    with pytest.raises(ValueError, match=message):
+        write_consumer_facts_jsonl([_soi_agi_fact()], facts_path, emit_epoch=emit_epoch)
+
+    assert not facts_path.exists()
+
+
+def test_write_consumer_facts_jsonl_accepts_the_ledger_epoch_string(tmp_path):
+    facts_path = tmp_path / "ledger.jsonl"
+
+    report = write_consumer_facts_jsonl(
+        [_soi_agi_fact()], facts_path, emit_epoch="ledger"
+    )
+
+    assert report.schema_version == "ledger.consumer_fact.v1"
+    assert facts_path.exists()
+
+
 def test_aggregate_fact_key_ignores_lineage_labels_and_evidence_notes():
     fact = _soi_agi_fact()
     changed = replace(

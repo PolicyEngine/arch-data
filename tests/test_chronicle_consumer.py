@@ -24,7 +24,11 @@ from policyengine_chronicle.consumer import (
     build_consumer_artifact,
     load_consumer_artifact,
 )
-from policyengine_chronicle.schema import CONSUMER_FACT_SCHEMA_SHA256
+from jsonschema import Draft202012Validator
+from policyengine_chronicle.schema import (
+    CONSUMER_FACT_SCHEMA_SHA256,
+    consumer_fact_schema,
+)
 
 SHA = "ab" * 32
 
@@ -159,7 +163,16 @@ def test_chronicle_epoch_artifact_emission_is_refused_until_a_schema_is_pinned(
     assert not (out_dir / "manifest.json").exists()
 
 
-def test_mixed_epoch_rows_load_in_one_artifact(tmp_path):
+def _artifact_bytes(out_dir):
+    return {
+        name: (out_dir / name).read_bytes()
+        for name in ("manifest.json", "consumer_facts.jsonl")
+    }
+
+
+def test_mixed_epoch_rows_are_emitted_ledger_named_in_one_artifact(tmp_path):
+    """Dual-domain acceptance on read; the artifact emits under the pinned
+    schema's epoch, so its rows validate against the frozen v1 bytes alone."""
     ledger_row = consumer_fact_rows([_fact(value=100, period_value=2021)])[0]
     chronicle_row = consumer_fact_rows(
         [_fact(value=110, period_value=2022)], emit_epoch=Epoch.CHRONICLE
@@ -172,10 +185,63 @@ def test_mixed_epoch_rows_load_in_one_artifact(tmp_path):
     artifact = load_consumer_artifact(out_dir)
 
     assert artifact.manifest["consumer_fact_schema_versions"] == [
-        "chronicle.consumer_fact.v2",
-        "ledger.consumer_fact.v1",
+        "ledger.consumer_fact.v1"
     ]
     assert len(artifact.rows) == 2
+    validator = Draft202012Validator(consumer_fact_schema())
+    for line in (out_dir / "consumer_facts.jsonl").read_text().splitlines():
+        row = json.loads(line)
+        validator.validate(row)
+        assert "chronicle." not in line
+        assert row["schema_version"] == "ledger.consumer_fact.v1"
+
+    # Canonicalizing on emit is the same artifact as emitting Ledger-named rows.
+    ledger_only_path = tmp_path / "ledger-consumer-facts.jsonl"
+    _write_rows(
+        ledger_only_path,
+        [ledger_row, consumer_fact_rows([_fact(value=110, period_value=2022)])[0]],
+    )
+    ledger_dir = tmp_path / "ledger-artifact"
+    build_consumer_artifact(ledger_dir, facts_path=ledger_only_path)
+    assert _artifact_bytes(out_dir) == _artifact_bytes(ledger_dir)
+
+
+@pytest.mark.parametrize(
+    ("emit_epoch", "message"),
+    [
+        (Epoch.CHRONICLE, "successor consumer-fact schema"),
+        ("chronicle", "successor consumer-fact schema"),
+        ("bogus", "unknown emit epoch"),
+    ],
+)
+def test_refused_emit_leaves_an_existing_artifact_untouched(
+    tmp_path, emit_epoch, message
+):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+    build_consumer_artifact(out_dir, facts_path=facts_path)
+    before = _artifact_bytes(out_dir)
+
+    with pytest.raises(ValueError, match=message):
+        build_consumer_artifact(
+            out_dir, facts_path=facts_path, replace=True, emit_epoch=emit_epoch
+        )
+
+    assert _artifact_bytes(out_dir) == before
+
+
+def test_emit_epoch_accepts_its_string_value(tmp_path):
+    facts_path = _write_facts(tmp_path)
+    out_dir = tmp_path / "artifact"
+
+    report = build_consumer_artifact(
+        out_dir, facts_path=facts_path, emit_epoch="ledger"
+    )
+
+    assert report.schema_version == "policyengine_ledger.consumer_artifact.v2"
+    assert load_consumer_artifact(out_dir).manifest["schema_version"] == (
+        "policyengine_ledger.consumer_artifact.v2"
+    )
 
 
 def test_artifact_load_rejects_tampered_facts(tmp_path):

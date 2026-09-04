@@ -70,16 +70,22 @@ def build_chronicle_db(
     source_rows: list[SourceRow] | None = None,
     build_id: str | None = None,
     replace: bool = False,
-    emit_epoch: Epoch = EMIT_EPOCH,
+    emit_epoch: Epoch | str = EMIT_EPOCH,
 ) -> ChronicleDbBuildReport:
-    """Build a deterministic SQLite Chronicle database artifact."""
-    path = Path(db_path)
-    if path.exists():
-        if not replace:
-            raise FileExistsError(f"Chronicle DB already exists: {path}")
-        path.unlink()
-    path.parent.mkdir(parents=True, exist_ok=True)
+    """Build a deterministic SQLite Chronicle database artifact.
 
+    ``emit_epoch`` may be the enum member or its string value. An explicit
+    ``build_id`` must carry an accepted build-domain prefix; it is validated
+    before the filesystem is touched so a refused call leaves an existing
+    database in place.
+    """
+    try:
+        emit_epoch = Epoch(emit_epoch)
+    except ValueError as error:
+        raise ValueError(
+            f"build_chronicle_db: unknown emit epoch {emit_epoch!r}; expected "
+            f"{Epoch.LEDGER.value!r} or {Epoch.CHRONICLE.value!r}"
+        ) from error
     cells = source_cells or []
     rows = source_rows or []
     columns = source_columns_from_source_rows(rows)
@@ -89,6 +95,13 @@ def build_chronicle_db(
         if build_id is not None
         else _build_id(facts, cells, rows, epoch=emit_epoch)
     )
+
+    path = Path(db_path)
+    if path.exists():
+        if not replace:
+            raise FileExistsError(f"Chronicle DB already exists: {path}")
+        path.unlink()
+    path.parent.mkdir(parents=True, exist_ok=True)
     fact_constraints = [(fact, build_aggregate_constraints(fact)) for fact in facts]
     source_record_ids = {
         fact.source_record_id for fact in facts if fact.source_record_id is not None
