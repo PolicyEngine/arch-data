@@ -127,10 +127,31 @@ def _write_checker_fixture(path: Path, ledger_text: str, manifest: dict) -> None
         )
 
 
+def _commit_candidate(path: Path) -> str:
+    """Commit whatever the fixture has just written and name that commit.
+
+    The checker judges a commit it checks out itself, so a fixture that mutated
+    a working tree has not yet said anything the checker can be asked about.
+    Committing is how the fixture states its candidate. An empty commit is
+    allowed because some fixtures change nothing and the question -- does this
+    commit pass -- is still a real one.
+    """
+
+    _git(path, "add", "-A")
+    _git(path, "commit", "-q", "--allow-empty", "-m", "candidate")
+    return _git(path, "rev-parse", "HEAD")
+
+
 def _run_checker(
     path: Path, base_ref: str | None = None
 ) -> subprocess.CompletedProcess:
-    command = [sys.executable, str(path / "scripts/check_thesis_facts_append.py")]
+    commit = _commit_candidate(path)
+    command = [
+        sys.executable,
+        str(path / "scripts/check_thesis_facts_append.py"),
+        "--commit",
+        commit,
+    ]
     if base_ref is not None:
         command.extend(["--base-ref", base_ref])
     return subprocess.run(command, cwd=path, capture_output=True, text=True)
@@ -305,6 +326,8 @@ def test_base_gate_uses_base_script_and_dependency_imports(
         encoding="utf-8",
     )
 
+    candidate_commit = _commit_candidate(candidate)
+
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(base_gate / "scripts")
     environment["PYTHONNOUSERSITE"] = "1"
@@ -314,6 +337,8 @@ def test_base_gate_uses_base_script_and_dependency_imports(
             str(base_gate / "scripts" / "check_thesis_facts_append.py"),
             "--root",
             str(candidate),
+            "--commit",
+            candidate_commit,
             "--base-ref",
             base,
         ],

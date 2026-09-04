@@ -118,14 +118,29 @@ def _run_script(
     *arguments: str,
     cwd: pathlib.Path = ROOT,
     stdin: bytes | None = None,
+    environment: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[bytes]:
     return subprocess.run(
         [sys.executable, str(script), *arguments],
         cwd=cwd,
         input=stdin,
+        env=environment,
         capture_output=True,
         check=False,
     )
+
+
+def _fixed_width_environment() -> dict[str, str]:
+    """The caller's environment with argparse's wrapping width fixed at 80.
+
+    ``argparse`` wraps help text to the terminal width, which it takes from
+    ``COLUMNS`` when there is no terminal. Fixing it is what lets a help text be
+    compared against a literal at all.
+    """
+
+    environment = os.environ.copy()
+    environment["COLUMNS"] = "80"
+    return environment
 
 
 def _normalized_stderr(value: bytes) -> bytes:
@@ -143,6 +158,52 @@ def _assert_byte_identical(
     assert original.returncode == expected_code
     assert shim.returncode == expected_code
     assert shim.stdout == original.stdout
+    assert _normalized_stderr(shim.stderr) == _normalized_stderr(original.stderr)
+
+
+CANDIDATE_LINE = re.compile(
+    rb"(?m)^candidate commit [0-9a-f]{40}(?:[0-9a-f]{24})? "
+    rb"tree [0-9a-f]{40}(?:[0-9a-f]{24})?\n\Z"
+)
+
+
+def _split_candidate_line(stdout: bytes) -> tuple[bytes, bytes | None]:
+    """Separate the shim's own last line from the gate's output.
+
+    The shim prints one line the original never printed: the commit it checked
+    out and that commit's tree. Everything before it is the gate's own bytes,
+    and those are what the differential compares.
+    """
+
+    match = CANDIDATE_LINE.search(stdout)
+    if match is None:
+        return stdout, None
+    return stdout[: match.start()], match.group(0)
+
+
+def _assert_gate_bytes_identical(
+    original: subprocess.CompletedProcess[bytes],
+    shim: subprocess.CompletedProcess[bytes],
+    *,
+    expected_code: int,
+    candidate: str | None,
+    tree: str | None,
+) -> None:
+    """Compare the pair on the gate's bytes, and check the shim's extra line.
+
+    The shim reaches its verdict about a checkout it makes itself, so its
+    stdout carries one line the original's does not. That line is asserted
+    against the object ids the fixture committed; the rest must be identical.
+    """
+
+    body, tail = _split_candidate_line(shim.stdout)
+    if expected_code == 0:
+        assert tail == f"candidate commit {candidate} tree {tree}\n".encode("utf-8")
+    else:
+        assert tail is None, shim.stdout
+    assert original.returncode == expected_code
+    assert shim.returncode == expected_code
+    assert body == original.stdout
     assert _normalized_stderr(shim.stderr) == _normalized_stderr(original.stderr)
 
 
@@ -307,8 +368,26 @@ def _release_file(root: pathlib.Path, suffix: str) -> pathlib.Path:
     return root / "releases" / "manifests" / f"{NEW_RELEASE_STEM}{suffix}"
 
 
-def _replay_latest_release(destination: pathlib.Path) -> tuple[pathlib.Path, str]:
-    """Create the real prior-release base and restore the witnessed HEAD append."""
+def _commit_candidate(root: pathlib.Path, message: str) -> str:
+    """Commit whatever is in the working tree and name the commit.
+
+    The shim judges a commit, so the fixture has to state its candidate as one.
+    """
+
+    _git(root, "add", "-A")
+    _git(root, "commit", "--quiet", "--allow-empty", "-m", message)
+    return _git(root, "rev-parse", "HEAD")
+
+
+def _replay_latest_release(
+    destination: pathlib.Path,
+) -> tuple[pathlib.Path, str, str]:
+    """Create the real prior-release base and commit the witnessed HEAD append.
+
+    Returns the clone, the base commit, and the candidate commit. The candidate
+    is a commit rather than a working-tree state because that is the only thing
+    the shim will judge: it checks the named commit out for itself.
+    """
 
     root = _copy_custody_tree(destination)
     ledger = root / "ledger" / "official_observations.jsonl"
@@ -323,9 +402,7 @@ def _replay_latest_release(destination: pathlib.Path) -> tuple[pathlib.Path, str
     _git(root, "init", "--quiet")
     _git(root, "config", "user.email", "shim-differential@example.invalid")
     _git(root, "config", "user.name", "Shim Differential")
-    _git(root, "add", "-A")
-    _git(root, "commit", "--quiet", "-m", "release 1 base")
-    base = _git(root, "rev-parse", "HEAD")
+    base = _commit_candidate(root, "release base")
 
     ledger.write_bytes(full_ledger)
     for suffix in RELEASE_FILE_SUFFIXES:
@@ -333,48 +410,114 @@ def _replay_latest_release(destination: pathlib.Path) -> tuple[pathlib.Path, str
             _release_file(ROOT, suffix),
             _release_file(root, suffix),
         )
-    return root, base
+    return root, base, _commit_candidate(root, "witnessed append")
+
+
+def _plain_checkout(
+    clone: pathlib.Path, oid: str, destination: pathlib.Path
+) -> pathlib.Path:
+    """Materialise one commit as a working tree for the original to judge.
+
+    The original script judges whatever directory it is pointed at, so the fair
+    comparison hands it a directory holding exactly the candidate commit --
+    which is what the shim now builds for itself instead of being handed one.
+    """
+
+    _git(clone, "worktree", "add", "--detach", str(destination), oid)
+    return destination
+
+
+def _tree_of(clone: pathlib.Path, oid: str) -> str:
+    return _git(clone, "rev-parse", f"{oid}^{{tree}}")
 
 
 def _run_append_pair(
     original_oracle: pathlib.Path,
     candidate: pathlib.Path,
     base: str,
+    oid: str,
 ) -> tuple[subprocess.CompletedProcess[bytes], subprocess.CompletedProcess[bytes]]:
-    arguments = ("--root", str(candidate), "--base-ref", base)
+    plain = _plain_checkout(candidate, oid, candidate.parent / "original-checkout")
     original = _run_script(
         original_oracle / "scripts" / "check_thesis_facts_append.py",
-        *arguments,
-        cwd=candidate,
+        "--root",
+        str(plain),
+        "--base-ref",
+        base,
+        cwd=plain,
     )
     shim = _run_script(
         SHIM_SCRIPTS / "check_thesis_facts_append.py",
-        *arguments,
+        "--root",
+        str(candidate),
+        "--base-ref",
+        base,
+        "--commit",
+        oid,
         cwd=candidate,
     )
     return original, shim
 
 
-def test_append_gate_cli_help_is_byte_identical(
+# The original's own command-line surface, pinned so that a change to it is
+# visible here rather than only in the fixture's digest. The shim's surface can
+# no longer be identical: it takes a commit, and the commit is required.
+ORIGINAL_APPEND_GATE_HELP = (
+    b"usage: check_thesis_facts_append.py [-h] [--root ROOT] "
+    b"[--base-ref BASE_REF]\n"
+    b"\n"
+    b"options:\n"
+    b"  -h, --help           show this help message and exit\n"
+    b"  --root ROOT          candidate worktree root (defaults to the "
+    b"checker's\n"
+    b"                       repository)\n"
+    b"  --base-ref BASE_REF  enforce an append-only diff against this git "
+    b"ref\n"
+)
+
+
+def test_original_append_gate_help_is_unchanged(
     original_oracle: pathlib.Path,
 ) -> None:
     original = _run_script(
         original_oracle / "scripts" / "check_thesis_facts_append.py",
         "--help",
+        environment=_fixed_width_environment(),
     )
-    shim = _run_script(SHIM_SCRIPTS / "check_thesis_facts_append.py", "--help")
-    _assert_byte_identical(original, shim, expected_code=0)
+    assert original.returncode == 0
+    assert original.stderr == b""
+    assert original.stdout == ORIGINAL_APPEND_GATE_HELP
+
+
+def test_shim_append_gate_help_requires_a_commit() -> None:
+    shim = _run_script(
+        SHIM_SCRIPTS / "check_thesis_facts_append.py",
+        "--help",
+        environment=_fixed_width_environment(),
+    )
+    assert shim.returncode == 0
+    assert shim.stderr == b""
+    assert b"--commit COMMIT" in shim.stdout
+    # Required, so argparse spells it without brackets in the usage line.
+    assert b"--commit COMMIT" in shim.stdout.split(b"\n\n", maxsplit=1)[0]
+    assert b"[--commit" not in shim.stdout
 
 
 def test_valid_base_ref_append_is_byte_identical(
     original_oracle: pathlib.Path,
     tmp_path: pathlib.Path,
 ) -> None:
-    candidate, base = _replay_latest_release(tmp_path)
-    original, shim = _run_append_pair(original_oracle, candidate, base)
-    _assert_byte_identical(original, shim, expected_code=0)
+    candidate, base, oid = _replay_latest_release(tmp_path)
+    original, shim = _run_append_pair(original_oracle, candidate, base, oid)
+    _assert_gate_bytes_identical(
+        original,
+        shim,
+        expected_code=0,
+        candidate=oid,
+        tree=_tree_of(candidate, oid),
+    )
     assert shim.stderr == b""
-    assert shim.stdout == APPEND_GATE_OK
+    assert _split_candidate_line(shim.stdout)[0] == APPEND_GATE_OK
 
 
 def _rewrite_historical_row(root: pathlib.Path) -> None:
@@ -430,9 +573,19 @@ def test_corrupt_base_ref_append_refusals_are_byte_identical(
     mutation: Mutation,
     marker: bytes,
 ) -> None:
-    candidate, base = _replay_latest_release(tmp_path / case)
+    candidate, base, _accepted = _replay_latest_release(tmp_path / case)
     mutation(candidate)
-    original, shim = _run_append_pair(original_oracle, candidate, base)
-    _assert_byte_identical(original, shim, expected_code=1)
+    # The corruption has to be committed: an uncommitted one is a divergence
+    # between the commit and the working tree, which is the precondition the
+    # shim now establishes rather than a refusal it is being asked to make.
+    oid = _commit_candidate(candidate, f"corrupt: {case}")
+    original, shim = _run_append_pair(original_oracle, candidate, base, oid)
+    _assert_gate_bytes_identical(
+        original,
+        shim,
+        expected_code=1,
+        candidate=None,
+        tree=None,
+    )
     assert shim.stdout == b""
     assert marker in _normalized_stderr(shim.stderr)
