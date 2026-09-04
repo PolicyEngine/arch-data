@@ -234,9 +234,12 @@ def _assert_manifest_identifies(
     leave one entry making two incompatible provenance claims.
     """
     for field, value in (("source_id", source_id), ("package_id", package_id)):
-        declared = existing_manifest.get(field)
-        declared = declared.strip() if isinstance(declared, str) else declared
-        if declared not in (None, "") and str(declared) != value:
+        if field not in existing_manifest:
+            continue
+        declared = _require_identity_segment(
+            existing_manifest[field], what=f"{manifest_path} {field}"
+        )
+        if declared != value:
             raise SourceArtifactManifestError(
                 f"{manifest_path} declares {field}={declared!r}; refusing to "
                 f"fetch {field}={value!r} into it. Fetch into the package the "

@@ -554,3 +554,13 @@ the per-finding reproduction/fix/test/commit/port map.
   refused before artifact/cache I/O; bad fetched bytes before cache writes.
 - The same focused command now exits 0: 11 passed, 12 warnings. Inventory's
   half of finding 2 remains next; no source package or source data was changed.
+
+### Finding 5: exact manifest declarations
+
+- Present `source_id` and `package_id` now pass `_require_identity_segment`
+  without stripping or stringification and must equal the fetch argument.
+  Absent fields remain eligible for first registration; null/empty fields do
+  not impersonate absence.
+- Focused regressions and existing other-package refusal controls passed:
+  direct exit 0, 12 passed. The red checkpoint above recorded all 10 new
+  declaration cases reaching publisher I/O before this fix.
