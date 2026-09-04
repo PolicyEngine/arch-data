@@ -46,6 +46,7 @@ from chronicle.registration import (
     is_manifest_filename,
     is_microdata_release,
     iter_file_specs,
+    iter_manifest_entries,
     load_manifest_document,
     manifest_kind,
     matching_directory_entry,
@@ -1034,6 +1035,25 @@ class SourceArtifactSpec:
                 "fetches, or parses it through another manifest "
                 "(docs/adr-chronicle-raw-microdata-identity.md)."
             )
+        declared_sha256 = spec.get("sha256")
+        if sha256 is None and not (
+            isinstance(declared_sha256, str) and declared_sha256.strip()
+        ):
+            for name, payload in manifests.items():
+                for key, _index, entry in iter_manifest_entries(payload):
+                    if not isinstance(entry, dict) or not is_hash_only(
+                        entry_access(entry)
+                    ):
+                        continue
+                    raise ManifestAccessError(
+                        f"{self.resource_directory}/{self.manifest} public entry "
+                        f"{spec.get('filename')!r} omits sha256 while "
+                        f"{self.resource_directory}/{name} registers "
+                        f"{entry.get('filename')!r} for {key!r} hash-only with "
+                        f"sha256={entry.get('sha256')!s}. The public entry must "
+                        "declare its digest before any source bytes may be read, "
+                        "fetched, or cached beside a gated registration."
+                    )
         collision_errors = validate_package_directory(manifests)
         if collision_errors:
             raise ManifestAccessError(
