@@ -710,3 +710,15 @@ the per-finding reproduction/fix/test/commit/port map.
   from moving an otherwise recognized route. Fetch applies the vintage check
   before publisher I/O; historical raw objects retain their existing routes.
   All 11 failing-first namespace cases pass (99 deselected, 12 warnings).
+
+### Final verification in progress
+
+- Final focused integration exits 0: 434 passed, 40 warnings in 11.11s.
+- Final `uv run ruff check .` exits 0 (`All checks passed!`). Final
+  `uv run ruff format --check` on the 8 changed Python files exits 0
+  (`8 files already formatted`). Both use the permitted UV cache.
+- `git diff --check fa98993a..HEAD` and the tracked `db/data` no-change check
+  both exit 0. Worktree clean before this journal update.
+- Restart the full suite at code commit `19d037f` with UV offline, offline
+  OpenTimestamps client selection, and live Supabase credentials removed from
+  the child environment. This keeps the required full run free of network.
