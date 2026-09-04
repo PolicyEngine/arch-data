@@ -588,3 +588,14 @@ the per-finding reproduction/fix/test/commit/port map.
 - Full consumer-contract module passes: direct exit 0, 95 passed, 32 warnings;
   scoped Ruff checks pass. Wiring configured prefixes into publication and
   refusing unrecognizable explicit routes remains a publication follow-up.
+
+### Finding 9: regular source resources
+
+- Directory and FIFO manifest/artifact regressions ran red: direct exit 1,
+  4 failed, 2 passed. The resolver returned non-regular manifests and reached
+  artifact-read sentinels; no test opened a FIFO.
+- The source resolver now requires an existing selected entry to be a regular
+  file after symlink and spelling checks. Missing artifact entries still use
+  the existing checksum-validated cache/fetch path; zip-backed resources work.
+- Same focused command exits 0: 6 passed, 12 warnings. The full source-package
+  module is running. Exact red/green commands are in the external evidence.

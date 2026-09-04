@@ -961,6 +961,11 @@ class SourceArtifactSpec:
                 f"{what} {existing} has the same normalized filename as "
                 f"{name!r}. Keep exactly one spelling in the package."
             )
+        if not existing.is_file():
+            raise ValueError(
+                f"{what} {existing} is not a regular file. Chronicle will "
+                "not open non-regular source-package resources."
+            )
         return existing
 
     def manifest_resource(self) -> Any:

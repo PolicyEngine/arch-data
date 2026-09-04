@@ -5,8 +5,9 @@ from __future__ import annotations
 from copy import deepcopy
 import hashlib
 from io import BytesIO
+import os
 from pathlib import Path
-from zipfile import ZipFile
+from zipfile import Path as ZipPath, ZipFile
 
 import openpyxl
 import pytest
@@ -1209,6 +1210,73 @@ def test_source_artifact_spec_accepts_consistent_recorded_r2(recorded_r2_artifac
         entry["source_url"],
         entry["storage"]["r2"],
     )
+
+
+@pytest.mark.parametrize("entry_kind", ["directory", "fifo"])
+@pytest.mark.parametrize("resource_kind", ["manifest", "artifact"])
+def test_source_artifact_spec_refuses_non_regular_resource_before_open(
+    recorded_r2_artifact, monkeypatch, entry_kind, resource_kind
+):
+    artifact, resource_dir, _content, entry = recorded_r2_artifact
+    name = "manifest.yaml" if resource_kind == "manifest" else "table.csv"
+    resource = resource_dir / name
+    if entry_kind == "directory":
+        resource.mkdir()
+    else:
+        os.mkfifo(resource)
+    if resource_kind == "artifact":
+        (resource_dir / "manifest.yaml").write_text(
+            yaml.safe_dump({"files": {2024: entry}})
+        )
+
+    def unexpected_read(_artifact_path, _spec):
+        raise AssertionError("non-regular artifact reached artifact I/O")
+
+    monkeypatch.setattr(
+        "chronicle.source_package._read_source_artifact_content", unexpected_read
+    )
+    with pytest.raises(ValueError, match="not a regular file"):
+        if resource_kind == "manifest":
+            # Resolve without opening: a broken guard must fail promptly even
+            # for a FIFO, whose actual open would block the test process.
+            artifact.manifest_resource()
+        else:
+            artifact._artifact_content(2024)
+
+
+def test_source_artifact_spec_reads_regular_importlib_zip_resources(
+    recorded_r2_artifact, monkeypatch
+):
+    artifact, _resource_dir, content, entry = recorded_r2_artifact
+    buffer = BytesIO()
+    with ZipFile(buffer, "w") as archive:
+        archive.writestr("data/publisher/package/table.csv", content)
+        archive.writestr(
+            "data/publisher/package/manifest.yaml",
+            yaml.safe_dump({"files": {2024: entry}}),
+        )
+    with ZipFile(buffer) as archive:
+        monkeypatch.setattr(
+            "chronicle.source_package.files", lambda _package: ZipPath(archive)
+        )
+        assert artifact._artifact_content(2024)[0] == content
+
+
+def test_source_artifact_spec_fetches_absent_regular_resource(
+    recorded_r2_artifact, tmp_path, monkeypatch
+):
+    artifact, resource_dir, content, entry = recorded_r2_artifact
+    (resource_dir / "manifest.yaml").write_text(
+        yaml.safe_dump({"files": {2024: entry}})
+    )
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(tmp_path / "cache"))
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    monkeypatch.setattr(
+        "chronicle.source_package._fetch_source_artifact_content", lambda _url: content
+    )
+
+    assert artifact._artifact_content(2024)[0] == content
+    assert _source_artifact_cache_path(entry).read_bytes() == content
 
 
 @pytest.mark.parametrize(
