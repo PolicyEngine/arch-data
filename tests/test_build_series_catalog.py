@@ -774,6 +774,12 @@ def test_committed_catalog_is_current_and_valid() -> None:
     # digit run 2374 trips the year hint; it is an identifier, not a date,
     # and stays in the identity because the observation was recorded so.
     assert committed["suspect_segments"] == ["LNU02374597"]
+    # Pin extended 2026-09-04 to the catalog at 55bbf3d: week_2026-07-13
+    # arrived at c2aa68d (va.vba.mmwr.claims_inventory; the segment is the
+    # VA MMWR report Monday, which falls inside the row's own week ending
+    # 2026-07-11, so the strip stands), week_2026-08-15 at 54dbabc8 and
+    # week_2026-08-22 at 55bbf3d (both dol.eta.continued_claims.sa and
+    # us.dol.initial_claims.sa).
     # EVERY stripped spelling is auditable, mapped to the canonical
     # concepts it touched — a statute or edition label colliding with a
     # period spelling can only be caught here.
@@ -1225,23 +1231,31 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # context admission adds the U.S. annual EIA N9040US2 vented-and-flared
     # identity in million cubic feet. All 218 prior live bindings are
     # unchanged (218 -> 219).
-    # Updated 2026-09-04 for the 2026-08-23 first-print wave recorded by
-    # resolve_pending.py (c2aa68d, released as manifest
-    # 0015-fdcfd0e570214f6b): nine mints from first observed identities
-    # (bls.ces.home_health_care_services.employment, bls.cps.LNU02374597,
-    # bls.cps.lfpr_55_plus, bls.laus.colorado.labor_force,
-    # ssa.oasdi.disabled_worker_beneficiaries, ssa.ssi.recipients.colorado,
-    # ssa.ssi.recipients.colorado.aged_65_plus,
-    # ssa.ssi.recipients_aged_65_plus, va.vba.mmwr.claims_inventory) and
-    # six docket placeholders enriched by their first observed identity
-    # through retire-and-reissue pairs that preserve the UUID and add the
-    # declared U.S. country geography and economy aggregate entity
-    # (bls.export_prices.all_commodities_mom, census.housing.completions_saar,
-    # census.housing.permits_saar, fed.g17.capacity_utilization.manufacturing,
-    # fed.g17.manufacturing_production_mom, ssa.ssi.total_recipients). The
-    # Colorado-scoped concepts carry country-level geography by seed-schema
-    # design, as the Minnesota case above. All 219 prior live bindings are
-    # otherwise unchanged (219 -> 228).
+    # Updated 2026-09-04 to the catalog at 55bbf3d, four resolve_pending.py
+    # waves after the previous pin: c2aa68d (2026-08-23, manifest
+    # 0015-fdcfd0e570214f6b), 54dbabc8 (0016), 734beb8 (0017-efa7d60fece304f7)
+    # and 55bbf3d (2026-09-03, 0020-7f669f1e1364c5cc). Recomputed per commit
+    # with this test's algorithm, the previous pin was exact at c2aa68d^ and
+    # the delta to 55bbf3d is nine mints from first observed identities, all
+    # at c2aa68d (bls.ces.home_health_care_services.employment,
+    # bls.cps.LNU02374597, bls.cps.lfpr_55_plus,
+    # bls.laus.colorado.labor_force, ssa.oasdi.disabled_worker_beneficiaries,
+    # ssa.ssi.recipients.colorado, ssa.ssi.recipients.colorado.aged_65_plus,
+    # ssa.ssi.recipients_aged_65_plus, va.vba.mmwr.claims_inventory), plus
+    # eight docket placeholders enriched by their first observed identity
+    # through retire-and-reissue pairs that preserve the UUID and take the
+    # observation's U.S. country geography and economy aggregate entity: six
+    # at c2aa68d (bls.export_prices.all_commodities_mom,
+    # census.housing.completions_saar, census.housing.permits_saar,
+    # fed.g17.capacity_utilization.manufacturing,
+    # fed.g17.manufacturing_production_mom, ssa.ssi.total_recipients),
+    # census.new_residential_sales.new_single_family_houses_sold_saar at
+    # 734beb8 and bea.trade.goods_services_deficit at 55bbf3d. Geography and
+    # entity on all seventeen rows are copied from the observation payload
+    # (the seed rows carry no country or entity; the docket-only country path
+    # is not involved), which is why the three Colorado-named concepts carry
+    # country-level geography: the observations were recorded that way. The
+    # other 211 live bindings are byte-unchanged (219 -> 228).
     assert digest == (
         "da63b697ad0e4444d4f834671fc15e979c67b47545aba836fb6f043d75e8404d"
     )
