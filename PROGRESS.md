@@ -538,8 +538,9 @@ the per-finding reproduction/fix/test/commit/port map.
   refusal. Finding 4: all 24 invalid publication identity cases reached an
   artifact read or build-ID inference. Finding 5: all 10 noncanonical manifest
   declarations reached the publisher read. Finding 6: all 4 single case/Unicode
-  aliases reached artifact reads. Finding 8: all 18 explicit-selector sibling
-  cases escaped as plain `ValueError`, including both CLI entry points.
+  aliases reached artifact reads. Finding 8: 12 explicit-selector sibling cases escaped as plain
+  `ValueError` through the functions and harness; 6 top-level CLI tests had
+  an invocation error (corrected and verified below).
 - Consumer guard, source resolver, and shared vintage regressions are being
   developed independently; all implementations remain gated on observed red.
 
@@ -605,5 +606,8 @@ the per-finding reproduction/fix/test/commit/port map.
 - `_package_manifests` now translates discovery's `ValueError` into
   `MalformedManifestError`, so publish/inventory and both CLI entry points
   use the shared controlled refusal path even with an explicit selector.
-- The same 18 cases that previously trace-backed now pass: direct exit 0,
-  18 passed, 12 warnings; no uploads or manifest rewrites occur.
+- The first post-fix command actually exited 1: 12 passed and 6 top-level
+  CLI cases failed because the test passed argv to a zero-argument entry point.
+  Corrected the test to set sys.argv and assert SystemExit. The corrected
+  command exits 0: 18 passed, 12 warnings; no uploads or rewrites occur.
+  The earlier premature passing-count journal entry is corrected here.

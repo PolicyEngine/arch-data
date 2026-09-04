@@ -219,10 +219,13 @@ def test_explicit_sweep_reports_nonregular_manifest_sibling(
         assert not report.valid
         assert "regular file" in " ".join(report.errors)
     else:
-        main = harness_main if entrypoint == "harness" else cli_main
-        assert (
-            main([operation, "--root", str(package), "--manifest", manifest_path.name])
-            == 1
-        )
+        args = [operation, "--root", str(package), "--manifest", manifest_path.name]
+        if entrypoint == "harness":
+            assert harness_main(args) == 1
+        else:
+            monkeypatch.setattr("sys.argv", ["chronicle", *args])
+            with pytest.raises(SystemExit) as exit_info:
+                cli_main()
+            assert exit_info.value.code == 1
         assert "regular file" in json.dumps(json.loads(capsys.readouterr().out))
     assert manifest_path.read_text() == before
