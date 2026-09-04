@@ -334,10 +334,10 @@ uv run chronicle build-suite dwp-pip-daily-living-foi-2025 \
   --out /tmp/chronicle-dwp-pip-daily-living-foi-2025 \
   --replace
 
-uv run chronicle validate-package dwp-uc-payment-distribution-may-2025 --year 2025
-uv run chronicle build-suite dwp-uc-payment-distribution-may-2025 \
+uv run chronicle validate-package dwp-uc-payment-distribution-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-payment-distribution-april-december-2025 \
   --year 2025 \
-  --out /tmp/chronicle-dwp-uc-payment-distribution-may-2025 \
+  --out /tmp/chronicle-dwp-uc-payment-distribution-april-december-2025 \
   --replace
 
 uv run chronicle validate-package dwp-uc-childcare-element-march-2021-august-2025 --year 2025
@@ -376,10 +376,52 @@ uv run chronicle build-suite dwp-uc-households-lcwra-entitlement-april-december-
   --out /tmp/chronicle-dwp-uc-lcwra-entitlement-2025 \
   --replace
 
-uv run chronicle validate-package dwp-uc-scotland-youngest-child-may-2025 --year 2025
-uv run chronicle build-suite dwp-uc-scotland-youngest-child-may-2025 \
+uv run chronicle validate-package dwp-uc-scotland-youngest-child-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-scotland-youngest-child-april-december-2025 \
   --year 2025 \
-  --out /tmp/chronicle-dwp-uc-scotland-youngest-child-may-2025 \
+  --out /tmp/chronicle-dwp-uc-scotland-youngest-child-april-december-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-family-type-child-entitlement-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-family-type-child-entitlement-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-family-type-child-entitlement-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-children-child-entitlement-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-children-child-entitlement-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-children-child-entitlement-2025 \
+  --replace
+
+uv run chronicle validate-package dwp-uc-households-family-type-payment-indicator-april-december-2025 --year 2025
+uv run chronicle build-suite dwp-uc-households-family-type-payment-indicator-april-december-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-dwp-uc-family-type-payment-indicator-2025 \
+  --replace
+
+uv run chronicle validate-package hmrc-child-benefit-august-2025 --year 2025
+uv run chronicle build-suite hmrc-child-benefit-august-2025 \
+  --year 2025 \
+  --out /tmp/chronicle-hmrc-child-benefit-august-2025 \
+  --replace
+
+uv run chronicle validate-package ons-census2021-ts003-household-composition-country --year 2021
+uv run chronicle build-suite ons-census2021-ts003-household-composition-country \
+  --year 2021 \
+  --out /tmp/chronicle-ons-census2021-ts003-household-composition-country \
+  --replace
+
+uv run chronicle validate-package nrs-census2022-uv113-household-composition-country --year 2022
+uv run chronicle build-suite nrs-census2022-uv113-household-composition-country \
+  --year 2022 \
+  --out /tmp/chronicle-nrs-census2022-uv113-household-composition-country \
+  --replace
+
+uv run chronicle validate-package nisra-census2021-household-composition-country --year 2021
+uv run chronicle build-suite nisra-census2021-household-composition-country \
+  --year 2021 \
+  --out /tmp/chronicle-nisra-census2021-household-composition-country \
   --replace
 
 uv run chronicle validate-package hmrc-salary-sacrifice-relief-2024-25 --year 2024

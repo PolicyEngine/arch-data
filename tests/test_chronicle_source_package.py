@@ -4180,11 +4180,11 @@ def test_ons_families_households_package_adds_household_totals_and_size():
 
     assert report.valid
     assert report.counts == {
-        "record_set_count": 24,
-        "row_count": 96,
-        "measure_count": 24,
-        "source_record_count": 96,
-        "source_region_count": 24,
+        "record_set_count": 40,
+        "row_count": 456,
+        "measure_count": 56,
+        "source_record_count": 816,
+        "source_region_count": 40,
     }
 
     package = load_source_package("ons-families-households-2025")
