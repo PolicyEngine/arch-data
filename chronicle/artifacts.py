@@ -1598,6 +1598,13 @@ def _validated_recorded_storage(
             f"{manifest_path} entry {year!r} storage must be a mapping; it is a "
             f"{type(storage).__name__}."
         )
+    if "previous_r2" in storage and not isinstance(storage["previous_r2"], list):
+        previous = storage["previous_r2"]
+        raise MalformedManifestError(
+            f"{manifest_path} entry {year!r} storage.previous_r2 must be a "
+            f"list; it is a {type(previous).__name__}. Chronicle will not "
+            "discard malformed archived provenance."
+        )
     return storage
 
 
