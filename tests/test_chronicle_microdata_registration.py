@@ -411,6 +411,43 @@ def test_hash_only_entry_reports_each_missing_field(mutation, expected_code):
 @pytest.mark.parametrize(
     ("mutation", "expected_code"),
     [
+        ({"filename": True}, "missing_filename"),
+        ({"licence": ["UKDS"]}, "missing_licence"),
+        ({"vintage": {"year": 2023}}, "missing_vintage"),
+        ({"doi": None, "access_route": True}, "missing_access_route"),
+        ({"attested_by": ["microcosm"]}, "missing_attested_by"),
+        (
+            {"attestation_evidence": {"manifest": "source_stages.json"}},
+            "missing_attestation_evidence",
+        ),
+        ({"verified_at": True}, "missing_verified_at"),
+    ],
+    ids=(
+        "filename",
+        "licence",
+        "vintage",
+        "access-route",
+        "attested-by",
+        "evidence",
+        "verified-at",
+    ),
+)
+def test_required_text_fields_reject_non_string_yaml_values(
+    mutation, expected_code
+):
+    errors = validate_file_entry(
+        _attested_entry(**mutation),
+        kind="microdata_release",
+        manifest={},
+        local_file_exists=False,
+    )
+
+    assert expected_code in errors
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_code"),
+    [
         ({"pinned_from": None}, "missing_pinned_from"),
         ({"pinned_from": "microcosm@abc"}, "malformed_pinned_from"),
         (
