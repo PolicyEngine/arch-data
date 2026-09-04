@@ -337,11 +337,31 @@ Running the same operations against a checkout of the previous head:
   artifact manifest reads to it, and shared it with source-package artifact
   manifest reads. Fix commit: `77e6fda`. The same focused command now exits 0
   with 4 passed.
+- **Findings 3, 4, and 5 reproduced and fixed.** Test-only commit: `264e46e`.
+  The finding 4 command covering creation beside `manifest.yml`,
+  `Manifest.yaml`, a mistyped named manifest, and a symlinked manifest exited
+  1 with 4 failures, all reaching the publisher-I/O sentinel. The finding 5
+  command covering parent traversal plus `*`, `?`, and character-class glob
+  selectors exited 1 with 4 failures because none raised `ManifestNameError`.
+  The finding 3 command covering absolute, parent-traversing, and symlinked
+  artifact paths exited 1 with 3 failures because inventory considered each
+  path valid (and the local, non-network publisher stub could read it).
+- Artifact and manifest inputs are now resolved only as literal package-local
+  directory entries: unsafe declared filenames return the named
+  `non_canonical_filename` error, symlinks are refused before reads, sweep
+  selectors cannot contain separators or glob syntax, and no new manifest
+  spelling can be created beside an existing registry. Fix commit: `0017520`.
+  Ported the #227-shaped `is_bare_filename`, `bare_filename`, `filename_key`,
+  `matching_directory_entry`, and package-manifest helpers from `44e1f8d`,
+  `7f9bfe6`, and `c2b7722`'s corresponding safety changes; the generalized
+  registry-creation and exact sweep-selector guards are slice-1 additions.
+  The focused post-fix command exits 0 with 13 passed, and the complete
+  artifact module exits 0 with 132 passed.
 
 ### Next
 
-1. Add focused failing regressions before each remaining fix and capture every red
-   command/observation for the external `-o out.md` report.
+1. Reproduce and fix cross-manifest shared-file revision ownership (finding 2),
+   including the tracked USDA two-manifest shape and every same-directory owner.
 2. Commit each coherent red-test and implementation step, updating this log.
 3. Run focused tests, lint/format checks on changed files, and the full suite
    with the directly captured exit code and counts.
