@@ -15,6 +15,7 @@ from zipfile import ZipFile
 import httpx
 import yaml
 
+from chronicle.artifacts import SourceArtifactManifestError, _validated_recorded_r2
 from chronicle.core import (
     ALLOWED_AGGREGATIONS,
     ALLOWED_ASSERTIONS,
@@ -1047,22 +1048,60 @@ class SourceArtifactSpec:
             self.resource_directory,
             spec["filename"],
         )
+        manifest_path = Path(self.resource_directory) / self.manifest
+        try:
+            recorded_r2 = _validated_recorded_r2(
+                spec,
+                manifest_path=manifest_path,
+                year=self.artifact_year or year,
+                source_id=str(manifest.get("source_id") or ""),
+                package_id=str(manifest.get("package_id") or ""),
+            )
+        except SourceArtifactManifestError as exc:
+            raise ManifestAccessError(str(exc)) from exc
+        expected_sha = spec.get("sha256")
+        if recorded_r2 is not None and (
+            recorded_r2.filename != Path(spec["filename"]).name
+            or (expected_sha and recorded_r2.sha256 != str(expected_sha))
+        ):
+            raise ManifestAccessError(
+                f"{manifest_path} entry {self.artifact_year or year!r} "
+                "storage.r2 identifies "
+                f"sha256={recorded_r2.sha256}, filename={recorded_r2.filename!r}; "
+                f"the entry identifies sha256={expected_sha!r}, "
+                f"filename={spec['filename']!r}. No source bytes will be read "
+                "through a locator for another artifact."
+            )
         content = _read_source_artifact_content(artifact_path, spec)
         actual_sha = hashlib.sha256(content).hexdigest()
-        expected_sha = spec.get("sha256")
         if expected_sha:
             _validate_source_artifact_sha(
                 content,
                 expected_sha=str(expected_sha),
                 filename=str(spec["filename"]),
             )
+        if recorded_r2 is not None and recorded_r2.sha256 != actual_sha:
+            raise ManifestAccessError(
+                f"{manifest_path} entry {self.artifact_year or year!r} "
+                f"storage.r2 identifies sha256={recorded_r2.sha256}, but "
+                f"{spec['filename']!r} contains sha256={actual_sha}. Refusing "
+                "to emit immutable source provenance for different bytes."
+            )
         self._assert_no_sibling_hash_only_registration(
             spec,
             manifest,
             sha256=actual_sha,
         )
-        storage = spec.get("storage") if isinstance(spec, dict) else None
-        raw_r2 = storage.get("r2") if isinstance(storage, dict) else {}
+        raw_r2 = (
+            {
+                "provider": recorded_r2.provider,
+                "bucket": recorded_r2.bucket,
+                "key": recorded_r2.key,
+                "uri": recorded_r2.uri,
+            }
+            if recorded_r2 is not None
+            else {}
+        )
         return content, spec["filename"], spec["source_url"], raw_r2 or {}
 
     def _sheet_name(self, filename: str, *, year: int) -> str:
