@@ -1988,3 +1988,134 @@ def test_fetch_carries_forward_fields_it_does_not_own(tmp_path, revision):
     updated = yaml.safe_load(manifest_path.read_text())["files"][2024]
     for field, value in metadata.items():
         assert updated.get(field) == value
+
+
+# ---------------------------------------------------------------------------
+# Sol gate round 3: whole-tree manifest discovery and files-block shape
+# ---------------------------------------------------------------------------
+
+
+def _write_sweep_manifests(root):
+    manifest_names = (
+        "manifest.yaml",
+        "manifest.yml",
+        "manifest_named.yaml",
+        "manifest_named.yml",
+    )
+    for index, manifest_name in enumerate(manifest_names):
+        package = root / f"package-{index}"
+        package.mkdir(parents=True)
+        content = f"publisher artifact {index}".encode()
+        filename = f"artifact-{index}.csv"
+        (package / filename).write_bytes(content)
+        (package / manifest_name).write_text(
+            yaml.safe_dump(
+                {
+                    "source_id": "publisher",
+                    "package_id": f"package-{index}",
+                    "files": {
+                        2024: {
+                            "filename": filename,
+                            "sha256": hashlib.sha256(content).hexdigest(),
+                            "size_bytes": len(content),
+                        }
+                    },
+                },
+                sort_keys=False,
+            )
+        )
+    decoy = root / "decoy" / "manifest-not-a-package.yaml"
+    decoy.parent.mkdir()
+    decoy.write_text("this: is not a package manifest\n")
+
+
+def test_inventory_default_sweep_discovers_every_package_manifest(tmp_path):
+    root = tmp_path / "data"
+    _write_sweep_manifests(root)
+
+    report = inventory_source_artifacts(root)
+
+    assert report.valid
+    assert report.counts["manifest_count"] == 4
+    assert report.counts["artifact_count"] == 4
+    assert {entry.manifest_path.rsplit("/", 1)[-1] for entry in report.entries} == {
+        "manifest.yaml",
+        "manifest.yml",
+        "manifest_named.yaml",
+        "manifest_named.yml",
+    }
+
+
+def test_publish_default_sweep_discovers_every_package_manifest(tmp_path):
+    root = tmp_path / "data"
+    _write_sweep_manifests(root)
+    log = tmp_path / "wrangler.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+
+    report = publish_source_artifacts(root, wrangler_command=str(wrangler))
+
+    assert report.valid
+    assert report.counts["manifest_count"] == 4
+    assert report.counts["artifact_count"] == 4
+    assert report.counts["uploaded_count"] == 4
+    assert len(log.read_text().splitlines()) == 4
+
+
+@pytest.mark.parametrize(
+    "files",
+    [
+        pytest.param([], id="empty-list"),
+        pytest.param("", id="empty-string"),
+        pytest.param(0, id="zero"),
+        pytest.param(False, id="false"),
+    ],
+)
+def test_sweeps_reject_falsy_non_mapping_files_blocks(tmp_path, files):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": files,
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+    log = tmp_path / "wrangler.log"
+    wrangler = _wrangler_stub(tmp_path, log)
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package, wrangler_command=str(wrangler))
+
+    assert (inventory.valid, published.valid) == (False, False)
+    assert "files must be a mapping" in inventory.errors[0]
+    assert "files must be a mapping" in published.errors[0]
+    assert inventory.entries == ()
+    assert published.entries == ()
+    assert not log.exists()
+    assert manifest_path.read_bytes() == before
+
+
+def test_sweeps_treat_a_null_files_block_as_absent(tmp_path):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    (package / "manifest.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": None,
+            },
+            sort_keys=False,
+        )
+    )
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package)
+
+    assert inventory.valid
+    assert published.valid

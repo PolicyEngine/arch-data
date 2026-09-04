@@ -48,6 +48,59 @@ DEFAULT_R2_DERIVED_PREFIX = "derived"
 # name is an input, not a constant, wherever a caller addresses a package.
 DEFAULT_MANIFEST_FILENAME = "manifest.yaml"
 
+# The names a package directory's manifests may carry. Match case-insensitively
+# because Chronicle is also used on case-insensitive filesystems.
+_MANIFEST_FILENAME_RE = re.compile(
+    r"^manifest(?:_[^/\\]+)?\.ya?ml$",
+    re.IGNORECASE,
+)
+
+
+def is_manifest_filename(value: Any) -> bool:
+    """Whether ``value`` is a package-manifest filename."""
+    if not isinstance(value, str) or not value or value != value.strip():
+        return False
+    return value == Path(value).name and bool(_MANIFEST_FILENAME_RE.fullmatch(value))
+
+
+def package_manifest_paths(package_dir: Path) -> list[Path]:
+    """Return every manifest file a package directory keeps, sorted by name."""
+    directory = Path(package_dir)
+    if not directory.is_dir():
+        return []
+    return sorted(
+        path
+        for path in directory.iterdir()
+        if path.is_file() and is_manifest_filename(path.name)
+    )
+
+
+def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
+    """Return the manifests a root sweep addresses.
+
+    The default is package discovery, not one literal filename: both YAML
+    extensions and every ``manifest_<package>`` sibling participate. A caller
+    that supplies another filename keeps the historical exact-name override.
+    """
+    if manifest_filename != DEFAULT_MANIFEST_FILENAME:
+        return sorted(path for path in root.rglob(manifest_filename) if path.is_file())
+    package_dirs = {
+        path.parent
+        for pattern in (
+            "manifest.yaml",
+            "manifest.yml",
+            "manifest_*.yaml",
+            "manifest_*.yml",
+        )
+        for path in root.rglob(pattern)
+        if path.is_file()
+    }
+    return sorted(
+        manifest_path
+        for package_dir in package_dirs
+        for manifest_path in package_manifest_paths(package_dir)
+    )
+
 
 def _manifest_path(output: Path, manifest_filename: str) -> Path:
     """Return the named manifest inside ``output``.
@@ -66,13 +119,10 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
 
 def _sibling_manifests(output: Path) -> list[str]:
     """Return the ``manifest_*.yaml`` files a package directory keeps."""
-    if not output.is_dir():
-        return []
     return sorted(
         path.name
-        for pattern in ("manifest_*.yaml", "manifest_*.yml")
-        for path in output.glob(pattern)
-        if path.is_file()
+        for path in package_manifest_paths(output)
+        if path.stem.startswith("manifest_")
     )
 
 
@@ -935,26 +985,22 @@ def publish_source_artifacts(
 
     entries: list[RawArtifactPublishEntry] = []
     errors: list[str] = []
-    for manifest_path in sorted(root_path.rglob(manifest_filename)):
+    for manifest_path in _root_manifest_paths(root_path, manifest_filename):
         try:
             manifest = _read_manifest(manifest_path)
+            files = _manifest_files(manifest, manifest_path)
         except (OSError, MalformedManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
 
         manifest_source_id = source_id or manifest.get("source_id")
         manifest_package_id = package_id or manifest.get("package_id")
-        files = manifest.get("files") or {}
         if not manifest_source_id:
             errors.append(f"Manifest missing source_id: {manifest_path}")
             continue
         if not manifest_package_id:
             errors.append(f"Manifest missing package_id: {manifest_path}")
             continue
-        if not isinstance(files, dict):
-            errors.append(f"Manifest files must be a mapping: {manifest_path}")
-            continue
-
         try:
             resolved_r2_prefix = resolve_r2_prefix(
                 prefix=r2_prefix,
@@ -1061,15 +1107,13 @@ def inventory_source_artifacts(
             errors=(f"Root does not exist: {root_path}",),
         )
 
-    manifests = sorted(root_path.rglob(manifest_filename))
+    manifests = _root_manifest_paths(root_path, manifest_filename)
     for manifest_path in manifests:
         try:
-            files = _read_manifest(manifest_path).get("files") or {}
+            manifest = _read_manifest(manifest_path)
+            files = _manifest_files(manifest, manifest_path)
         except (OSError, MalformedManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
-            continue
-        if not isinstance(files, dict):
-            errors.append(f"Manifest files must be a mapping: {manifest_path}")
             continue
         for year, spec in files.items():
             entries.append(_inventory_entry(manifest_path, year, spec))

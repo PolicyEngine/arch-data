@@ -225,11 +225,18 @@ Running the same operations against a checkout of the previous head:
   shape before I/O, resolves either year-key spelling while refusing both,
   preserves the recorded key spelling, and carries forward every field it does
   not own. The 11 focused cases now pass.
+- Reproduced finding 2 with both default sweeps reporting only one of four
+  supported manifest names, and finding 7 with all four falsy non-mapping
+  `files` values producing `(inventory.valid, publish.valid) == (True, True)`.
+- Ported #227's `is_manifest_filename` / `package_manifest_paths` shapes and
+  made default root sweeps discover `manifest.yaml`, `manifest.yml`, and both
+  `manifest_<package>` extensions. Both sweeps now share `_manifest_files`, so
+  only `None` means absent and every other non-mapping value is reported. All
+  106 artifact tests pass.
 
 ### Next
 
-- Reproduce and fix root discovery/type validation (findings 2 and 7), then R2
-  canonical-location/provider validation (findings 3 and 6).
-- Port #227's `package_manifest_paths` helper shape for the default root sweeps.
+- Reproduce and fix R2 canonical-location/provider validation (findings 3 and
+  6).
 - Reproduce and fix findings 9-10, then run the required lint, format, full-test,
   and tracked-USDA sweep verification.
