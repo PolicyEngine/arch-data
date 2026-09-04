@@ -562,6 +562,17 @@ def iter_manifest_artifacts(
             yield payload, artifact
 
 
+def _artifact_byte_identity(artifact: Mapping[str, Any]) -> tuple[str, str] | None:
+    """Return the immutable locator/checksum pair used across stage labels."""
+    locator = artifact.get("locator")
+    sha256 = artifact.get("sha256")
+    if not isinstance(locator, str) or not locator.strip():
+        return None
+    if not isinstance(sha256, str) or not sha256.strip():
+        return None
+    return locator, sha256
+
+
 def select_artifact(
     payload: Mapping[str, Any],
     selector: ArtifactSelector,
@@ -574,10 +585,14 @@ def select_artifact(
     only when they agree on every field the registration reads; disagreement is
     an error, never a silent first-match.
     """
-    matches: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
+    candidates: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
     for stage, artifact in iter_manifest_artifacts(payload):
         if selector.stage is not None and stage.get("stage") != selector.stage:
             continue
+        candidates.append((stage, artifact))
+
+    matches: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
+    for stage, artifact in candidates:
         if (
             selector.kind is not None
             and artifact.get("kind") != selector.kind
@@ -587,6 +602,19 @@ def select_artifact(
         if any(artifact.get(key) != value for key, value in selector.match.items()):
             continue
         matches.append((stage, artifact))
+    if selector.compare_across_kinds:
+        anchor_ids = {id(artifact) for _stage, artifact in matches}
+        byte_identities = {
+            identity
+            for _stage, artifact in matches
+            if (identity := _artifact_byte_identity(artifact)) is not None
+        }
+        matches = [
+            (stage, artifact)
+            for stage, artifact in candidates
+            if id(artifact) in anchor_ids
+            or _artifact_byte_identity(artifact) in byte_identities
+        ]
     if not matches:
         raise CatalogueError(
             f"{release_id}: no Microcosm artifact matches {selector}. The "
