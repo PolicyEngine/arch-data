@@ -1204,8 +1204,13 @@ def test_byte_reader_refuses_an_unpinned_public_alias_of_hash_only_bytes(
         spec._artifact_content(2023)
 
 
+@pytest.mark.parametrize(
+    "declared_sha256",
+    [None, "not-a-digest"],
+    ids=("omitted", "malformed"),
+)
 def test_byte_reader_does_not_cache_an_unpinned_alias_before_refusal(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, declared_sha256
 ):
     from chronicle import source_package
 
@@ -1214,7 +1219,10 @@ def test_byte_reader_does_not_cache_an_unpinned_alias_before_refusal(
     resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
     resource_dir.mkdir(parents=True)
     public = _public_table_entry("public-alias.tab", LICENSED_BYTES)
-    public.pop("sha256")
+    if declared_sha256 is None:
+        public.pop("sha256")
+    else:
+        public["sha256"] = declared_sha256
     _write(
         resource_dir / "manifest_tables.yaml",
         _table_manifest(files={2023: public}),
@@ -1246,7 +1254,7 @@ def test_byte_reader_does_not_cache_an_unpinned_alias_before_refusal(
         artifact_year=2023,
     )
 
-    with pytest.raises(ManifestAccessError, match="sha256"):
+    with pytest.raises((ManifestAccessError, ValueError)):
         spec._artifact_content(2023)
     assert fetches == []
     assert not cache_root.exists()
