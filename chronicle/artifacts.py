@@ -1041,6 +1041,8 @@ def fetch_source_artifact(
         selected_spec,
         manifest_path=manifest_path,
         year=vintage_key,
+        source_id=source_id,
+        package_id=package_id,
     )
     _assert_table_vintage_is_revisable(
         existing_value,
@@ -2258,6 +2260,8 @@ def _validated_recorded_r2(
     *,
     manifest_path: Path,
     year: Any,
+    source_id: str,
+    package_id: str,
 ) -> RecordedR2Object | None:
     """Return the object a recorded ``storage.r2`` block names, or None.
 
@@ -2329,6 +2333,11 @@ def _validated_recorded_r2(
             "locate its object: provider, bucket and key, or a uri that "
             "supplies them."
         )
+    if provider != "r2":
+        raise RecordedR2LocatorError(
+            f"{where}: provider must be 'r2', not {provider!r}. A block under "
+            "storage.r2 cannot record another storage service."
+        )
 
     segments = key.split("/")
     if (
@@ -2340,6 +2349,24 @@ def _validated_recorded_r2(
             f"{where}: key {key!r} is not content-addressed. A raw key ends in "
             "{sha256}/{filename}, which is what says the object holds the "
             "entry's bytes; Chronicle will not guess for a key that does not."
+        )
+    try:
+        expected_release = (
+            _clean_key_part(source_id),
+            _clean_key_part(package_id),
+            str(year),
+        )
+    except ValueError as exc:
+        raise RecordedR2LocatorError(
+            f"{where}: cannot bind the locator to source_id={source_id!r}, "
+            f"package_id={package_id!r}, year={year!r}: {exc}"
+        ) from exc
+    recorded_release = tuple(segments[-5:-2])
+    if recorded_release != expected_release:
+        raise RecordedR2LocatorError(
+            f"{where}: key {key!r} is bound to source/package/year "
+            f"{recorded_release!r}, not {expected_release!r}. A recorded object "
+            "must carry the complete registration identity."
         )
     return RecordedR2Object(
         provider=provider,
@@ -2355,6 +2382,8 @@ def _recorded_identity(
     *,
     manifest_path: Path,
     year: Any,
+    source_id: str,
+    package_id: str,
 ) -> RecordedIdentity | None:
     """Return what a manifest entry says its vintage holds, if anything.
 
@@ -2364,7 +2393,13 @@ def _recorded_identity(
     ``sha256`` and ``filename``. Both are recorded identities, and a fetch of
     different bytes over either one is a publisher revision.
     """
-    recorded_r2 = _validated_recorded_r2(spec, manifest_path=manifest_path, year=year)
+    recorded_r2 = _validated_recorded_r2(
+        spec,
+        manifest_path=manifest_path,
+        year=year,
+        source_id=source_id,
+        package_id=package_id,
+    )
     declared_sha256 = spec.get("sha256") if isinstance(spec, dict) else None
     declared_sha256 = declared_sha256 if isinstance(declared_sha256, str) else None
     declared_filename = spec.get("filename") if isinstance(spec, dict) else None
@@ -2608,7 +2643,13 @@ def _upsert_manifest(
         kind=kind,
     )
     recorded_storage = _recorded_storage(recorded_spec)
-    identity = _recorded_identity(recorded_spec, manifest_path=manifest_path, year=key)
+    identity = _recorded_identity(
+        recorded_spec,
+        manifest_path=manifest_path,
+        year=key,
+        source_id=source_id,
+        package_id=package_id,
+    )
     _assert_expected_identity(
         expected,
         manifest_path=manifest_path,
@@ -2955,7 +2996,11 @@ def _publish_raw_manifest_entry(
 
     try:
         recorded_r2 = _validated_recorded_r2(
-            spec, manifest_path=manifest_path, year=year
+            spec,
+            manifest_path=manifest_path,
+            year=year,
+            source_id=source_id,
+            package_id=package_id,
         )
     except SourceArtifactManifestError as error:
         # A block that does not name one object cannot be treated as history,
@@ -3121,7 +3166,11 @@ def _inventory_entry(
     validated_r2: RecordedR2Object | None = None
     try:
         validated_r2 = _validated_recorded_r2(
-            spec, manifest_path=manifest_path, year=year
+            spec,
+            manifest_path=manifest_path,
+            year=year,
+            source_id=str((manifest or {}).get("source_id") or ""),
+            package_id=str((manifest or {}).get("package_id") or ""),
         )
     except SourceArtifactManifestError as error:
         errors.append(f"recorded_r2_locator_invalid:{error}")

@@ -1864,9 +1864,13 @@ def test_a_public_release_without_a_recorded_object_is_incomplete(
             {
                 "provider": "r2",
                 "bucket": "ledger-raw",
-                "key": f"raw/census_acs/release/2022/{PUBLIC_SHA}/csv_hus.zip",
+                "key": (
+                    "raw/census_acs/census-acs-pums-2022-1yr/2022/"
+                    f"{PUBLIC_SHA}/csv_hus.zip"
+                ),
                 "uri": (
-                    "r2://ledger-raw/raw/census_acs/release/2022/"
+                    "r2://ledger-raw/raw/census_acs/"
+                    "census-acs-pums-2022-1yr/2022/"
                     f"{OTHER_SHA}/csv_hus.zip"
                 ),
             },
@@ -1877,9 +1881,14 @@ def test_a_public_release_without_a_recorded_object_is_incomplete(
             {
                 "provider": "r2",
                 "bucket": "ledger-raw",
-                "key": f"raw/census_acs/release/2022/{OTHER_SHA}/other.zip",
+                "key": (
+                    "raw/census_acs/census-acs-pums-2022-1yr/2022/"
+                    f"{OTHER_SHA}/other.zip"
+                ),
                 "uri": (
-                    f"r2://ledger-raw/raw/census_acs/release/2022/{OTHER_SHA}/other.zip"
+                    "r2://ledger-raw/raw/census_acs/"
+                    "census-acs-pums-2022-1yr/2022/"
+                    f"{OTHER_SHA}/other.zip"
                 ),
             },
             "recorded_r2_identity_mismatch:",
@@ -1889,9 +1898,13 @@ def test_a_public_release_without_a_recorded_object_is_incomplete(
             {
                 "provider": "s3",
                 "bucket": "ledger-raw",
-                "key": f"raw/census_acs/release/2022/{PUBLIC_SHA}/csv_hus.zip",
+                "key": (
+                    "raw/census_acs/census-acs-pums-2022-1yr/2022/"
+                    f"{PUBLIC_SHA}/csv_hus.zip"
+                ),
                 "uri": (
-                    "s3://ledger-raw/raw/census_acs/release/2022/"
+                    "s3://ledger-raw/raw/census_acs/"
+                    "census-acs-pums-2022-1yr/2022/"
                     f"{PUBLIC_SHA}/csv_hus.zip"
                 ),
             },
