@@ -57,9 +57,11 @@ any manifest it touches, so a frozen manifest leaves the freeze the first time
 it is modified. A kindless manifest outside that list is an error at every
 entry point — `fetch-artifact`, `publish-raw`, `inventory-artifacts`,
 `validate-package` and the source-package byte reader — and never a publisher
-table by default. A manifest's kind is fixed once declared: `fetch-artifact
---kind` must match it, and a conflicting kind is refused before anything is
-read.
+table by default. A manifest that declares no file entry yet (a bare
+`files:` line or an empty mapping) has nothing to classify, and the command
+writing its first entry declares the kind. A manifest's kind is fixed once
+declared: `fetch-artifact --kind` must match it, and a conflicting kind is
+refused before anything is read.
 
 ## Hash-Only Registrations
 

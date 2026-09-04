@@ -262,25 +262,54 @@ def test_emit_refuses_a_pin_that_drifted_from_the_committed_one(tmp_path, capsys
     assert target.read_bytes() == FRS_MANIFEST.read_bytes()
 
 
+def _fixture_copy(destination: Path) -> Path:
+    for path in FIXTURE_ROOT.rglob("*.json"):
+        copy = destination / path.relative_to(FIXTURE_ROOT)
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        copy.write_bytes(path.read_bytes())
+    return destination
+
+
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
+    ).stdout.strip()
+
+
 def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
-    exit_code, _out, err = _run(
-        [
-            "--microcosm-root",
-            str(FIXTURE_ROOT),
-            "--root",
-            str(tmp_path / "data"),
-            "emit",
-        ],
-        capsys,
-    )
-    assert exit_code == 1
-    assert "pass --microcosm-commit" in err
-    assert not (tmp_path / "data").exists()
+    # The fixture inside this repository is committed, so a run against it
+    # would read a Chronicle commit as if it were the consumer's. Outside any
+    # repository there is no commit to read; inside one whose manifests are
+    # untracked there is none either. Both refuse before writing.
+    outside = _fixture_copy(tmp_path / "outside-git")
+    assert not (outside / ".git").exists()
+    untracked = _fixture_copy(tmp_path / "untracked")
+    _git(untracked, "init", "-q")
+    _git(untracked, "config", "user.email", "t@example.com")
+    _git(untracked, "config", "user.name", "t")
+    (untracked / "README").write_text("nothing pinned here")
+    _git(untracked, "add", "README")
+    _git(untracked, "commit", "-q", "-m", "unrelated")
+
+    for checkout in (outside, untracked):
+        exit_code, _out, err = _run(
+            [
+                "--microcosm-root",
+                str(checkout),
+                "--root",
+                str(tmp_path / "data"),
+                "emit",
+            ],
+            capsys,
+        )
+        assert exit_code == 1
+        assert "--microcosm-commit" in err
+        assert not (tmp_path / "data").exists()
 
     exit_code, _out, err = _run(
         [
             "--microcosm-root",
-            str(FIXTURE_ROOT),
+            str(outside),
             "--root",
             str(tmp_path / "data"),
             "emit",
@@ -291,6 +320,32 @@ def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
     )
     assert exit_code == 2
     assert "40-hex commit" in err
+    assert not (tmp_path / "data").exists()
+
+
+def test_emit_from_a_checkout_outside_git_registers_with_the_given_commit(
+    tmp_path, capsys
+):
+    outside = _fixture_copy(tmp_path / "outside-git")
+
+    exit_code, out, err = _run(
+        [
+            "--microcosm-root",
+            str(outside),
+            "--root",
+            str(tmp_path / "data"),
+            "--json",
+            "emit",
+            *PIN_COMMIT_ARGS,
+        ],
+        capsys,
+    )
+
+    assert exit_code == 0, err
+    assert len(json.loads(out)["registrations"]) == 15
+    assert (tmp_path / "data" / "dwp/frs_2023_24/manifest.yaml").read_bytes() == (
+        FRS_MANIFEST.read_bytes()
+    )
 
 
 def test_pin_commit_reads_the_last_commit_that_changed_the_file(tmp_path):

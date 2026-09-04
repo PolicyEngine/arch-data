@@ -45,6 +45,7 @@ from chronicle.registration import (
     ManifestKindError,
     bare_filename,
     filename_key,
+    has_file_entries,
     is_bare_filename,
     is_hash_only,
     iter_file_specs,
@@ -562,7 +563,6 @@ class RawArtifactPublishEntry:
             "size_bytes": self.size_bytes,
             "r2_location": (self.r2_location.to_dict() if self.r2_location else None),
             "upload": self.upload.to_dict() if self.upload else None,
-            "skipped": self.skipped,
             "errors": list(self.errors),
         }
 
@@ -1754,7 +1754,12 @@ def _resolve_manifest_kind(
         ) from exc
     if requested is None:
         return stored
-    if existing_manifest and requested != stored:
+    if requested != stored and (
+        existing_manifest.get("kind") is not None or has_file_entries(existing_manifest)
+    ):
+        # A declared kind is fixed, and a frozen kindless manifest with
+        # entries is a publisher table. A manifest with neither is declared
+        # by this fetch.
         raise ManifestAccessError(
             f"{manifest_path} is a {stored} manifest; refusing to fetch into it "
             f"as a {requested}. A manifest's kind is fixed once declared: "
@@ -2384,22 +2389,20 @@ def _upsert_manifest(
         size_bytes=size_bytes,
     )
     new_r2 = r2_location.to_dict() if r2_location is not None else None
+    # Different bytes under the same vintage, or the same bytes under another
+    # name: fetch_source_artifact refuses both before the read; the guard is
+    # repeated here so no caller can reach a false-provenance write.
+    _assert_recorded_identity_holds_these_bytes(
+        identity,
+        manifest_path=manifest_path,
+        year=key,
+        filename=filename,
+        sha256=sha256,
+        size_bytes=size_bytes,
+        r2_bucket=(new_r2 or {}).get("bucket") or default_r2_raw_bucket(),
+        record_revision=record_revision,
+    )
     holds = identity is not None and identity.holds(sha256=sha256, filename=filename)
-    if identity is not None and not holds and not record_revision:
-        # Different bytes under the same vintage. The guard in
-        # fetch_source_artifact refuses this without --record-revision; repeat
-        # the check here so no caller can reach a false-provenance write.
-        raise SourceArtifactRevisionError(
-            _revision_error_message(
-                manifest_path=manifest_path,
-                year=key,
-                filename=filename,
-                identity=identity,
-                sha256=sha256,
-                size_bytes=size_bytes,
-                r2_bucket=(new_r2 or {}).get("bucket") or default_r2_raw_bucket(),
-            )
-        )
     if holds and identity.r2 is not None:
         # A recorded storage.r2 block for these exact bytes is historical
         # truth: archived witness records pin raw R2 URLs by hash. Re-fetching

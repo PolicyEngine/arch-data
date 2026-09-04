@@ -163,14 +163,19 @@ def manifest_kind(
     """Return a manifest's declared kind.
 
     An absent or empty manifest has the default kind: the command creating it
-    declares one. A manifest with content must declare ``kind`` itself, unless
-    ``manifest_path`` names a file frozen kindless before the rule and its
-    bytes still match the freeze.
+    declares one. So does a manifest that declares no file entry (a bare
+    ``files:`` line or an empty mapping): there is nothing in it that could be
+    read as a publisher table, and the command writing its first entry
+    declares the kind. A manifest with entries must declare ``kind`` itself,
+    unless ``manifest_path`` names a file frozen kindless before the rule and
+    its bytes still match the freeze.
     """
     if not isinstance(manifest, Mapping) or not manifest:
         return DEFAULT_MANIFEST_KIND
     declared = manifest.get("kind")
     if declared is None:
+        if not has_file_entries(manifest):
+            return DEFAULT_MANIFEST_KIND
         if manifest_path is not None and is_grandfathered_manifest(manifest_path):
             return PUBLISHER_TABLE_KIND
         where = str(manifest_path) if manifest_path is not None else "Manifest"
@@ -388,6 +393,25 @@ def iter_manifest_entries(
                 yield key, index, entry
         else:
             yield key, None, spec
+
+
+def has_file_entries(manifest: Mapping[str, Any] | None) -> bool:
+    """Whether a manifest declares any file entry at all.
+
+    A ``files`` block that is absent, an explicit null (a bare ``files:``
+    line) or an empty mapping declares nothing; a vintage key holding an empty
+    list declares nothing either. A ``files`` value that is not a mapping is
+    content Chronicle cannot read, and counts as entries so that the kind rule
+    and the ``files_not_a_mapping`` refusal both fire on it.
+    """
+    if not isinstance(manifest, Mapping):
+        return False
+    files = manifest.get("files")
+    if files is None:
+        return False
+    if not isinstance(files, Mapping):
+        return True
+    return any(True for _entry in iter_manifest_entries(manifest))
 
 
 def registration_id(
@@ -847,7 +871,12 @@ def register_hash_only_artifact(
         existing_kind = manifest_kind(payload, manifest_path=manifest_path)
     except ManifestAccessError as exc:
         raise HashOnlyRegistrationError(str(exc)) from exc
-    if payload and existing_kind != MICRODATA_RELEASE_KIND:
+    if existing_kind != MICRODATA_RELEASE_KIND and (
+        payload.get("kind") is not None or has_file_entries(payload)
+    ):
+        # A declared kind is fixed, and a frozen kindless manifest with
+        # entries is a publisher table. A manifest with neither is declared
+        # by this write.
         raise HashOnlyRegistrationError(
             f"{manifest_path} is a {existing_kind} manifest; hash-only "
             "registrations belong in a kind: microdata_release manifest."
@@ -911,7 +940,10 @@ def register_hash_only_artifact(
         payload.setdefault("source_page", source_page)
     if table:
         payload.setdefault("table", table)
-    payload.setdefault("files", {})
+    if payload.get("files") is None:
+        # setdefault keeps an explicit null (a bare ``files:`` line); the
+        # entry below needs a mapping to record into.
+        payload["files"] = {}
 
     entries = _existing_entries(payload["files"], key)
     wanted = filename_key(artifact_name)
@@ -1196,6 +1228,7 @@ __all__ = [
     "bare_filename",
     "entry_access",
     "filename_key",
+    "has_file_entries",
     "is_bare_filename",
     "is_hash_only",
     "is_microdata_release",

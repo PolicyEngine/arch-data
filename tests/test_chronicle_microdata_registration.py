@@ -29,6 +29,8 @@ from chronicle.artifacts import (
     ExpectedArtifactIdentityError,
     MalformedManifestError,
     SourceArtifactRevisionError,
+    _expected_identity,
+    _upsert_manifest,
     fetch_source_artifact,
     inventory_source_artifacts,
     microdata_staging_path,
@@ -47,6 +49,7 @@ from chronicle.registration import (
     bare_filename,
     entry_access,
     filename_key,
+    has_file_entries,
     is_bare_filename,
     is_hash_only,
     is_microdata_release,
@@ -265,6 +268,21 @@ def test_manifest_kind_is_explicit_except_for_an_absent_manifest():
     # A manifest with content and no kind is an error, never a table.
     with pytest.raises(ManifestAccessError, match="declares no kind"):
         manifest_kind({"files": {2023: {"filename": "table.xlsx"}}})
+
+
+def test_a_manifest_with_no_entries_has_nothing_to_classify():
+    # A bare ``files:`` line or an empty mapping declares no entry that could
+    # be misread as a publisher table, so the manifest reads like an absent
+    # one and the command writing its first entry declares the kind.
+    assert has_file_entries({"source_id": "irs_soi", "files": None}) is False
+    assert has_file_entries({"source_id": "irs_soi", "files": {}}) is False
+    assert has_file_entries({"files": {2023: {"filename": "t.xlsx"}}}) is True
+    assert has_file_entries({"files": {2023: []}}) is False
+    assert has_file_entries({"files": ["not", "a", "mapping"]}) is True
+    assert manifest_kind({"source_id": "irs_soi", "files": None}) == "publisher_table"
+    assert manifest_kind({"source_id": "irs_soi", "files": {}}) == "publisher_table"
+    with pytest.raises(ManifestAccessError, match="declares no kind"):
+        manifest_kind({"source_id": "irs_soi", "files": {2023: {"filename": "t"}}})
 
 
 def test_hash_sources_are_the_closed_contract_set():
@@ -764,6 +782,39 @@ def test_register_refuses_a_kindless_manifest_with_content(tmp_path):
     original = (output_dir / "manifest.yaml").read_bytes()
 
     with pytest.raises(HashOnlyRegistrationError, match="declares no kind"):
+        _register(output_dir)
+
+    assert (output_dir / "manifest.yaml").read_bytes() == original
+
+
+def _entryless_manifest(tmp_path: Path, **fields: object) -> Path:
+    output_dir = tmp_path / "pkg"
+    output_dir.mkdir()
+    payload = {"source_id": "dwp", "package_id": "dwp-frs-2023-24", **fields}
+    (output_dir / "manifest.yaml").write_text(
+        yaml.safe_dump(payload, sort_keys=False).replace("files: null", "files:")
+    )
+    return output_dir
+
+
+@pytest.mark.parametrize("files", [None, {}], ids=["explicit-null", "empty-mapping"])
+def test_register_declares_the_kind_of_an_entryless_kindless_manifest(tmp_path, files):
+    output_dir = _entryless_manifest(tmp_path, files=files)
+
+    report = _register(output_dir)
+    manifest = _manifest(output_dir)
+
+    assert report.valid
+    assert manifest["kind"] == "microdata_release"
+    assert manifest["files"][2023][0]["filename"] == "adult.tab"
+
+
+def test_register_never_reclassifies_a_declared_publisher_table(tmp_path):
+    # An explicit kind is fixed even when the manifest holds no entry yet.
+    output_dir = _entryless_manifest(tmp_path, kind="publisher_table", files={})
+    original = (output_dir / "manifest.yaml").read_bytes()
+
+    with pytest.raises(HashOnlyRegistrationError, match="publisher_table manifest"):
         _register(output_dir)
 
     assert (output_dir / "manifest.yaml").read_bytes() == original
@@ -1283,6 +1334,55 @@ def test_fetch_refuses_a_kind_that_conflicts_with_the_manifest(tmp_path, monkeyp
         assert not (path / "codebook.pdf").exists()
 
 
+@pytest.mark.parametrize("files", [None, {}], ids=["explicit-null", "empty-mapping"])
+def test_fetch_declares_the_requested_kind_on_an_entryless_kindless_manifest(
+    tmp_path, monkeypatch, files
+):
+    output_dir = _entryless_manifest(tmp_path, files=files)
+    _serve(monkeypatch, PUBLIC_BYTES)
+
+    report = _fetch_release(
+        output_dir,
+        staging_dir=tmp_path / "staging",
+        source_id="dwp",
+        package_id="dwp-frs-2023-24",
+        year=2023,
+        licence="OGL-UK-3.0",
+        publisher="Department for Work and Pensions",
+        vintage="2023_24",
+        licence_evidence={**EVIDENCE, "issuer": "DWP"},
+    )
+    manifest = _manifest(output_dir)
+
+    assert report.valid
+    assert manifest["kind"] == "microdata_release"
+    assert [entry["filename"] for entry in manifest["files"][2023]] == ["csv_hus.zip"]
+
+
+def test_fetch_never_reclassifies_a_declared_kind_without_entries(
+    tmp_path, monkeypatch
+):
+    output_dir = _entryless_manifest(tmp_path, kind="publisher_table", files={})
+    original = (output_dir / "manifest.yaml").read_bytes()
+    reads = _refuse_read(monkeypatch)
+
+    with pytest.raises(ManifestAccessError, match="is a publisher_table manifest"):
+        _fetch_release(
+            output_dir,
+            staging_dir=tmp_path / "staging",
+            source_id="dwp",
+            package_id="dwp-frs-2023-24",
+            year=2023,
+            licence="OGL-UK-3.0",
+            publisher="Department for Work and Pensions",
+            vintage="2023_24",
+            licence_evidence={**EVIDENCE, "issuer": "DWP"},
+        )
+
+    assert reads == []
+    assert (output_dir / "manifest.yaml").read_bytes() == original
+
+
 def test_fetch_refuses_a_stored_unknown_kind_even_with_an_explicit_kind(
     tmp_path, monkeypatch
 ):
@@ -1764,6 +1864,44 @@ def test_a_second_file_never_turns_a_publisher_table_vintage_into_a_list(
 
     assert isinstance(revised, dict)
     assert revised["filename"] == "22in05ira_rev.xlsx"
+
+
+def test_the_manifest_write_refuses_a_same_bytes_rename_by_itself(tmp_path):
+    # PR #226's rule: identical bytes under another filename are a rename,
+    # not a revision, so --record-revision does not apply. The write path
+    # repeats the guard so no caller reaches a false-provenance write.
+    output_dir = tmp_path / "pkg"
+    (tmp_path / "22in05ira.xlsx").write_bytes(b"IRA table 5")
+    _fetch_table(tmp_path / "22in05ira.xlsx", output_dir, year=2022)
+    original = (output_dir / "manifest.yaml").read_bytes()
+
+    for record_revision in (False, True):
+        with pytest.raises(SourceArtifactRevisionError, match="rename is not"):
+            _upsert_manifest(
+                output_dir / "manifest.yaml",
+                source_id="irs_soi",
+                package_id="soi-table-1-2",
+                dataset="irs_soi_soi-table-1-2",
+                source_page=None,
+                table=None,
+                publisher=None,
+                year=2022,
+                filename="table-5.xlsx",
+                source_url="https://publisher.example/table-5.xlsx",
+                sha256=hashlib.sha256(b"IRA table 5").hexdigest(),
+                size_bytes=len(b"IRA table 5"),
+                fetched_at="2026-09-04T00:00:00+00:00",
+                access="public",
+                licence=None,
+                kind="publisher_table",
+                vintage=None,
+                licence_evidence=None,
+                expected=_expected_identity(None, None),
+                r2_location=None,
+                record_revision=record_revision,
+            )
+
+    assert (output_dir / "manifest.yaml").read_bytes() == original
 
 
 def test_a_second_file_over_an_unidentified_table_entry_is_refused(
