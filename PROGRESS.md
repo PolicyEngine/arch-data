@@ -699,3 +699,8 @@ the per-finding reproduction/fix/test/commit/port map.
   `fetch-vintage-red.log` (3 failed); all direct exits 1. CLI refusals hit
   non-JSON date/set values; malformed vintage/build segments reached reads or
   upload sentinels. Exact commands will be included in the final report.
+
+- Raw publication now keeps original identity values for validation and uses
+  separate string fields only in reports. Date/set refusals serialize cleanly
+  through both CLIs; historical skips also retain serializable identity fields.
+  The regression and history controls exit 0: 14 passed, 12 warnings.

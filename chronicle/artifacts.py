@@ -2523,6 +2523,10 @@ def _publish_raw_manifest_entry(
     manifest_identity: dict[str, Any] | None = None,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
+    # Validate original values below; reports must still serialize refusals of
+    # YAML dates, sets, and other non-string declarations through the CLI.
+    reported_source_id = str(source_id) if source_id is not None else ""
+    reported_package_id = str(package_id) if package_id is not None else ""
     if not isinstance(spec, dict):
         spec = {}
         errors.append("malformed_file_spec")
@@ -2538,8 +2542,8 @@ def _publish_raw_manifest_entry(
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=source_id,
-                package_id=package_id,
+                source_id=reported_source_id,
+                package_id=reported_package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(artifact_path),
@@ -2556,8 +2560,8 @@ def _publish_raw_manifest_entry(
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=source_id,
-                package_id=package_id,
+                source_id=reported_source_id,
+                package_id=reported_package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(manifest_path.parent),
@@ -2573,8 +2577,8 @@ def _publish_raw_manifest_entry(
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=source_id,
-                package_id=package_id,
+                source_id=reported_source_id,
+                package_id=reported_package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(manifest_path.parent),
@@ -2672,8 +2676,8 @@ def _publish_raw_manifest_entry(
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=source_id,
-                package_id=package_id,
+                source_id=reported_source_id,
+                package_id=reported_package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(artifact_path),
@@ -2722,8 +2726,8 @@ def _publish_raw_manifest_entry(
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
-                source_id=source_id,
-                package_id=package_id,
+                source_id=reported_source_id,
+                package_id=reported_package_id,
                 year=str(year),
                 filename=filename,
                 local_path=str(artifact_path),
@@ -2759,8 +2763,8 @@ def _publish_raw_manifest_entry(
     return (
         RawArtifactPublishEntry(
             manifest_path=str(manifest_path),
-            source_id=source_id,
-            package_id=package_id,
+            source_id=reported_source_id,
+            package_id=reported_package_id,
             year=str(year),
             filename=filename,
             local_path=str(artifact_path),
