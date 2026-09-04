@@ -405,11 +405,25 @@ Running the same operations against a checkout of the previous head:
   provenance. Fix commit: `8b7ab22`; no #227 hunk applies. The focused command
   now exits 0 with 3 passed (5 passed including ordinary and shared revision
   history controls).
+- **Finding 8 reproduced and fixed.** A fresh-process regression sets each of
+  `CHRONICLE_SCHEMA`, `POLICYENGINE_LEDGER_SCHEMA`, and `LEDGER_SCHEMA` before
+  importing the compatibility constants, alongside
+  `POLICYENGINE_TARGETS_SCHEMA`. Red command:
+  `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p
+  no:cacheprovider tests/test_chronicle_env.py::test_supabase_schema_compatibility_aliases_honor_import_time_environment`
+  exited 1 with 3 failures; every subprocess returned `ledger` / `targets`.
+  Test-only commit: `e2ceedf`.
+- `LEDGER_SCHEMA` and `TARGETS_SCHEMA` are now import-time snapshots of the
+  same lazy resolver functions runtime queries use, restoring their original
+  environment-backed behavior while later environment mutations remain lazy
+  through `chronicle_schema()` / `targets_schema()`. Fix commit: `f41ad0f`; no
+  #227 hunk applies. The focused regression now exits 0 with 3 passed; it and
+  the runtime/default namespace controls exit 0 with 11 passed.
 
 ### Next
 
-1. Reproduce and fix import-time Supabase compatibility aliases (finding 8)
-   for Chronicle/current and both legacy schema environment spellings.
+1. Audit the eight findings and #227 port surface for missed CLI/refusal cases,
+   then run focused and full verification.
 2. Commit each coherent red-test and implementation step, updating this log.
 3. Run focused tests, lint/format checks on changed files, and the full suite
    with the directly captured exit code and counts.
