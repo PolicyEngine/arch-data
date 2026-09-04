@@ -33,6 +33,7 @@ from chronicle.core import (
 )
 from chronicle.env import env_flag, env_value
 from chronicle.epoch import SCHEMA_IDS, schema_id
+from chronicle.registration import load_manifest_document
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
     SourceCell,
@@ -877,7 +878,7 @@ class SourceArtifactSpec:
             self.manifest,
         )
         with manifest_path.open("r", encoding="utf-8") as file:
-            manifest = yaml.safe_load(file)
+            manifest = load_manifest_document(file.read())
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
         artifact_path = files(self.resource_package).joinpath(
             self.resource_directory,

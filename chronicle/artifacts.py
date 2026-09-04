@@ -26,6 +26,7 @@ from chronicle.database import (
 )
 from chronicle.env import env_value
 from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
+from chronicle.registration import load_manifest_document
 
 
 R2_RAW_BUCKET_ENV = "CHRONICLE_R2_RAW_BUCKET"
@@ -1458,7 +1459,7 @@ def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     if not manifest_path.exists():
         return {}
     try:
-        payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        payload = load_manifest_document(manifest_path.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
         raise MalformedManifestError(
             f"{manifest_path} is not valid YAML: {exc}"
