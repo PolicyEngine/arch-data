@@ -292,36 +292,29 @@ def _assert_manifest_identifies(
             )
 
 
-def _sibling_manifests(output: Path) -> list[str]:
-    """Return the ``manifest_*.yaml`` files a package directory keeps."""
-    if not output.is_dir():
-        return []
-    return sorted(
-        path.name
-        for pattern in ("manifest_*.yaml", "manifest_*.yml")
-        for path in output.glob(pattern)
-        if path.is_file()
-    )
-
-
 def _refuse_a_stray_default_manifest(output: Path, manifest_path: Path) -> None:
-    """Refuse to create ``manifest.yaml`` beside a package's named manifests.
+    """Refuse to create any new manifest beside a package's registry.
 
-    A publisher directory that feeds several source packages keeps one
-    ``manifest_<package>.yaml`` per package and no ``manifest.yaml``. A fetch
-    that omits ``--manifest`` there would create a third manifest none of the
-    packages read, and would bypass the revision guard of the one it should
-    have addressed (PolicyEngine/chronicle#225).
+    Every supported spelling participates: a missing ``manifest.yaml`` beside
+    ``manifest.yml`` or ``Manifest.yaml`` is just as ambiguous as one beside a
+    named manifest, and a mistyped named selector must not create a parallel
+    registry. Operators may create an intentional empty sibling explicitly,
+    then select that existing file.
     """
-    if manifest_path.name != DEFAULT_MANIFEST_FILENAME or manifest_path.exists():
+    paths = package_manifest_paths(output)
+    if (
+        any(path.name == manifest_path.name for path in paths)
+        or manifest_path.is_symlink()
+    ):
         return
-    siblings = _sibling_manifests(output)
+    siblings = [path.name for path in paths]
     if not siblings:
         return
     raise AmbiguousManifestError(
-        f"{output} keeps {', '.join(siblings)} and no {DEFAULT_MANIFEST_FILENAME}; "
-        "pass --manifest to name the manifest this fetch records into rather "
-        f"than creating {DEFAULT_MANIFEST_FILENAME} beside them."
+        f"{output} already keeps {', '.join(siblings)}; refusing to create "
+        f"{manifest_path.name} beside that registry. Pass --manifest to name "
+        "an existing manifest, or create an intentional empty sibling "
+        "explicitly before fetching into it."
     )
 
 

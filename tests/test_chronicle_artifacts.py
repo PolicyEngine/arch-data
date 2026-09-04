@@ -823,8 +823,7 @@ def test_publish_refuses_a_wrong_route_before_a_preserved_bucket_skip(
     manifest = yaml.safe_load(manifest_path.read_text())
     artifact = manifest["files"][2024]
     wrong_key = (
-        "raw/uk/ons/wrong-package/1999/"
-        f"{artifact['sha256']}/{artifact['filename']}"
+        f"raw/uk/ons/wrong-package/1999/{artifact['sha256']}/{artifact['filename']}"
     )
     artifact["storage"] = {
         "r2": {
@@ -846,8 +845,10 @@ def test_publish_refuses_a_wrong_route_before_a_preserved_bucket_skip(
     assert not report.valid
     assert report.entries[0].upload is None
     assert report.entries[0].skipped is None
-    assert report.entries[0].errors[0].startswith(
-        "recorded_r2_key_disagrees_with_country_prefix:"
+    assert (
+        report.entries[0]
+        .errors[0]
+        .startswith("recorded_r2_key_disagrees_with_country_prefix:")
     )
     assert not log.exists()
     assert manifest_path.read_bytes() == before
@@ -1297,6 +1298,17 @@ def test_fetch_artifact_writes_the_manifest_it_was_given(tmp_path):
     package = tmp_path / "db" / "data" / "irs_soi" / "ira_contributions"
     traditional = _publish(tmp_path, "22in05ira.xlsx", b"traditional IRA table")
     roth = _publish(tmp_path, "22in06ira.xlsx", b"roth IRA table")
+    package.mkdir(parents=True)
+    for name, package_id in (
+        (TRADITIONAL_MANIFEST, "soi-ira-traditional-contributions-2022"),
+        (ROTH_MANIFEST, "soi-ira-roth-contributions-2022"),
+    ):
+        (package / name).write_text(
+            yaml.safe_dump(
+                {"source_id": "irs_soi", "package_id": package_id, "files": {}},
+                sort_keys=False,
+            )
+        )
 
     _fetch_local(
         package,
