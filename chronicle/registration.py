@@ -787,6 +787,12 @@ def validate_file_entry(
     elif is_manifest_filename(filename):
         errors.append(f"manifest_named_filename:{filename}")
 
+    declared_sha256 = spec.get("sha256")
+    if declared_sha256 is not None and not (
+        isinstance(declared_sha256, str) and _SHA256_RE.fullmatch(declared_sha256)
+    ):
+        errors.append("malformed_sha256")
+
     declared_access = spec.get("access")
     if declared_access is None:
         if kind == MICRODATA_RELEASE_KIND:
