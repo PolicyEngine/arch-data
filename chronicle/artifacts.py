@@ -1043,6 +1043,7 @@ def fetch_source_artifact(
         year=vintage_key,
         source_id=source_id,
         package_id=package_id,
+        bind_registration_identity=release,
     )
     _assert_table_vintage_is_revisable(
         existing_value,
@@ -2262,6 +2263,7 @@ def _validated_recorded_r2(
     year: Any,
     source_id: str,
     package_id: str,
+    bind_registration_identity: bool = False,
 ) -> RecordedR2Object | None:
     """Return the object a recorded ``storage.r2`` block names, or None.
 
@@ -2350,24 +2352,25 @@ def _validated_recorded_r2(
             "{sha256}/{filename}, which is what says the object holds the "
             "entry's bytes; Chronicle will not guess for a key that does not."
         )
-    try:
-        expected_release = (
-            _clean_key_part(source_id),
-            _clean_key_part(package_id),
-            str(year),
-        )
-    except ValueError as exc:
-        raise RecordedR2LocatorError(
-            f"{where}: cannot bind the locator to source_id={source_id!r}, "
-            f"package_id={package_id!r}, year={year!r}: {exc}"
-        ) from exc
-    recorded_release = tuple(segments[-5:-2])
-    if recorded_release != expected_release:
-        raise RecordedR2LocatorError(
-            f"{where}: key {key!r} is bound to source/package/year "
-            f"{recorded_release!r}, not {expected_release!r}. A recorded object "
-            "must carry the complete registration identity."
-        )
+    if bind_registration_identity:
+        try:
+            expected_release = (
+                _clean_key_part(source_id),
+                _clean_key_part(package_id),
+                str(year),
+            )
+        except ValueError as exc:
+            raise RecordedR2LocatorError(
+                f"{where}: cannot bind the locator to source_id={source_id!r}, "
+                f"package_id={package_id!r}, year={year!r}: {exc}"
+            ) from exc
+        recorded_release = tuple(segments[-5:-2])
+        if recorded_release != expected_release:
+            raise RecordedR2LocatorError(
+                f"{where}: key {key!r} is bound to source/package/year "
+                f"{recorded_release!r}, not {expected_release!r}. A recorded "
+                "release object must carry the complete registration identity."
+            )
     return RecordedR2Object(
         provider=provider,
         bucket=bucket,
@@ -2384,6 +2387,7 @@ def _recorded_identity(
     year: Any,
     source_id: str,
     package_id: str,
+    bind_registration_identity: bool = False,
 ) -> RecordedIdentity | None:
     """Return what a manifest entry says its vintage holds, if anything.
 
@@ -2399,6 +2403,7 @@ def _recorded_identity(
         year=year,
         source_id=source_id,
         package_id=package_id,
+        bind_registration_identity=bind_registration_identity,
     )
     declared_sha256 = spec.get("sha256") if isinstance(spec, dict) else None
     declared_sha256 = declared_sha256 if isinstance(declared_sha256, str) else None
@@ -2649,6 +2654,7 @@ def _upsert_manifest(
         year=key,
         source_id=source_id,
         package_id=package_id,
+        bind_registration_identity=release,
     )
     _assert_expected_identity(
         expected,
@@ -3001,6 +3007,7 @@ def _publish_raw_manifest_entry(
             year=year,
             source_id=source_id,
             package_id=package_id,
+            bind_registration_identity=release,
         )
     except SourceArtifactManifestError as error:
         # A block that does not name one object cannot be treated as history,
@@ -3171,6 +3178,7 @@ def _inventory_entry(
             year=year,
             source_id=str((manifest or {}).get("source_id") or ""),
             package_id=str((manifest or {}).get("package_id") or ""),
+            bind_registration_identity=release,
         )
     except SourceArtifactManifestError as error:
         errors.append(f"recorded_r2_locator_invalid:{error}")
