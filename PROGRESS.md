@@ -459,6 +459,41 @@ Running the same operations against a checkout of the previous head:
 
 ### Next
 
-1. Run the requested lint/format/full-suite verification.
-2. Write the external `-o out.md` report with the per-finding command,
-   observation, fix, regression, commit, and port provenance.
+None. The eight findings, required #227 ports, adversarial preflight follow-ups,
+and final verification are complete. The external `-o out.md` report contains
+the per-finding reproduction/fix/test/commit/port map.
+
+### Final verification (eight-finding round)
+
+- The first bare `uv run` lint invocations exited 2 before Ruff started because
+  the sandbox denied access to `/Users/maxghenis/.cache/uv`. Re-running through
+  the permitted existing cache (`UV_CACHE_DIR=/tmp/chronicle-uv-cache`) gave:
+  `uv run ruff check .` exit 0 (`All checks passed!`) and `uv run ruff format
+  --check` on the eight changed Python files exit 0 (`8 files already
+  formatted`).
+- `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p no:cacheprovider`:
+  direct exit 0, 1,039 passed, 7 skipped, 18 warnings in 1,323.73 seconds.
+- Focused artifact module: direct exit 0, 154 passed, 12 warnings in 7.15
+  seconds. Focused source-package module: direct exit 0, 135 passed, 13 warnings
+  in 193.89 seconds.
+- `git diff c36f3fc8..HEAD -- db/data` is empty: no tracked source manifest was
+  modified.
+
+### Deliberate boundaries
+
+- Did not add crash-atomic multi-file transactions for an unexpected write or
+  process failure midway through a coordinated revision. Every deterministic
+  refusal is preflighted before writes/uploads and the successful path updates
+  all owners; true cross-file crash atomicity needs a separate staging/rollback
+  design and is not one of the eight findings.
+- Did not port #227's `iter_directory_entries`: its exact implementation depends
+  on #227's microdata list-entry machinery, which this slice explicitly
+  excludes. Also retained the current artifact-local `bare_filename` exception
+  wrapper so filename refusals remain `SourceArtifactManifestError` and the
+  existing CLI reports them cleanly; #227's later rebase can adopt its broader
+  exception hierarchy together.
+- Did not add a new rule for two physical artifact files whose names normalize
+  to the same key when the exact requested spelling sorts first. That is
+  defense-in-depth outside findings 3/4; there are no such collisions in the
+  tracked tree. Manifest-name collisions are already refused independent of
+  sort order.
