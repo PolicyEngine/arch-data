@@ -3084,6 +3084,180 @@ def _legacy_raw_r2_key(
     )
 
 
+def _raw_r2_route_keys(
+    *,
+    source_id: str,
+    package_id: str,
+    year: Any,
+    sha256: str,
+    filename: str,
+    resolved_prefix: str,
+    package_path: Path,
+) -> set[str]:
+    """Return the exact current and pre-country keys for one declared route."""
+    keys = {
+        build_r2_key(
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            sha256=sha256,
+            filename=filename,
+            prefix=resolved_prefix,
+            package_path=package_path,
+        )
+    }
+    legacy = _legacy_raw_r2_key(
+        source_id=source_id,
+        package_id=package_id,
+        year=year,
+        sha256=sha256,
+        filename=filename,
+        resolved_prefix=resolved_prefix,
+        package_path=package_path,
+    )
+    if legacy is not None:
+        keys.add(legacy)
+    return keys
+
+
+def _entry_records_one_of_raw_routes(
+    spec: dict[str, Any],
+    *,
+    manifest_path: Path,
+    year: Any,
+    source_id: str,
+    package_id: str,
+    route_keys: set[str],
+) -> bool:
+    """Whether an entry witnesses one exact canonical or legacy route."""
+    try:
+        recorded = _validated_recorded_r2(
+            spec,
+            manifest_path=manifest_path,
+            year=year,
+            source_id=source_id,
+            package_id=package_id,
+        )
+    except SourceArtifactManifestError:
+        return False
+    return recorded is not None and recorded.key in route_keys
+
+
+def _compatible_recorded_raw_keys(
+    *,
+    manifest_path: Path,
+    manifest: dict[str, Any] | None,
+    package_manifests: Mapping[str, dict[str, Any]] | None,
+    source_id: str,
+    package_id: str,
+    year: Any,
+    sha256: str,
+    filename: str,
+    resolved_prefix: str,
+) -> set[str]:
+    """Return exact raw routes established by current or package history.
+
+    Besides the entry's current/pre-country route, two recorded legacy shapes
+    are evidence-backed: another public sibling owns the same bytes at its own
+    canonical route, or a nonnumeric table label uses the numeric release year
+    anchored by this manifest and its package ID. Merely sharing a digest/name
+    tail is never enough.
+    """
+    allowed = _raw_r2_route_keys(
+        source_id=source_id,
+        package_id=package_id,
+        year=year,
+        sha256=sha256,
+        filename=filename,
+        resolved_prefix=resolved_prefix,
+        package_path=manifest_path,
+    )
+
+    for owner_manifest_name, owner_manifest in (package_manifests or {}).items():
+        owner_source_id = owner_manifest.get("source_id")
+        owner_package_id = owner_manifest.get("package_id")
+        if not isinstance(owner_source_id, str) or not owner_source_id.strip():
+            continue
+        if not isinstance(owner_package_id, str) or not owner_package_id.strip():
+            continue
+        owner_manifest_path = Path(owner_manifest_name)
+        for owner_year, _index, owner_spec in iter_manifest_entries(owner_manifest):
+            if not isinstance(owner_spec, dict):
+                continue
+            if is_hash_only(safe_entry_access(owner_spec)):
+                continue
+            if owner_spec.get("sha256") != sha256 or filename_key(
+                owner_spec.get("filename")
+            ) != filename_key(filename):
+                continue
+            try:
+                owner_routes = _raw_r2_route_keys(
+                    source_id=owner_source_id,
+                    package_id=owner_package_id,
+                    year=owner_year,
+                    sha256=sha256,
+                    filename=filename,
+                    resolved_prefix=resolved_prefix,
+                    package_path=owner_manifest_path,
+                )
+            except ValueError:
+                continue
+            if _entry_records_one_of_raw_routes(
+                owner_spec,
+                manifest_path=owner_manifest_path,
+                year=owner_year,
+                source_id=owner_source_id,
+                package_id=owner_package_id,
+                route_keys=owner_routes,
+            ):
+                allowed.update(owner_routes)
+
+    year_text = str(year)
+    release_match = re.search(r"(?:^|[-_])(\d{4})$", package_id)
+    if manifest is None or year_text.isdecimal() or release_match is None:
+        return allowed
+    release_year = release_match.group(1)
+    for anchor_year, _index, anchor_spec in iter_manifest_entries(manifest):
+        if str(anchor_year) != release_year or not isinstance(anchor_spec, dict):
+            continue
+        if is_hash_only(safe_entry_access(anchor_spec)):
+            continue
+        try:
+            anchor_routes = _raw_r2_route_keys(
+                source_id=source_id,
+                package_id=package_id,
+                year=anchor_year,
+                sha256=str(anchor_spec.get("sha256") or ""),
+                filename=str(anchor_spec.get("filename") or ""),
+                resolved_prefix=resolved_prefix,
+                package_path=manifest_path,
+            )
+        except ValueError:
+            continue
+        if not _entry_records_one_of_raw_routes(
+            anchor_spec,
+            manifest_path=manifest_path,
+            year=anchor_year,
+            source_id=source_id,
+            package_id=package_id,
+            route_keys=anchor_routes,
+        ):
+            continue
+        allowed.update(
+            _raw_r2_route_keys(
+                source_id=source_id,
+                package_id=package_id,
+                year=release_year,
+                sha256=sha256,
+                filename=filename,
+                resolved_prefix=resolved_prefix,
+                package_path=manifest_path,
+            )
+        )
+        break
+    return allowed
+
+
 def _publish_raw_manifest_entry(
     manifest_path: Path,
     source_id: str,
@@ -3300,16 +3474,18 @@ def _publish_raw_manifest_entry(
     )
     recorded_bucket = recorded_r2.bucket if recorded_r2 is not None else None
     recorded_key = recorded_r2.key if recorded_r2 is not None else None
-    legacy_key = _legacy_raw_r2_key(
+    compatible_recorded_keys = _compatible_recorded_raw_keys(
+        manifest_path=manifest_path,
+        manifest=manifest,
+        package_manifests=package_manifests,
         source_id=source_id,
         package_id=package_id,
         year=year,
         sha256=sha256_actual or "",
         filename=filename,
         resolved_prefix=r2_prefix,
-        package_path=manifest_path,
     )
-    if recorded_key and recorded_key not in {location.key, legacy_key}:
+    if recorded_key and recorded_key not in compatible_recorded_keys:
         return refuse(
             "recorded_r2_key_disagrees_with_country_prefix:"
             f"recorded={recorded_key}:expected={location.key}"
