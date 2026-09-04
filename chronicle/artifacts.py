@@ -1479,6 +1479,7 @@ def publish_source_artifacts(
                             wrangler_command=wrangler_command,
                             skip_hash_only=skip_hash_only,
                             staging_dir=staging_dir,
+                            package_manifests=package_manifests,
                             preflight_only=True,
                         )
                         entries.append(entry)
@@ -1500,6 +1501,7 @@ def publish_source_artifacts(
                     wrangler_command=wrangler_command,
                     skip_hash_only=skip_hash_only,
                     staging_dir=staging_dir,
+                    package_manifests=package_manifests,
                     preflight_only=True,
                 )
                 preflight_entries.append(entry)
@@ -1526,6 +1528,7 @@ def publish_source_artifacts(
                     wrangler_command=wrangler_command,
                     skip_hash_only=skip_hash_only,
                     staging_dir=staging_dir,
+                    package_manifests=package_manifests,
                 )
                 entries.append(entry)
                 if updated_spec is not None and isinstance(file_spec, dict):
@@ -2989,6 +2992,7 @@ def _publish_raw_manifest_entry(
     wrangler_command: str,
     skip_hash_only: bool = False,
     staging_dir: str | Path | None = None,
+    package_manifests: Mapping[str, dict[str, Any]] | None = None,
     preflight_only: bool = False,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
@@ -3131,6 +3135,18 @@ def _publish_raw_manifest_entry(
         size_bytes = len(content)
         if sha256_expected and sha256_actual != sha256_expected:
             errors.append("checksum_mismatch")
+        if sha256_actual and package_manifests is not None:
+            try:
+                _assert_no_hash_only_bytes(
+                    package_manifests,
+                    sha256=sha256_actual,
+                    filename=filename,
+                    what="the local artifact's bytes",
+                )
+            except ManifestAccessError:
+                errors.append(
+                    f"sha256_collision_across_manifests:{sha256_actual}"
+                )
 
     if errors:
         return refuse()

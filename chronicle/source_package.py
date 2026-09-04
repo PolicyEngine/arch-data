@@ -960,15 +960,26 @@ class SourceArtifactSpec:
         entry's own access class -- a licensed or restricted entry is identity
         only whatever manifest it sits in.
         """
+        _manifest, spec = self._parseable_entry(year)
+        return spec
+
+    def _parseable_entry(self, year: int) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Return one validated manifest snapshot and its selected entry."""
         manifest = self.manifest_payload()
         self._assert_manifest_kind_is_parseable(manifest)
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
         _assert_entry_bytes_readable(spec)
         self._assert_complete_manifest_valid(manifest)
-        self._assert_no_sibling_hash_only_registration(spec)
-        return spec
+        self._assert_no_sibling_hash_only_registration(spec, manifest)
+        return manifest, spec
 
-    def _assert_no_sibling_hash_only_registration(self, spec: Any) -> None:
+    def _assert_no_sibling_hash_only_registration(
+        self,
+        spec: Any,
+        manifest: dict[str, Any],
+        *,
+        sha256: str | None = None,
+    ) -> None:
         """Refuse a file another manifest in the directory registers hash-only.
 
         The boundary is the file in the package directory, not the manifest
@@ -980,7 +991,7 @@ class SourceArtifactSpec:
         if not isinstance(spec, dict):
             return
         directory = files(self.resource_package).joinpath(self.resource_directory)
-        siblings: dict[str, dict[str, Any]] = {}
+        manifests: dict[str, dict[str, Any]] = {self.manifest: manifest}
         for item in directory.iterdir():
             if item.name == self.manifest or not is_manifest_filename(item.name):
                 continue
@@ -1005,15 +1016,18 @@ class SourceArtifactSpec:
                     f"{spec.get('filename')!r} hash-only cannot be decided."
                 )
             self._assert_complete_manifest_valid(payload, manifest_name=item.name)
-            siblings[item.name] = payload
+            manifests[item.name] = payload
         for name, key, entry in hash_only_registrations(
-            siblings, filename=spec.get("filename"), sha256=spec.get("sha256")
+            manifests,
+            filename=spec.get("filename"),
+            sha256=sha256 or spec.get("sha256"),
         ):
             raise ManifestAccessError(
                 f"{self.resource_directory}/{name} registers "
                 f"{entry.get('filename')!r} for {key!r} as "
                 f"access={entry.get('access')!r}: the same file, or the same "
-                f"bytes, as {spec.get('filename')!r}. A licensed or restricted "
+                f"bytes (sha256={sha256 or spec.get('sha256')!s}), as "
+                f"{spec.get('filename')!r}. A licensed or restricted "
                 "artifact is identity only, so no source package reads, caches, "
                 "fetches, or parses it through another manifest "
                 "(docs/adr-chronicle-raw-microdata-identity.md)."
@@ -1023,7 +1037,7 @@ class SourceArtifactSpec:
         self,
         year: int,
     ) -> tuple[bytes, str, str, dict[str, str]]:
-        spec = self.assert_parseable(year)
+        manifest, spec = self._parseable_entry(year)
         if not is_bare_filename(spec.get("filename")):
             raise ValueError(
                 f"Source artifact filename must be a bare filename inside "
@@ -1034,6 +1048,7 @@ class SourceArtifactSpec:
             spec["filename"],
         )
         content = _read_source_artifact_content(artifact_path, spec)
+        actual_sha = hashlib.sha256(content).hexdigest()
         expected_sha = spec.get("sha256")
         if expected_sha:
             _validate_source_artifact_sha(
@@ -1041,6 +1056,11 @@ class SourceArtifactSpec:
                 expected_sha=str(expected_sha),
                 filename=str(spec["filename"]),
             )
+        self._assert_no_sibling_hash_only_registration(
+            spec,
+            manifest,
+            sha256=actual_sha,
+        )
         storage = spec.get("storage") if isinstance(spec, dict) else None
         raw_r2 = storage.get("r2") if isinstance(storage, dict) else {}
         return content, spec["filename"], spec["source_url"], raw_r2 or {}

@@ -598,7 +598,8 @@ def test_publish_refuses_an_unpinned_public_alias_of_hash_only_bytes(
     assert uploads == []
     assert any(
         error.startswith(f"sha256_collision_across_manifests:{LICENSED_SHA}")
-        for error in report.errors
+        for entry in report.entries
+        for error in entry.errors
     )
 
 
