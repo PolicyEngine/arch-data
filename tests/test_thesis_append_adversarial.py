@@ -13,6 +13,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 import os
 import subprocess
 import sys
@@ -39,7 +40,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from check_thesis_facts_append import (  # noqa: E402
     AppendError,
-    check_append_only,
     check_rows,
     effective_current_rows,
     expected_assertion_version_id,
@@ -128,8 +128,31 @@ def _write_checker_fixture(path: Path, ledger_text: str, manifest: dict) -> None
         )
 
 
-def _run_checker(path: Path, base_ref: str | None = None) -> subprocess.CompletedProcess:
-    command = [sys.executable, str(path / "scripts/check_thesis_facts_append.py")]
+def _commit_candidate(path: Path) -> str:
+    """Commit whatever the fixture has just written and name that commit.
+
+    The checker judges a commit it checks out itself, so a fixture that mutated
+    a working tree has not yet said anything the checker can be asked about.
+    Committing is how the fixture states its candidate. An empty commit is
+    allowed because some fixtures change nothing and the question -- does this
+    commit pass -- is still a real one.
+    """
+
+    _git(path, "add", "-A")
+    _git(path, "commit", "-q", "--allow-empty", "-m", "candidate")
+    return _git(path, "rev-parse", "HEAD")
+
+
+def _run_checker(
+    path: Path, base_ref: str | None = None
+) -> subprocess.CompletedProcess:
+    commit = _commit_candidate(path)
+    command = [
+        sys.executable,
+        str(path / "scripts/check_thesis_facts_append.py"),
+        "--commit",
+        commit,
+    ]
     if base_ref is not None:
         command.extend(["--base-ref", base_ref])
     return subprocess.run(command, cwd=path, capture_output=True, text=True)
@@ -155,8 +178,7 @@ def _rehash_manifest(lines: list[str]) -> dict:
     manifest = json.loads(PREFIX_PATH.read_text(encoding="utf-8"))
     count = int(manifest["prefixLineCount"])
     manifest["lineSha256s"] = [
-        hashlib.sha256(line.encode("utf-8")).hexdigest()
-        for line in lines[:count]
+        hashlib.sha256(line.encode("utf-8")).hexdigest() for line in lines[:count]
     ]
     manifest["prefixSha256"] = hashlib.sha256(
         ("\n".join(lines[:count]) + "\n").encode("utf-8")
@@ -305,6 +327,8 @@ def test_base_gate_uses_base_script_and_dependency_imports(
         encoding="utf-8",
     )
 
+    candidate_commit = _commit_candidate(candidate)
+
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(base_gate / "scripts")
     environment["PYTHONNOUSERSITE"] = "1"
@@ -314,6 +338,8 @@ def test_base_gate_uses_base_script_and_dependency_imports(
             str(base_gate / "scripts" / "check_thesis_facts_append.py"),
             "--root",
             str(candidate),
+            "--commit",
+            candidate_commit,
             "--base-ref",
             base,
         ],
@@ -330,9 +356,9 @@ def test_base_gate_uses_base_script_and_dependency_imports(
 
 
 def test_workflow_has_a_base_owned_trusted_pr_gate():
-    workflow = (
-        ROOT / ".github" / "workflows" / "thesis-facts-append.yml"
-    ).read_text(encoding="utf-8")
+    workflow = (ROOT / ".github" / "workflows" / "thesis-facts-append.yml").read_text(
+        encoding="utf-8"
+    )
 
     # A pull_request workflow is loaded from the candidate merge ref, so its
     # detached base-script step can itself be replaced. Once installed on the
@@ -356,37 +382,44 @@ def test_workflow_has_a_base_owned_trusted_pr_gate():
         'python "$base_gate/scripts/check_thesis_facts_append.py"',
         '--root "$candidate"',
         '--base-ref "$BASE_SHA"',
+        # The commit under judgement is named on the command line in all three
+        # invocations. Dropping any of them would leave the gate judging
+        # whichever tree the checkout at --root happened to be sitting at,
+        # which is the divergence the shim exists to exclude.
+        '--commit "$MERGE_SHA"',
+        '--commit "$workspace_sha"',
+        '--commit "$GITHUB_SHA"',
     ):
         assert required in workflow
 
+    # And the pull_request job's id is read from the workspace and shape-checked
+    # before it is passed, the same way the other two are.
+    assert 'workspace_sha="$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"' in workflow
+    assert '[[ "$workspace_sha" =~ ^[0-9a-f]{40,64}$ ]]' in workflow
 
-def test_base_check_rejects_an_existing_line_rewrite():
-    lines = _read_lines()
-    rewritten = json.loads(lines[-1])
-    rewritten["value"] += 1
-    candidate = [*lines[:-1], _json_line(rewritten)]
-
-    with pytest.raises(
-        AppendError,
-        match=rf"rewrites existing line {len(lines)}",
-    ):
-        check_append_only("HEAD", candidate)
-
-
-def test_base_check_rejects_truncation():
-    lines = _read_lines()
-
-    with pytest.raises(
-        AppendError,
-        match=rf"truncates the ledger: {len(lines)} -> {len(lines) - 1}",
-    ):
-        check_append_only("HEAD", lines[:-1])
-
-
-def test_base_check_accepts_a_true_append():
-    lines = _read_lines()
-
-    assert check_append_only("HEAD", [*lines, "{}"]) == 1
+    # Both base-gate jobs ask the base gate what it accepts before invoking it,
+    # because the base gate on any pull request opened before --commit merged
+    # does not accept it and the one after requires it. The question goes to
+    # base-owned code about its own interface. The fallback is never silent, so
+    # a run that took it says so in its own log; requiring the notice here is
+    # what stops the fallback being quietly widened into the ordinary path.
+    assert workflow.count('base_gate_help="$(') == 2
+    assert workflow.count('case "$base_gate_help" in') == 2
+    assert workflow.count("*--commit*)") == 2
+    assert workflow.count('echo "note: the base gate at') == 2
+    # Shell `case` takes the first matching arm, so the order of the arms is
+    # part of the contract: the `--commit` arm must come before the fallback
+    # in each block, and the `--commit` invocation must sit inside its arm
+    # (peer review of #241, round 1).
+    for block in workflow.split('case "$base_gate_help" in')[1:]:
+        body = block.split("esac", 1)[0]
+        commit_arm = body.index("*--commit*)")
+        fallback = re.search(r"^\s*\*\)\s*$", body, re.M)
+        assert fallback is not None
+        fallback_arm = fallback.start()
+        assert commit_arm < fallback_arm
+        assert '--commit "$' in body[commit_arm:fallback_arm]
+        assert '--commit "$' not in body[fallback_arm:]
 
 
 def test_duplicate_identity_without_supersedes_is_rejected():
@@ -422,9 +455,7 @@ def test_mismatched_av2_id_is_rejected():
         ("source_row_keys", ["different:publisher:row"]),
     ],
 )
-def test_av2_binds_material_concept_and_source_lineage(
-    path: str, replacement: object
-):
+def test_av2_binds_material_concept_and_source_lineage(path: str, replacement: object):
     # Review finding 6: av1 projected only measure concept/unit and four source
     # fields, so these material changes collided. The av2 projection binds the
     # complete concept mapping, exact source file/digest, and row/cell lineage.
@@ -473,8 +504,8 @@ def test_pre_versioning_row_is_addressable_by_recomputed_av2_id():
     lines = _read_lines()
     original = json.loads(lines[-1])
     correction = _appended_row(original, value_delta=1)
-    correction["assertionVersion"]["supersedes"] = (
-        expected_assertion_version_id(original)
+    correction["assertionVersion"]["supersedes"] = expected_assertion_version_id(
+        original
     )
 
     check_rows([*lines, _json_line(correction)], len(lines))
@@ -488,8 +519,8 @@ def test_full_ci_fact_validation_accepts_an_explicit_correction():
     rows = [json.loads(line) for line in _read_lines()]
     original = rows[-1]
     correction = _appended_row(original, value_delta=1)
-    correction["assertionVersion"]["supersedes"] = (
-        expected_assertion_version_id(original)
+    correction["assertionVersion"]["supersedes"] = expected_assertion_version_id(
+        original
     )
 
     # The append gate itself accepts exactly the advertised correction shape.

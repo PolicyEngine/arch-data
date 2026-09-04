@@ -9,6 +9,7 @@ duplicate identities only exist as explicit supersede corrections.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -32,11 +33,14 @@ PREFIX_PATH = ROOT / "ledger" / "immutable_prefix.json"
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from check_thesis_facts_append import (  # noqa: E402
-    check_prefix,
     check_rows,
     effective_current_rows,
     expected_assertion_version_id,
 )
+
+
+def _prefix_manifest() -> dict:
+    return json.loads(PREFIX_PATH.read_text(encoding="utf-8"))
 
 
 def _read_lines() -> list[str]:
@@ -87,21 +91,30 @@ def _to_aggregate_fact(row: dict) -> AggregateFact:
 
 
 def test_immutable_prefix_is_intact():
+    # The manifest records a digest per frozen line and one over the frozen
+    # region as a whole. Both are recomputed here from the ledger as it stands,
+    # so a rewritten frozen line fails whichever of the two it moved.
+    manifest = _prefix_manifest()
+    count = int(manifest["prefixLineCount"])
     lines = _read_lines()
 
-    prefix = check_prefix(lines)
-
-    assert prefix["prefixLineCount"] >= 128
-    assert len(lines) >= prefix["prefixLineCount"]
+    assert count >= 128
+    assert len(lines) >= count
+    assert [
+        hashlib.sha256(line.encode("utf-8")).hexdigest() for line in lines[:count]
+    ] == manifest["lineSha256s"]
+    assert (
+        hashlib.sha256(("\n".join(lines[:count]) + "\n").encode("utf-8")).hexdigest()
+        == manifest["prefixSha256"]
+    )
 
 
 def test_every_row_satisfies_the_append_invariants():
     lines = _read_lines()
-    prefix = check_prefix(lines)
 
     # Raises on any malformed row, unexplained duplicate identity,
     # mis-addressed assertion version, or missing post-prefix binding.
-    check_rows(lines, int(prefix["prefixLineCount"]))
+    check_rows(lines, int(_prefix_manifest()["prefixLineCount"]))
 
 
 def test_official_observation_ledger_contains_facts_not_predictions():
@@ -133,6 +146,16 @@ def test_rows_carry_no_unknown_top_level_fields():
         assert not unknown, f"line {number} has unknown fields: {sorted(unknown)}"
 
 
+def _git(repo: Path, *arguments: str) -> str:
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+
 def test_a_rewritten_prefix_line_is_detected(tmp_path):
     lines = _read_lines()
     row = json.loads(lines[0])
@@ -140,9 +163,7 @@ def test_a_rewritten_prefix_line_is_detected(tmp_path):
     tampered = [json.dumps(row, separators=(",", ":")), *lines[1:]]
     ledger_dir = tmp_path / "ledger"
     ledger_dir.mkdir()
-    (ledger_dir / "official_observations.jsonl").write_text(
-        "\n".join(tampered) + "\n"
-    )
+    (ledger_dir / "official_observations.jsonl").write_text("\n".join(tampered) + "\n")
     (ledger_dir / "immutable_prefix.json").write_text(PREFIX_PATH.read_text())
     scripts_dir = tmp_path / "scripts"
     scripts_dir.mkdir()
@@ -153,13 +174,27 @@ def test_a_rewritten_prefix_line_is_detected(tmp_path):
     ):
         (scripts_dir / name).write_text((ROOT / "scripts" / name).read_text())
 
+    # The checker judges a commit it checks out itself, so the tampering has to
+    # be committed before it can be asked about.
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "config", "user.name", "Ledger Invariants Test")
+    _git(tmp_path, "config", "user.email", "ledger-invariants@example.invalid")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-qm", "tampered prefix")
+
     completed = subprocess.run(
-        [sys.executable, str(scripts_dir / "check_thesis_facts_append.py")],
+        [
+            sys.executable,
+            str(scripts_dir / "check_thesis_facts_append.py"),
+            "--commit",
+            _git(tmp_path, "rev-parse", "HEAD"),
+        ],
+        cwd=tmp_path,
         capture_output=True,
         text=True,
     )
 
-    assert completed.returncode == 1
+    assert completed.returncode == 1, completed.stdout + completed.stderr
     assert "was rewritten" in completed.stderr
 
 
@@ -185,9 +220,7 @@ def test_a_duplicate_identity_without_supersedes_is_detected():
         "supersedes": None,
     }
     try:
-        check_rows(
-            [*lines, json.dumps(duplicate, separators=(",", ":"))], len(lines)
-        )
+        check_rows([*lines, json.dumps(duplicate, separators=(",", ":"))], len(lines))
     except ValueError as error:
         assert "without superseding" in str(error)
     else:
@@ -205,9 +238,7 @@ def test_an_explicit_supersede_correction_is_accepted():
         "supersedes": expected_assertion_version_id(original),
     }
 
-    check_rows(
-        [*lines, json.dumps(correction, separators=(",", ":"))], len(lines)
-    )
+    check_rows([*lines, json.dumps(correction, separators=(",", ":"))], len(lines))
 
 
 def test_a_correction_naming_a_stale_version_is_rejected():
@@ -219,9 +250,7 @@ def test_a_correction_naming_a_stale_version_is_rejected():
         "supersedes": "av2:" + "0" * 64,
     }
     try:
-        check_rows(
-            [*lines, json.dumps(correction, separators=(",", ":"))], len(lines)
-        )
+        check_rows([*lines, json.dumps(correction, separators=(",", ":"))], len(lines))
     except ValueError as error:
         assert "the active version" in str(error)
     else:
