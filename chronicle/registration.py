@@ -181,13 +181,42 @@ class StrictManifestLoader(yaml.SafeLoader):
         return mapping
 
 
-def load_manifest_document(text: str) -> Any:
-    """Parse a manifest document, refusing duplicate keys.
+def validate_manifest_vintages(payload: Any) -> None:
+    """Refuse different keys that identify one logical ``files`` vintage.
 
-    Raises :class:`yaml.YAMLError` (a ``ConstructorError`` naming the
-    duplicate key) for a document YAML would otherwise silently collapse.
+    YAML distinguishes integer ``2024`` from quoted ``"2024"``, but manifest
+    consumers select or report them as the same vintage. Validate the entire
+    manifest, including vintages other than the one a caller requested, before
+    any consumer can read artifact bytes or construct publication routes.
+
+    Leave non-mapping documents and ``files`` blocks to the consumers' existing
+    shape checks. Labels retain their spelling, including leading zeroes.
     """
-    return yaml.load(text, Loader=StrictManifestLoader)  # noqa: S506
+    files = payload.get("files") if isinstance(payload, Mapping) else None
+    if not isinstance(files, Mapping):
+        return
+    seen: dict[str, Any] = {}
+    for vintage in files:
+        identity = str(vintage)
+        if identity in seen:
+            raise yaml.YAMLError(
+                f"Vintage {identity!r} is recorded under both keys "
+                f"{seen[identity]!r} and {vintage!r}; one vintage has one key. "
+                "Merge the entries by hand first. Chronicle will not choose "
+                "which entry is the record."
+            )
+        seen[identity] = vintage
+
+
+def load_manifest_document(text: str) -> Any:
+    """Parse a manifest document, refusing duplicate keys and vintages.
+
+    Raises :class:`yaml.YAMLError` for keys YAML would silently collapse or
+    for distinct YAML keys that manifest consumers treat as one vintage.
+    """
+    payload = yaml.load(text, Loader=StrictManifestLoader)  # noqa: S506
+    validate_manifest_vintages(payload)
+    return payload
 
 
 __all__ = [
@@ -200,5 +229,6 @@ __all__ = [
     "load_manifest_document",
     "matching_directory_entry",
     "package_manifest_paths",
+    "validate_manifest_vintages",
     "validate_package_directory",
 ]

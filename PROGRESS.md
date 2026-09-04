@@ -564,3 +564,14 @@ the per-finding reproduction/fix/test/commit/port map.
 - Focused regressions and existing other-package refusal controls passed:
   direct exit 0, 12 passed. The red checkpoint above recorded all 10 new
   declaration cases reaching publisher I/O before this fix.
+
+### Finding 7: shared logical vintage validation
+
+- Before implementation, the new manifest-vintage tests exited 1: 5 failed,
+  1 passed. Duplicate keys `2024` and `"2024"` reached artifact I/O through
+  publish, inventory, source loading, and fetch of another selected vintage.
+- `load_manifest_document` now invokes shared `validate_manifest_vintages`
+  over the entire manifest, so every consumer refuses a logical duplicate
+  through its existing controlled YAML error path. Shared names are unchanged.
+- Six regressions plus existing quoted-year compatibility tests exit 0:
+  8 passed, 12 warnings. Scoped Ruff lint/format checks both pass.
