@@ -1734,6 +1734,39 @@ def test_artifact_filename_is_refused_before_publisher_io(
     assert manifest_path.read_bytes() == before
 
 
+@pytest.mark.parametrize(
+    ("source_id", "package_id"),
+    [
+        pytest.param("/", "package", id="source-id"),
+        pytest.param("publisher", "/", id="package-id"),
+    ],
+)
+def test_fetch_refuses_invalid_r2_identity_before_publisher_io(
+    tmp_path, monkeypatch, source_id, package_id
+):
+    package = tmp_path / "db" / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    artifact_path = package / "table.csv"
+    artifact_path.write_bytes(b"registered publisher bytes")
+
+    def unexpected_read(_source_url):
+        raise AssertionError("an invalid R2 identity reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(ValueError, match="R2 key parts cannot be empty"):
+        fetch_source_artifact(
+            "https://publisher.test/table.csv",
+            source_id=source_id,
+            package_id=package_id,
+            year=2024,
+            output_dir=package,
+        )
+
+    assert artifact_path.read_bytes() == b"registered publisher bytes"
+    assert not (package / "manifest.yaml").exists()
+
+
 def test_manifest_name_must_be_discoverable_before_publisher_io(tmp_path, monkeypatch):
     package = tmp_path / "db" / "data" / "irs_soi" / "soi-table"
     source = _publish(tmp_path, "table.csv", b"publisher table")
@@ -3020,6 +3053,65 @@ def test_publish_preflights_every_sibling_manifest_before_any_upload(
     assert uploads == []
     assert any(
         "manifest_named_filename:manifest.yaml" in entry.errors
+        for entry in report.entries
+    )
+    assert {path: path.read_bytes() for path in manifests} == before
+
+
+def test_publish_preflights_entire_root_before_any_upload(tmp_path, monkeypatch):
+    root = tmp_path / "data"
+    good_package = root / "a_good"
+    bad_package = root / "z_bad"
+    good_package.mkdir(parents=True)
+    bad_package.mkdir(parents=True)
+    good_content = b"good publisher table"
+    bad_content = b"bad publisher table"
+    (good_package / "good.csv").write_bytes(good_content)
+    (bad_package / "bad.csv").write_bytes(bad_content)
+    manifests = {
+        good_package / "manifest.yaml": {
+            "source_id": "publisher",
+            "package_id": "good-package",
+            "files": {
+                2024: {
+                    "filename": "good.csv",
+                    "sha256": hashlib.sha256(good_content).hexdigest(),
+                }
+            },
+        },
+        bad_package / "manifest.yaml": {
+            "source_id": "publisher",
+            "package_id": "bad-package",
+            "files": {
+                2024: {
+                    "filename": "../bad.csv",
+                    "sha256": hashlib.sha256(bad_content).hexdigest(),
+                }
+            },
+        },
+    }
+    for path, payload in manifests.items():
+        path.write_text(yaml.safe_dump(payload, sort_keys=False))
+    before = {path: path.read_bytes() for path in manifests}
+    uploads = []
+
+    def non_writing_uploader(location, local_path, *, wrangler_command):
+        uploads.append((location, local_path, wrangler_command))
+        return ArtifactCommandResult(
+            command=("non-writing-uploader",),
+            returncode=0,
+            stdout="",
+            stderr="",
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", non_writing_uploader)
+
+    report = publish_source_artifacts(root)
+
+    assert not report.valid
+    assert uploads == []
+    assert any(
+        "non_canonical_filename:../bad.csv" in entry.errors
         for entry in report.entries
     )
     assert {path: path.read_bytes() for path in manifests} == before

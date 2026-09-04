@@ -443,12 +443,18 @@ Running the same operations against a checkout of the previous head:
   I/O. `SourceArtifactSpec` now resolves both manifest and artifact resources
   through the shared #227 filename-identity helpers before opening either.
   The ten focused cases pass, and the full source-package module passes with
-  135 tests (13 warnings).
+  135 tests (13 warnings). Fix/journal commit: `64fe94b`.
+- **Residual side-effect ordering reproduced.** The focused command covering
+  `test_fetch_refuses_invalid_r2_identity_before_publisher_io` and
+  `test_publish_preflights_entire_root_before_any_upload` exited 1 with three
+  failures. Both slash-only R2 identity fields reached the publisher-read
+  sentinel; a root sweep uploaded and rewrote the valid `a_good` package before
+  reporting the unsafe filename in `z_bad`.
 
 ### Next
 
-1. Reproduce and close the audit finding that a bad later package in a root
-   publish sweep can be discovered only after an earlier package uploads.
+1. Validate raw-key identity before publisher I/O and make publish's preflight
+   cover the complete selected root before any upload or manifest rewrite.
 2. Finish the #227 port/adversarial audit, then run the complete artifact
    module and requested lint/format/full-suite verification.
 3. Write the external `-o out.md` report with the per-finding command,
