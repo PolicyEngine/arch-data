@@ -1081,6 +1081,136 @@ def test_source_artifact_loader_fetches_missing_artifact_when_enabled(
     assert _source_artifact_cache_path(spec).read_bytes() == content
 
 
+@pytest.fixture
+def recorded_r2_artifact(tmp_path, monkeypatch):
+    resource_root = tmp_path / "resources"
+    resource_dir = resource_root / "data" / "publisher" / "package"
+    resource_dir.mkdir(parents=True)
+    content = b"publisher source artifact"
+    digest = hashlib.sha256(content).hexdigest()
+    key = f"raw/publisher/package/2024/{digest}/table.csv"
+    entry = {
+        "filename": "table.csv",
+        "source_url": "https://example.test/table.csv",
+        "sha256": digest,
+        "storage": {
+            "r2": {
+                "provider": "r2",
+                "bucket": "ledger-raw",
+                "key": key,
+                "uri": f"r2://ledger-raw/{key}",
+            }
+        },
+    }
+    artifact = SourceArtifactSpec(
+        source_name="publisher",
+        source_table="Table",
+        resource_package="test_resources",
+        resource_directory="data/publisher/package",
+        manifest="manifest.yaml",
+        vintage="2024",
+        extracted_at="2026-09-04",
+        extraction_method="test",
+        artifact_year=2024,
+    )
+    monkeypatch.setattr(
+        "chronicle.source_package.files", lambda _package: resource_root
+    )
+    return artifact, resource_dir, content, entry
+
+
+@pytest.mark.parametrize(
+    "invalid_locator",
+    [
+        "contradictory-key",
+        "contradictory-bucket",
+        "missing-provider",
+        "missing-uri",
+        "non-r2",
+        "null-block",
+        "checksum-identity",
+        "filename-identity",
+    ],
+)
+def test_source_artifact_spec_refuses_invalid_recorded_r2_before_read(
+    recorded_r2_artifact, monkeypatch, invalid_locator
+):
+    artifact, resource_dir, content, entry = recorded_r2_artifact
+    recorded = entry["storage"]["r2"]
+    if invalid_locator == "contradictory-key":
+        recorded["key"] = recorded["key"].replace("table.csv", "other.csv")
+    elif invalid_locator == "contradictory-bucket":
+        recorded["bucket"] = "other-raw"
+    elif invalid_locator == "missing-provider":
+        del recorded["provider"]
+    elif invalid_locator == "missing-uri":
+        del recorded["uri"]
+    elif invalid_locator == "non-r2":
+        recorded["provider"] = "s3"
+        recorded["uri"] = recorded["uri"].replace("r2://", "s3://")
+    elif invalid_locator == "null-block":
+        entry["storage"]["r2"] = None
+    elif invalid_locator == "checksum-identity":
+        entry["sha256"] = "0" * 64
+    else:
+        recorded["key"] = recorded["key"].replace("table.csv", "other.csv")
+        recorded["uri"] = recorded["uri"].replace("table.csv", "other.csv")
+    (resource_dir / "manifest.yaml").write_text(
+        yaml.safe_dump({"files": {2024: entry}})
+    )
+    (resource_dir / "table.csv").write_bytes(content)
+
+    def unexpected_read(_artifact_path, _spec):
+        raise AssertionError("invalid R2 provenance reached artifact I/O")
+
+    monkeypatch.setattr(
+        "chronicle.source_package._read_source_artifact_content", unexpected_read
+    )
+    with pytest.raises(ValueError, match="storage.r2|recorded R2"):
+        artifact._artifact_content(2024)
+
+
+@pytest.mark.parametrize("location", ["local", "fetch"])
+def test_source_artifact_spec_checks_recorded_r2_digest_without_declared_checksum(
+    recorded_r2_artifact, tmp_path, monkeypatch, location
+):
+    artifact, resource_dir, _content, entry = recorded_r2_artifact
+    del entry["sha256"]
+    (resource_dir / "manifest.yaml").write_text(
+        yaml.safe_dump({"files": {2024: entry}})
+    )
+    changed_content = b"different publisher bytes"
+    cache = tmp_path / "cache"
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(cache))
+    if location == "local":
+        (resource_dir / "table.csv").write_bytes(changed_content)
+    else:
+        monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+        monkeypatch.setattr(
+            "chronicle.source_package._fetch_source_artifact_content",
+            lambda _url: changed_content,
+        )
+
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        artifact._artifact_content(2024)
+    assert not cache.exists()
+
+
+def test_source_artifact_spec_accepts_consistent_recorded_r2(recorded_r2_artifact):
+    artifact, resource_dir, content, entry = recorded_r2_artifact
+    (resource_dir / "manifest.yaml").write_text(
+        yaml.safe_dump({"files": {2024: entry}})
+    )
+    (resource_dir / "table.csv").write_bytes(content)
+
+    assert artifact._artifact_content(2024) == (
+        content,
+        "table.csv",
+        entry["source_url"],
+        entry["storage"]["r2"],
+    )
+
+
 @pytest.mark.parametrize(
     "path_kind",
     ["absolute", "parent", "symlink", "normalized-alias", "manifest-name"],

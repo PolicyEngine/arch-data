@@ -15,6 +15,7 @@ from zipfile import ZipFile
 import httpx
 import yaml
 
+from chronicle.artifacts import SourceArtifactManifestError, _validated_recorded_r2
 from chronicle.core import (
     ALLOWED_AGGREGATIONS,
     ALLOWED_ASSERTIONS,
@@ -1001,17 +1002,45 @@ class SourceArtifactSpec:
             what="Source artifact filename",
             forbid_manifest_name=True,
         )
-        content = _read_source_artifact_content(artifact_path, spec)
+        try:
+            recorded_r2 = _validated_recorded_r2(
+                spec,
+                manifest_path=Path(self.resource_directory) / self.manifest,
+                year=self.artifact_year or year,
+            )
+        except SourceArtifactManifestError as exc:
+            raise ValueError(str(exc)) from exc
         expected_sha = spec.get("sha256")
+        raw_r2 = {}
+        if recorded_r2 is not None:
+            if recorded_r2.filename != filename or (
+                expected_sha is not None and expected_sha != recorded_r2.sha256
+            ):
+                raise ValueError(
+                    f"Source artifact {filename!r} disagrees with its recorded "
+                    f"R2 identity: storage.r2 names {recorded_r2.filename!r} "
+                    f"with sha256={recorded_r2.sha256}, while the manifest "
+                    f"declares sha256={expected_sha!r}."
+                )
+            expected_sha = recorded_r2.sha256
+            # The immutable object also supplies the checksum for a manifest
+            # without a separate sha256 field. Pass it into the fetch/cache
+            # reader so wrong publisher bytes are refused before cache writes.
+            spec = {**spec, "sha256": expected_sha}
+            raw_r2 = {
+                "provider": recorded_r2.provider,
+                "bucket": recorded_r2.bucket,
+                "key": recorded_r2.key,
+                "uri": recorded_r2.uri,
+            }
+        content = _read_source_artifact_content(artifact_path, spec)
         if expected_sha:
             _validate_source_artifact_sha(
                 content,
                 expected_sha=str(expected_sha),
                 filename=str(filename),
             )
-        storage = spec.get("storage") if isinstance(spec, dict) else None
-        raw_r2 = storage.get("r2") if isinstance(storage, dict) else {}
-        return content, str(filename), spec["source_url"], raw_r2 or {}
+        return content, str(filename), spec["source_url"], raw_r2
 
     def _sheet_name(self, filename: str, *, year: int) -> str:
         if self.sheet_name:

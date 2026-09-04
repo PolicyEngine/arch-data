@@ -542,3 +542,15 @@ the per-finding reproduction/fix/test/commit/port map.
   cases escaped as plain `ValueError`, including both CLI entry points.
 - Consumer guard, source resolver, and shared vintage regressions are being
   developed independently; all implementations remain gated on observed red.
+
+### Finding 2: source provenance reader
+
+- Reproduced malformed/contradictory/non-R2 locators and checksum/filename
+  mismatches with 10 failures and 1 passing control before implementation;
+  exact command and output are in the external report's source evidence.
+- `SourceArtifactSpec` now reuses `_validated_recorded_r2`, checks the manifest
+  identity, and uses the immutable object's digest to validate local/fetched
+  bytes even without a separately declared checksum. Invalid metadata is
+  refused before artifact/cache I/O; bad fetched bytes before cache writes.
+- The same focused command now exits 0: 11 passed, 12 warnings. Inventory's
+  half of finding 2 remains next; no source package or source data was changed.
