@@ -6,7 +6,7 @@ Provides connection to PolicyEngine Supabase database for:
 - Target inputs
 
 ``LEDGER_SCHEMA`` and ``TARGETS_SCHEMA`` remain as deprecated compatibility
-aliases for their default schema names. Runtime code should call
+snapshots of the environment at import time. Runtime code should call
 ``chronicle_schema()`` and ``targets_schema()`` so environment overrides are
 resolved at the time of use.
 """
@@ -20,20 +20,10 @@ from unittest.mock import Mock
 
 from supabase import create_client, Client
 
-from chronicle.env import (
-    DEFAULT_CHRONICLE_SCHEMA,
-    default_chronicle_schema,
-    env_value,
-)
+from chronicle.env import default_chronicle_schema, env_value
 
 TARGETS_SCHEMA_ENV = "POLICYENGINE_TARGETS_SCHEMA"
 DEFAULT_TARGETS_SCHEMA = "targets"
-
-# Deprecated import compatibility. These are deliberately aliases for the
-# defaults, not environment-backed runtime values; query paths below remain on
-# the lazy resolver functions.
-LEDGER_SCHEMA = DEFAULT_CHRONICLE_SCHEMA
-TARGETS_SCHEMA = DEFAULT_TARGETS_SCHEMA
 
 
 def chronicle_schema() -> str:
@@ -57,6 +47,13 @@ def targets_schema() -> str:
     window, so it is read literally.
     """
     return env_value(TARGETS_SCHEMA_ENV, default=DEFAULT_TARGETS_SCHEMA)
+
+
+# Deprecated import compatibility. Preserve the historical import-time
+# environment snapshot for downstream code that still imports these names;
+# Chronicle's own query paths use the lazy resolvers above.
+LEDGER_SCHEMA = chronicle_schema()
+TARGETS_SCHEMA = targets_schema()
 
 
 @dataclass
