@@ -903,7 +903,9 @@ def test_publish_refuses_release_year_route_without_a_labelled_peer(
     before = manifest_path.read_bytes()
 
     report = publish_source_artifacts(output_dir)
-    labelled = next(entry for entry in report.entries if entry.year == "UNRELATED_LABEL")
+    labelled = next(
+        entry for entry in report.entries if entry.year == "UNRELATED_LABEL"
+    )
 
     assert not report.valid
     assert labelled.upload is None

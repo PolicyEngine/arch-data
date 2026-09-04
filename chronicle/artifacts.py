@@ -3159,9 +3159,9 @@ def _compatible_recorded_raw_keys(
 
     Besides the entry's current/pre-country route, two recorded legacy shapes
     are evidence-backed: another public sibling owns the same bytes at its own
-    canonical route, or a nonnumeric table label uses the numeric release year
-    anchored by this manifest and its package ID. Merely sharing a digest/name
-    tail is never enough.
+    canonical route, or multiple nonnumeric table labels use the numeric
+    release year anchored by this manifest and its package ID. Merely sharing
+    a digest/name tail, or having one unrelated numeric anchor, is never enough.
     """
     allowed = _raw_r2_route_keys(
         source_id=source_id,
@@ -3217,6 +3217,50 @@ def _compatible_recorded_raw_keys(
     if manifest is None or year_text.isdecimal() or release_match is None:
         return allowed
     release_year = release_match.group(1)
+    labelled_peer_witnessed = False
+    for peer_year, _index, peer_spec in iter_manifest_entries(manifest):
+        peer_year_text = str(peer_year)
+        if (
+            peer_year_text == year_text
+            or peer_year_text.isdecimal()
+            or not isinstance(peer_spec, dict)
+            or is_hash_only(safe_entry_access(peer_spec))
+        ):
+            continue
+        peer_sha256 = peer_spec.get("sha256")
+        peer_filename = peer_spec.get("filename")
+        if not isinstance(peer_sha256, str) or not isinstance(peer_filename, str):
+            continue
+        if (peer_sha256, filename_key(peer_filename)) == (
+            sha256,
+            filename_key(filename),
+        ):
+            continue
+        try:
+            peer_release_routes = _raw_r2_route_keys(
+                source_id=source_id,
+                package_id=package_id,
+                year=release_year,
+                sha256=peer_sha256,
+                filename=peer_filename,
+                resolved_prefix=resolved_prefix,
+                package_path=manifest_path,
+            )
+        except ValueError:
+            continue
+        if _entry_records_one_of_raw_routes(
+            peer_spec,
+            manifest_path=manifest_path,
+            year=peer_year,
+            source_id=source_id,
+            package_id=package_id,
+            route_keys=peer_release_routes,
+        ):
+            labelled_peer_witnessed = True
+            break
+    if not labelled_peer_witnessed:
+        return allowed
+
     for anchor_year, _index, anchor_spec in iter_manifest_entries(manifest):
         if str(anchor_year) != release_year or not isinstance(anchor_spec, dict):
             continue
