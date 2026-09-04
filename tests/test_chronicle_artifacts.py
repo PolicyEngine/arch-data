@@ -2969,6 +2969,62 @@ def test_publish_preflights_every_entry_before_any_upload(
     assert manifest_path.read_bytes() == before
 
 
+def test_publish_preflights_every_sibling_manifest_before_any_upload(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    content = b"publisher table"
+    (package / "table.csv").write_bytes(content)
+    manifests = {
+        package / "manifest_a.yaml": {
+            "source_id": "publisher",
+            "package_id": "package-a",
+            "files": {
+                2024: {
+                    "filename": "table.csv",
+                    "sha256": hashlib.sha256(content).hexdigest(),
+                }
+            },
+        },
+        package / "manifest_b.yaml": {
+            "source_id": "publisher",
+            "package_id": "package-b",
+            "files": {
+                2024: {
+                    "filename": "manifest.yaml",
+                    "sha256": hashlib.sha256(b"not a manifest").hexdigest(),
+                }
+            },
+        },
+    }
+    for path, payload in manifests.items():
+        path.write_text(yaml.safe_dump(payload, sort_keys=False))
+    before = {path: path.read_bytes() for path in manifests}
+    uploads = []
+
+    def non_writing_uploader(location, local_path, *, wrangler_command):
+        uploads.append((location, local_path, wrangler_command))
+        return ArtifactCommandResult(
+            command=("non-writing-uploader",),
+            returncode=0,
+            stdout="",
+            stderr="",
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", non_writing_uploader)
+
+    report = publish_source_artifacts(package)
+
+    assert not report.valid
+    assert uploads == []
+    assert any(
+        "manifest_named_filename:manifest.yaml" in entry.errors
+        for entry in report.entries
+    )
+    assert {path: path.read_bytes() for path in manifests} == before
+
+
 def test_sweeps_refuse_conflicting_owners_across_package_manifests(
     tmp_path, monkeypatch
 ):

@@ -33,6 +33,7 @@ from chronicle.registration import (
     load_manifest_document,
     matching_directory_entry,
     package_manifest_paths,
+    validate_package_directory,
 )
 
 
@@ -1095,12 +1096,44 @@ def publish_source_artifacts(
         try:
             manifest = _read_manifest(manifest_path)
             files = _manifest_files(manifest, manifest_path)
-        except (OSError, MalformedManifestError) as exc:
+            package_manifests = _package_manifests(
+                manifest_path.parent, manifest_path, manifest
+            )
+            _assert_package_file_owner_identities_agree(package_manifests)
+        except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
 
         manifest_source_id = str(source_id or manifest.get("source_id") or "")
         manifest_package_id = str(package_id or manifest.get("package_id") or "")
+
+        preflight_failures: list[RawArtifactPublishEntry] = []
+        for package_manifest_name, package_manifest in package_manifests.items():
+            package_manifest_path = Path(package_manifest_name)
+            package_source_id = str(
+                source_id or package_manifest.get("source_id") or ""
+            )
+            package_id_value = str(
+                package_id or package_manifest.get("package_id") or ""
+            )
+            package_files = _manifest_files(package_manifest, package_manifest_path)
+            for year, spec in package_files.items():
+                entry, _updated_spec = _publish_raw_manifest_entry(
+                    package_manifest_path,
+                    package_source_id,
+                    package_id_value,
+                    year,
+                    spec,
+                    r2_bucket=r2_bucket,
+                    r2_prefix=r2_prefix,
+                    wrangler_command=wrangler_command,
+                    preflight_only=True,
+                )
+                if entry.errors:
+                    preflight_failures.append(entry)
+        if preflight_failures:
+            entries.extend(preflight_failures)
+            continue
 
         updated = False
         for year, spec in files.items():
@@ -1200,19 +1233,23 @@ def inventory_source_artifacts(
             errors=(f"Root does not exist: {root_path}",),
         )
 
-    manifests = _root_manifest_paths(root_path, manifest_filename)
-    for manifest_path in manifests:
+    manifest_paths = _root_manifest_paths(root_path, manifest_filename)
+    for manifest_path in manifest_paths:
         try:
             manifest = _read_manifest(manifest_path)
             files = _manifest_files(manifest, manifest_path)
-        except (OSError, MalformedManifestError) as exc:
+            package_manifests = _package_manifests(
+                manifest_path.parent, manifest_path, manifest
+            )
+            _assert_package_file_owner_identities_agree(package_manifests)
+        except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
         for year, spec in files.items():
             entries.append(_inventory_entry(manifest_path, year, spec))
 
     counts = {
-        "manifest_count": len(manifests),
+        "manifest_count": len(manifest_paths),
         "artifact_count": len(entries),
         "missing_count": sum(1 for entry in entries if not entry.exists),
         "checksum_mismatch_count": sum(
@@ -1876,6 +1913,63 @@ def _assert_shared_owner_identities_agree(
         )
 
 
+def _assert_package_file_owner_identities_agree(
+    manifests: Mapping[str, dict[str, Any]],
+) -> None:
+    """Refuse contradictory identities for any package-local filename.
+
+    Publish and inventory sweep a manifest at a time, but the physical byte is
+    shared by every manifest in its directory. Validate every identified owner
+    as one package boundary before a selected manifest can upload anything.
+    Entry-shape and local-file errors remain the per-entry preflight's job.
+    """
+    collision_codes = validate_package_directory(manifests)
+    if collision_codes:
+        raise SourceArtifactManifestError(
+            "Package manifests identify different bytes for one package-local "
+            f"filename: {', '.join(collision_codes)}. Reconcile the manifests "
+            "before publishing or inventorying that directory."
+        )
+
+    owners_by_filename: dict[str, list[_ManifestFileOwner]] = {}
+    display_names: dict[str, str] = {}
+    for name, payload in manifests.items():
+        manifest_path = Path(name)
+        for vintage, spec in _manifest_files(payload, manifest_path).items():
+            if not isinstance(spec, dict):
+                continue
+            recorded_name = spec.get("filename")
+            if not is_bare_filename(recorded_name):
+                continue
+            try:
+                identity = _recorded_identity(
+                    spec,
+                    manifest_path=manifest_path,
+                    year=vintage,
+                )
+            except SourceArtifactManifestError:
+                # The complete per-entry preflight reports the precise locator
+                # or history error without letting another entry upload first.
+                continue
+            if identity is None:
+                continue
+            key = filename_key(recorded_name)
+            display_names.setdefault(key, str(recorded_name))
+            owners_by_filename.setdefault(key, []).append(
+                _ManifestFileOwner(
+                    manifest_path=manifest_path,
+                    vintage=vintage,
+                    spec=spec,
+                    identity=identity,
+                )
+            )
+    for key, owners in owners_by_filename.items():
+        _assert_shared_owner_identities_agree(
+            owners,
+            filename=display_names[key],
+        )
+
+
 def _assert_siblings_record_these_bytes(
     manifests: Mapping[str, dict[str, Any]],
     *,
@@ -2241,6 +2335,7 @@ def _publish_raw_manifest_entry(
     r2_bucket: str,
     r2_prefix: str | None,
     wrangler_command: str,
+    preflight_only: bool = False,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
     if not isinstance(spec, dict):
@@ -2413,6 +2508,23 @@ def _publish_raw_manifest_entry(
             package_path=manifest_path,
         ),
     )
+    if preflight_only:
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(artifact_path),
+                sha256=sha256_actual,
+                size_bytes=size_bytes,
+                r2_location=location,
+                upload=None,
+                errors=(),
+            ),
+            None,
+        )
     upload = _upload_r2_object(
         location,
         artifact_path,

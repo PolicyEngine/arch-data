@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import re
-from typing import Any
+from typing import Any, Mapping
 import unicodedata
 
 import yaml
@@ -74,6 +74,39 @@ def package_manifest_paths(package_dir: Path) -> list[Path]:
         for path in directory.iterdir()
         if path.is_file() and is_manifest_filename(path.name)
     )
+
+
+def validate_package_directory(
+    manifests: Mapping[str, Mapping[str, Any] | None],
+) -> tuple[str, ...]:
+    """Return filename-identity collisions across a package's manifests.
+
+    Two manifests may name one physical file only when they record the same
+    digest. A differing digest means the same package-local bytes have two
+    incompatible identities, so no command may act through either record.
+    """
+    by_name: dict[str, list[tuple[str, str]]] = {}
+    for name, manifest in manifests.items():
+        files = manifest.get("files") if isinstance(manifest, Mapping) else None
+        if not isinstance(files, Mapping):
+            continue
+        for entry in files.values():
+            if not isinstance(entry, Mapping):
+                continue
+            filename = entry.get("filename")
+            if filename is None:
+                continue
+            digest = entry.get("sha256")
+            digest = digest.strip() if isinstance(digest, str) else ""
+            by_name.setdefault(filename_key(filename), []).append((name, digest))
+
+    errors: list[str] = []
+    for key, records in by_name.items():
+        if len({name for name, _digest in records}) < 2:
+            continue
+        if len({digest for _name, digest in records}) > 1:
+            errors.append(f"filename_collision_across_manifests:{key}")
+    return tuple(dict.fromkeys(errors))
 
 
 def matching_directory_entry(directory: Any, filename: Any) -> Any | None:
@@ -156,4 +189,5 @@ __all__ = [
     "load_manifest_document",
     "matching_directory_entry",
     "package_manifest_paths",
+    "validate_package_directory",
 ]
