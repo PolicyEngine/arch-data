@@ -1127,3 +1127,32 @@ def test_contract_reports_malformed_lineage_keys_instead_of_raising(tmp_path):
         ValueError, match="Cannot export invalid Chronicle consumer-contract facts"
     ):
         write_consumer_facts_jsonl([fact], tmp_path / "facts.jsonl")
+
+
+@pytest.mark.parametrize(
+    ("bucket", "key"),
+    [
+        ("publisher-derived", "exports/facts.jsonl"),
+        ("PUBLISHER-Derived", "exports/facts.jsonl"),
+        ("some-archive", "derived/exports/facts.jsonl"),
+    ],
+)
+def test_consumer_contract_keeps_rejecting_legacy_derived_routes(bucket, key):
+    """Configured routes extend the derived boundary; they never narrow it.
+    A bucket ending in ``-derived`` or a ``derived/`` key was rejected before
+    routes became configurable and must still be, under default config."""
+    fact = _soi_agi_fact()
+    derived = replace(
+        fact,
+        source=replace(
+            fact.source,
+            source_file=f"{bucket}:{key}",
+            raw_r2_bucket=bucket,
+            raw_r2_key=key,
+            raw_r2_uri=f"r2://{bucket}/{key}",
+        ),
+    )
+
+    report = validate_consumer_fact_contract([derived])
+
+    assert "derived_fact_provenance" in {error.code for error in report.errors}

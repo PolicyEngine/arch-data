@@ -3404,3 +3404,43 @@ def test_fetch_refuses_a_dangling_manifest_symlink_instead_of_creating_one(
 
     assert (package / "manifest.yaml").is_symlink()
     assert not (package / "table.xlsx").exists()
+
+
+
+def test_record_revision_updates_every_owner_even_when_yaml_aliases_share_one_entry(
+    tmp_path,
+):
+    """Two vintages sharing one physical file are two owners even when the
+    manifest spelled them with a YAML anchor and alias (one dict object);
+    identifying the selected owner by object identity skipped both."""
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    source = _publish(tmp_path, "archive.zip", b"first publication")
+    _fetch_local(package, source, upload_r2=False)
+    manifest_path = package / "manifest.yaml"
+    entry = _entry(manifest_path)
+    lines = ["source_id: irs_soi", "package_id: soi-table-5", "files:", "  2022: &shared"]
+    for field, value in entry.items():
+        lines.append(f"    {field}: {json.dumps(value)}")
+    lines.append("  2023: *shared")
+    manifest_path.write_text("\n".join(lines) + "\n")
+    old_sha = entry["sha256"]
+
+    source.write_bytes(b"second publication, revised rows")
+    report = fetch_source_artifact(
+        str(source),
+        source_id="irs_soi",
+        package_id="soi-table-5",
+        year=2023,
+        output_dir=package,
+        upload_r2=False,
+        record_revision=True,
+    )
+
+    assert report.valid
+    manifest = yaml.safe_load(manifest_path.read_text())
+    new_sha = hashlib.sha256(b"second publication, revised rows").hexdigest()
+    assert manifest["files"][2023]["sha256"] == new_sha
+    assert manifest["files"][2022]["sha256"] == new_sha, (
+        "the aliased owner kept the superseded checksum"
+    )
+    assert old_sha != new_sha
