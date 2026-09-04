@@ -594,6 +594,33 @@ def test_publish_strictly_validates_a_sibling_before_any_upload(tmp_path, monkey
     assert any("unknown_field:Access" in error for error in report.errors)
 
 
+def test_publish_validates_the_complete_selected_manifest_before_any_upload(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "data" / "dwp" / "frs_2023_24"
+    malformed = _public_table_entry("other.tab", PUBLIC_BYTES)
+    malformed["Access"] = "licensed"
+    malformed.pop("access")
+    _write(
+        package / "manifest_tables.yaml",
+        _table_manifest(
+            files={
+                2023: _public_table_entry("adult.tab", LICENSED_BYTES),
+                2022: malformed,
+            }
+        ),
+    )
+    (package / "adult.tab").write_bytes(LICENSED_BYTES)
+    (package / "other.tab").write_bytes(PUBLIC_BYTES)
+    uploads = _record_uploads(monkeypatch)
+
+    report = publish_source_artifacts(package, manifest_filename="manifest_tables.yaml")
+
+    assert not report.valid
+    assert uploads == []
+    assert any("unknown_field:Access" in error for error in report.errors)
+
+
 def test_inventory_reports_collisions_across_manifests(tmp_path):
     root = _mixed_directory(tmp_path)
 
