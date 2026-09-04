@@ -107,13 +107,16 @@ class ArtifactSelector:
     """Locate one artifact inside a Microcosm source-stages JSON file.
 
     ``stage`` names the build stage; ``match`` is a set of artifact fields that
-    must equal the given values. A selector that matches nothing, or matches
+    must equal the given values. ``compare_across_kinds`` lets a release detect
+    an access-kind disagreement among otherwise matching cross-stage references
+    before enforcing ``kind``. A selector that matches nothing, or matches
     inconsistent bytes across stages, is a hard error rather than a guess.
     """
 
     stage: str | None = None
     match: Mapping[str, Any] = field(default_factory=dict)
     kind: str | None = None
+    compare_across_kinds: bool = False
 
 
 @dataclass(frozen=True)
@@ -219,6 +222,7 @@ CATALOGUE: tuple[Release, ...] = (
             selector=ArtifactSelector(
                 kind="licensed_microdata",
                 match={"table": tab},
+                compare_across_kinds=True,
             ),
             source_id="dwp",
             package_id="dwp-frs-2023-24",
@@ -574,7 +578,11 @@ def select_artifact(
     for stage, artifact in iter_manifest_artifacts(payload):
         if selector.stage is not None and stage.get("stage") != selector.stage:
             continue
-        if selector.kind is not None and artifact.get("kind") != selector.kind:
+        if (
+            selector.kind is not None
+            and artifact.get("kind") != selector.kind
+            and not selector.compare_across_kinds
+        ):
             continue
         if any(artifact.get(key) != value for key, value in selector.match.items()):
             continue
@@ -592,6 +600,13 @@ def select_artifact(
                 f"{release_id}: Microcosm pins conflicting values for this "
                 "artifact across stages; refusing to choose between them."
             )
+    if selector.kind is not None and first.get("kind") != selector.kind:
+        raise CatalogueError(
+            f"{release_id}: matching Microcosm artifacts declare "
+            f"kind={first.get('kind')!r}, not {selector.kind!r}. The consumer "
+            "manifest changed; re-derive the catalogue rather than silently "
+            "reclassifying its bytes."
+        )
     return first_stage, first
 
 
@@ -716,6 +731,28 @@ def assert_manifest_matches_commit(
     if not relative or relative_path.is_absolute() or ".." in relative_path.parts:
         raise CatalogueError(
             f"Consumer manifest path must stay inside {microcosm_root}: {relative!r}."
+        )
+    try:
+        object_type = subprocess.run(
+            ["git", "-C", str(microcosm_root), "cat-file", "-t", commit],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        detail = ""
+        if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
+            detail = exc.stderr.strip()
+        suffix = f" ({detail})" if detail else ""
+        raise CatalogueError(
+            f"Cannot read consumer manifest {relative} at commit {commit} from "
+            f"{microcosm_root}{suffix}. The recorded commit must be a readable "
+            "Git commit containing the exact reviewed blob."
+        ) from exc
+    if object_type != "commit":
+        raise CatalogueError(
+            f"Consumer manifest pin {commit} names a Git {object_type or 'unknown'} "
+            "object, not a commit. Refusing to record it as pinned_from.commit."
         )
     object_name = f"{commit}:./{relative_path.as_posix()}"
     try:
