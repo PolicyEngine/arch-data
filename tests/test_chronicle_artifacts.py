@@ -856,6 +856,64 @@ def test_publish_refuses_a_wrong_route_before_a_preserved_bucket_skip(
     assert manifest_path.read_bytes() == before
 
 
+def test_publish_refuses_release_year_route_without_a_labelled_peer(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("CHRONICLE_R2_RAW_BUCKET", "chronicle-raw")
+    output_dir = tmp_path / "db" / "data" / "example" / "example-package-2023"
+    anchor = tmp_path / "anchor.csv"
+    selected = tmp_path / "selected.csv"
+    anchor.write_bytes(b"numeric anchor")
+    selected.write_bytes(b"unrelated labelled entry")
+    fetch_source_artifact(
+        str(anchor),
+        source_id="example",
+        package_id="example-package-2023",
+        year=2023,
+        output_dir=output_dir,
+    )
+    fetch_source_artifact(
+        str(selected),
+        source_id="example",
+        package_id="example-package-2023",
+        year="UNRELATED_LABEL",
+        output_dir=output_dir,
+    )
+    manifest_path = output_dir / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    for table, route_year in ((2023, 2023), ("UNRELATED_LABEL", 2023)):
+        artifact = manifest["files"][table]
+        key = build_r2_key(
+            source_id="example",
+            package_id="example-package-2023",
+            year=route_year,
+            sha256=artifact["sha256"],
+            filename=artifact["filename"],
+            package_path=manifest_path,
+        )
+        artifact["storage"] = {
+            "r2": {
+                "provider": "r2",
+                "bucket": "ledger-raw",
+                "key": key,
+                "uri": f"r2://ledger-raw/{key}",
+            }
+        }
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    before = manifest_path.read_bytes()
+
+    report = publish_source_artifacts(output_dir)
+    labelled = next(entry for entry in report.entries if entry.year == "UNRELATED_LABEL")
+
+    assert not report.valid
+    assert labelled.upload is None
+    assert labelled.skipped is None
+    assert labelled.errors[0].startswith(
+        "recorded_r2_key_disagrees_with_country_prefix:"
+    )
+    assert manifest_path.read_bytes() == before
+
+
 @pytest.mark.parametrize(
     ("relative_package", "expected_entries"),
     [
