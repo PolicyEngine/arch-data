@@ -497,3 +497,32 @@ the per-finding reproduction/fix/test/commit/port map.
   defense-in-depth outside findings 3/4; there are no such collisions in the
   tracked tree. Manifest-name collisions are already refused independent of
   sort order.
+
+## Peer round 4 (nine findings)
+
+### State
+
+- Started from detached HEAD `fa98993a` with a clean worktree; no branches,
+  pushes, stashes, GitHub access, or tracked `db/data/**` changes are authorized.
+- Scope: the nine supplied provenance, publication preflight, canonical
+  identity, manifest-vintage, filename, and regular-file findings.
+- Preserve the shared helper names used by stacked PR #227; its worktree is
+  read-only and will not be modified.
+- Report path: `/tmp/chronicle-226-round4/out.md` (no explicit runner `-o`
+  path was provided in the visible request).
+
+### Done
+
+- Read the existing journal, storage architecture, role rules, and named code
+  surfaces. Began reviewing the named test modules and shared registration
+  helpers. GitNexus debugging guidance is available, but no graph tools are
+  exposed; use repository search and hermetic regression tests.
+- Established this committed state/done/next journal before implementation.
+
+### Next
+
+- Add and run failing regressions for each finding before its implementation.
+- Fix and commit coherent steps, recording exact red commands and observations
+  in the external report.
+- Run full Ruff lint, formatting checks for changed Python files, and the full
+  pytest suite with direct exit codes; record counts and final commit map.
