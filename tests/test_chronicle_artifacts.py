@@ -1179,6 +1179,203 @@ def test_record_revision_without_an_upload_records_no_current_object(
     ]
 
 
+def _shared_archive_entry(content, *, package_id, year, filename="shared.zip"):
+    sha256 = hashlib.sha256(content).hexdigest()
+    key = f"raw/usda_snap/{package_id}/{year}/{sha256}/{filename}"
+    return {
+        "filename": filename,
+        "source_url": "https://example.test/shared.zip",
+        "sha256": sha256,
+        "size_bytes": len(content),
+        "fetched_at": "2026-05-11T11:57:29+00:00",
+        "storage": {
+            "r2": {
+                "provider": "r2",
+                "bucket": "ledger-raw",
+                "key": key,
+                "uri": f"r2://ledger-raw/{key}",
+            }
+        },
+    }
+
+
+def test_shared_archive_revision_is_refused_through_an_unregistered_owner(tmp_path):
+    """A selected empty vintage cannot bypass another manifest's identity."""
+    package = tmp_path / "db" / "data" / "usda_snap" / "fy69_to_current"
+    package.mkdir(parents=True)
+    original = b"USDA archive, first publication"
+    revised = b"USDA archive, revised publication"
+    filename = "snap-zip-fy69tocurrent-6.zip"
+    (package / filename).write_bytes(original)
+    primary_path = package / "manifest.yaml"
+    primary_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "usda_snap",
+                "package_id": "usda-snap-fy69-to-current",
+                "files": {},
+            },
+            sort_keys=False,
+        )
+    )
+    sibling_path = package / "manifest_fy2025_monthly_source_package.yaml"
+    sibling_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "usda_snap",
+                "package_id": "usda-snap-fy2025-monthly-state-caseloads",
+                "files": {
+                    2025: _shared_archive_entry(
+                        original,
+                        package_id="usda-snap-fy69-to-current",
+                        year=2024,
+                        filename=filename,
+                    )
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    publisher = _publish(tmp_path, filename, revised)
+    before = {path: path.read_bytes() for path in (primary_path, sibling_path)}
+
+    with pytest.raises(SourceArtifactRevisionError):
+        fetch_source_artifact(
+            str(publisher),
+            source_id="usda_snap",
+            package_id="usda-snap-fy69-to-current",
+            year=2024,
+            output_dir=package,
+        )
+
+    assert (package / filename).read_bytes() == original
+    assert {path: path.read_bytes() for path in before} == before
+
+
+def test_record_revision_updates_every_owner_of_usda_shared_archive(tmp_path):
+    """The tracked USDA two-manifest shape has one physical archive."""
+    package = tmp_path / "db" / "data" / "usda_snap" / "fy69_to_current"
+    package.mkdir(parents=True)
+    original = b"USDA archive, first publication"
+    revised = b"USDA archive, revised publication"
+    revised_sha256 = hashlib.sha256(revised).hexdigest()
+    filename = "snap-zip-fy69tocurrent-6.zip"
+    (package / filename).write_bytes(original)
+    manifests = (
+        (
+            package / "manifest.yaml",
+            "usda-snap-fy69-to-current",
+            2024,
+            "usda-snap-fy69-to-current",
+            2024,
+        ),
+        (
+            package / "manifest_fy2025_monthly_source_package.yaml",
+            "usda-snap-fy2025-monthly-state-caseloads",
+            2025,
+            "usda-snap-fy69-to-current",
+            2024,
+        ),
+    )
+    previous_uris = {}
+    for path, package_id, vintage, route_package, route_year in manifests:
+        entry = _shared_archive_entry(
+            original,
+            package_id=route_package,
+            year=route_year,
+            filename=filename,
+        )
+        entry["source_table"] = f"owner {vintage}"
+        previous_uris[path] = entry["storage"]["r2"]["uri"]
+        path.write_text(
+            yaml.safe_dump(
+                {
+                    "source_id": "usda_snap",
+                    "package_id": package_id,
+                    "files": {vintage: entry},
+                },
+                sort_keys=False,
+            )
+        )
+    publisher = _publish(tmp_path, filename, revised)
+
+    fetch_source_artifact(
+        str(publisher),
+        source_id="usda_snap",
+        package_id="usda-snap-fy69-to-current",
+        year=2024,
+        output_dir=package,
+        record_revision=True,
+    )
+
+    assert (package / filename).read_bytes() == revised
+    for path, _package_id, vintage, _route_package, _route_year in manifests:
+        entry = yaml.safe_load(path.read_text())["files"][vintage]
+        assert entry["sha256"] == revised_sha256
+        assert entry["size_bytes"] == len(revised)
+        assert entry["source_table"] == f"owner {vintage}"
+        assert "r2" not in entry["storage"]
+        assert [item["uri"] for item in entry["storage"]["previous_r2"]] == [
+            previous_uris[path]
+        ]
+
+
+def test_record_revision_updates_every_same_manifest_owner(tmp_path):
+    """SSA-style semantic aliases of one file share one byte identity."""
+    package = tmp_path / "db" / "data" / "ssa" / "supplement"
+    package.mkdir(parents=True)
+    original = b"SSA extracted table, first publication"
+    revised = b"SSA extracted table, revised publication"
+    revised_sha256 = hashlib.sha256(revised).hexdigest()
+    filename = "ssa_oasdi_ssi_2024.csv"
+    (package / filename).write_bytes(original)
+    manifest_path = package / "manifest.yaml"
+    entries = {
+        2024: _shared_archive_entry(
+            original,
+            package_id="ssa-annual-statistical-supplement-2025",
+            year=2024,
+            filename=filename,
+        ),
+        "extracted_targets": _shared_archive_entry(
+            original,
+            package_id="ssa-annual-statistical-supplement-2025",
+            year="extracted_targets",
+            filename=filename,
+        ),
+    }
+    for entry in entries.values():
+        entry["source_url"] = "https://example.test/ssa.csv"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "ssa",
+                "package_id": "ssa-annual-statistical-supplement-2025",
+                "files": entries,
+            },
+            sort_keys=False,
+        )
+    )
+    publisher = _publish(tmp_path, filename, revised)
+
+    fetch_source_artifact(
+        str(publisher),
+        source_id="ssa",
+        package_id="ssa-annual-statistical-supplement-2025",
+        year=2024,
+        output_dir=package,
+        record_revision=True,
+    )
+
+    updated = yaml.safe_load(manifest_path.read_text())["files"]
+    assert {entry["sha256"] for entry in updated.values()} == {revised_sha256}
+    assert {
+        item["sha256"]
+        for entry in updated.values()
+        for item in entry["storage"]["previous_r2"]
+    } == {hashlib.sha256(original).hexdigest()}
+
+
 def test_a_recorded_block_that_only_carries_a_uri_is_still_recognized(
     tmp_path, monkeypatch
 ):
