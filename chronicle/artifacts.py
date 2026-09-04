@@ -59,6 +59,7 @@ from chronicle.registration import (
     matching_directory_entry,
     normalize_access,
     package_manifest_paths,
+    _registration_lock,
     recorded_r2,
     resolve_vintage_key,
     safe_entry_access,
@@ -884,6 +885,7 @@ def fetch_source_artifact(
     r2_bucket: str | None = None,
     r2_prefix: str | None = None,
     wrangler_command: str = DEFAULT_WRANGLER_COMMAND,
+    _manifest_lock_held: bool = False,
 ) -> ArtifactFetchReport:
     """Fetch/register a source artifact and optionally upload it to R2.
 
@@ -1071,6 +1073,39 @@ def fetch_source_artifact(
             "or pass --record-revision together with the reviewed "
             "--expected-sha256 to register the publisher revision."
         )
+
+    if not _manifest_lock_held:
+        # The first pass above is side-effect-free. Repeat it after acquiring
+        # the registration lock, then keep that lock through publisher access,
+        # local/staging persistence, upload, and every manifest rewrite.
+        with _registration_lock(output):
+            return fetch_source_artifact(
+                source_url,
+                source_id=source_id,
+                package_id=package_id,
+                year=year,
+                output_dir=output,
+                dataset=dataset,
+                source_page=source_page,
+                table=table,
+                filename=filename,
+                manifest_filename=manifest_filename,
+                access=access,
+                licence=licence,
+                kind=kind,
+                publisher=publisher,
+                vintage=vintage,
+                expected_sha256=expected_sha256,
+                expected_size_bytes=expected_size_bytes,
+                licence_evidence=licence_evidence,
+                staging_dir=staging_dir,
+                upload_r2=upload_r2,
+                record_revision=record_revision,
+                r2_bucket=r2_bucket,
+                r2_prefix=r2_prefix,
+                wrangler_command=wrangler_command,
+                _manifest_lock_held=True,
+            )
 
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
     content, _inferred_filename = _read_artifact(source_url)
@@ -1342,6 +1377,8 @@ def publish_source_artifacts(
     wrangler_command: str = DEFAULT_WRANGLER_COMMAND,
     skip_hash_only: bool = False,
     staging_dir: str | Path | None = None,
+    _selected_manifest_path: Path | None = None,
+    _manifest_lock_held: bool = False,
 ) -> RawArtifactPublishReport:
     """Upload manifest-declared raw source artifacts and record R2 locations.
 
@@ -1364,7 +1401,12 @@ def publish_source_artifacts(
 
     entries: list[RawArtifactPublishEntry] = []
     errors: list[str] = []
-    for manifest_path in _root_manifest_paths(root_path, manifest_filename):
+    manifest_paths = (
+        [_selected_manifest_path]
+        if _selected_manifest_path is not None
+        else _root_manifest_paths(root_path, manifest_filename)
+    )
+    for manifest_path in manifest_paths:
         try:
             manifest = _read_manifest(manifest_path)
         except (OSError, SourceArtifactManifestError) as exc:
@@ -1483,6 +1525,28 @@ def publish_source_artifacts(
                             preflight_only=True,
                         )
                         entries.append(entry)
+            continue
+
+        if not _manifest_lock_held:
+            # Everything above is manifest-only preflight. Re-read and repeat
+            # it while holding the registration lock before opening local
+            # bytes, uploading, or writing the manifest.
+            with _registration_lock(manifest_path.parent):
+                locked_report = publish_source_artifacts(
+                    root_path,
+                    manifest_filename=manifest_filename,
+                    source_id=source_id,
+                    package_id=package_id,
+                    r2_bucket=r2_bucket,
+                    r2_prefix=r2_prefix,
+                    wrangler_command=wrangler_command,
+                    skip_hash_only=skip_hash_only,
+                    staging_dir=staging_dir,
+                    _selected_manifest_path=manifest_path,
+                    _manifest_lock_held=True,
+                )
+            entries.extend(locked_report.entries)
+            errors.extend(locked_report.errors)
             continue
 
         preflight_entries: list[RawArtifactPublishEntry] = []
@@ -3193,9 +3257,7 @@ def _publish_raw_manifest_entry(
                     what="the local artifact's bytes",
                 )
             except ManifestAccessError:
-                errors.append(
-                    f"sha256_collision_across_manifests:{sha256_actual}"
-                )
+                errors.append(f"sha256_collision_across_manifests:{sha256_actual}")
 
     if errors:
         return refuse()
