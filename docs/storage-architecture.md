@@ -203,9 +203,10 @@ The registry should expose:
   authority, legal vintage, and evidence;
 - build metadata, validation status, and derived artifact R2 bucket/key/URI.
 
-The current Supabase migration mirrors the core relational tables and includes
-R2 location fields for raw source artifacts and derived build artifacts, so the
-registry can serve as the shared index over both R2 buckets.
+A deployment migration for the selected Supabase schema must mirror the core
+relational tables and include R2 location fields for raw source artifacts and
+derived build artifacts, so the registry can serve as the shared index over
+both R2 buckets.
 
 ## Build And Publish Flow
 
@@ -249,9 +250,11 @@ The intended flow is:
      --build-artifacts /tmp/chronicle-build-artifacts.jsonl
    ```
 
-The Supabase project must have the checked migration applied and the `chronicle`
-schema exposed in PostgREST/Data API settings before the REST loader can write
-to it. Use `--dry-run` to verify local JSONL files without writing.
+The Supabase project must have a deployment migration for the selected schema
+applied and that schema exposed in PostgREST/Data API settings before the REST
+loader can write to it. The load defaults to `ledger`; set
+`CHRONICLE_SCHEMA=chronicle` or pass `--schema chronicle` to target a migrated
+`chronicle` schema. Use `--dry-run` to verify local JSONL files without writing.
 
 ## Environment Variable Rename Window
 

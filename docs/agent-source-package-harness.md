@@ -684,11 +684,11 @@ uv run chronicle publish-derived \
   --build-artifacts-out /tmp/chronicle-build-artifacts.jsonl
 ```
 
-The SQL schema is checked in at
-`supabase/migrations/20260504_chronicle_bronze.sql`. Spreadsheet publications are
-stored as immutable artifact metadata and one parsed-cell row per workbook cell.
-Agents should not try to normalize irregular government worksheets into tidy
-sheet tables before selector specs interpret them.
+Before loading, create and apply a Supabase/Postgres migration that creates the
+mirror tables in the selected schema. Spreadsheet publications are stored as
+immutable artifact metadata and one parsed-cell row per workbook cell. Agents
+should not try to normalize irregular government worksheets into tidy sheet
+tables before selector specs interpret them.
 
 After the DB export and derived publish, agents can validate and load the
 hosted mirror:
@@ -704,8 +704,11 @@ uv run chronicle load-supabase-mirror \
 ```
 
 The live load requires `POLICYENGINE_SUPABASE_URL` and
-`POLICYENGINE_SUPABASE_SERVICE_KEY`, the Chronicle mirror migration applied, and the
-`chronicle` schema exposed by the Supabase Data API.
+`POLICYENGINE_SUPABASE_SERVICE_KEY`, the deployment migration applied, and the
+selected schema exposed by the Supabase Data API. With neither
+`CHRONICLE_SCHEMA` nor `--schema`, the selected schema is `ledger`; set
+`CHRONICLE_SCHEMA=chronicle` or pass `--schema chronicle` to load a migrated
+`chronicle` schema.
 
 ## Declarative Authoring Contract
 

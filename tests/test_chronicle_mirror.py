@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+import re
 
 import pytest
 
-from chronicle.env import ChronicleEnvDeprecationWarning
+from chronicle.env import ChronicleEnvDeprecationWarning, DEFAULT_CHRONICLE_SCHEMA
 from chronicle.harness import main as harness_main
 from chronicle.mirror import (
     LEDGER_MIRROR_TABLES,
@@ -311,6 +313,32 @@ def test_load_supabase_mirror_cli_writes_to_the_configured_schema(
         "chronicle_probe",
         "explicit_probe",
     ]
+
+
+def _readme_supabase_cutover_section():
+    readme = (Path(__file__).parents[1] / "README.md").read_text()
+    return readme[
+        readme.index("To prepare the deterministic SQLite artifact") : readme.index(
+            "Chronicle settings are read"
+        )
+    ]
+
+
+def test_readme_supabase_cutover_documents_the_runtime_schema_default():
+    section = _readme_supabase_cutover_section()
+
+    assert f"writes to `{DEFAULT_CHRONICLE_SCHEMA}`" in section
+    assert "`CHRONICLE_SCHEMA=chronicle`" in section
+    assert "`--schema chronicle`" in section
+
+
+def test_readme_supabase_cutover_only_names_checked_in_migrations():
+    section = _readme_supabase_cutover_section()
+    repository = Path(__file__).parents[1]
+    migration_paths = re.findall(r"`([^`\n]+[.]sql)`", section)
+    missing = [path for path in migration_paths if not (repository / path).is_file()]
+
+    assert missing == []
 
 
 class _FakeSupabaseClient:

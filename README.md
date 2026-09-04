@@ -434,19 +434,24 @@ uv run chronicle publish-derived \
   --build-artifacts-out /tmp/chronicle-build-artifacts.jsonl
 ```
 
-The Supabase schema for this mirror lives at
-`supabase/migrations/20260504_chronicle_bronze.sql`. Raw government spreadsheets are
-mirrored as artifact metadata plus one row per parsed cell, not one tidy table
-per sheet. Chronicle does not host raw survey microdata tables.
+Before loading, create and apply a Supabase/Postgres migration that creates the
+mirror tables in the schema selected for the load, then expose that schema
+through the Supabase Data API. Raw government spreadsheets are mirrored as
+artifact metadata plus one row per parsed cell, not one tidy table per sheet.
+Chronicle does not host raw survey microdata tables.
 
-After the migration is applied and the `chronicle` schema is exposed through the
-Supabase Data API, accepted mirror exports can be upserted with:
+After that deployment migration is applied, accepted mirror exports can be
+upserted with:
 
 ```bash
 uv run chronicle load-supabase-mirror \
   --dir /tmp/chronicle-mirror \
   --build-artifacts /tmp/chronicle-build-artifacts.jsonl
 ```
+
+With neither `CHRONICLE_SCHEMA` nor `--schema`, this command writes to `ledger`.
+To load a migrated `chronicle` schema instead, set `CHRONICLE_SCHEMA=chronicle`
+or pass `--schema chronicle`.
 
 Use `--dry-run` first to validate JSONL row counts and file coverage without
 writing to Supabase.

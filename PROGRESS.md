@@ -249,9 +249,13 @@ Running the same operations against a checkout of the previous head:
 - Reproduced both parts of finding 10: the README did not state that an
   unqualified mirror load writes to `ledger`, and it named the absent
   `supabase/migrations/20260504_chronicle_bronze.sql` file.
+- README now instructs operators to create and apply the deployment migration,
+  states the `ledger` runtime default, and gives both supported ways to target
+  `chronicle`. The storage architecture and source-package harness use the same
+  truthful procedure; no documentation names the absent SQL file. Both README
+  regression tests pass.
 
 ### Next
 
-- Fix the README cutover instructions and commit their two regression tests.
 - Run the required lint, format, full-test, and tracked-USDA sweep verification,
   then write the final `out.md` report.
