@@ -24,7 +24,7 @@ dependencies = [
     "odfpy>=1.4.1",
     "xlrd>=2.0.1",
     "pypdf>=6.0.0",
-    "receipt @ git+https://github.com/TheAxiomFoundation/receipt@e80cc5e82e22d74c24d36860c949138c472ec97c",
+    "receipt==0.5.2",
 ]
 
 [project.optional-dependencies]
@@ -43,12 +43,6 @@ arch = "arch.cli:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# The receipt pin above is a direct reference (a git revision) while the 0.5.2
-# tag does not yet exist, and hatchling refuses to build metadata containing one
-# unless this says so. It comes out again with the direct reference, when the
-# pin returns to a released version.
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["arch", "db", "micro", "calibration", "packages"]
