@@ -427,7 +427,9 @@ def test_commit_validation_uses_the_snapshot_resolve_actually_parsed(tmp_path):
         )
 
 
-def test_commit_blob_lookup_is_relative_to_a_nested_microcosm_root(tmp_path):
+def test_emit_refuses_a_microcosm_root_nested_in_an_enclosing_repository(
+    tmp_path, capsys
+):
     repository = tmp_path / "repository"
     checkout = _fixture_copy(repository / "vendor" / "microcosm")
     _git(repository, "init", "-q")
@@ -435,16 +437,26 @@ def test_commit_blob_lookup_is_relative_to_a_nested_microcosm_root(tmp_path):
     _git(repository, "config", "user.name", "t")
     _git(repository, "add", ".")
     _git(repository, "commit", "-q", "-m", "nested consumer checkout")
-    commit = _git(repository, "rev-parse", "HEAD")
-    loaded = (checkout / UK_STAGES).read_bytes()
+    root = tmp_path / "data"
 
-    assert script.pin_commit(checkout, UK_STAGES) == commit
-    script.assert_manifest_matches_commit(
-        checkout,
-        UK_STAGES,
-        commit,
-        loaded_bytes=loaded,
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(checkout),
+            "--root",
+            str(root),
+            "--release",
+            "dwp-frs-2023-24:adult",
+            "emit",
+        ],
+        capsys,
     )
+
+    assert exit_code == 1
+    assert "Git repository root" in err
+    assert str(repository) in err
+    assert str(checkout) in err
+    assert not root.exists()
 
 
 def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
