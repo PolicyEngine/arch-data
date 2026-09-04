@@ -10,6 +10,7 @@ import yaml
 
 from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
+    build_artifact_key,
     build_artifact_rows,
     build_derived_r2_key,
     bootstrap_r2_buckets,
@@ -21,6 +22,7 @@ from chronicle.artifacts import (
     publish_derived_artifacts,
     publish_source_artifacts,
 )
+from chronicle.epoch import Epoch
 from chronicle.harness import main as harness_main
 
 
@@ -49,6 +51,39 @@ def test_build_derived_r2_key_is_build_scoped():
         "derived/irs_soi/soi-table-1-1/2023/"
         "ledger.build.v1:abc123/reports/build_summary.json"
     )
+
+
+def test_build_artifact_key_hashes_one_payload_across_epochs():
+    ledger = build_artifact_key(
+        build_id="ledger.build.v1:abc123",
+        artifact_name="reports/build_summary.json",
+        sha256="def456",
+    )
+    chronicle = build_artifact_key(
+        build_id="chronicle.build.v2:abc123",
+        artifact_name="reports/build_summary.json",
+        sha256="def456",
+        epoch=Epoch.CHRONICLE,
+    )
+
+    assert ledger.startswith("ledger.build_artifact.v1:")
+    assert chronicle.startswith("chronicle.build_artifact.v2:")
+    assert ledger.split(":", maxsplit=1)[1] == chronicle.split(":", maxsplit=1)[1]
+
+
+def test_build_artifact_key_rejects_unknown_build_epoch():
+    with pytest.raises(
+        ValueError,
+        match=(
+            "ledger[.]build[.]v1.*chronicle[.]build[.]v2|"
+            "chronicle[.]build[.]v2.*ledger[.]build[.]v1"
+        ),
+    ):
+        build_artifact_key(
+            build_id="future.build.v9:abc123",
+            artifact_name="facts.jsonl",
+            sha256="def456",
+        )
 
 
 @pytest.mark.parametrize(
@@ -487,6 +522,42 @@ def test_publish_derived_artifacts_uploads_build_directory(tmp_path):
     assert build_artifact_rows[0]["r2_bucket"] == "ledger-derived"
     assert "ledger-derived/derived/irs_soi/soi-table-1-1/2023/" in command_log
     assert "reports/build_summary.json" in command_log
+
+
+@pytest.mark.parametrize("write_build_artifacts", [False, True])
+def test_publish_derived_artifacts_rejects_unknown_build_before_side_effects(
+    tmp_path,
+    write_build_artifacts,
+):
+    suite = tmp_path / "suite"
+    reports = suite / "reports"
+    reports.mkdir(parents=True)
+    (reports / "database.json").write_text(
+        json.dumps({"build_id": "future.build.v9:invalid"})
+    )
+    (suite / "facts.jsonl").write_text("{}\n")
+    upload_log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {upload_log}\necho ok\n")
+    wrangler.chmod(0o755)
+    build_artifacts_path = tmp_path / "build_artifacts.jsonl"
+    build_artifacts_path.write_text("sentinel\n")
+
+    report = publish_derived_artifacts(
+        suite,
+        source_id="irs_soi",
+        package_id="soi-table-1-1",
+        year=2023,
+        build_artifacts_output=(
+            build_artifacts_path if write_build_artifacts else None
+        ),
+        wrangler_command=str(wrangler),
+    )
+
+    assert report.errors == ("malformed_build_id",)
+    assert report.entries == ()
+    assert not upload_log.exists()
+    assert build_artifacts_path.read_text() == "sentinel\n"
 
 
 def test_build_artifact_rows_skips_failed_uploads(tmp_path):

@@ -14,6 +14,8 @@ from dataclasses import asdict, dataclass, field
 from decimal import Decimal
 from typing import Any
 
+from chronicle.epoch import EMIT_EPOCH, HASH_DOMAINS, Epoch, hash_domain
+
 Scalar = str | int | float | bool | None
 
 # Year-typed periods store one integer. Split-label years store the opening
@@ -100,7 +102,7 @@ ALLOWED_PERIOD_BASES = {
     "projection_horizon",
 }
 ALLOWED_ACCOUNTING_BASES = {"cash", "accrual"}
-FACT_KEY_PREFIX = "ledger.fact.v1"
+FACT_KEY_PREFIX = hash_domain("fact")
 
 
 @dataclass(frozen=True)
@@ -313,12 +315,16 @@ class ValidationReport:
         }
 
 
-def build_fact_key(fact: AggregateFact) -> str:
+def build_fact_key(
+    fact: AggregateFact,
+    *,
+    epoch: Epoch = EMIT_EPOCH,
+) -> str:
     """Build a stable key from fact schema fields, not human labels."""
     payload = _canonical_key_payload(fact)
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
-    return f"{FACT_KEY_PREFIX}:{digest}"
+    return f"{hash_domain('fact', epoch)}:{digest}"
 
 
 def build_label(fact: AggregateFact) -> str:
@@ -506,6 +512,18 @@ def validate_fact(fact: AggregateFact) -> tuple[ValidationIssue, ...]:
     _validate_filters(errors, fact.filters)
     _validate_constraints(errors, fact.constraints)
     _validate_provenance(errors, fact.source)
+    _validate_lineage_keys(
+        errors,
+        fact.source_cell_keys,
+        field="source_cell_keys",
+        domain="source_cell",
+    )
+    _validate_lineage_keys(
+        errors,
+        fact.source_row_keys,
+        field="source_row_keys",
+        domain="source_row",
+    )
     if fact.period_coverage is not None:
         _validate_period_coverage(errors, fact.period_coverage)
 
@@ -629,6 +647,51 @@ def _validate_value(errors: list[ValidationIssue], value: Any) -> None:
         return
     if isinstance(value, str) and not value.strip():
         errors.append(_issue("missing_value", "Fact value is required", "value"))
+
+
+def _validate_lineage_keys(
+    errors: list[ValidationIssue],
+    keys: tuple[str, ...],
+    *,
+    field: str,
+    domain: str,
+) -> None:
+    pair = HASH_DOMAINS[domain]
+    seen: set[str] = set()
+    for key in keys:
+        if not isinstance(key, str):
+            errors.append(
+                _issue(
+                    "malformed_lineage_key",
+                    f"Unsupported lineage key {key!r}; accepted prefixes are "
+                    f"{pair.ledger!r} and {pair.chronicle!r}",
+                    field,
+                )
+            )
+            continue
+        try:
+            canonical_key = pair.key_for_epoch(key, Epoch.LEDGER)
+        except ValueError as error:
+            errors.append(
+                _issue(
+                    "malformed_lineage_key",
+                    str(error),
+                    field,
+                )
+            )
+            continue
+        if canonical_key in seen:
+            errors.append(
+                _issue(
+                    "duplicate_lineage_key",
+                    f"Duplicate canonical lineage key {canonical_key!r}; each "
+                    "lineage identity may appear only once across accepted "
+                    "Ledger and Chronicle aliases",
+                    field,
+                )
+            )
+            continue
+        seen.add(canonical_key)
 
 
 def _validate_provenance_class(

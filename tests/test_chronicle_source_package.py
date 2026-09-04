@@ -17,15 +17,18 @@ from chronicle.consumer_contract import (
     validate_consumer_fact_contract,
 )
 from chronicle.core import validate_facts
+from chronicle.epoch import SCHEMA_IDS
 from chronicle.source_package import (
     SOURCE_ARTIFACT_CACHE_ENV,
     SOURCE_ARTIFACT_FETCH_ENV,
+    SOURCE_PACKAGE_SCHEMA_VERSION,
     DeclarativeRecordSet,
     SourceArtifactSpec,
     _read_source_artifact_content,
     _render_string,
     _source_artifact_cache_path,
     load_source_package,
+    scaffold_source_package,
     validate_source_package,
 )
 from chronicle.sources.cells import build_source_cell_key, validate_source_cells
@@ -166,6 +169,51 @@ def test_record_set_provenance_fields_propagate_to_specs_and_facts():
     assert survey_set.survey_instrument == "ACS 1-year"
     assert survey_spec.provenance_class == "survey_aggregate"
     assert survey_spec.survey_instrument == "ACS 1-year"
+
+
+def test_source_package_accepts_chronicle_epoch_and_keeps_ledger_emit_default(
+    tmp_path,
+):
+    schema_pair = SCHEMA_IDS["source_package"]
+    source_path = REPO_ROOT / "packages" / "irs_soi" / "table_1_1"
+    payload = yaml.safe_load((source_path / "source_package.yaml").read_text())
+    payload["schema_version"] = schema_pair.chronicle
+    package_dir = tmp_path / "chronicle-source-package"
+    package_dir.mkdir()
+    (package_dir / "source_package.yaml").write_text(yaml.safe_dump(payload))
+
+    package = load_source_package(package_dir)
+    scaffold_dir = tmp_path / "ledger-default-scaffold"
+    report = scaffold_source_package(
+        scaffold_dir,
+        source_id="test",
+        package_id="test-package",
+    )
+
+    assert package.package_id == payload["package_id"]
+    assert SOURCE_PACKAGE_SCHEMA_VERSION == schema_pair.ledger
+    assert (
+        Path(report.source_package_path)
+        .read_text()
+        .startswith(f"schema_version: {schema_pair.ledger}\n")
+    )
+
+
+def test_source_package_rejects_unknown_schema_and_names_both_epochs(tmp_path):
+    schema_pair = SCHEMA_IDS["source_package"]
+    source_path = REPO_ROOT / "packages" / "irs_soi" / "table_1_1"
+    payload = yaml.safe_load((source_path / "source_package.yaml").read_text())
+    payload["schema_version"] = "future.source_package.v9"
+    package_dir = tmp_path / "unknown-source-package-schema"
+    package_dir.mkdir()
+    (package_dir / "source_package.yaml").write_text(yaml.safe_dump(payload))
+
+    with pytest.raises(ValueError) as error:
+        load_source_package(package_dir)
+
+    message = str(error.value)
+    assert schema_pair.ledger in message
+    assert schema_pair.chronicle in message
 
 
 def test_hmrc_packages_preserve_provenance_and_definition_year_metadata():

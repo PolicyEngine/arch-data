@@ -3,14 +3,64 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
-from chronicle.bundle import UK_BUNDLE_SOURCES, build_bundle, build_bundle_coverage
+import pytest
+
+from chronicle.bundle import (
+    BUNDLE_COVERAGE_SCHEMA_VERSION,
+    BUNDLE_SCHEMA_VERSION,
+    BUNDLE_SOURCES_SCHEMA_VERSION,
+    UK_BUNDLE_SOURCES,
+    _load_jsonl as load_bundle_jsonl,
+    build_bundle,
+    build_bundle_coverage,
+)
+from chronicle.epoch import HASH_DOMAINS, SCHEMA_IDS, Epoch
 from chronicle.harness import build_bundle_dir
 from chronicle.harness import main as harness_main
 
 
 def _load_jsonl(path):
     return [json.loads(line) for line in path.read_text().splitlines() if line]
+
+
+def _fixture_consumer_rows():
+    path = Path(__file__).parents[1] / "chronicle" / "fixtures" / "consumer_facts.jsonl"
+    return _load_jsonl(path)
+
+
+def _row_for_epoch(row, epoch):
+    transformed = json.loads(json.dumps(row))
+    transformed["schema_version"] = SCHEMA_IDS["consumer_fact"].for_epoch(epoch)
+    for field_name, domain_name in (
+        ("aggregate_fact_key", "aggregate_fact"),
+        ("semantic_fact_key", "semantic_fact"),
+        ("legacy_fact_key", "fact"),
+        ("source_release_key", "source_release"),
+        ("source_series_key", "source_series"),
+        ("observed_measure_key", "observed_measure"),
+        ("dimension_set_key", "dimension_set"),
+        ("universe_constraint_set_key", "universe_constraint_set"),
+    ):
+        transformed[field_name] = HASH_DOMAINS[domain_name].key_for_epoch(
+            transformed[field_name], epoch
+        )
+    alignment = transformed.get("concept_alignment")
+    if alignment:
+        alignment["concept_alignment_key"] = HASH_DOMAINS[
+            "concept_alignment"
+        ].key_for_epoch(alignment["concept_alignment_key"], epoch)
+    lineage = transformed["lineage"]
+    for field_name, domain_name in (
+        ("source_cell_keys", "source_cell"),
+        ("source_row_keys", "source_row"),
+    ):
+        lineage[field_name] = [
+            HASH_DOMAINS[domain_name].key_for_epoch(key, epoch)
+            for key in lineage[field_name]
+        ]
+    return transformed
 
 
 def test_build_bundle_dir_uk_suite_uses_curated_sources(tmp_path, monkeypatch):
@@ -1231,3 +1281,122 @@ def test_build_bundle_coverage_reports_duplicate_keys():
     assert coverage["counts"]["by_source"] == {"irs_soi": 2}
     assert coverage["duplicates"]["aggregate_fact_keys"][0]["count"] == 2
     assert coverage["duplicates"]["semantic_fact_keys"][0]["count"] == 2
+
+
+def test_bundle_jsonl_ingestion_accepts_chronicle_only_rows(tmp_path):
+    row = _row_for_epoch(_fixture_consumer_rows()[0], Epoch.CHRONICLE)
+    path = tmp_path / "consumer_facts.jsonl"
+    path.write_text(json.dumps(row, sort_keys=True) + "\n")
+
+    loaded = load_bundle_jsonl(path)
+
+    assert loaded == [row]
+    assert loaded[0]["schema_version"] == "chronicle.consumer_fact.v2"
+    assert loaded[0]["aggregate_fact_key"].startswith("chronicle.aggregate_fact.v3:")
+
+
+def test_bundle_jsonl_ingestion_accepts_mixed_epoch_rows(tmp_path):
+    ledger_row, chronicle_source = _fixture_consumer_rows()[:2]
+    chronicle_row = _row_for_epoch(chronicle_source, Epoch.CHRONICLE)
+    path = tmp_path / "consumer_facts.jsonl"
+    path.write_text(
+        "".join(
+            json.dumps(row, sort_keys=True) + "\n"
+            for row in (ledger_row, chronicle_row)
+        )
+    )
+
+    loaded = load_bundle_jsonl(path)
+
+    assert loaded == [ledger_row, chronicle_row]
+    assert {row["schema_version"] for row in loaded} == {
+        "ledger.consumer_fact.v1",
+        "chronicle.consumer_fact.v2",
+    }
+
+
+def test_bundle_jsonl_ingestion_rejects_unknown_key_domain(tmp_path):
+    row = _row_for_epoch(_fixture_consumer_rows()[0], Epoch.CHRONICLE)
+    digest = row["aggregate_fact_key"].partition(":")[2]
+    row["aggregate_fact_key"] = f"future.aggregate_fact.v4:{digest}"
+    path = tmp_path / "consumer_facts.jsonl"
+    path.write_text(json.dumps(row, sort_keys=True) + "\n")
+
+    with pytest.raises(ValueError) as error:
+        load_bundle_jsonl(path)
+
+    message = str(error.value)
+    assert "ledger.aggregate_fact.v2" in message
+    assert "chronicle.aggregate_fact.v3" in message
+
+
+def test_bundle_coverage_canonicalizes_cross_epoch_identities():
+    ledger_row = _fixture_consumer_rows()[0]
+    chronicle_row = _row_for_epoch(ledger_row, Epoch.CHRONICLE)
+
+    coverage = build_bundle_coverage([ledger_row, chronicle_row])
+
+    assert BUNDLE_SCHEMA_VERSION == "ledger.bundle.v1"
+    assert BUNDLE_COVERAGE_SCHEMA_VERSION == "ledger.bundle_coverage.v1"
+    assert BUNDLE_SOURCES_SCHEMA_VERSION == "ledger.bundle_sources.v1"
+    assert coverage["unique_counts"] == {
+        "aggregate_fact_key": 1,
+        "semantic_fact_key": 1,
+        "source_release_key": 1,
+        "source_series_key": 1,
+        "observed_measure_key": 1,
+        "dimension_set_key": 1,
+        "universe_constraint_set_key": 1,
+    }
+    assert coverage["duplicates"]["aggregate_fact_keys"] == [
+        {
+            "key": ledger_row["aggregate_fact_key"],
+            "count": 2,
+            "sources": ["irs_soi:Publication 1304 Table 1.1"],
+            "legacy_fact_keys": [ledger_row["legacy_fact_key"]],
+        }
+    ]
+
+
+def test_bundle_coverage_preserves_non_string_identity_scalars(tmp_path):
+    identity_fields = (
+        "aggregate_fact_key",
+        "semantic_fact_key",
+        "legacy_fact_key",
+        "source_release_key",
+        "source_series_key",
+        "observed_measure_key",
+        "dimension_set_key",
+        "universe_constraint_set_key",
+    )
+    rows = [_fixture_consumer_rows()[0]]
+    for value in (None, 7):
+        row = json.loads(json.dumps(rows[0]))
+        for field_name in identity_fields:
+            row[field_name] = value
+        rows.append(row)
+    path = tmp_path / "consumer_facts.jsonl"
+    path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows))
+
+    loaded = load_bundle_jsonl(path)
+    coverage = build_bundle_coverage(loaded)
+
+    for field_name in identity_fields:
+        assert [row[field_name] for row in loaded] == [
+            rows[0][field_name],
+            None,
+            7,
+        ]
+    assert coverage["unique_counts"] == {
+        "aggregate_fact_key": 3,
+        "semantic_fact_key": 3,
+        "source_release_key": 3,
+        "source_series_key": 3,
+        "observed_measure_key": 3,
+        "dimension_set_key": 3,
+        "universe_constraint_set_key": 3,
+    }
+    assert coverage["duplicates"] == {
+        "aggregate_fact_keys": [],
+        "semantic_fact_keys": [],
+    }

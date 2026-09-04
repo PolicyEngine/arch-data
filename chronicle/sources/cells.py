@@ -20,8 +20,10 @@ from zipfile import ZipFile
 import openpyxl
 import xlrd
 
+from chronicle.epoch import EMIT_EPOCH, HASH_DOMAINS, Epoch, hash_domain
+
 Scalar = str | int | float | bool | None
-SOURCE_CELL_KEY_PREFIX = "ledger.source_cell.v1"
+SOURCE_CELL_KEY_PREFIX = hash_domain("source_cell")
 
 
 @dataclass(frozen=True)
@@ -99,7 +101,11 @@ class SourceCellReport:
         }
 
 
-def build_source_cell_key(cell: SourceCell) -> str:
+def build_source_cell_key(
+    cell: SourceCell,
+    *,
+    epoch: Epoch = EMIT_EPOCH,
+) -> str:
     """Build a stable key from artifact hash and sheet coordinates."""
     payload = {
         "artifact_sha256": cell.artifact.sha256,
@@ -109,7 +115,7 @@ def build_source_cell_key(cell: SourceCell) -> str:
     }
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
-    return f"{SOURCE_CELL_KEY_PREFIX}:{digest}"
+    return f"{hash_domain('source_cell', epoch)}:{digest}"
 
 
 def source_cells_from_xls(
@@ -439,6 +445,30 @@ def validate_source_cells(cells: list[SourceCell]) -> SourceCellReport:
                     cell_index=index,
                 )
             )
+        if cell.source_row_key is not None:
+            source_row_pair = HASH_DOMAINS["source_row"]
+            if not isinstance(cell.source_row_key, str):
+                message = (
+                    f"Unsupported source-row key {cell.source_row_key!r}; accepted "
+                    f"prefixes are {source_row_pair.ledger!r} and "
+                    f"{source_row_pair.chronicle!r}"
+                )
+            else:
+                try:
+                    source_row_pair.infer_key_epoch(cell.source_row_key)
+                except ValueError as error:
+                    message = str(error)
+                else:
+                    message = None
+            if message is not None:
+                errors.append(
+                    SourceCellIssue(
+                        code="malformed_source_row_key",
+                        message=message,
+                        source_cell_key=key,
+                        cell_index=index,
+                    )
+                )
 
     for key, indices in key_indices.items():
         if len(indices) > 1:
