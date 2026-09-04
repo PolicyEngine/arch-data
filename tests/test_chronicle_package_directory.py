@@ -573,6 +573,27 @@ def test_publish_raw_never_uploads_what_a_sibling_manifest_registers_hash_only(
     assert _snapshot(package) == before
 
 
+def test_publish_strictly_validates_a_sibling_before_any_upload(tmp_path, monkeypatch):
+    root = tmp_path / "data"
+    package = root / "dwp" / "frs_2023_24"
+    malformed = _hash_only_manifest(sha256=LICENSED_SHA)
+    malformed["files"][2023][0]["Access"] = "licensed"
+    malformed["files"][2023][0].pop("access")
+    _write(package / "manifest.yaml", malformed)
+    _write(
+        package / "manifest_tables.yaml",
+        _table_manifest(files={2023: _public_table_entry("adult.tab", LICENSED_BYTES)}),
+    )
+    (package / "adult.tab").write_bytes(LICENSED_BYTES)
+    uploads = _record_uploads(monkeypatch)
+
+    report = publish_source_artifacts(root, manifest_filename="manifest_tables.yaml")
+
+    assert not report.valid
+    assert uploads == []
+    assert any("unknown_field:Access" in error for error in report.errors)
+
+
 def test_inventory_reports_collisions_across_manifests(tmp_path):
     root = _mixed_directory(tmp_path)
 

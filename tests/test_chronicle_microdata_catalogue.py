@@ -149,7 +149,12 @@ def test_selection_accepts_agreeing_duplicates_and_refuses_conflicts():
         )
 
 
-def test_frs_catalogue_selector_refuses_cross_stage_pin_drift():
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("sha256", "f" * 64), ("kind", "restricted_microdata")],
+    ids=("checksum", "access-kind"),
+)
+def test_frs_catalogue_selector_refuses_cross_stage_pin_drift(field, value):
     payload = json.loads((FIXTURE_ROOT / UK_STAGES).read_text())
     release = next(
         release
@@ -164,7 +169,7 @@ def test_frs_catalogue_selector_refuses_cross_stage_pin_drift():
         for artifact in employment["artifacts"]
         if artifact.get("table") == "adult"
     )
-    adult["sha256"] = "f" * 64
+    adult[field] = value
 
     with pytest.raises(script.CatalogueError, match="conflicting values"):
         script.select_artifact(

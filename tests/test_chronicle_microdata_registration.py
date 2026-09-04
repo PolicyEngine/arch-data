@@ -907,6 +907,8 @@ def test_register_checks_symlinks_before_resolving_parent_segments(tmp_path):
     outside = tmp_path / "outside"
     linked_parent = outside / "linked-parent"
     linked_parent.mkdir(parents=True)
+    (outside / "escaped").mkdir()
+    (inside / "escaped").mkdir()
     link = inside / "link"
     link.symlink_to(linked_parent, target_is_directory=True)
     output_dir = link / ".." / "escaped"
@@ -914,8 +916,8 @@ def test_register_checks_symlinks_before_resolving_parent_segments(tmp_path):
     with pytest.raises(HashOnlyRegistrationError, match="symbolic link"):
         _register(output_dir)
 
-    assert not (outside / "escaped").exists()
-    assert not (inside / "escaped").exists()
+    assert not (outside / "escaped" / "manifest.yaml").exists()
+    assert not (inside / "escaped" / "manifest.yaml").exists()
 
 
 def test_registration_persists_with_atomic_replace_under_an_exclusive_lock(
