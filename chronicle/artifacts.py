@@ -3510,7 +3510,7 @@ def _inventory_entry(
         # transient and checked when present.
         if validated_r2 is None:
             errors.append("r2_object_not_recorded")
-        if exists and inspect_bytes:
+        if exists and inspect_bytes and not errors:
             content = artifact_path.read_bytes()
             sha256_actual = hashlib.sha256(content).hexdigest()
             size_bytes = len(content)
@@ -3518,7 +3518,7 @@ def _inventory_entry(
                 errors.append("checksum_mismatch")
     elif not exists:
         errors.append("missing_file")
-    elif inspect_bytes:
+    elif inspect_bytes and not errors:
         content = artifact_path.read_bytes()
         sha256_actual = hashlib.sha256(content).hexdigest()
         size_bytes = len(content)

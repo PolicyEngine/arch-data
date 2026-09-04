@@ -769,10 +769,7 @@ def test_inventory_does_not_read_bytes_after_locator_validation_error(
 ):
     package = tmp_path / "data" / "dwp" / "frs_2023_24"
     entry = _public_table_entry("adult.tab", LICENSED_BYTES)
-    key = (
-        "raw/dwp/dwp-frs-2023-24/2023/"
-        f"{entry['sha256']}/{entry['filename']}"
-    )
+    key = f"raw/dwp/dwp-frs-2023-24/2023/{entry['sha256']}/{entry['filename']}"
     entry["storage"] = {
         "r2": {
             "provider": "r2",
