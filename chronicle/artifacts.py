@@ -2736,8 +2736,36 @@ def _inventory_entry(
         spec = {}
         errors.append("malformed_file_spec")
     filename = str(spec.get("filename") or "")
-    storage = spec.get("storage") if isinstance(spec, dict) else None
-    r2 = storage.get("r2") if isinstance(storage, dict) else None
+    r2 = None
+    recorded_r2 = None
+    try:
+        recorded_r2 = _validated_recorded_r2(
+            spec, manifest_path=manifest_path, year=year
+        )
+    except SourceArtifactManifestError as error:
+        errors.append(f"recorded_r2_locator_invalid:{error}")
+    if recorded_r2 is not None and (
+        recorded_r2.filename != filename
+        or (
+            spec.get("sha256") is not None
+            and recorded_r2.sha256 != spec["sha256"]
+        )
+    ):
+        errors.append("recorded_r2_identity_mismatch")
+    if errors:
+        return ArtifactInventoryEntry(
+            manifest_path=str(manifest_path),
+            year=str(year),
+            filename=filename,
+            local_path=str(manifest_path.parent),
+            exists=False,
+            sha256_expected=spec.get("sha256"),
+            sha256_actual=None,
+            size_bytes=None,
+            source_url=spec.get("source_url"),
+            r2=None,
+            errors=tuple(errors),
+        )
     if filename and not is_bare_filename(filename):
         return ArtifactInventoryEntry(
             manifest_path=str(manifest_path),
@@ -2795,6 +2823,16 @@ def _inventory_entry(
         size_bytes = len(content)
         if sha256_expected and sha256_actual != sha256_expected:
             errors.append("checksum_mismatch")
+    if recorded_r2 is not None:
+        if sha256_actual is not None and sha256_actual != recorded_r2.sha256:
+            errors.append("recorded_r2_identity_mismatch")
+        if not errors:
+            r2 = {
+                "provider": recorded_r2.provider,
+                "bucket": recorded_r2.bucket,
+                "key": recorded_r2.key,
+                "uri": recorded_r2.uri,
+            }
     return ArtifactInventoryEntry(
         manifest_path=str(manifest_path),
         year=str(year),

@@ -655,3 +655,13 @@ the per-finding reproduction/fix/test/commit/port map.
   41 deselected, 12 warnings. Six historical-identity controls and the full
   tracked-registry cutover test also pass: 7 passed, 12 warnings. Recorded
   objects keep their original routes even when old manifests omit package_id.
+
+### Finding 2: inventory provenance
+
+- Inventory now reuses `_validated_recorded_r2` before artifact reads, rejects
+  contradictory/incomplete/non-R2 locators and mismatched checksum/filename
+  declarations, and checks actual bytes against the recorded digest even when
+  a separate checksum is absent. Invalid entries expose no R2 link.
+- Seven failing-first defect cases plus the valid URI-only control now pass:
+  direct exit 0, 8 passed, 83 deselected, 12 warnings. Together with `d5e9952`,
+  both consumers named in finding 2 now enforce immutable provenance.
