@@ -704,3 +704,9 @@ the per-finding reproduction/fix/test/commit/port map.
   separate string fields only in reports. Date/set refusals serialize cleanly
   through both CLIs; historical skips also retain serializable identity fields.
   The regression and history controls exit 0: 14 passed, 12 warnings.
+
+- New publication vintage segments and derived build-ID segments now pass the
+  same canonical segment validator, preventing API-provided slashes or '..'
+  from moving an otherwise recognized route. Fetch applies the vintage check
+  before publisher I/O; historical raw objects retain their existing routes.
+  All 11 failing-first namespace cases pass (99 deselected, 12 warnings).

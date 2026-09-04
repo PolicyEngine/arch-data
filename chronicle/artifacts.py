@@ -846,6 +846,7 @@ def fetch_source_artifact(
     # when the prospective R2 key is constructed below.
     _require_identity_segment(source_id, what="source_id")
     _require_identity_segment(package_id, what="package_id")
+    _require_identity_segment(str(year), what="year")
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
         default_prefix=DEFAULT_R2_PREFIX,
@@ -1048,6 +1049,7 @@ def publish_derived_artifacts(
     try:
         _require_identity_segment(source_id, what="source_id")
         _require_identity_segment(package_id, what="package_id")
+        _require_identity_segment(str(year), what="year")
     except SourceArtifactManifestError as error:
         return DerivedArtifactPublishReport(
             input_dir=str(input_path),
@@ -1148,6 +1150,7 @@ def publish_derived_artifacts(
     # input failure like the ones above, reported rather than raised.
     try:
         canonicalize_key("build", resolved_build_id)
+        _require_identity_segment(resolved_build_id, what="build_id")
     except ValueError:
         return DerivedArtifactPublishReport(
             input_dir=str(input_path),
@@ -2602,6 +2605,7 @@ def _publish_raw_manifest_entry(
         try:
             _require_identity_segment(source_id, what="source_id")
             _require_identity_segment(package_id, what="package_id")
+            _require_identity_segment(str(year), what="year")
             _assert_manifest_identifies(
                 manifest_identity or {},
                 manifest_path,
