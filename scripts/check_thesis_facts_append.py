@@ -91,7 +91,8 @@ OBJECT_ID = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})")
 
 # Every environment variable beginning with GIT_ that git(1) documents in its
 # ENVIRONMENT VARIABLES section, read from the Git 2.53.0 manual page on the
-# machine this was written on (`git help --man git`). There are 73 of them.
+# machine this was written on (`git help --man git`), plus GIT_REFERENCE_BACKEND,
+# which the git on ubuntu-latest documents and this machine's does not. There are 74 of them.
 #
 # The shim does not drop these names one by one: it drops every variable whose
 # name begins with GIT_, which is necessarily a superset of any list. The tuple
@@ -148,6 +149,7 @@ DOCUMENTED_GIT_VARIABLES = (
     "GIT_REDIRECT_STDERR",
     "GIT_REDIRECT_STDIN",
     "GIT_REDIRECT_STDOUT",
+    "GIT_REFERENCE_BACKEND",
     "GIT_REFLOG_ACTION",
     "GIT_REF_PARANOIA",
     "GIT_SEQUENCE_EDITOR",
