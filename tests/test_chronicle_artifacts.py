@@ -15,6 +15,7 @@ from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
     AmbiguousManifestError,
     ArtifactCommandResult,
+    ArtifactFilenameError,
     MalformedManifestError,
     ManifestNameError,
     RecordedR2LocatorError,
@@ -1880,6 +1881,65 @@ def test_fetch_refuses_a_symlinked_manifest_before_publisher_io(tmp_path, monkey
     assert outside_manifest.read_bytes() == before
 
 
+def test_fetch_refuses_physically_distinct_normalized_manifest_aliases(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "db" / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text("source_id: publisher\npackage_id: package\nfiles: {}\n")
+    case_alias = package / "Manifest.yaml"
+    monkeypatch.setattr(
+        "chronicle.artifacts.package_manifest_paths",
+        lambda _package: [manifest_path, case_alias],
+    )
+
+    def unexpected_read(_source_url):
+        raise AssertionError("normalized manifest aliases reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(AmbiguousManifestError, match="normalized manifest name"):
+        fetch_source_artifact(
+            "https://example.test/table.csv",
+            source_id="publisher",
+            package_id="package",
+            year=2024,
+            output_dir=package,
+        )
+
+
+def test_fetch_refuses_a_symlinked_artifact_target_before_publisher_io(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "db" / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text("source_id: publisher\npackage_id: package\nfiles: {}\n")
+    outside = tmp_path / "outside.csv"
+    outside.write_bytes(b"outside bytes")
+    artifact_path = package / "table.csv"
+    artifact_path.symlink_to(outside)
+    before = {manifest_path: manifest_path.read_bytes(), outside: outside.read_bytes()}
+
+    def unexpected_read(_source_url):
+        raise AssertionError("symlinked artifact target reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(ArtifactFilenameError, match="symbolic link"):
+        fetch_source_artifact(
+            "https://example.test/table.csv",
+            source_id="publisher",
+            package_id="package",
+            year=2024,
+            output_dir=package,
+        )
+
+    assert artifact_path.is_symlink()
+    assert {path: path.read_bytes() for path in before} == before
+
+
 @pytest.mark.parametrize(
     "manifest_filename",
     [
@@ -1930,6 +1990,34 @@ def test_sweep_manifest_selector_must_be_a_literal_supported_filename(
 
     assert {path: path.read_bytes() for path in before} == before
     assert not log.exists()
+
+
+@pytest.mark.parametrize(
+    "operation", [inventory_source_artifacts, publish_source_artifacts]
+)
+def test_invalid_sweep_manifest_selector_is_refused_even_when_root_is_missing(
+    tmp_path, operation
+):
+    with pytest.raises(ManifestNameError):
+        operation(tmp_path / "missing", manifest_filename="../manifest.yaml")
+
+
+@pytest.mark.parametrize("command", ["inventory-artifacts", "publish-raw"])
+def test_sweep_cli_reports_an_invalid_manifest_selector(command, tmp_path, capsys):
+    exit_code = harness_main(
+        [
+            command,
+            "--root",
+            str(tmp_path),
+            "--manifest",
+            "../manifest.yaml",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert captured.out == ""
+    assert captured.err.startswith("error: ")
 
 
 # ---------------------------------------------------------------------------
@@ -2800,6 +2888,142 @@ def test_sweeps_refuse_a_symlinked_artifact_without_reading_it(tmp_path):
     assert not log.exists()
     assert manifest_path.read_bytes() == before
     assert artifact_path.is_symlink()
+
+
+@pytest.mark.parametrize(
+    "bad_kind",
+    [
+        pytest.param("parent", id="parent-path"),
+        pytest.param("symlink", id="symlink"),
+        pytest.param("manifest-name", id="manifest-name"),
+        pytest.param("previous-r2", id="malformed-history"),
+    ],
+)
+def test_publish_preflights_every_entry_before_any_upload(
+    tmp_path, monkeypatch, bad_kind
+):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    first = b"first publisher table"
+    second = b"second publisher table"
+    (package / "one.csv").write_bytes(first)
+    outside = tmp_path / "data" / "outside.csv"
+    outside.write_bytes(second)
+    second_path = package / "two.csv"
+    bad_filename = "two.csv"
+    bad_storage = None
+    if bad_kind == "parent":
+        bad_filename = "../outside.csv"
+    elif bad_kind == "symlink":
+        second_path.symlink_to(outside)
+    elif bad_kind == "manifest-name":
+        bad_filename = "manifest.yaml"
+    else:
+        second_path.write_bytes(second)
+        bad_storage = {"previous_r2": {"not": "a list"}}
+    bad_entry = {
+        "filename": bad_filename,
+        "source_url": "https://example.test/two.csv",
+        "sha256": hashlib.sha256(second).hexdigest(),
+        "size_bytes": len(second),
+    }
+    if bad_storage is not None:
+        bad_entry["storage"] = bad_storage
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": {
+                    2023: {
+                        "filename": "one.csv",
+                        "source_url": "https://example.test/one.csv",
+                        "sha256": hashlib.sha256(first).hexdigest(),
+                        "size_bytes": len(first),
+                    },
+                    2024: bad_entry,
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+    uploads = []
+
+    def non_writing_uploader(location, local_path, *, wrangler_command):
+        uploads.append((location, local_path, wrangler_command))
+        return ArtifactCommandResult(
+            command=("non-writing-uploader",),
+            returncode=0,
+            stdout="",
+            stderr="",
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", non_writing_uploader)
+
+    report = publish_source_artifacts(package)
+
+    assert not report.valid
+    assert uploads == []
+    assert manifest_path.read_bytes() == before
+
+
+def test_sweeps_refuse_conflicting_owners_across_package_manifests(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "data" / "package"
+    package.mkdir(parents=True)
+    content = b"publisher table"
+    filename = "table.csv"
+    (package / filename).write_bytes(content)
+    manifest_paths = (
+        package / "manifest_a.yaml",
+        package / "manifest_b.yaml",
+    )
+    for path, sha256 in zip(
+        manifest_paths,
+        (hashlib.sha256(content).hexdigest(), hashlib.sha256(b"other").hexdigest()),
+    ):
+        path.write_text(
+            yaml.safe_dump(
+                {
+                    "source_id": "publisher",
+                    "package_id": path.stem,
+                    "files": {
+                        2024: {
+                            "filename": filename,
+                            "sha256": sha256,
+                            "size_bytes": len(content),
+                        }
+                    },
+                },
+                sort_keys=False,
+            )
+        )
+    before = {path: path.read_bytes() for path in manifest_paths}
+    uploads = []
+
+    def non_writing_uploader(location, local_path, *, wrangler_command):
+        uploads.append((location, local_path, wrangler_command))
+        return ArtifactCommandResult(
+            command=("non-writing-uploader",),
+            returncode=0,
+            stdout="",
+            stderr="",
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", non_writing_uploader)
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package)
+
+    assert not inventory.valid
+    assert not published.valid
+    assert any("identify different bytes" in error for error in inventory.errors)
+    assert any("identify different bytes" in error for error in published.errors)
+    assert uploads == []
+    assert {path: path.read_bytes() for path in manifest_paths} == before
 
 
 # ---------------------------------------------------------------------------
