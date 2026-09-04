@@ -1395,25 +1395,79 @@ def publish_source_artifacts(
             errors.append(f"Could not resolve R2 prefix for {manifest_path}: {exc}")
             continue
 
-        kind, kind_error = safe_manifest_kind(manifest, manifest_path=manifest_path)
-        manifest_errors = [kind_error] if kind_error else []
-        manifest_errors.extend(validate_manifest_files(manifest))
+        kind, _kind_error = safe_manifest_kind(manifest, manifest_path=manifest_path)
         try:
-            manifest_errors.extend(
-                validate_package_directory(
-                    _package_manifests(manifest_path.parent, manifest_path, manifest)
-                )
+            package_manifests = _package_manifests(
+                manifest_path.parent, manifest_path, manifest
             )
         except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read a manifest beside {manifest_path}: {exc}")
             continue
-        if manifest_errors:
+        structural_errors: list[str] = []
+        entry_errors: list[str] = []
+        for package_manifest_name, package_manifest in package_manifests.items():
+            package_manifest_path = Path(package_manifest_name)
+            package_kind, package_kind_error = safe_manifest_kind(
+                package_manifest,
+                manifest_path=package_manifest_path,
+            )
+            if package_kind_error:
+                structural_errors.append(
+                    f"{package_kind_error}: {package_manifest_path}"
+                )
+            structural_errors.extend(
+                f"{code}: {package_manifest_path}"
+                for code in validate_manifest_files(package_manifest)
+            )
+            entry_errors.extend(
+                f"{code}: {package_manifest_path}"
+                for code in _manifest_entry_validation_errors(
+                    package_manifest,
+                    kind=package_kind,
+                    package_dir=package_manifest_path.parent,
+                )
+            )
+        structural_errors.extend(
+            f"{code}: {manifest_path}"
+            for code in validate_package_directory(package_manifests)
+        )
+        if structural_errors:
             # Validate, then touch: a manifest Chronicle cannot classify, whose
-            # entries collide, or whose directory's other manifests disagree
-            # with it is reported and left alone; publishing any entry under
-            # it could ship bytes through the wrong record.
-            errors.extend(f"{code}: {manifest_path}" for code in manifest_errors)
+            # entries are invalid, or whose directory's other manifests
+            # disagree with it is reported and left alone; publishing any
+            # entry under it could ship bytes through the wrong record.
+            errors.extend((*structural_errors, *entry_errors))
             continue
+
+        preflight_entries: list[RawArtifactPublishEntry] = []
+        for year, spec in files.items():
+            for file_spec in iter_file_specs(spec, kind=kind):
+                entry, _updated_spec = _publish_raw_manifest_entry(
+                    manifest_path,
+                    manifest_source_id,
+                    manifest_package_id,
+                    year,
+                    file_spec,
+                    manifest=manifest,
+                    kind=kind,
+                    r2_bucket=r2_bucket,
+                    r2_prefix=resolved_r2_prefix,
+                    wrangler_command=wrangler_command,
+                    skip_hash_only=skip_hash_only,
+                    staging_dir=staging_dir,
+                    preflight_only=True,
+                )
+                preflight_entries.append(entry)
+        preflight_failures = [entry for entry in preflight_entries if entry.errors]
+        if entry_errors or preflight_failures:
+            # Preserve per-entry diagnostics for the selected manifest while
+            # still refusing the package before the first upload. Sibling
+            # defects remain package errors because those entries were not
+            # selected for publishing.
+            errors.extend(entry_errors)
+            entries.extend(preflight_failures)
+            continue
+
         updated = False
         for year, spec in files.items():
             for file_spec in iter_file_specs(spec, kind=kind):
@@ -1997,20 +2051,31 @@ def _resolve_manifest_kind(
     return requested
 
 
-def _assert_manifest_valid_for_fetch(
+def _complete_manifest_validation_errors(
     manifest: dict[str, Any],
-    manifest_path: Path,
     *,
     kind: str,
     package_dir: Path,
-) -> None:
-    """Refuse to fetch into a manifest inventory would report as invalid.
+) -> list[str]:
+    """Return all manifest- and entry-level validation errors."""
+    return [
+        *validate_manifest_files(manifest),
+        *_manifest_entry_validation_errors(
+            manifest,
+            kind=kind,
+            package_dir=package_dir,
+        ),
+    ]
 
-    Uses the exact vocabulary ``inventory-artifacts`` and ``publish-raw``
-    report, so a fetch never carries an invalid registration forward -- or
-    conceals one under a rewrite.
-    """
-    codes: list[str] = list(validate_manifest_files(manifest))
+
+def _manifest_entry_validation_errors(
+    manifest: dict[str, Any],
+    *,
+    kind: str,
+    package_dir: Path,
+) -> list[str]:
+    """Return entry-level validation errors for a complete manifest."""
+    codes: list[str] = []
     files = manifest.get("files") or {}
     if isinstance(files, dict):
         for key, spec in files.items():
@@ -2026,6 +2091,27 @@ def _assert_manifest_valid_for_fetch(
                     local_file_exists=exists,
                 ):
                     codes.append(f"{key!r}/{name}: {code}")
+    return codes
+
+
+def _assert_manifest_valid_for_fetch(
+    manifest: dict[str, Any],
+    manifest_path: Path,
+    *,
+    kind: str,
+    package_dir: Path,
+) -> None:
+    """Refuse to fetch into a manifest inventory would report as invalid.
+
+    Uses the exact vocabulary ``inventory-artifacts`` and ``publish-raw``
+    report, so a fetch never carries an invalid registration forward -- or
+    conceals one under a rewrite.
+    """
+    codes = _complete_manifest_validation_errors(
+        manifest,
+        kind=kind,
+        package_dir=package_dir,
+    )
     if codes:
         raise ManifestAccessError(
             f"{manifest_path} is not a valid {kind} manifest: "
@@ -2861,6 +2947,7 @@ def _publish_raw_manifest_entry(
     wrangler_command: str,
     skip_hash_only: bool = False,
     staging_dir: str | Path | None = None,
+    preflight_only: bool = False,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
     if isinstance(spec, ListSpecRejected):
@@ -3081,6 +3168,23 @@ def _publish_raw_manifest_entry(
         return refuse(
             "recorded_r2_key_disagrees_with_country_prefix:"
             f"recorded={recorded_key}:expected={location.key}"
+        )
+    if preflight_only:
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(artifact_path),
+                sha256=sha256_actual,
+                size_bytes=size_bytes,
+                r2_location=location,
+                upload=None,
+                errors=(),
+            ),
+            None,
         )
     upload = _upload_r2_object(
         location,

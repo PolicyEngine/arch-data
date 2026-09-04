@@ -591,7 +591,7 @@ def test_publish_strictly_validates_a_sibling_before_any_upload(tmp_path, monkey
 
     assert not report.valid
     assert uploads == []
-    assert any("unknown_field:Access" in error for error in report.errors)
+    assert any("misspelled_field:Access" in error for error in report.errors)
 
 
 def test_publish_validates_the_complete_selected_manifest_before_any_upload(
@@ -618,7 +618,7 @@ def test_publish_validates_the_complete_selected_manifest_before_any_upload(
 
     assert not report.valid
     assert uploads == []
-    assert any("unknown_field:Access" in error for error in report.errors)
+    assert any("misspelled_field:Access" in error for error in report.errors)
 
 
 def test_inventory_reports_collisions_across_manifests(tmp_path):
