@@ -3,7 +3,8 @@
 ## State
 
 - Detached lane rebased from `28647088` onto `origin/ops-rename-slice1`
-  (`ba8147a7`). Integration checks pass; the full baseline is next. No findings fixed yet.
+  (`ba8147a7`). Integration checks pass; the full baseline is running on code commit
+  `426651e`. No findings fixed yet.
 - Evidence report: `/tmp/chronicle-227-fix/out.md`.
 - Prior PR #227 journal preserved beside the report as `pr227-prior-progress.md`.
   The #226 journal below is retained verbatim.
@@ -21,9 +22,16 @@
   without editing data files. Both public staged releases and shared table-file
   revisions retain their distinct storage behavior.
 
+- Read-only rebase scope audit passed: all 1,130 inherited test functions,
+  protected files, 22 timestamp proofs, and 15 UK microdata pins are preserved.
+- Source audit found a possible scalar-entry error-handling regression from
+  integration. Reproduction and any correction are deferred until the baseline
+  has completed, keeping the tested code fixed throughout that run.
+
 ## Next
 
-- Run and record the full baseline suite from the integration commit.
+- Record the full baseline counts and direct exit code.
+- Reproduce and resolve the source-entry integration concern.
 - Reproduce each finding before fixing it, then run the final required gates.
 
 # Operational rename, slice 1 (chronicle#143, mechanism 3)
