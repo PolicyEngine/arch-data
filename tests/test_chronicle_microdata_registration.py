@@ -15,11 +15,13 @@ repository guard in ``tests/test_chronicle_manifest_kind.py``.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import fcntl
 import hashlib
 import json
 import os
 import sys
+import threading
 import uuid
 from pathlib import Path
 
@@ -923,6 +925,50 @@ def test_registration_persists_with_atomic_replace_under_an_exclusive_lock(
         ("replace", None),
         ("flock", fcntl.LOCK_UN),
     ]
+
+
+def test_concurrent_registrations_preserve_both_manifest_updates(tmp_path, monkeypatch):
+    output_dir = tmp_path / "pkg"
+    first_inside_replace = threading.Event()
+    release_first_replace = threading.Event()
+    second_inside_replace = threading.Event()
+    call_count = 0
+    call_count_lock = threading.Lock()
+    from chronicle import registration
+
+    real_atomic_replace = registration._atomic_replace_manifest
+
+    def coordinated_replace(manifest_path, document):
+        nonlocal call_count
+        with call_count_lock:
+            call_index = call_count
+            call_count += 1
+        if call_index == 0:
+            first_inside_replace.set()
+            assert release_first_replace.wait(5)
+        else:
+            second_inside_replace.set()
+        real_atomic_replace(manifest_path, document)
+
+    monkeypatch.setattr(registration, "_atomic_replace_manifest", coordinated_replace)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(_register, output_dir)
+        assert first_inside_replace.wait(5)
+        second = executor.submit(
+            _register, output_dir, filename="child.tab", sha256=OTHER_SHA
+        )
+        try:
+            assert not second_inside_replace.wait(0.25)
+        finally:
+            release_first_replace.set()
+        assert first.result(timeout=5).valid
+        assert second.result(timeout=5).valid
+
+    entries = _manifest(output_dir)["files"][2023]
+    assert {(entry["filename"], entry["sha256"]) for entry in entries} == {
+        ("adult.tab", FIXTURE_SHA),
+        ("child.tab", OTHER_SHA),
+    }
 
 
 def test_atomic_registration_failure_preserves_the_original_manifest(

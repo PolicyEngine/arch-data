@@ -1460,6 +1460,21 @@ def _registration_sibling_manifests(
 
 def _assert_registration_target_safe(output: Path, manifest_path: Path) -> None:
     """Refuse symlinked targets and normalized aliases before reading them."""
+    lexical_output = Path(os.path.abspath(os.fspath(output)))
+    symlink_component = next(
+        (
+            candidate
+            for candidate in (lexical_output, *lexical_output.parents)
+            if candidate.is_symlink()
+        ),
+        None,
+    )
+    if symlink_component is not None:
+        raise HashOnlyRegistrationError(
+            f"Refusing registration output {output}: path component "
+            f"{symlink_component} is a symbolic link. Registration writes only "
+            "through a physical package-directory path."
+        )
     if manifest_path.is_symlink():
         raise HashOnlyRegistrationError(
             f"Refusing manifest target {manifest_path}: it is a symbolic link. "
