@@ -119,6 +119,30 @@ def _manifest_files(payload: dict[str, Any], manifest_path: Path) -> dict[str, A
     return files
 
 
+def _assert_manifest_identifies(
+    existing_manifest: dict[str, Any],
+    manifest_path: Path,
+    *,
+    source_id: str,
+    package_id: str,
+) -> None:
+    """Refuse to fetch into a manifest that identifies another package.
+
+    The R2 key and registration identity are built from the fetch arguments.
+    Recording them in a manifest that declares different identifiers would
+    leave one entry making two incompatible provenance claims.
+    """
+    for field, value in (("source_id", source_id), ("package_id", package_id)):
+        declared = existing_manifest.get(field)
+        declared = declared.strip() if isinstance(declared, str) else declared
+        if declared not in (None, "") and str(declared) != value:
+            raise SourceArtifactManifestError(
+                f"{manifest_path} declares {field}={declared!r}; refusing to "
+                f"fetch {field}={value!r} into it. Fetch into the package the "
+                "manifest identifies, or into that package's own directory."
+            )
+
+
 def default_r2_raw_bucket() -> str:
     """Resolve the raw bucket: ``$CHRONICLE_R2_RAW_BUCKET`` or the default."""
     return env_value(R2_RAW_BUCKET_ENV, default=DEFAULT_R2_RAW_BUCKET)
@@ -651,10 +675,21 @@ def fetch_source_artifact(
     _refuse_a_stray_default_manifest(output, manifest_path)
     existing_manifest = _read_manifest(manifest_path)
     _manifest_files(existing_manifest, manifest_path)
-    recorded_identity = _recorded_identity(
-        _manifest_file_spec(existing_manifest, year),
+    _assert_manifest_identifies(
+        existing_manifest,
+        manifest_path,
+        source_id=source_id,
+        package_id=package_id,
+    )
+    vintage_key, _existing_value, selected_spec, _index = _select_vintage_entry(
+        existing_manifest,
         manifest_path=manifest_path,
         year=year,
+    )
+    recorded_identity = _recorded_identity(
+        selected_spec,
+        manifest_path=manifest_path,
+        year=vintage_key,
     )
 
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
@@ -671,7 +706,7 @@ def fetch_source_artifact(
     _assert_recorded_identity_holds_these_bytes(
         recorded_identity,
         manifest_path=manifest_path,
-        year=year,
+        year=vintage_key,
         filename=artifact_filename,
         sha256=sha256,
         size_bytes=size_bytes,
@@ -1341,13 +1376,58 @@ def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     return payload
 
 
-def _manifest_file_spec(payload: dict[str, Any], year: Any) -> dict[str, Any]:
-    """Return one manifest ``files`` entry, or an empty mapping."""
-    files = payload.get("files")
+def _select_vintage_entry(
+    payload: dict[str, Any],
+    *,
+    manifest_path: Path,
+    year: Any,
+) -> tuple[Any, Any, dict[str, Any], int | None]:
+    """Locate the entry a fetch revises: ``(key, files[key], entry, index)``.
+
+    Integer and quoted-integer keys are two spellings of one vintage. Preserve
+    the spelling already present, refuse a manifest that contains both, and
+    reject any present non-mapping entry before publisher I/O. The final tuple
+    slot matches the stacked #227 selector; table manifests never use a list
+    index.
+    """
+    files = payload.get("files") if isinstance(payload, dict) else None
+    if files is None:
+        return year, None, {}, None
     if not isinstance(files, dict):
-        return {}
-    spec = files.get(year)
-    return spec if isinstance(spec, dict) else {}
+        raise MalformedManifestError(
+            f"{manifest_path} files must be a mapping; it is a "
+            f"{type(files).__name__}. Chronicle will not write into a manifest "
+            "it cannot read."
+        )
+
+    forms: tuple[Any, ...]
+    if isinstance(year, bool):
+        forms = (year,)
+    elif isinstance(year, int):
+        forms = (year, str(year))
+    else:
+        text = str(year)
+        if text.isdecimal() and (text == "0" or not text.startswith("0")):
+            forms = (year, int(text))
+        else:
+            forms = (year,)
+    present = [form for form in forms if form in files]
+    if len(present) > 1:
+        raise MalformedManifestError(
+            f"{manifest_path}: Vintage {year!r} is recorded under both keys "
+            f"{present!r}; one vintage has one key. Merge the entries by hand "
+            "first. Chronicle will not choose which entry is the record."
+        )
+    if not present:
+        return year, None, {}, None
+    key = present[0]
+    existing = files[key]
+    if not isinstance(existing, dict):
+        raise MalformedManifestError(
+            f"{manifest_path} entry {key!r} must be a mapping; it is a "
+            f"{type(existing).__name__}."
+        )
+    return key, existing, existing, None
 
 
 def _recorded_storage(spec: Any) -> dict[str, Any]:
@@ -1663,6 +1743,20 @@ def _superseding_storage(
     return storage
 
 
+#: Entry fields a fetch owns. Every other field already recorded on the entry
+#: is carried forward during a refetch or explicit publisher revision.
+_FETCH_OWNED_FIELDS: frozenset[str] = frozenset(
+    {
+        "filename",
+        "source_url",
+        "sha256",
+        "size_bytes",
+        "fetched_at",
+        "storage",
+    }
+)
+
+
 def _upsert_manifest(
     manifest_path: Path,
     *,
@@ -1681,6 +1775,13 @@ def _upsert_manifest(
     record_revision: bool = False,
 ) -> None:
     payload = _read_manifest(manifest_path)
+    _manifest_files(payload, manifest_path)
+    _assert_manifest_identifies(
+        payload,
+        manifest_path,
+        source_id=source_id,
+        package_id=package_id,
+    )
     payload.setdefault("source_id", source_id)
     payload.setdefault("package_id", package_id)
     payload.setdefault("dataset", dataset)
@@ -1690,6 +1791,11 @@ def _upsert_manifest(
         # setdefault keeps an explicit null (a bare ``files:`` line); the
         # entry below needs a mapping to record into.
         payload["files"] = {}
+    key, _existing_value, recorded_spec, _index = _select_vintage_entry(
+        payload,
+        manifest_path=manifest_path,
+        year=year,
+    )
     file_entry: dict[str, Any] = {
         "filename": filename,
         "source_url": source_url,
@@ -1697,9 +1803,11 @@ def _upsert_manifest(
         "size_bytes": size_bytes,
         "fetched_at": fetched_at,
     }
-    recorded_spec = _manifest_file_spec(payload, year)
+    for field, value in recorded_spec.items():
+        if field not in _FETCH_OWNED_FIELDS and field not in file_entry:
+            file_entry[field] = value
     recorded_storage = _recorded_storage(recorded_spec)
-    identity = _recorded_identity(recorded_spec, manifest_path=manifest_path, year=year)
+    identity = _recorded_identity(recorded_spec, manifest_path=manifest_path, year=key)
     new_r2 = r2_location.to_dict() if r2_location is not None else None
     holds = identity is not None and identity.holds(sha256=sha256, filename=filename)
     if identity is not None and not holds and not record_revision:
@@ -1709,7 +1817,7 @@ def _upsert_manifest(
         raise SourceArtifactRevisionError(
             _revision_error_message(
                 manifest_path=manifest_path,
-                year=year,
+                year=key,
                 filename=filename,
                 identity=identity,
                 sha256=sha256,
@@ -1738,7 +1846,7 @@ def _upsert_manifest(
     # revision over a never-published entry supersedes nothing.
     if storage:
         file_entry["storage"] = storage
-    payload["files"][year] = file_entry
+    payload["files"][key] = file_entry
     manifest_path.write_text(
         yaml.safe_dump(payload, sort_keys=False),
         encoding="utf-8",

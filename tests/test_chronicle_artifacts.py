@@ -14,6 +14,7 @@ from chronicle.artifacts import (
     AmbiguousManifestError,
     MalformedManifestError,
     RecordedR2LocatorError,
+    SourceArtifactManifestError,
     SourceArtifactRevisionError,
     build_artifact_key,
     build_artifact_rows,
@@ -1742,3 +1743,248 @@ def test_a_malformed_manifest_is_reported_by_inventory_and_publish(tmp_path):
     assert not published.valid
     assert published.entries == ()
     assert "must be a YAML mapping" in published.errors[0]
+
+
+# ---------------------------------------------------------------------------
+# Sol gate round 3: fetch preflight and in-place manifest updates
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    (
+        "mismatched_field",
+        "declared_source_id",
+        "declared_package_id",
+        "source_id",
+        "package_id",
+    ),
+    [
+        pytest.param(
+            "source_id",
+            "other_source",
+            "requested-package",
+            "requested_source",
+            "requested-package",
+            id="source-id",
+        ),
+        pytest.param(
+            "package_id",
+            "usda_snap",
+            "usda-snap-fy69-to-current",
+            "usda_snap",
+            "usda-snap-fy2025-monthly-state-caseloads",
+            id="package-id",
+        ),
+    ],
+)
+def test_fetch_refuses_a_selected_manifest_for_another_package_before_io(
+    tmp_path,
+    monkeypatch,
+    mismatched_field,
+    declared_source_id,
+    declared_package_id,
+    source_id,
+    package_id,
+):
+    package = tmp_path / "db" / "data" / "usda_snap" / "fy69_to_current"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": declared_source_id,
+                "package_id": declared_package_id,
+                "files": {},
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("a mismatched manifest must be refused before I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(SourceArtifactManifestError) as raised:
+        fetch_source_artifact(
+            "https://example.test/snap-zip-fy69tocurrent-6.zip",
+            source_id=source_id,
+            package_id=package_id,
+            year=2025,
+            output_dir=package,
+        )
+
+    message = str(raised.value)
+    declared = {
+        "source_id": declared_source_id,
+        "package_id": declared_package_id,
+    }[mismatched_field]
+    requested = {"source_id": source_id, "package_id": package_id}[mismatched_field]
+    assert f"{mismatched_field}={declared!r}" in message
+    assert f"{mismatched_field}={requested!r}" in message
+    assert manifest_path.read_bytes() == before
+    assert list(package.iterdir()) == [manifest_path]
+
+
+def test_fetch_uses_a_quoted_year_key_for_revision_protection(tmp_path):
+    package = tmp_path / "db" / "data" / "irs_soi" / "table"
+    package.mkdir(parents=True)
+    artifact_path = package / "table.xlsx"
+    original = b"original publisher bytes"
+    revised = b"silently revised publisher bytes"
+    artifact_path.write_bytes(original)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "irs_soi",
+                "package_id": "soi-table",
+                "files": {
+                    "2024": {
+                        "filename": artifact_path.name,
+                        "source_url": "https://example.test/table.xlsx",
+                        "sha256": hashlib.sha256(original).hexdigest(),
+                        "size_bytes": len(original),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    source = _publish(tmp_path, artifact_path.name, revised)
+    before = manifest_path.read_bytes()
+
+    with pytest.raises(SourceArtifactRevisionError):
+        fetch_source_artifact(
+            str(source),
+            source_id="irs_soi",
+            package_id="soi-table",
+            year=2024,
+            output_dir=package,
+        )
+
+    assert manifest_path.read_bytes() == before
+    assert artifact_path.read_bytes() == original
+
+
+def test_fetch_refuses_both_spellings_of_one_year_before_io(tmp_path, monkeypatch):
+    package = tmp_path / "db" / "data" / "irs_soi" / "table"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "irs_soi",
+                "package_id": "soi-table",
+                "files": {
+                    2024: {"filename": "numeric.xlsx"},
+                    "2024": {"filename": "quoted.xlsx"},
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("ambiguous year keys must be refused before I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(MalformedManifestError, match="both keys"):
+        fetch_source_artifact(
+            "https://example.test/table.xlsx",
+            source_id="irs_soi",
+            package_id="soi-table",
+            year=2024,
+            output_dir=package,
+        )
+
+    assert manifest_path.read_bytes() == before
+    assert list(package.iterdir()) == [manifest_path]
+
+
+@pytest.mark.parametrize(
+    "file_spec",
+    [
+        pytest.param([], id="list"),
+        pytest.param("not a mapping", id="string"),
+        pytest.param(0, id="zero"),
+        pytest.param(False, id="false"),
+        pytest.param(None, id="null"),
+    ],
+)
+def test_fetch_refuses_a_non_mapping_year_entry_before_io(
+    tmp_path, monkeypatch, file_spec
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "table"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "irs_soi",
+                "package_id": "soi-table",
+                "files": {2024: file_spec},
+            },
+            sort_keys=False,
+        )
+    )
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("a malformed year entry must be refused before I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(MalformedManifestError, match="entry 2024.*mapping"):
+        fetch_source_artifact(
+            "https://example.test/table.xlsx",
+            source_id="irs_soi",
+            package_id="soi-table",
+            year=2024,
+            output_dir=package,
+        )
+
+    assert manifest_path.read_bytes() == before
+    assert list(package.iterdir()) == [manifest_path]
+
+
+@pytest.mark.parametrize("revision", [False, True], ids=["refetch", "revision"])
+def test_fetch_carries_forward_fields_it_does_not_own(tmp_path, revision):
+    package = tmp_path / "db" / "data" / "irs_soi" / "table"
+    source = _publish(tmp_path, "table.xlsx", b"original publisher bytes")
+    fetch_source_artifact(
+        str(source),
+        source_id="irs_soi",
+        package_id="soi-table",
+        year=2024,
+        output_dir=package,
+    )
+    manifest_path = package / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    metadata = {
+        "source_table": "Publisher table 7",
+        "notes": "Keep this review note.",
+        "source_urls": ["https://example.test/landing-page"],
+        "archive_member": "table.csv",
+        "year": 2024,
+    }
+    manifest["files"][2024].update(metadata)
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    if revision:
+        source.write_bytes(b"publisher revision")
+
+    fetch_source_artifact(
+        str(source),
+        source_id="irs_soi",
+        package_id="soi-table",
+        year=2024,
+        output_dir=package,
+        record_revision=revision,
+    )
+
+    updated = yaml.safe_load(manifest_path.read_text())["files"][2024]
+    for field, value in metadata.items():
+        assert updated.get(field) == value

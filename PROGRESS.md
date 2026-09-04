@@ -215,12 +215,21 @@ Running the same operations against a checkout of the previous head:
   named implementation/test surfaces. Confirmed Chronicle must preserve
   publisher bytes and provenance, refuse unsafe fetches before I/O, and leave
   schema/bucket value cutovers explicit.
+- Reproduced findings 1, 4, 5, and 8 with 11 failing cases: mismatched manifest
+  identity reached the publisher read, quoted year keys bypassed revision
+  protection, duplicate year spellings and malformed entries reached I/O, and
+  both refetch and revision discarded entry metadata.
+- Ported the non-microdata parts of #227's `_assert_manifest_identifies`,
+  `_select_vintage_entry`, `_FETCH_OWNED_FIELDS`, and in-place
+  `_upsert_manifest` flow. Fetch now validates manifest identity and entry
+  shape before I/O, resolves either year-key spelling while refusing both,
+  preserves the recorded key spelling, and carries forward every field it does
+  not own. The 11 focused cases now pass.
 
 ### Next
 
-- Add and run focused failing regression tests for findings 1-8, recording the
-  exact commands and observed failures for `out.md`.
-- Port the matching #227 validation, year-key selection, in-place entry update,
-  and package-manifest discovery hunks; implement the remaining artifact fixes.
+- Reproduce and fix root discovery/type validation (findings 2 and 7), then R2
+  canonical-location/provider validation (findings 3 and 6).
+- Port #227's `package_manifest_paths` helper shape for the default root sweeps.
 - Reproduce and fix findings 9-10, then run the required lint, format, full-test,
   and tracked-USDA sweep verification.
