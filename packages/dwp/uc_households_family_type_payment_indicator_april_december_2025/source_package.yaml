@@ -180,7 +180,7 @@ record_sets:
     expected_column_header_row: 1
     expected_column_header: value
     concept: dwp.uc_benefit_units
-    source_concept: dwp.uc_households_on_universal_credit
+    source_concept: dwp.uc_households
     concept_relation: source_label
     concept_authority: dwp
     concept_evidence_url: https://stat-xplore.dwp.gov.uk/

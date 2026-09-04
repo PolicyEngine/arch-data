@@ -85,6 +85,9 @@ def test_uc_monthly_packages_cover_april_to_december_2025(
     assert {fact.period.value for fact in facts} == set(MONTHS)
     assert all(fact.period.type == "month" for fact in facts)
     assert all(fact.measure.concept == "dwp.uc_benefit_units" for fact in facts)
+    # The #188 histories' source concept is kept so consumers bound to
+    # dwp.uc_households keep resolving after the May snapshots retire.
+    assert all(fact.measure.source_concept == "dwp.uc_households" for fact in facts)
     assert all(fact.entity.name == "benefit_unit" for fact in facts)
     assert all(fact.geography.id == geography_id for fact in facts)
     assert all(fact.assertion == "observation" for fact in facts)
@@ -232,17 +235,24 @@ def test_payment_distribution_history_keeps_band_labels_and_summary_band_kind():
     ).build_facts(2025)
 
     assert len({fact.filters["monthly_award_amount_bands"] for fact in facts}) == 28
-    summary_band = [
+    assert all(fact.layout.table_record_kind == "detail" for fact in facts)
+    # The publisher's legacy '£1500.01 or over' band is unpopulated: zero in every
+    # cell, with the £100 sub-bands above £1,500 carrying the mass.
+    legacy_band = [
         fact
         for fact in facts
         if fact.filters["monthly_award_amount_bands"] == "£1500.01 or over"
     ]
-    assert len(summary_band) == 45
-    assert all(fact.layout.table_record_kind == "total" for fact in summary_band)
-    assert all(
-        fact.layout.table_record_kind == "detail"
-        for fact in facts
-        if fact.filters["monthly_award_amount_bands"] != "£1500.01 or over"
+    assert len(legacy_band) == 45
+    assert all(fact.value == 0 for fact in legacy_band)
+    assert (
+        _fact(
+            facts,
+            period="2025-04",
+            family_type="Single, with children",
+            monthly_award_amount_bands="£1500.01 to £1600.00",
+        ).value
+        > 0
     )
     assert (
         _fact(

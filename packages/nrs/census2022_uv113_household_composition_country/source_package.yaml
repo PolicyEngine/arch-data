@@ -8,7 +8,11 @@
 # cell ('Data has been perturbed'), so details need not sum to totals; values are
 # carried as published and nothing is reconciled. Mapping the classification onto
 # the ONS Families and households Table 7 categories is a consumer declaration
-# (chronicle#237).
+# (chronicle#237). Dependent child (Scotland's Census 2022 metadata): any person aged 0
+# to 15 in a household, or aged 16 to 18 in full-time education living in a family with
+# a parent or grandparent, excluding 16 to 18 year olds with a spouse, partner or child in
+# the household; the same rule as England and Wales, with the one / two-or-more split of
+# dependent children as the publisher's categories.
 schema_version: ledger.source_package.v1
 package_id: nrs-census2022-uv113-household-composition-country
 label: 'Scotland''s Census 2022 UV113: households by household composition, Scotland'
@@ -55,7 +59,7 @@ record_sets:
     concept_relation: source_label
     concept_authority: nrs
     concept_evidence_url: https://statistics.ukdataservice.ac.uk/dataset/scotland-s-census-2022-uv113-household-composition-households
-    concept_evidence_notes: 'Scotland''s Census 2022 table UV113 Household composition (households), country level, from the NRS SuperWEB2 export published through the UK Data Service; 26 publisher categories including the all-households, one-person, one-family, couple, lone-parent and other-household-type totals, which are carried as table_record_kind total.'
+    concept_evidence_notes: 'Scotland''s Census 2022 table UV113 Household composition (households), country level, from the NRS SuperWEB2 export published through the UK Data Service; 26 publisher categories including the all-households, one-person, one-family, couple, lone-parent and other-household-type totals, which are carried as table_record_kind total. Scotland''s Census 2022 metadata, dependent child indicator: a dependent child is any person aged 0 to 15 in a household (whether or not in a family) or a person aged 16 to 18 who is in full-time education and living in a family with his or her parent(s) or grandparent(s); it does not include people aged 16 to 18 who have a spouse, partner or child living in the household (https://www.scotlandscensus.gov.uk/metadata/dependent-child-indicator/).'
     unit: count
     aggregation: sum
     expected_cell_type: number

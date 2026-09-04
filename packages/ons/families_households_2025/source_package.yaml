@@ -9,7 +9,9 @@
 # children, chronicle#235) carry the family entity, and every row lands as
 # two measures from the same workbook row: the published estimate and the
 # publisher's 'CI+/-' 95% confidence-interval half-width (statistic
-# dimension), with the CV robustness-category letter guarded per row.
+# dimension), with the CV robustness-category letter guarded per row: the letter is
+# lineage (a guard cell), not a fact, because the CI half-width already carries the
+# published uncertainty and the CV band is a presentation of CI / estimate.
 # Family-type roll-ups and the all-families rows are table_record_kind
 # 'total'; lone mother and lone father rows partition the lone parent rows.
 schema_version: ledger.source_package.v1

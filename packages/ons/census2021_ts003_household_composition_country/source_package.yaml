@@ -8,7 +8,10 @@
 # Census day is 2021-03-21, hence calendar_year 2021. Chronicle keeps the census
 # classification as published: mapping it onto the ONS Families and households
 # Table 7 categories (one-family vs multi-family, dependent vs non-dependent) is a
-# consumer declaration (chronicle#237).
+# consumer declaration (chronicle#237). Dependent child (ONS Census 2021 dictionary): a
+# person aged 0 to 15, or aged 16 to 18 in full-time education living in a family with a
+# parent or grandparent, excluding 16 to 18 year olds with a spouse, partner or child in
+# the household.
 schema_version: ledger.source_package.v1
 package_id: ons-census2021-ts003-household-composition-country
 label: 'Census 2021 TS003: households by household composition, England and Wales and constituent countries'
@@ -54,7 +57,7 @@ record_sets:
     concept_relation: source_label
     concept_authority: ons
     concept_evidence_url: https://www.nomisweb.co.uk/datasets/c2021ts003
-    concept_evidence_notes: 'Census 2021 TS003 Household composition (Nomis NM_2023_1, 2021 countries geography type), households by the 22-category publisher classification (c2021_hhcomp_15); values as published, subtotal rows carried as table_record_kind total.'
+    concept_evidence_notes: 'Census 2021 TS003 Household composition (Nomis NM_2023_1, 2021 countries geography type), households by the 22-category publisher classification (c2021_hhcomp_15); values as published, subtotal rows carried as table_record_kind total. Census 2021 dictionary, dependent child indicator: a dependent child is a person aged 0 to 15 years in a household, or a person aged 16 to 18 years who is in full-time education and lives in a family with their parent, parents, grandparent or grandparents; it does not include any person aged 16 to 18 years who has a spouse, partner or child living in the household (https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/demographyvariablescensus2021/dependentchildindicator).'
     unit: count
     aggregation: sum
     expected_cell_type: number
@@ -374,7 +377,7 @@ record_sets:
     concept_relation: source_label
     concept_authority: ons
     concept_evidence_url: https://www.nomisweb.co.uk/datasets/c2021ts003
-    concept_evidence_notes: 'Census 2021 TS003 Household composition (Nomis NM_2023_1, 2021 countries geography type), households by the 22-category publisher classification (c2021_hhcomp_15); values as published, subtotal rows carried as table_record_kind total.'
+    concept_evidence_notes: 'Census 2021 TS003 Household composition (Nomis NM_2023_1, 2021 countries geography type), households by the 22-category publisher classification (c2021_hhcomp_15); values as published, subtotal rows carried as table_record_kind total. Census 2021 dictionary, dependent child indicator: a dependent child is a person aged 0 to 15 years in a household, or a person aged 16 to 18 years who is in full-time education and lives in a family with their parent, parents, grandparent or grandparents; it does not include any person aged 16 to 18 years who has a spouse, partner or child living in the household (https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/demographyvariablescensus2021/dependentchildindicator).'
     unit: count
     aggregation: sum
     expected_cell_type: number
@@ -694,7 +697,7 @@ record_sets:
     concept_relation: source_label
     concept_authority: ons
     concept_evidence_url: https://www.nomisweb.co.uk/datasets/c2021ts003
-    concept_evidence_notes: 'Census 2021 TS003 Household composition (Nomis NM_2023_1, 2021 countries geography type), households by the 22-category publisher classification (c2021_hhcomp_15); values as published, subtotal rows carried as table_record_kind total.'
+    concept_evidence_notes: 'Census 2021 TS003 Household composition (Nomis NM_2023_1, 2021 countries geography type), households by the 22-category publisher classification (c2021_hhcomp_15); values as published, subtotal rows carried as table_record_kind total. Census 2021 dictionary, dependent child indicator: a dependent child is a person aged 0 to 15 years in a household, or a person aged 16 to 18 years who is in full-time education and lives in a family with their parent, parents, grandparent or grandparents; it does not include any person aged 16 to 18 years who has a spouse, partner or child living in the household (https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/demographyvariablescensus2021/dependentchildindicator).'
     unit: count
     aggregation: sum
     expected_cell_type: number

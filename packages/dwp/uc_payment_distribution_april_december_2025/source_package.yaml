@@ -5,14 +5,16 @@
 # Households on Universal Credit, Month x Monthly Award Amount (bands) x Family Type,
 # April to December 2025 (chronicle#234; supersedes the May-2025 snapshot package
 # dwp-uc-payment-distribution-may-2025). The publisher band list includes 'No payment'
-# and an overlapping '£1500.01 or over' summary band alongside its £100 sub-bands:
-# every band lands with its exact publisher label as the categorical identity, and the
-# '£1500.01 or over' rows carry table_record_kind 'total' (they are subtotals over the
-# £100 sub-bands above £1,500; the 'detail' rows alone are disjoint). Mapping labels to
-# numeric monthly bounds (and any x12 annualisation) is a downstream declaration.
-# Entity follows the April-December family-type and children packages (benefit_unit,
-# concept dwp.uc_benefit_units) rather than the retired May package's household/
-# dwp.uc_households pair.
+# and a legacy '£1500.01 or over' band alongside the £100 sub-bands above £1,500. In
+# this extract (and already in the retired May snapshot) that legacy band is 0 in every
+# cell while the sub-bands carry the mass, so it is an unpopulated publisher category,
+# not a subtotal: it is kept with its exact label, typed 'detail' like every other band,
+# and the 28 bands partition the caseload with the legacy band contributing zero. Do
+# not read it as the mass at or above £1,500. Mapping labels to numeric monthly bounds
+# (and any x12 annualisation) is a downstream declaration.
+# Entity and concepts follow the April-December family-type and children packages
+# (#188): benefit_unit, concept dwp.uc_benefit_units, source_concept dwp.uc_households,
+# so the retired May package's dwp.uc_households source concept is kept.
 schema_version: ledger.source_package.v1
 package_id: dwp-uc-payment-distribution-april-december-2025
 label: 'DWP Stat-Xplore: Universal Credit benefit units by monthly award amount band and family type, Great Britain, April to December 2025'
@@ -1094,7 +1096,7 @@ record_sets:
     row_number: 82
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: total
+    table_record_kind: detail
     filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Single, no children'}
     constraints:
     - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
@@ -1107,7 +1109,7 @@ record_sets:
     row_number: 83
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: total
+    table_record_kind: detail
     filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Single, with children'}
     constraints:
     - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
@@ -1120,7 +1122,7 @@ record_sets:
     row_number: 84
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: total
+    table_record_kind: detail
     filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Couple, no children'}
     constraints:
     - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
@@ -1133,7 +1135,7 @@ record_sets:
     row_number: 85
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: total
+    table_record_kind: detail
     filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Couple, with children'}
     constraints:
     - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
@@ -1146,7 +1148,7 @@ record_sets:
     row_number: 86
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: total
+    table_record_kind: detail
     filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Unknown or missing family type'}
     constraints:
     - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
@@ -1876,11 +1878,11 @@ record_sets:
     expected_column_header_row: 1
     expected_column_header: value
     concept: dwp.uc_benefit_units
-    source_concept: dwp.uc_households_on_universal_credit
+    source_concept: dwp.uc_households
     concept_relation: source_label
     concept_authority: dwp
     concept_evidence_url: https://stat-xplore.dwp.gov.uk/
-    concept_evidence_notes: 'Stat-Xplore ''Households on Universal Credit'' dataset, April to December 2025, Great Britain, dimensioned by Monthly Award Amount (bands) x Family Type; query echoed in the archived API response. Band identities are the publisher''s exact band labels; mapping the labels to numeric monthly-award bounds (and any x12 annualisation) is a downstream declaration. DWP defines a Universal Credit household as the UC unit of assessment; Chronicle normalizes that entity to benefit_unit.'
+    concept_evidence_notes: 'Stat-Xplore ''Households on Universal Credit'' dataset, April to December 2025, Great Britain, dimensioned by Monthly Award Amount (bands) x Family Type; query echoed in the archived API response. Band identities are the publisher''s exact band labels; the legacy ''£1500.01 or over'' band is published as zero in every cell and is not a subtotal; mapping the labels to numeric monthly-award bounds (and any x12 annualisation) is a downstream declaration. DWP defines a Universal Credit household as the UC unit of assessment; Chronicle normalizes that entity to benefit_unit.'
     unit: count
     aggregation: sum
     expected_cell_type: number

@@ -6,7 +6,12 @@
 # identity. Northern Ireland splits lone-parent families by sex of the parent and
 # separates 'Other family composition' single-family households; mapping onto the
 # ONS Families and households Table 7 categories (or the England and Wales TS003
-# classification) is a consumer declaration (chronicle#237).
+# classification) is a consumer declaration (chronicle#237). Dependent child (NISRA
+# Census 2021 metadata): a person aged 0 to 15, or aged 16 to 18 who is a full-time
+# student and in a family with a parent; NISRA's family definition includes grandparent
+# households with no intervening parent, and children in couple families need not belong
+# to both members of the couple. The same age rule as the other two legs, without the
+# explicit spouse/partner/child exclusion that ONS and NRS state.
 schema_version: ledger.source_package.v1
 package_id: nisra-census2021-household-composition-country
 label: 'NISRA Census 2021: households by household composition, Northern Ireland'
@@ -52,7 +57,7 @@ record_sets:
     concept_relation: source_label
     concept_authority: nisra
     concept_evidence_url: https://build.nisra.gov.uk/en/metadata/variable?d=HOUSEHOLD&v=HH_FAMILY_COMPOSITION_AGG23
-    concept_evidence_notes: 'NISRA Census 2021 Flexible Table Builder, dataset HOUSEHOLD, variable HH_FAMILY_COMPOSITION_AGG23 (Household Composition, 23 categories), Northern Ireland total; the full classification is carried with the publisher labels, lone-parent categories split by sex of parent as published.'
+    concept_evidence_notes: 'NISRA Census 2021 Flexible Table Builder, dataset HOUSEHOLD, variable HH_FAMILY_COMPOSITION_AGG23 (Household Composition, 23 categories), Northern Ireland total; the full classification is carried with the publisher labels, lone-parent categories split by sex of parent as published. NISRA Census 2021 variable metadata: a dependent child is a person in a household aged 0-15 (whether or not in a family) or a person aged 16-18 who is a full-time student and in a family with parent(s); a family is a couple (married, civil partnership or cohabiting) with or without children, or a lone parent and their children, and includes a couple with their grandchildren or a lone grandparent with their grandchildren where no parent in the intervening generation is in the household; children in couple families need not belong to both members of the couple.'
     unit: count
     aggregation: sum
     expected_cell_type: number
