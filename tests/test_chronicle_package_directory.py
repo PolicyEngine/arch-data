@@ -285,6 +285,46 @@ def test_fetch_strictly_validates_a_sibling_before_any_publisher_read(
     assert _snapshot(package) == before
 
 
+def test_fetch_validation_finds_a_normalized_alias_of_hash_only_bytes(
+    tmp_path, monkeypatch
+):
+    """Simulate a case-sensitive directory while running on folded APFS."""
+    package = tmp_path / "db" / "data" / "dwp" / "frs_2023_24"
+    _write(package / "manifest.yaml", _hash_only_manifest(sha256=LICENSED_SHA))
+    actual_path = package / "ADULT.TAB"
+    actual_path.write_bytes(LICENSED_BYTES)
+    declared_path = package / "adult.tab"
+    real_exists = Path.exists
+
+    def case_sensitive_exists(path: Path) -> bool:
+        if path == declared_path:
+            return False
+        return real_exists(path)
+
+    monkeypatch.setattr(Path, "exists", case_sensitive_exists)
+    reads = _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    with pytest.raises(ManifestAccessError, match="bytes_present_for_hash_only_entry"):
+        _fetch_release(
+            package,
+            staging_dir=tmp_path / "staging",
+            filename="codebook.pdf",
+            content=PUBLIC_BYTES,
+            source_id="dwp",
+            package_id="dwp-frs-2023-24",
+            year=2023,
+            licence="OGL-UK-3.0",
+            publisher="Department for Work and Pensions",
+            vintage="2023_24",
+            licence_evidence={**EVIDENCE, "issuer": "DWP"},
+            upload_r2=True,
+        )
+
+    assert reads == []
+    assert actual_path.read_bytes() == LICENSED_BYTES
+
+
 def test_package_manifests_refuses_distinct_normalized_name_aliases(
     tmp_path, monkeypatch
 ):

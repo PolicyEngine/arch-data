@@ -879,6 +879,23 @@ def test_register_refuses_a_symlinked_manifest_target_before_writing(
         assert not outside.exists()
 
 
+@pytest.mark.parametrize("target_exists", [True, False], ids=("existing", "dangling"))
+def test_register_refuses_a_symlinked_output_directory_before_writing(
+    tmp_path, target_exists
+):
+    outside = tmp_path / "outside"
+    if target_exists:
+        outside.mkdir()
+    output_dir = tmp_path / "requested"
+    output_dir.symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(HashOnlyRegistrationError, match="symbolic link"):
+        _register(output_dir)
+
+    assert output_dir.is_symlink()
+    assert not (outside / "manifest.yaml").exists()
+
+
 def test_registration_persists_with_atomic_replace_under_an_exclusive_lock(
     tmp_path, monkeypatch
 ):
@@ -1818,6 +1835,19 @@ def test_a_public_release_without_a_recorded_object_is_incomplete(
             },
             "recorded_r2_identity_mismatch:",
             id="wrong-entry-identity",
+        ),
+        pytest.param(
+            {
+                "provider": "s3",
+                "bucket": "ledger-raw",
+                "key": f"raw/census_acs/release/2022/{PUBLIC_SHA}/csv_hus.zip",
+                "uri": (
+                    "s3://ledger-raw/raw/census_acs/release/2022/"
+                    f"{PUBLIC_SHA}/csv_hus.zip"
+                ),
+            },
+            "recorded_r2_locator_invalid:",
+            id="wrong-provider",
         ),
     ],
 )
