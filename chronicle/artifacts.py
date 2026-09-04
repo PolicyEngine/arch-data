@@ -1632,21 +1632,44 @@ def inventory_source_artifacts(
         if not isinstance(files, dict):
             errors.append(f"Manifest files must be a mapping: {manifest_path}")
             continue
-        kind, kind_error = safe_manifest_kind(manifest, manifest_path=manifest_path)
-        if kind_error:
-            errors.append(f"{kind_error}: {manifest_path}")
-        errors.extend(
-            f"{code}: {manifest_path}" for code in validate_manifest_files(manifest)
-        )
+        kind, _kind_error = safe_manifest_kind(manifest, manifest_path=manifest_path)
+        package_errors: list[str] = []
         try:
-            errors.extend(
-                f"{code}: {manifest_path}"
-                for code in validate_package_directory(
-                    _package_manifests(manifest_path.parent, manifest_path, manifest)
-                )
+            package_manifests = _package_manifests(
+                manifest_path.parent, manifest_path, manifest
             )
         except (OSError, SourceArtifactManifestError) as exc:
-            errors.append(f"Could not read a manifest beside {manifest_path}: {exc}")
+            package_errors.append(
+                f"Could not read a manifest beside {manifest_path}: {exc}"
+            )
+        else:
+            for package_manifest_name, package_manifest in package_manifests.items():
+                package_manifest_path = Path(package_manifest_name)
+                package_kind, package_kind_error = safe_manifest_kind(
+                    package_manifest,
+                    manifest_path=package_manifest_path,
+                )
+                if package_kind_error:
+                    package_errors.append(
+                        f"{package_kind_error}: {package_manifest_path}"
+                    )
+                package_errors.extend(
+                    f"{code}: {package_manifest_path}"
+                    for code in validate_manifest_files(package_manifest)
+                )
+                package_errors.extend(
+                    f"{code}: {package_manifest_path}"
+                    for code in _manifest_entry_validation_errors(
+                        package_manifest,
+                        kind=package_kind,
+                        package_dir=package_manifest_path.parent,
+                    )
+                )
+            package_errors.extend(
+                f"{code}: {manifest_path}"
+                for code in validate_package_directory(package_manifests)
+            )
+        errors.extend(package_errors)
         for year, spec in files.items():
             for file_spec in iter_file_specs(spec, kind=kind):
                 entries.append(
@@ -1657,6 +1680,7 @@ def inventory_source_artifacts(
                         manifest=manifest,
                         kind=kind,
                         staging_dir=staging_dir,
+                        inspect_bytes=not package_errors,
                     )
                 )
 
@@ -3297,6 +3321,7 @@ def _inventory_entry(
     manifest: dict[str, Any] | None = None,
     kind: str | None = None,
     staging_dir: str | Path | None = None,
+    inspect_bytes: bool = True,
 ) -> ArtifactInventoryEntry:
     errors: list[str] = []
     original_spec = spec
@@ -3396,7 +3421,7 @@ def _inventory_entry(
         # transient and checked when present.
         if validated_r2 is None:
             errors.append("r2_object_not_recorded")
-        if exists:
+        if exists and inspect_bytes:
             content = artifact_path.read_bytes()
             sha256_actual = hashlib.sha256(content).hexdigest()
             size_bytes = len(content)
@@ -3404,7 +3429,7 @@ def _inventory_entry(
                 errors.append("checksum_mismatch")
     elif not exists:
         errors.append("missing_file")
-    else:
+    elif inspect_bytes:
         content = artifact_path.read_bytes()
         sha256_actual = hashlib.sha256(content).hexdigest()
         size_bytes = len(content)
