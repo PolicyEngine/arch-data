@@ -611,3 +611,19 @@ the per-finding reproduction/fix/test/commit/port map.
   Corrected the test to set sys.argv and assert SystemExit. The corrected
   command exits 0: 18 passed, 12 warnings; no uploads or rewrites occur.
   The earlier premature passing-count journal entry is corrected here.
+
+### Additional round 4 red checkpoint
+
+- Added inventory locator/identity regressions, explicit raw identity overrides,
+  root/nested/excluded-registry derived symlinks, and derived prefix publication
+  integration before fixing those paths. Focused `additional-red.log` command
+  exited 1: 24 failed, 1 passed, 60 deselected, 14 warnings.
+- Finding 2 inventory: six malformed/contradictory identity cases reached
+  artifact reads; absent separate checksum allowed wrong local bytes as a valid
+  R2 link. Valid URI-only locator control passed.
+- Finding 3 additional tree cases reached upload or silently skipped the link.
+  Finding 4 explicit overrides reached reads. Finding 1 both-custom explicit
+  route reached inference; all three prefix environment names were ignored by
+  publication. Exact command and observations are in the external report.
+- Full source-package module completed: direct exit 0, 157 passed, 13 warnings
+  in 192.07 seconds, including both source-reader fixes.

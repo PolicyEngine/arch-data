@@ -229,3 +229,182 @@ def test_explicit_sweep_reports_nonregular_manifest_sibling(
             assert exit_info.value.code == 1
         assert "regular file" in json.dumps(json.loads(capsys.readouterr().out))
     assert manifest_path.read_text() == before
+
+
+@pytest.mark.parametrize("location", ["root", "nested", "excluded-registry"])
+def test_derived_preflight_rejects_symlinks_at_every_tree_boundary(
+    tmp_path, monkeypatch, location
+):
+    suite = tmp_path / "suite"
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "secret.csv").write_bytes(b"outside")
+    if location == "root":
+        suite.symlink_to(outside, target_is_directory=True)
+    else:
+        suite.mkdir()
+        target = suite / "build_artifacts.jsonl"
+        if location == "nested":
+            (suite / "reports").mkdir()
+            target = suite / "reports" / "database.json"
+        target.symlink_to(outside / "secret.csv")
+    _no_upload(monkeypatch)
+    report = publish_derived_artifacts(
+        suite,
+        source_id="publisher",
+        package_id="package",
+        year=2024,
+        build_id="ledger.build.v1:peer4",
+    )
+    assert not report.valid
+    assert report.entries == ()
+
+
+@pytest.mark.parametrize("field", ["source_id", "package_id"])
+@pytest.mark.parametrize("bad_id", ["foo bar", "a/b", "..", 123, ""])
+def test_raw_publication_refuses_noncanonical_explicit_identity_before_read(
+    tmp_path, monkeypatch, field, bad_id
+):
+    package, manifest_path, _manifest = _package(tmp_path)
+    before = manifest_path.read_text()
+    _no_upload(monkeypatch)
+
+    def unexpected_read(*args, **kwargs):
+        pytest.fail("artifact read reached with invalid explicit identity")
+
+    monkeypatch.setattr(Path, "read_bytes", unexpected_read)
+    report = publish_source_artifacts(package, **{field: bad_id})
+    assert not report.valid
+    assert manifest_path.read_text() == before
+
+
+@pytest.mark.parametrize(
+    "defect",
+    [
+        "contradictory",
+        "incomplete",
+        "non-r2",
+        "empty",
+        "sha256",
+        "filename",
+        "local-digest",
+    ],
+)
+def test_inventory_refuses_invalid_recorded_r2_and_does_not_count_link(
+    tmp_path, monkeypatch, defect
+):
+    package, manifest_path, manifest = _package(tmp_path)
+    spec = manifest["files"][2024]
+    key = f"raw/publisher/package/2024/{spec['sha256']}/table.csv"
+    block = {
+        "provider": "r2",
+        "bucket": "archive",
+        "key": key,
+        "uri": f"r2://archive/{key}",
+    }
+    if defect == "contradictory":
+        block["bucket"] = "different"
+    elif defect == "incomplete":
+        del block["provider"]
+    elif defect == "non-r2":
+        block["provider"] = "s3"
+        block["uri"] = f"s3://archive/{key}"
+    elif defect == "empty":
+        block = {}
+    elif defect == "sha256":
+        spec["sha256"] = "0" * 64
+    elif defect == "filename":
+        block["key"] = key.replace("table.csv", "other.csv")
+        block["uri"] = f"r2://archive/{block['key']}"
+    else:
+        del spec["sha256"]
+        (package / "table.csv").write_bytes(b"different local bytes")
+    spec["storage"] = {"r2": block}
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    before = manifest_path.read_text()
+    if defect != "local-digest":
+
+        def unexpected_read(*args, **kwargs):
+            pytest.fail("inventory read bytes before refusing invalid R2 identity")
+
+        monkeypatch.setattr(Path, "read_bytes", unexpected_read)
+    report = inventory_source_artifacts(package)
+    assert not report.valid
+    assert report.counts["r2_link_count"] == 0
+    assert report.entries[0].r2 is None
+    assert any("recorded_r2" in error for error in report.entries[0].errors)
+    assert manifest_path.read_text() == before
+
+
+def test_inventory_accepts_consistent_uri_only_r2_locator(tmp_path):
+    package, manifest_path, manifest = _package(tmp_path)
+    spec = manifest["files"][2024]
+    spec["storage"] = {
+        "r2": {
+            "provider": "r2",
+            "uri": f"r2://archive/raw/publisher/package/2024/{spec['sha256']}/table.csv",
+        }
+    }
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    report = inventory_source_artifacts(package)
+    assert report.valid
+    assert report.counts["r2_link_count"] == 1
+
+
+def test_derived_publication_refuses_unrecognized_explicit_route_before_read(
+    tmp_path, monkeypatch
+):
+    suite = tmp_path / "suite"
+    suite.mkdir()
+    (suite / "facts.jsonl").write_bytes(b"{}\n")
+    _no_upload(monkeypatch)
+
+    def unexpected_read(*args, **kwargs):
+        pytest.fail("build read reached for an unrecognizable derived route")
+
+    monkeypatch.setattr("chronicle.artifacts.infer_build_id", unexpected_read)
+    report = publish_derived_artifacts(
+        suite,
+        source_id="publisher",
+        package_id="package",
+        year=2024,
+        r2_bucket="chronicle-builds",
+        r2_prefix="builds",
+    )
+    assert not report.valid
+    assert "derived_route" in " ".join(report.errors)
+
+
+@pytest.mark.parametrize(
+    "env_prefix", ["CHRONICLE_", "POLICYENGINE_LEDGER_", "LEDGER_"]
+)
+def test_derived_publication_propagates_configured_prefix(
+    tmp_path, monkeypatch, env_prefix
+):
+    from chronicle.consumer_contract import _points_at_derived
+
+    suite = tmp_path / "suite"
+    suite.mkdir()
+    (suite / "facts.jsonl").write_bytes(b"{}\n")
+    monkeypatch.setenv(f"{env_prefix}R2_DERIVED_BUCKET", "chronicle-builds")
+    monkeypatch.setenv(f"{env_prefix}R2_DERIVED_PREFIX", "builds")
+    uploaded = []
+
+    def upload(location, *_args, **_kwargs):
+        uploaded.append(location)
+        return ArtifactCommandResult(
+            command=("test",), returncode=0, stdout="", stderr=""
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", upload)
+    report = publish_derived_artifacts(
+        suite,
+        source_id="publisher",
+        package_id="package",
+        year=2024,
+        build_id="ledger.build.v1:peer4",
+    )
+    assert report.valid
+    assert len(uploaded) == 1
+    assert uploaded[0].key.startswith("builds/")
+    assert _points_at_derived(uploaded[0].bucket, uploaded[0].key)
