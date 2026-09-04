@@ -1513,7 +1513,15 @@ def _assert_registration_target_safe(output: Path, manifest_path: Path) -> None:
 
 def _registration_lock_path(output: Path) -> Path:
     """Return the persistent package-wide lock file outside the package tree."""
-    identity = os.fsencode(str(output.resolve(strict=False)))
+    # Use one identity before and after the package directory exists. NFC plus
+    # case-folding models the most restrictive supported filesystem, so paths
+    # that may be one directory on macOS/Windows always serialize; distinct
+    # case-sensitive paths may harmlessly share a lock. ``resolve`` still
+    # collapses existing symlink/parent aliases to their physical route.
+    canonical = unicodedata.normalize(
+        "NFC", str(output.resolve(strict=False))
+    ).casefold()
+    identity = os.fsencode(canonical)
     digest = hashlib.sha256(identity).hexdigest()
     return (
         Path(tempfile.gettempdir())
