@@ -357,11 +357,31 @@ Running the same operations against a checkout of the previous head:
   registry-creation and exact sweep-selector guards are slice-1 additions.
   The focused post-fix command exits 0 with 13 passed, and the complete
   artifact module exits 0 with 132 passed.
+- **Finding 2 reproduced and fixed.** Red command:
+  `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p
+  no:cacheprovider tests/test_chronicle_artifacts.py::test_shared_archive_revision_is_refused_through_an_unregistered_owner
+  tests/test_chronicle_artifacts.py::test_record_revision_updates_every_owner_of_usda_shared_archive
+  tests/test_chronicle_artifacts.py::test_record_revision_updates_every_same_manifest_owner`
+  exited 1 with 3 failures: the empty selected vintage bypassed a sibling's
+  recorded identity, the USDA second manifest retained its old checksum, and
+  the SSA-style second key retained its old checksum. Test-only commit:
+  `3636395`.
+- Fetch now strictly loads every manifest in the package directory before
+  publisher I/O, establishes one normalized byte identity for every entry
+  naming the physical file, and applies the revision guard to all owners. An
+  explicit revision rewrites every owner from payloads rendered before the
+  first manifest write, preserves owner-specific metadata, and archives each
+  owner's own R2 provenance. Ported #227's `_package_manifests` and
+  `_assert_siblings_record_these_bytes` names/shapes from `c0d9d74`, including
+  the normalized manifest-alias exclusion from `235c616`; the coordinated
+  all-owner rewrite is slice-1-specific. Fix/docs commit: `7da26a9`. The red
+  command now exits 0 with 3 passed; the artifact module exits 0 with 135
+  passed.
 
 ### Next
 
-1. Reproduce and fix cross-manifest shared-file revision ownership (finding 2),
-   including the tracked USDA two-manifest shape and every same-directory owner.
+1. Reproduce and fix recorded-key cutover compatibility (finding 1) with the
+   documented non-writing sweep over a temporary copy of the tracked tree.
 2. Commit each coherent red-test and implementation step, updating this log.
 3. Run focused tests, lint/format checks on changed files, and the full suite
    with the directly captured exit code and counts.
