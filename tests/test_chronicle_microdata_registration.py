@@ -68,6 +68,7 @@ from chronicle.registration import (
     validate_file_entry,
     validate_manifest_files,
     vintage_key_forms,
+    _registration_lock_path,
 )
 from chronicle.source_package import (
     SOURCE_ARTIFACT_CACHE_ENV,
@@ -947,6 +948,12 @@ def test_registration_persists_with_atomic_replace_under_an_exclusive_lock(
         ("replace", None),
         ("flock", fcntl.LOCK_UN),
     ]
+
+
+def test_registration_lock_identity_folds_case_variant_package_paths(tmp_path):
+    assert _registration_lock_path(tmp_path / "Package") == _registration_lock_path(
+        tmp_path / "package"
+    )
 
 
 def test_concurrent_registrations_preserve_both_manifest_updates(tmp_path, monkeypatch):
