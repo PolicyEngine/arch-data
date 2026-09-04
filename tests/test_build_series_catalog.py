@@ -768,7 +768,20 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert bsc.render(catalog) == committed_text
     assert bsc.validate_uuids(committed) == []
     assert bsc.registry_agreement_problems(committed, registry) == []
-    assert committed["suspect_segments"] == []
+    # Curated 2026-09-04: LNU02374597 is the BLS CPS series id for the
+    # employment-population ratio of persons with a disability, recorded
+    # under its raw id by the 2026-08-23 first-print wave (c2aa68d). Its
+    # digit run 2374 trips the year hint; it is an identifier, not a date,
+    # and stays in the identity because the observation was recorded so.
+    assert committed["suspect_segments"] == ["LNU02374597"]
+    # Pin extended 2026-09-04 to the catalog at 55bbf3d. Spellings first seen:
+    # week_2026-07-13 at c2aa68d (va.vba.mmwr.claims_inventory: the VA MMWR
+    # publication date for the week ending 2026-07-11, the row's own period,
+    # so a period spelling of this row and not a colliding label; the strip
+    # stands), week_2026-08-15 at 54dbabc8 and week_2026-08-22 at 55bbf3d.
+    # Occurrences as of 55bbf3d: both August keys map to
+    # dol.eta.continued_claims.sa (joined week_2026-08-15 at d77afe2) and
+    # us.dol.initial_claims.sa.
     # EVERY stripped spelling is auditable, mapped to the canonical
     # concepts it touched — a statute or edition label colliding with a
     # period spelling can only be caught here.
@@ -779,8 +792,9 @@ def test_committed_catalog_is_current_and_valid() -> None:
         "february_to_april_2026", "fy2024", "fy2025", "july_2026",
         "june_2026", "may_2026", "q1_2026", "week_2026-06-13",
         "week_2026-06-20", "week_2026-06-27", "week_2026-07-04",
-        "week_2026-07-11", "week_2026-07-18", "week_2026-07-25",
-        "week_2026-08-01", "week_2026-08-08", "week_2026_06_13",
+        "week_2026-07-11", "week_2026-07-13", "week_2026-07-18",
+        "week_2026-07-25", "week_2026-08-01", "week_2026-08-08",
+        "week_2026-08-15", "week_2026-08-22", "week_2026_06_13",
         "week_ending_2026_06_06",
     ]
     assert committed["stripped_segments"]["after_mpc_june_2026"] == [
@@ -793,7 +807,7 @@ def test_committed_catalog_is_current_and_valid() -> None:
     assert committed["docket_seed_sha256"] is not None
     assert committed["uuid_registry_sha256"] == registry.sha256()
     assert bsc.DOCKET_SEED.exists()
-    assert len(committed["series"]) == 219
+    assert len(committed["series"]) == 228
 
 
 def test_rebuild_without_prior_catalog_is_gated(
@@ -1219,8 +1233,37 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # context admission adds the U.S. annual EIA N9040US2 vented-and-flared
     # identity in million cubic feet. All 218 prior live bindings are
     # unchanged (218 -> 219).
+    # Updated 2026-09-04 to the catalog at 55bbf3d, six resolve_pending.py
+    # waves after the previous pin: c2aa68d (2026-08-23, manifest
+    # 0015-fdcfd0e570214f6b), 54dbabc8 (0016-5226191699ae168d), 734beb8
+    # (0017-efa7d60fece304f7), 9526211 (0018-20974a5bdeeace01), d77afe2
+    # (0019-01d2f0bfb2ebff75) and 55bbf3d (2026-09-03,
+    # 0020-7f669f1e1364c5cc); 0018 and 0019 changed occurrences and
+    # aliases only, so the anchor tuples are identical from 734beb8 through
+    # d77afe2. Recomputed per commit
+    # with this test's algorithm, the previous pin was exact at c2aa68d^ and
+    # the delta to 55bbf3d is nine mints from first observed identities, all
+    # at c2aa68d (bls.ces.home_health_care_services.employment,
+    # bls.cps.LNU02374597, bls.cps.lfpr_55_plus,
+    # bls.laus.colorado.labor_force, ssa.oasdi.disabled_worker_beneficiaries,
+    # ssa.ssi.recipients.colorado, ssa.ssi.recipients.colorado.aged_65_plus,
+    # ssa.ssi.recipients_aged_65_plus, va.vba.mmwr.claims_inventory), plus
+    # eight docket placeholders enriched by their first observed identity
+    # through retire-and-reissue pairs that preserve the UUID and take the
+    # observation's U.S. country geography and economy aggregate entity: six
+    # at c2aa68d (bls.export_prices.all_commodities_mom,
+    # census.housing.completions_saar, census.housing.permits_saar,
+    # fed.g17.capacity_utilization.manufacturing,
+    # fed.g17.manufacturing_production_mom, ssa.ssi.total_recipients),
+    # census.new_residential_sales.new_single_family_houses_sold_saar at
+    # 734beb8 and bea.trade.goods_services_deficit at 55bbf3d. Geography and
+    # entity on all seventeen rows are copied from the observation payload
+    # (the seed rows carry no country or entity; the docket-only country path
+    # is not involved), which is why the three Colorado-named concepts carry
+    # country-level geography: the observations were recorded that way. The
+    # other 211 live bindings are byte-unchanged (219 -> 228).
     assert digest == (
-        "c0b8a9c791fcb2b9d6e5df5ecfd1960def5210ae953698c64ae665e77b603fd9"
+        "da63b697ad0e4444d4f834671fc15e979c67b47545aba836fb6f043d75e8404d"
     )
 
 
