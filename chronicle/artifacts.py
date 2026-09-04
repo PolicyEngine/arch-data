@@ -167,7 +167,12 @@ def _package_manifests(
     fetch selected. A malformed sibling is therefore a pre-I/O refusal: until
     Chronicle can read every owner, it cannot safely overwrite shared bytes.
     """
-    paths = package_manifest_paths(output)
+    try:
+        paths = package_manifest_paths(output)
+    except ValueError as error:
+        # Explicit sweep selectors still inspect every sibling registry. Keep
+        # discovery refusals in the shared exception family both CLIs report.
+        raise MalformedManifestError(str(error)) from error
     by_name: dict[str, Path] = {}
     for path in paths:
         key = filename_key(path.name)

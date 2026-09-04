@@ -599,3 +599,11 @@ the per-finding reproduction/fix/test/commit/port map.
   the existing checksum-validated cache/fetch path; zip-backed resources work.
 - Same focused command exits 0: 6 passed, 12 warnings. The full source-package
   module is running. Exact red/green commands are in the external evidence.
+
+### Finding 8: controlled sibling-manifest refusals
+
+- `_package_manifests` now translates discovery's `ValueError` into
+  `MalformedManifestError`, so publish/inventory and both CLI entry points
+  use the shared controlled refusal path even with an explicit selector.
+- The same 18 cases that previously trace-backed now pass: direct exit 0,
+  18 passed, 12 warnings; no uploads or manifest rewrites occur.
