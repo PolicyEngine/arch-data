@@ -15,6 +15,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from chronicle import artifacts
 from chronicle.core import (
     ALLOWED_PROVENANCE_CLASSES,
     DEFAULT_ASSERTION,
@@ -493,11 +494,30 @@ def _is_derived_source_record_id(source_record_id: str) -> bool:
 def _points_at_derived(bucket: str, key: str) -> bool:
     """Whether an R2 bucket/key pair addresses derived build output.
 
-    Matched on shape rather than on the ledger-era bucket names, so the guard
-    keeps firing once the buckets are renamed (PolicyEngine/chronicle#143,
-    mechanism 3).
+    Resolve publication configuration at validation time: an operator may use
+    a bucket or prefix with no ``derived`` marker in its spelling. Archived
+    rename-window routes remain derived after the active destination changes.
     """
-    return bucket.endswith("-derived") or key.startswith("derived/")
+    derived_buckets = {
+        "ledger-derived",
+        "chronicle-derived",
+        artifacts.DEFAULT_R2_DERIVED_BUCKET,
+        artifacts.default_r2_derived_bucket(),
+    }
+    derived_prefixes = {
+        "derived",
+        artifacts.resolve_r2_prefix(
+            prefix=None,
+            default_prefix=artifacts.DEFAULT_R2_DERIVED_PREFIX,
+        ),
+        artifacts.resolve_r2_prefix(
+            prefix=None,
+            default_prefix=artifacts.default_r2_derived_prefix(),
+        ),
+    }
+    return bucket in derived_buckets or any(
+        key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
+    )
 
 
 def _derived_source_provenance_issue(fact: AggregateFact) -> str | None:
@@ -521,14 +541,23 @@ def _derived_source_provenance_issue(fact: AggregateFact) -> str | None:
             "itself. Target construction, aging, and reconciliation belong in "
             "Microcosm."
         )
-    source_file_bucket, bucket_separator, _ = source_file.partition(":")
-    if bucket_separator and source_file_bucket.endswith("-derived"):
+    if source_file.startswith("r2://"):
+        source_file_bucket, source_file_key = _r2_uri_parts(source_file)
+    else:
+        source_file_bucket, bucket_separator, source_file_key = source_file.partition(
+            ":"
+        )
+        if not bucket_separator:
+            source_file_bucket = source_file_key = ""
+    if _points_at_derived(source_file_bucket, source_file_key):
         return (
             "Chronicle consumer facts must cite raw publisher artifacts. Derived "
             "target-construction artifacts belong in Microcosm."
         )
-    if _points_at_derived(raw_r2_bucket, raw_r2_key) or _points_at_derived(
-        *_r2_uri_parts(raw_r2_uri)
+    if (
+        _points_at_derived(raw_r2_bucket, raw_r2_key)
+        or _points_at_derived(*_r2_uri_parts(raw_r2_uri))
+        or _points_at_derived(*_r2_uri_parts(source.url or ""))
     ):
         return (
             "Chronicle consumer facts must point at raw source artifacts, not "

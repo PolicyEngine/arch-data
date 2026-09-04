@@ -257,6 +257,11 @@ def default_r2_derived_bucket() -> str:
     return env_value(R2_DERIVED_BUCKET_ENV, default=DEFAULT_R2_DERIVED_BUCKET)
 
 
+def default_r2_derived_prefix() -> str:
+    """Resolve the derived route shared by publication and fact refusals."""
+    return env_value("CHRONICLE_R2_DERIVED_PREFIX", default=DEFAULT_R2_DERIVED_PREFIX)
+
+
 class SourceArtifactManifestError(RuntimeError):
     """A manifest refuses the write a fetch is about to make.
 

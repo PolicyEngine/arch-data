@@ -575,3 +575,16 @@ the per-finding reproduction/fix/test/commit/port map.
   through its existing controlled YAML error path. Shared names are unchanged.
 - Six regressions plus existing quoted-year compatibility tests exit 0:
   8 passed, 12 warnings. Scoped Ruff lint/format checks both pass.
+
+### Finding 1: configured derived provenance
+
+- Consumer guard regressions ran red before implementation: direct exit 1,
+  35 failed and 1 passed; configured bucket/prefix provenance did not produce
+  `derived_fact_provenance`. Exact evidence is in the external report.
+- The guard resolves derived bucket/prefix configuration lazily, retains exact
+  archived routes, and checks raw locator fields, source-file locators, and
+  source URL. Added `default_r2_derived_prefix` with the standard environment
+  lookup ladder so publication and the guard can share it.
+- Full consumer-contract module passes: direct exit 0, 95 passed, 32 warnings;
+  scoped Ruff checks pass. Wiring configured prefixes into publication and
+  refusing unrecognizable explicit routes remains a publication follow-up.

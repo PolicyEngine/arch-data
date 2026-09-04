@@ -11,6 +11,7 @@ from typing import Any
 
 import pytest
 
+import chronicle.artifacts as artifacts
 import chronicle.consumer_contract as consumer_contract
 from chronicle.consumer_contract import (
     CONSUMER_FACT_SCHEMA_VERSION,
@@ -938,6 +939,92 @@ def test_consumer_contract_rejects_downstream_derived_target_facts(
 
     assert not report.valid
     assert "derived_fact_provenance" in {error.code for error in report.errors}
+
+
+@pytest.mark.parametrize(
+    "bucket_env",
+    [
+        "CHRONICLE_R2_DERIVED_BUCKET",
+        "POLICYENGINE_LEDGER_R2_DERIVED_BUCKET",
+        "LEDGER_R2_DERIVED_BUCKET",
+    ],
+)
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("raw_r2_bucket", "chronicle-builds"),
+        ("raw_r2_uri", "r2://chronicle-builds/builds/source/fact.json"),
+        ("source_file", "chronicle-builds:builds/source/fact.json"),
+        ("source_file", "r2://chronicle-builds/builds/source/fact.json"),
+        ("url", "r2://chronicle-builds/builds/source/fact.json"),
+    ],
+)
+def test_consumer_contract_rejects_configured_derived_bucket(
+    monkeypatch, tmp_path, bucket_env, field, value
+):
+    monkeypatch.setenv(bucket_env, "chronicle-builds")
+    fact = _soi_agi_fact()
+    derived = replace(fact, source=replace(fact.source, **{field: value}))
+
+    report = validate_consumer_fact_contract([derived])
+
+    assert "derived_fact_provenance" in {error.code for error in report.errors}
+    output = tmp_path / "new-directory" / "consumer_facts.jsonl"
+    with pytest.raises(ValueError, match="consumer-contract"):
+        write_consumer_facts_jsonl([derived], output)
+    assert not output.parent.exists()
+
+
+@pytest.mark.parametrize(
+    "prefix_env",
+    [
+        None,
+        "CHRONICLE_R2_DERIVED_PREFIX",
+        "POLICYENGINE_LEDGER_R2_DERIVED_PREFIX",
+        "LEDGER_R2_DERIVED_PREFIX",
+    ],
+)
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("raw_r2_key", "builds/source/fact.json"),
+        ("raw_r2_uri", "r2://publisher-archive/builds/source/fact.json"),
+        ("source_file", "publisher-archive:builds/source/fact.json"),
+        ("source_file", "r2://publisher-archive/builds/source/fact.json"),
+        ("url", "r2://publisher-archive/builds/source/fact.json"),
+    ],
+)
+def test_consumer_contract_rejects_configured_derived_prefix(
+    monkeypatch, prefix_env, field, value
+):
+    if prefix_env is None:
+        monkeypatch.setattr(artifacts, "DEFAULT_R2_DERIVED_PREFIX", "builds")
+    else:
+        monkeypatch.setenv(prefix_env, "builds")
+    fact = _soi_agi_fact()
+    derived = replace(fact, source=replace(fact.source, **{field: value}))
+
+    report = validate_consumer_fact_contract([derived])
+
+    assert "derived_fact_provenance" in {error.code for error in report.errors}
+
+
+def test_consumer_contract_derived_routes_match_complete_names(monkeypatch):
+    monkeypatch.setenv("CHRONICLE_R2_DERIVED_BUCKET", "chronicle-builds")
+    monkeypatch.setattr(artifacts, "DEFAULT_R2_DERIVED_PREFIX", "builds")
+    fact = _soi_agi_fact()
+    publisher = replace(
+        fact,
+        source=replace(
+            fact.source,
+            source_file="chronicle-builds-raw:buildstats/source/publisher.csv",
+            raw_r2_bucket="chronicle-builds-raw",
+            raw_r2_key="buildstats/source/publisher.csv",
+            raw_r2_uri="r2://chronicle-builds-raw/buildstats/source/publisher.csv",
+        ),
+    )
+
+    assert validate_consumer_fact_contract([publisher]).valid
 
 
 def test_derived_record_marker_is_rejected_in_either_spelling():
