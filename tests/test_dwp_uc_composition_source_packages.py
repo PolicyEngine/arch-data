@@ -55,7 +55,7 @@ def _fact(facts, *, period, **filters):
         ),
         (
             "dwp-uc-payment-distribution-april-december-2025",
-            140,
+            135,
             "K03000001",
             "dwp.uc_monthly_award_band",
         ),
@@ -229,31 +229,25 @@ def test_payment_indicator_no_matches_the_no_payment_award_band_cell_for_cell():
             assert nil_award.value == no_payment_band.value, (period, family_type)
 
 
-def test_payment_distribution_history_keeps_band_labels_and_summary_band_kind():
+def test_payment_distribution_history_omits_the_pre_september_2022_band():
+    """DWP's '£1500.01 or over' band applies to months up to August 2022 only
+    (Stat-Xplore metadata); it is zero in every April to December 2025 cell and
+    is not ported, so nothing can bind it by mistake."""
     facts = load_source_package(
         "dwp-uc-payment-distribution-april-december-2025"
     ).build_facts(2025)
+    bands = {fact.filters["monthly_award_amount_bands"] for fact in facts}
 
-    assert len({fact.filters["monthly_award_amount_bands"] for fact in facts}) == 28
+    assert len(facts) == 27 * 5 * 9
+    assert len(bands) == 27
+    assert "£1500.01 or over" not in bands
+    assert {
+        "No payment",
+        "£1400.01 to £1500.00",
+        "£1500.01 to £1600.00",
+        "£2500.01 or over",
+    } <= bands
     assert all(fact.layout.table_record_kind == "detail" for fact in facts)
-    # The publisher's legacy '£1500.01 or over' band is unpopulated: zero in every
-    # cell, with the £100 sub-bands above £1,500 carrying the mass.
-    legacy_band = [
-        fact
-        for fact in facts
-        if fact.filters["monthly_award_amount_bands"] == "£1500.01 or over"
-    ]
-    assert len(legacy_band) == 45
-    assert all(fact.value == 0 for fact in legacy_band)
-    assert (
-        _fact(
-            facts,
-            period="2025-04",
-            family_type="Single, with children",
-            monthly_award_amount_bands="£1500.01 to £1600.00",
-        ).value
-        > 0
-    )
     assert (
         _fact(
             facts,
@@ -262,6 +256,15 @@ def test_payment_distribution_history_keeps_band_labels_and_summary_band_kind():
             monthly_award_amount_bands="No payment",
         ).value
         == 345_734
+    )
+    assert (
+        _fact(
+            facts,
+            period="2025-04",
+            family_type="Single, with children",
+            monthly_award_amount_bands="£1500.01 to £1600.00",
+        ).value
+        > 0
     )
     assert (
         _fact(

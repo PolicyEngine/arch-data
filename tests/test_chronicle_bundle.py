@@ -79,7 +79,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "aggregate_duplicate_key_count": 0,
         "entity_count": 12,
         "error_count": 0,
-        "fact_count": 192505,
+        "fact_count": 192460,
         "geography_count": 12539,
         "period_count": 269,
         "semantic_duplicate_key_count": 177,
@@ -88,7 +88,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "source_package_count": 167,
         "warning_count": 1,
     }
-    assert len(rows) == 192505
+    assert len(rows) == 192460
     assert {row["provenance_class"] for row in rows} <= {
         "administrative",
         "census",
@@ -120,7 +120,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "jct-obbba-revenue-estimates-2025",
         "jct-tax-expenditures-2024",
     ]
-    assert coverage["fact_count"] == 192505
+    assert coverage["fact_count"] == 192460
     assert coverage["counts"]["by_source"] == {
         "bea": 445,
         "bfp_economic_outlook": 5,
@@ -135,7 +135,7 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "dfe": 770,
         "dfc_ni": 1189,
         "dft": 233,
-        "dwp": 8175,
+        "dwp": 8130,
         "eurostat": 207,
         "federal_reserve": 1,
         "fpb_economic_outlook": 1000,
@@ -730,15 +730,15 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
         "month:2025-01": 487,
         "month:2025-02": 485,
         "month:2025-03": 615,
-        "month:2025-04": 689,
-        "month:2025-05": 6656,
-        "month:2025-06": 605,
-        "month:2025-07": 597,
-        "month:2025-08": 1034,
-        "month:2025-09": 613,
-        "month:2025-10": 596,
-        "month:2025-11": 611,
-        "month:2025-12": 860,
+        "month:2025-04": 684,
+        "month:2025-05": 6651,
+        "month:2025-06": 600,
+        "month:2025-07": 592,
+        "month:2025-08": 1029,
+        "month:2025-09": 608,
+        "month:2025-10": 591,
+        "month:2025-11": 606,
+        "month:2025-12": 855,
         "month:2026-01": 381,
         "month:2026-02": 385,
         "month:2026-03": 386,
@@ -827,10 +827,10 @@ def test_build_bundle_writes_merged_consumer_contract(tmp_path):
     )
     assert coverage["counts"]["by_geography"]["country:K02000001"] == 6373
     assert coverage["counts"]["by_geography"]["country:E92000001"] == 1437
-    assert coverage["counts"]["by_geography"]["country:K03000001"] == 2020
+    assert coverage["counts"]["by_geography"]["country:K03000001"] == 1975
     assert len(coverage["counts"]["by_geography"]) == 12539
     assert coverage["counts"]["by_entity"] == {
-        "benefit_unit": 2024,
+        "benefit_unit": 1979,
         "dwelling": 27041,
         "family": 1299,
         "firm": 1439,

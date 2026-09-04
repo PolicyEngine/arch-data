@@ -4,14 +4,16 @@
 # Stat-Xplore Open Data API extract (raw API response, query echoed inside it):
 # Households on Universal Credit, Month x Monthly Award Amount (bands) x Family Type,
 # April to December 2025 (chronicle#234; supersedes the May-2025 snapshot package
-# dwp-uc-payment-distribution-may-2025). The publisher band list includes 'No payment'
-# and a legacy '£1500.01 or over' band alongside the £100 sub-bands above £1,500. In
-# this extract (and already in the retired May snapshot) that legacy band is 0 in every
-# cell while the sub-bands carry the mass, so it is an unpopulated publisher category,
-# not a subtotal: it is kept with its exact label, typed 'detail' like every other band,
-# and the 28 bands partition the caseload with the legacy band contributing zero. Do
-# not read it as the mass at or above £1,500. Mapping labels to numeric monthly bounds
-# (and any x12 annualisation) is a downstream declaration.
+# dwp-uc-payment-distribution-may-2025). The publisher band list has 28 values: 'No
+# payment', 15 bands of £100 up to £1,500, the '£1500.01 or over' band that DWP's
+# metadata marks 'for months up to August 2022', and the eleven £100 bands above
+# £1,500 plus '£2500.01 or over' that apply from September 2022. The pre-September-2022
+# band does not apply to any month here (its 45 cells are 0 in the archived response,
+# as they were in the retired May snapshot) and is not ported, so no fact exists under
+# that label for a consumer to bind by mistake; the 27 ported bands are disjoint and
+# partition the caseload. Every ported band keeps its exact publisher label as the
+# categorical identity. Mapping labels to numeric monthly bounds (and any x12
+# annualisation) is a downstream declaration.
 # Entity and concepts follow the April-December family-type and children packages
 # (#188): benefit_unit, concept dwp.uc_benefit_units, source_concept dwp.uc_households,
 # so the retired May package's dwp.uc_households source concept is kept.
@@ -1089,75 +1091,10 @@ record_sets:
     - {variable: monthly_award_amount_bands, operator: '==', value: '£1400.01 to £1500.00', label: monthly award amount bands}
     - {variable: family_type, operator: '==', value: 'Unknown or missing family type', label: family type}
     guard_cells: [{column: C, row: 81, expected_value: 'April 2025', label: month}, {column: H, row: 81, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]
-  - &1500_01_or_over__single_no_children
-    value_id: 1500_01_or_over__single_no_children
-    label: '£1500.01 or over, Single, no children'
-    ordinal: 80
-    row_number: 82
-    expected_row_header_column: F
-    expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: detail
-    filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Single, no children'}
-    constraints:
-    - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
-    - {variable: family_type, operator: '==', value: 'Single, no children', label: family type}
-    guard_cells: [{column: C, row: 82, expected_value: 'April 2025', label: month}, {column: H, row: 82, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]
-  - &1500_01_or_over__single_with_children
-    value_id: 1500_01_or_over__single_with_children
-    label: '£1500.01 or over, Single, with children'
-    ordinal: 81
-    row_number: 83
-    expected_row_header_column: F
-    expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: detail
-    filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Single, with children'}
-    constraints:
-    - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
-    - {variable: family_type, operator: '==', value: 'Single, with children', label: family type}
-    guard_cells: [{column: C, row: 83, expected_value: 'April 2025', label: month}, {column: H, row: 83, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]
-  - &1500_01_or_over__couple_no_children
-    value_id: 1500_01_or_over__couple_no_children
-    label: '£1500.01 or over, Couple, no children'
-    ordinal: 82
-    row_number: 84
-    expected_row_header_column: F
-    expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: detail
-    filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Couple, no children'}
-    constraints:
-    - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
-    - {variable: family_type, operator: '==', value: 'Couple, no children', label: family type}
-    guard_cells: [{column: C, row: 84, expected_value: 'April 2025', label: month}, {column: H, row: 84, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]
-  - &1500_01_or_over__couple_with_children
-    value_id: 1500_01_or_over__couple_with_children
-    label: '£1500.01 or over, Couple, with children'
-    ordinal: 83
-    row_number: 85
-    expected_row_header_column: F
-    expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: detail
-    filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Couple, with children'}
-    constraints:
-    - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
-    - {variable: family_type, operator: '==', value: 'Couple, with children', label: family type}
-    guard_cells: [{column: C, row: 85, expected_value: 'April 2025', label: month}, {column: H, row: 85, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]
-  - &1500_01_or_over__unknown_or_missing_family_type
-    value_id: 1500_01_or_over__unknown_or_missing_family_type
-    label: '£1500.01 or over, Unknown or missing family type'
-    ordinal: 84
-    row_number: 86
-    expected_row_header_column: F
-    expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:16'
-    table_record_kind: detail
-    filters: {monthly_award_amount_bands: '£1500.01 or over', family_type: 'Unknown or missing family type'}
-    constraints:
-    - {variable: monthly_award_amount_bands, operator: '==', value: '£1500.01 or over', label: monthly award amount bands}
-    - {variable: family_type, operator: '==', value: 'Unknown or missing family type', label: family type}
-    guard_cells: [{column: C, row: 86, expected_value: 'April 2025', label: month}, {column: H, row: 86, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]
   - &1500_01_to_1600_00__single_no_children
     value_id: 1500_01_to_1600_00__single_no_children
     label: '£1500.01 to £1600.00, Single, no children'
-    ordinal: 85
+    ordinal: 80
     row_number: 87
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:17'
@@ -1170,7 +1107,7 @@ record_sets:
   - &1500_01_to_1600_00__single_with_children
     value_id: 1500_01_to_1600_00__single_with_children
     label: '£1500.01 to £1600.00, Single, with children'
-    ordinal: 86
+    ordinal: 81
     row_number: 88
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:17'
@@ -1183,7 +1120,7 @@ record_sets:
   - &1500_01_to_1600_00__couple_no_children
     value_id: 1500_01_to_1600_00__couple_no_children
     label: '£1500.01 to £1600.00, Couple, no children'
-    ordinal: 87
+    ordinal: 82
     row_number: 89
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:17'
@@ -1196,7 +1133,7 @@ record_sets:
   - &1500_01_to_1600_00__couple_with_children
     value_id: 1500_01_to_1600_00__couple_with_children
     label: '£1500.01 to £1600.00, Couple, with children'
-    ordinal: 88
+    ordinal: 83
     row_number: 90
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:17'
@@ -1209,7 +1146,7 @@ record_sets:
   - &1500_01_to_1600_00__unknown_or_missing_family_type
     value_id: 1500_01_to_1600_00__unknown_or_missing_family_type
     label: '£1500.01 to £1600.00, Unknown or missing family type'
-    ordinal: 89
+    ordinal: 84
     row_number: 91
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:17'
@@ -1222,7 +1159,7 @@ record_sets:
   - &1600_01_to_1700_00__single_no_children
     value_id: 1600_01_to_1700_00__single_no_children
     label: '£1600.01 to £1700.00, Single, no children'
-    ordinal: 90
+    ordinal: 85
     row_number: 92
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:18'
@@ -1235,7 +1172,7 @@ record_sets:
   - &1600_01_to_1700_00__single_with_children
     value_id: 1600_01_to_1700_00__single_with_children
     label: '£1600.01 to £1700.00, Single, with children'
-    ordinal: 91
+    ordinal: 86
     row_number: 93
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:18'
@@ -1248,7 +1185,7 @@ record_sets:
   - &1600_01_to_1700_00__couple_no_children
     value_id: 1600_01_to_1700_00__couple_no_children
     label: '£1600.01 to £1700.00, Couple, no children'
-    ordinal: 92
+    ordinal: 87
     row_number: 94
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:18'
@@ -1261,7 +1198,7 @@ record_sets:
   - &1600_01_to_1700_00__couple_with_children
     value_id: 1600_01_to_1700_00__couple_with_children
     label: '£1600.01 to £1700.00, Couple, with children'
-    ordinal: 93
+    ordinal: 88
     row_number: 95
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:18'
@@ -1274,7 +1211,7 @@ record_sets:
   - &1600_01_to_1700_00__unknown_or_missing_family_type
     value_id: 1600_01_to_1700_00__unknown_or_missing_family_type
     label: '£1600.01 to £1700.00, Unknown or missing family type'
-    ordinal: 94
+    ordinal: 89
     row_number: 96
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:18'
@@ -1287,7 +1224,7 @@ record_sets:
   - &1700_01_to_1800_00__single_no_children
     value_id: 1700_01_to_1800_00__single_no_children
     label: '£1700.01 to £1800.00, Single, no children'
-    ordinal: 95
+    ordinal: 90
     row_number: 97
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:19'
@@ -1300,7 +1237,7 @@ record_sets:
   - &1700_01_to_1800_00__single_with_children
     value_id: 1700_01_to_1800_00__single_with_children
     label: '£1700.01 to £1800.00, Single, with children'
-    ordinal: 96
+    ordinal: 91
     row_number: 98
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:19'
@@ -1313,7 +1250,7 @@ record_sets:
   - &1700_01_to_1800_00__couple_no_children
     value_id: 1700_01_to_1800_00__couple_no_children
     label: '£1700.01 to £1800.00, Couple, no children'
-    ordinal: 97
+    ordinal: 92
     row_number: 99
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:19'
@@ -1326,7 +1263,7 @@ record_sets:
   - &1700_01_to_1800_00__couple_with_children
     value_id: 1700_01_to_1800_00__couple_with_children
     label: '£1700.01 to £1800.00, Couple, with children'
-    ordinal: 98
+    ordinal: 93
     row_number: 100
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:19'
@@ -1339,7 +1276,7 @@ record_sets:
   - &1700_01_to_1800_00__unknown_or_missing_family_type
     value_id: 1700_01_to_1800_00__unknown_or_missing_family_type
     label: '£1700.01 to £1800.00, Unknown or missing family type'
-    ordinal: 99
+    ordinal: 94
     row_number: 101
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:19'
@@ -1352,7 +1289,7 @@ record_sets:
   - &1800_01_to_1900_00__single_no_children
     value_id: 1800_01_to_1900_00__single_no_children
     label: '£1800.01 to £1900.00, Single, no children'
-    ordinal: 100
+    ordinal: 95
     row_number: 102
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:20'
@@ -1365,7 +1302,7 @@ record_sets:
   - &1800_01_to_1900_00__single_with_children
     value_id: 1800_01_to_1900_00__single_with_children
     label: '£1800.01 to £1900.00, Single, with children'
-    ordinal: 101
+    ordinal: 96
     row_number: 103
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:20'
@@ -1378,7 +1315,7 @@ record_sets:
   - &1800_01_to_1900_00__couple_no_children
     value_id: 1800_01_to_1900_00__couple_no_children
     label: '£1800.01 to £1900.00, Couple, no children'
-    ordinal: 102
+    ordinal: 97
     row_number: 104
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:20'
@@ -1391,7 +1328,7 @@ record_sets:
   - &1800_01_to_1900_00__couple_with_children
     value_id: 1800_01_to_1900_00__couple_with_children
     label: '£1800.01 to £1900.00, Couple, with children'
-    ordinal: 103
+    ordinal: 98
     row_number: 105
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:20'
@@ -1404,7 +1341,7 @@ record_sets:
   - &1800_01_to_1900_00__unknown_or_missing_family_type
     value_id: 1800_01_to_1900_00__unknown_or_missing_family_type
     label: '£1800.01 to £1900.00, Unknown or missing family type'
-    ordinal: 104
+    ordinal: 99
     row_number: 106
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:20'
@@ -1417,7 +1354,7 @@ record_sets:
   - &1900_01_to_2000_00__single_no_children
     value_id: 1900_01_to_2000_00__single_no_children
     label: '£1900.01 to £2000.00, Single, no children'
-    ordinal: 105
+    ordinal: 100
     row_number: 107
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:21'
@@ -1430,7 +1367,7 @@ record_sets:
   - &1900_01_to_2000_00__single_with_children
     value_id: 1900_01_to_2000_00__single_with_children
     label: '£1900.01 to £2000.00, Single, with children'
-    ordinal: 106
+    ordinal: 101
     row_number: 108
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:21'
@@ -1443,7 +1380,7 @@ record_sets:
   - &1900_01_to_2000_00__couple_no_children
     value_id: 1900_01_to_2000_00__couple_no_children
     label: '£1900.01 to £2000.00, Couple, no children'
-    ordinal: 107
+    ordinal: 102
     row_number: 109
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:21'
@@ -1456,7 +1393,7 @@ record_sets:
   - &1900_01_to_2000_00__couple_with_children
     value_id: 1900_01_to_2000_00__couple_with_children
     label: '£1900.01 to £2000.00, Couple, with children'
-    ordinal: 108
+    ordinal: 103
     row_number: 110
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:21'
@@ -1469,7 +1406,7 @@ record_sets:
   - &1900_01_to_2000_00__unknown_or_missing_family_type
     value_id: 1900_01_to_2000_00__unknown_or_missing_family_type
     label: '£1900.01 to £2000.00, Unknown or missing family type'
-    ordinal: 109
+    ordinal: 104
     row_number: 111
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:21'
@@ -1482,7 +1419,7 @@ record_sets:
   - &2000_01_to_2100_00__single_no_children
     value_id: 2000_01_to_2100_00__single_no_children
     label: '£2000.01 to £2100.00, Single, no children'
-    ordinal: 110
+    ordinal: 105
     row_number: 112
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:22'
@@ -1495,7 +1432,7 @@ record_sets:
   - &2000_01_to_2100_00__single_with_children
     value_id: 2000_01_to_2100_00__single_with_children
     label: '£2000.01 to £2100.00, Single, with children'
-    ordinal: 111
+    ordinal: 106
     row_number: 113
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:22'
@@ -1508,7 +1445,7 @@ record_sets:
   - &2000_01_to_2100_00__couple_no_children
     value_id: 2000_01_to_2100_00__couple_no_children
     label: '£2000.01 to £2100.00, Couple, no children'
-    ordinal: 112
+    ordinal: 107
     row_number: 114
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:22'
@@ -1521,7 +1458,7 @@ record_sets:
   - &2000_01_to_2100_00__couple_with_children
     value_id: 2000_01_to_2100_00__couple_with_children
     label: '£2000.01 to £2100.00, Couple, with children'
-    ordinal: 113
+    ordinal: 108
     row_number: 115
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:22'
@@ -1534,7 +1471,7 @@ record_sets:
   - &2000_01_to_2100_00__unknown_or_missing_family_type
     value_id: 2000_01_to_2100_00__unknown_or_missing_family_type
     label: '£2000.01 to £2100.00, Unknown or missing family type'
-    ordinal: 114
+    ordinal: 109
     row_number: 116
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:22'
@@ -1547,7 +1484,7 @@ record_sets:
   - &2100_01_to_2200_00__single_no_children
     value_id: 2100_01_to_2200_00__single_no_children
     label: '£2100.01 to £2200.00, Single, no children'
-    ordinal: 115
+    ordinal: 110
     row_number: 117
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:23'
@@ -1560,7 +1497,7 @@ record_sets:
   - &2100_01_to_2200_00__single_with_children
     value_id: 2100_01_to_2200_00__single_with_children
     label: '£2100.01 to £2200.00, Single, with children'
-    ordinal: 116
+    ordinal: 111
     row_number: 118
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:23'
@@ -1573,7 +1510,7 @@ record_sets:
   - &2100_01_to_2200_00__couple_no_children
     value_id: 2100_01_to_2200_00__couple_no_children
     label: '£2100.01 to £2200.00, Couple, no children'
-    ordinal: 117
+    ordinal: 112
     row_number: 119
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:23'
@@ -1586,7 +1523,7 @@ record_sets:
   - &2100_01_to_2200_00__couple_with_children
     value_id: 2100_01_to_2200_00__couple_with_children
     label: '£2100.01 to £2200.00, Couple, with children'
-    ordinal: 118
+    ordinal: 113
     row_number: 120
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:23'
@@ -1599,7 +1536,7 @@ record_sets:
   - &2100_01_to_2200_00__unknown_or_missing_family_type
     value_id: 2100_01_to_2200_00__unknown_or_missing_family_type
     label: '£2100.01 to £2200.00, Unknown or missing family type'
-    ordinal: 119
+    ordinal: 114
     row_number: 121
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:23'
@@ -1612,7 +1549,7 @@ record_sets:
   - &2200_01_to_2300_00__single_no_children
     value_id: 2200_01_to_2300_00__single_no_children
     label: '£2200.01 to £2300.00, Single, no children'
-    ordinal: 120
+    ordinal: 115
     row_number: 122
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:24'
@@ -1625,7 +1562,7 @@ record_sets:
   - &2200_01_to_2300_00__single_with_children
     value_id: 2200_01_to_2300_00__single_with_children
     label: '£2200.01 to £2300.00, Single, with children'
-    ordinal: 121
+    ordinal: 116
     row_number: 123
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:24'
@@ -1638,7 +1575,7 @@ record_sets:
   - &2200_01_to_2300_00__couple_no_children
     value_id: 2200_01_to_2300_00__couple_no_children
     label: '£2200.01 to £2300.00, Couple, no children'
-    ordinal: 122
+    ordinal: 117
     row_number: 124
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:24'
@@ -1651,7 +1588,7 @@ record_sets:
   - &2200_01_to_2300_00__couple_with_children
     value_id: 2200_01_to_2300_00__couple_with_children
     label: '£2200.01 to £2300.00, Couple, with children'
-    ordinal: 123
+    ordinal: 118
     row_number: 125
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:24'
@@ -1664,7 +1601,7 @@ record_sets:
   - &2200_01_to_2300_00__unknown_or_missing_family_type
     value_id: 2200_01_to_2300_00__unknown_or_missing_family_type
     label: '£2200.01 to £2300.00, Unknown or missing family type'
-    ordinal: 124
+    ordinal: 119
     row_number: 126
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:24'
@@ -1677,7 +1614,7 @@ record_sets:
   - &2300_01_to_2400_00__single_no_children
     value_id: 2300_01_to_2400_00__single_no_children
     label: '£2300.01 to £2400.00, Single, no children'
-    ordinal: 125
+    ordinal: 120
     row_number: 127
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:25'
@@ -1690,7 +1627,7 @@ record_sets:
   - &2300_01_to_2400_00__single_with_children
     value_id: 2300_01_to_2400_00__single_with_children
     label: '£2300.01 to £2400.00, Single, with children'
-    ordinal: 126
+    ordinal: 121
     row_number: 128
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:25'
@@ -1703,7 +1640,7 @@ record_sets:
   - &2300_01_to_2400_00__couple_no_children
     value_id: 2300_01_to_2400_00__couple_no_children
     label: '£2300.01 to £2400.00, Couple, no children'
-    ordinal: 127
+    ordinal: 122
     row_number: 129
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:25'
@@ -1716,7 +1653,7 @@ record_sets:
   - &2300_01_to_2400_00__couple_with_children
     value_id: 2300_01_to_2400_00__couple_with_children
     label: '£2300.01 to £2400.00, Couple, with children'
-    ordinal: 128
+    ordinal: 123
     row_number: 130
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:25'
@@ -1729,7 +1666,7 @@ record_sets:
   - &2300_01_to_2400_00__unknown_or_missing_family_type
     value_id: 2300_01_to_2400_00__unknown_or_missing_family_type
     label: '£2300.01 to £2400.00, Unknown or missing family type'
-    ordinal: 129
+    ordinal: 124
     row_number: 131
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:25'
@@ -1742,7 +1679,7 @@ record_sets:
   - &2400_01_to_2500_00__single_no_children
     value_id: 2400_01_to_2500_00__single_no_children
     label: '£2400.01 to £2500.00, Single, no children'
-    ordinal: 130
+    ordinal: 125
     row_number: 132
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:26'
@@ -1755,7 +1692,7 @@ record_sets:
   - &2400_01_to_2500_00__single_with_children
     value_id: 2400_01_to_2500_00__single_with_children
     label: '£2400.01 to £2500.00, Single, with children'
-    ordinal: 131
+    ordinal: 126
     row_number: 133
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:26'
@@ -1768,7 +1705,7 @@ record_sets:
   - &2400_01_to_2500_00__couple_no_children
     value_id: 2400_01_to_2500_00__couple_no_children
     label: '£2400.01 to £2500.00, Couple, no children'
-    ordinal: 132
+    ordinal: 127
     row_number: 134
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:26'
@@ -1781,7 +1718,7 @@ record_sets:
   - &2400_01_to_2500_00__couple_with_children
     value_id: 2400_01_to_2500_00__couple_with_children
     label: '£2400.01 to £2500.00, Couple, with children'
-    ordinal: 133
+    ordinal: 128
     row_number: 135
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:26'
@@ -1794,7 +1731,7 @@ record_sets:
   - &2400_01_to_2500_00__unknown_or_missing_family_type
     value_id: 2400_01_to_2500_00__unknown_or_missing_family_type
     label: '£2400.01 to £2500.00, Unknown or missing family type'
-    ordinal: 134
+    ordinal: 129
     row_number: 136
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:26'
@@ -1807,7 +1744,7 @@ record_sets:
   - &2500_01_or_over__single_no_children
     value_id: 2500_01_or_over__single_no_children
     label: '£2500.01 or over, Single, no children'
-    ordinal: 135
+    ordinal: 130
     row_number: 137
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:27'
@@ -1820,7 +1757,7 @@ record_sets:
   - &2500_01_or_over__single_with_children
     value_id: 2500_01_or_over__single_with_children
     label: '£2500.01 or over, Single, with children'
-    ordinal: 136
+    ordinal: 131
     row_number: 138
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:27'
@@ -1833,7 +1770,7 @@ record_sets:
   - &2500_01_or_over__couple_no_children
     value_id: 2500_01_or_over__couple_no_children
     label: '£2500.01 or over, Couple, no children'
-    ordinal: 137
+    ordinal: 132
     row_number: 139
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:27'
@@ -1846,7 +1783,7 @@ record_sets:
   - &2500_01_or_over__couple_with_children
     value_id: 2500_01_or_over__couple_with_children
     label: '£2500.01 or over, Couple, with children'
-    ordinal: 138
+    ordinal: 133
     row_number: 140
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:27'
@@ -1859,7 +1796,7 @@ record_sets:
   - &2500_01_or_over__unknown_or_missing_family_type
     value_id: 2500_01_or_over__unknown_or_missing_family_type
     label: '£2500.01 or over, Unknown or missing family type'
-    ordinal: 139
+    ordinal: 134
     row_number: 141
     expected_row_header_column: F
     expected_row_header: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnpayment_band:C_UC_PAYMENT_BAND:27'
@@ -1882,7 +1819,7 @@ record_sets:
     concept_relation: source_label
     concept_authority: dwp
     concept_evidence_url: https://stat-xplore.dwp.gov.uk/
-    concept_evidence_notes: 'Stat-Xplore ''Households on Universal Credit'' dataset, April to December 2025, Great Britain, dimensioned by Monthly Award Amount (bands) x Family Type; query echoed in the archived API response. Band identities are the publisher''s exact band labels; the legacy ''£1500.01 or over'' band is published as zero in every cell and is not a subtotal; mapping the labels to numeric monthly-award bounds (and any x12 annualisation) is a downstream declaration. DWP defines a Universal Credit household as the UC unit of assessment; Chronicle normalizes that entity to benefit_unit.'
+    concept_evidence_notes: 'Stat-Xplore ''Households on Universal Credit'' dataset, April to December 2025, Great Britain, dimensioned by Monthly Award Amount (bands) x Family Type; query echoed in the archived API response. Band identities are the publisher''s exact band labels; the ''£1500.01 or over'' band applies to months up to August 2022 only (DWP metadata) and is not ported; mapping the labels to numeric monthly-award bounds (and any x12 annualisation) is a downstream declaration. DWP defines a Universal Credit household as the UC unit of assessment; Chronicle normalizes that entity to benefit_unit.'
     unit: count
     aggregation: sum
     expected_cell_type: number
@@ -1973,11 +1910,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 219, guard_cells: [{column: C, row: 219, expected_value: 'May 2025', label: month}, {column: H, row: 219, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 220, guard_cells: [{column: C, row: 220, expected_value: 'May 2025', label: month}, {column: H, row: 220, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 221, guard_cells: [{column: C, row: 221, expected_value: 'May 2025', label: month}, {column: H, row: 221, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 222, guard_cells: [{column: C, row: 222, expected_value: 'May 2025', label: month}, {column: H, row: 222, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 223, guard_cells: [{column: C, row: 223, expected_value: 'May 2025', label: month}, {column: H, row: 223, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 224, guard_cells: [{column: C, row: 224, expected_value: 'May 2025', label: month}, {column: H, row: 224, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 225, guard_cells: [{column: C, row: 225, expected_value: 'May 2025', label: month}, {column: H, row: 225, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 226, guard_cells: [{column: C, row: 226, expected_value: 'May 2025', label: month}, {column: H, row: 226, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 227, guard_cells: [{column: C, row: 227, expected_value: 'May 2025', label: month}, {column: H, row: 227, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 228, guard_cells: [{column: C, row: 228, expected_value: 'May 2025', label: month}, {column: H, row: 228, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 229, guard_cells: [{column: C, row: 229, expected_value: 'May 2025', label: month}, {column: H, row: 229, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -2120,11 +2052,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 359, guard_cells: [{column: C, row: 359, expected_value: 'June 2025', label: month}, {column: H, row: 359, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 360, guard_cells: [{column: C, row: 360, expected_value: 'June 2025', label: month}, {column: H, row: 360, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 361, guard_cells: [{column: C, row: 361, expected_value: 'June 2025', label: month}, {column: H, row: 361, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 362, guard_cells: [{column: C, row: 362, expected_value: 'June 2025', label: month}, {column: H, row: 362, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 363, guard_cells: [{column: C, row: 363, expected_value: 'June 2025', label: month}, {column: H, row: 363, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 364, guard_cells: [{column: C, row: 364, expected_value: 'June 2025', label: month}, {column: H, row: 364, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 365, guard_cells: [{column: C, row: 365, expected_value: 'June 2025', label: month}, {column: H, row: 365, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 366, guard_cells: [{column: C, row: 366, expected_value: 'June 2025', label: month}, {column: H, row: 366, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 367, guard_cells: [{column: C, row: 367, expected_value: 'June 2025', label: month}, {column: H, row: 367, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 368, guard_cells: [{column: C, row: 368, expected_value: 'June 2025', label: month}, {column: H, row: 368, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 369, guard_cells: [{column: C, row: 369, expected_value: 'June 2025', label: month}, {column: H, row: 369, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -2267,11 +2194,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 499, guard_cells: [{column: C, row: 499, expected_value: 'July 2025', label: month}, {column: H, row: 499, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 500, guard_cells: [{column: C, row: 500, expected_value: 'July 2025', label: month}, {column: H, row: 500, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 501, guard_cells: [{column: C, row: 501, expected_value: 'July 2025', label: month}, {column: H, row: 501, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 502, guard_cells: [{column: C, row: 502, expected_value: 'July 2025', label: month}, {column: H, row: 502, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 503, guard_cells: [{column: C, row: 503, expected_value: 'July 2025', label: month}, {column: H, row: 503, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 504, guard_cells: [{column: C, row: 504, expected_value: 'July 2025', label: month}, {column: H, row: 504, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 505, guard_cells: [{column: C, row: 505, expected_value: 'July 2025', label: month}, {column: H, row: 505, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 506, guard_cells: [{column: C, row: 506, expected_value: 'July 2025', label: month}, {column: H, row: 506, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 507, guard_cells: [{column: C, row: 507, expected_value: 'July 2025', label: month}, {column: H, row: 507, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 508, guard_cells: [{column: C, row: 508, expected_value: 'July 2025', label: month}, {column: H, row: 508, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 509, guard_cells: [{column: C, row: 509, expected_value: 'July 2025', label: month}, {column: H, row: 509, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -2414,11 +2336,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 639, guard_cells: [{column: C, row: 639, expected_value: 'August 2025', label: month}, {column: H, row: 639, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 640, guard_cells: [{column: C, row: 640, expected_value: 'August 2025', label: month}, {column: H, row: 640, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 641, guard_cells: [{column: C, row: 641, expected_value: 'August 2025', label: month}, {column: H, row: 641, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 642, guard_cells: [{column: C, row: 642, expected_value: 'August 2025', label: month}, {column: H, row: 642, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 643, guard_cells: [{column: C, row: 643, expected_value: 'August 2025', label: month}, {column: H, row: 643, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 644, guard_cells: [{column: C, row: 644, expected_value: 'August 2025', label: month}, {column: H, row: 644, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 645, guard_cells: [{column: C, row: 645, expected_value: 'August 2025', label: month}, {column: H, row: 645, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 646, guard_cells: [{column: C, row: 646, expected_value: 'August 2025', label: month}, {column: H, row: 646, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 647, guard_cells: [{column: C, row: 647, expected_value: 'August 2025', label: month}, {column: H, row: 647, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 648, guard_cells: [{column: C, row: 648, expected_value: 'August 2025', label: month}, {column: H, row: 648, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 649, guard_cells: [{column: C, row: 649, expected_value: 'August 2025', label: month}, {column: H, row: 649, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -2561,11 +2478,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 779, guard_cells: [{column: C, row: 779, expected_value: 'September 2025', label: month}, {column: H, row: 779, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 780, guard_cells: [{column: C, row: 780, expected_value: 'September 2025', label: month}, {column: H, row: 780, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 781, guard_cells: [{column: C, row: 781, expected_value: 'September 2025', label: month}, {column: H, row: 781, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 782, guard_cells: [{column: C, row: 782, expected_value: 'September 2025', label: month}, {column: H, row: 782, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 783, guard_cells: [{column: C, row: 783, expected_value: 'September 2025', label: month}, {column: H, row: 783, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 784, guard_cells: [{column: C, row: 784, expected_value: 'September 2025', label: month}, {column: H, row: 784, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 785, guard_cells: [{column: C, row: 785, expected_value: 'September 2025', label: month}, {column: H, row: 785, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 786, guard_cells: [{column: C, row: 786, expected_value: 'September 2025', label: month}, {column: H, row: 786, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 787, guard_cells: [{column: C, row: 787, expected_value: 'September 2025', label: month}, {column: H, row: 787, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 788, guard_cells: [{column: C, row: 788, expected_value: 'September 2025', label: month}, {column: H, row: 788, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 789, guard_cells: [{column: C, row: 789, expected_value: 'September 2025', label: month}, {column: H, row: 789, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -2708,11 +2620,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 919, guard_cells: [{column: C, row: 919, expected_value: 'October 2025', label: month}, {column: H, row: 919, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 920, guard_cells: [{column: C, row: 920, expected_value: 'October 2025', label: month}, {column: H, row: 920, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 921, guard_cells: [{column: C, row: 921, expected_value: 'October 2025', label: month}, {column: H, row: 921, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 922, guard_cells: [{column: C, row: 922, expected_value: 'October 2025', label: month}, {column: H, row: 922, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 923, guard_cells: [{column: C, row: 923, expected_value: 'October 2025', label: month}, {column: H, row: 923, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 924, guard_cells: [{column: C, row: 924, expected_value: 'October 2025', label: month}, {column: H, row: 924, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 925, guard_cells: [{column: C, row: 925, expected_value: 'October 2025', label: month}, {column: H, row: 925, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 926, guard_cells: [{column: C, row: 926, expected_value: 'October 2025', label: month}, {column: H, row: 926, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 927, guard_cells: [{column: C, row: 927, expected_value: 'October 2025', label: month}, {column: H, row: 927, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 928, guard_cells: [{column: C, row: 928, expected_value: 'October 2025', label: month}, {column: H, row: 928, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 929, guard_cells: [{column: C, row: 929, expected_value: 'October 2025', label: month}, {column: H, row: 929, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -2855,11 +2762,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 1059, guard_cells: [{column: C, row: 1059, expected_value: 'November 2025', label: month}, {column: H, row: 1059, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 1060, guard_cells: [{column: C, row: 1060, expected_value: 'November 2025', label: month}, {column: H, row: 1060, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 1061, guard_cells: [{column: C, row: 1061, expected_value: 'November 2025', label: month}, {column: H, row: 1061, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 1062, guard_cells: [{column: C, row: 1062, expected_value: 'November 2025', label: month}, {column: H, row: 1062, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 1063, guard_cells: [{column: C, row: 1063, expected_value: 'November 2025', label: month}, {column: H, row: 1063, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 1064, guard_cells: [{column: C, row: 1064, expected_value: 'November 2025', label: month}, {column: H, row: 1064, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 1065, guard_cells: [{column: C, row: 1065, expected_value: 'November 2025', label: month}, {column: H, row: 1065, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 1066, guard_cells: [{column: C, row: 1066, expected_value: 'November 2025', label: month}, {column: H, row: 1066, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 1067, guard_cells: [{column: C, row: 1067, expected_value: 'November 2025', label: month}, {column: H, row: 1067, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 1068, guard_cells: [{column: C, row: 1068, expected_value: 'November 2025', label: month}, {column: H, row: 1068, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 1069, guard_cells: [{column: C, row: 1069, expected_value: 'November 2025', label: month}, {column: H, row: 1069, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
@@ -3002,11 +2904,6 @@ record_sets:
   - {<<: *1400_01_to_1500_00__couple_no_children, row_number: 1199, guard_cells: [{column: C, row: 1199, expected_value: 'December 2025', label: month}, {column: H, row: 1199, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__couple_with_children, row_number: 1200, guard_cells: [{column: C, row: 1200, expected_value: 'December 2025', label: month}, {column: H, row: 1200, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
   - {<<: *1400_01_to_1500_00__unknown_or_missing_family_type, row_number: 1201, guard_cells: [{column: C, row: 1201, expected_value: 'December 2025', label: month}, {column: H, row: 1201, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_no_children, row_number: 1202, guard_cells: [{column: C, row: 1202, expected_value: 'December 2025', label: month}, {column: H, row: 1202, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
-  - {<<: *1500_01_or_over__single_with_children, row_number: 1203, guard_cells: [{column: C, row: 1203, expected_value: 'December 2025', label: month}, {column: H, row: 1203, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_no_children, row_number: 1204, guard_cells: [{column: C, row: 1204, expected_value: 'December 2025', label: month}, {column: H, row: 1204, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
-  - {<<: *1500_01_or_over__couple_with_children, row_number: 1205, guard_cells: [{column: C, row: 1205, expected_value: 'December 2025', label: month}, {column: H, row: 1205, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:4', label: family type value URI}]}
-  - {<<: *1500_01_or_over__unknown_or_missing_family_type, row_number: 1206, guard_cells: [{column: C, row: 1206, expected_value: 'December 2025', label: month}, {column: H, row: 1206, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:99', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_no_children, row_number: 1207, guard_cells: [{column: C, row: 1207, expected_value: 'December 2025', label: month}, {column: H, row: 1207, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:1', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__single_with_children, row_number: 1208, guard_cells: [{column: C, row: 1208, expected_value: 'December 2025', label: month}, {column: H, row: 1208, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:2', label: family type value URI}]}
   - {<<: *1500_01_to_1600_00__couple_no_children, row_number: 1209, guard_cells: [{column: C, row: 1209, expected_value: 'December 2025', label: month}, {column: H, row: 1209, expected_value: 'str:value:UC_Households:V_F_UC_HOUSEHOLDS:hnfamily_type:C_UC_FAMILY_TYPE:3', label: family type value URI}]}
