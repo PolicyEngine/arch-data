@@ -270,12 +270,27 @@ Running the same operations against a checkout of the previous head:
   including `filename=manifest.yaml`, which could overwrite the selected
   manifest, and reproduced an undiscoverable `custom.yaml` manifest reaching
   publisher I/O. Ported `is_bare_filename`, `bare_filename`,
-  `_infer_artifact_filename`, the manifest-like artifact refusal from
-  `daafac0`, and c0d9d74's discoverable `_manifest_path` restriction. All 117
-  artifact tests pass after the pre-I/O fix.
+  `_infer_artifact_filename` from `daafac0`, and the manifest-like artifact
+  refusal plus discoverable `_manifest_path` restriction from `c0d9d74`. All
+  117 artifact tests pass after the pre-I/O fix.
 
 ### Next
 
-- Commit the adversarial-review corrections, run the required lint, format,
-  full-test, and tracked-USDA sweep verification, then write the final `out.md`
-  report.
+- None in this lane. All ten Sol findings, the non-microdata #227 port
+  completeness pass, and adversarial follow-ups are committed and verified.
+  The final evidence and per-finding commit map are in the runner's external
+  `-o out.md` report, not a repository-root file.
+
+### Final verification
+
+- `uv run ruff check .`: exit 0 (`All checks passed!`).
+- `uv run ruff format --check` on all six changed Python files: exit 0
+  (`6 files already formatted`).
+- Full `uv run pytest -q -p no:cacheprovider`: direct exit 0, 995 passed,
+  1 skipped, 18 warnings in 1539.05 seconds.
+- A fresh `/tmp` copy of tracked USDA `fy69_to_current` reports two manifests
+  and two artifacts in inventory. Publish includes both: FY2024 is one safe
+  preserved-bucket skip and the known misrouted FY2025 package/year key is one
+  explicit failure, with zero uploads. No tracked manifest was changed.
+- The external `-o out.md` report records every failing-first command and
+  observation, regression test, fix commit, and exact #227 port provenance.
