@@ -53,3 +53,24 @@ were closed on 2026-08-09 by chronicle#153:
   replay rejects the hand-forged plan before any write reaches disk, and
   the builder end-to-end refuses the stale catalog, leaving both
   artifacts untouched.
+
+## Country geography on Colorado-scoped concepts, and one raw series id (2026-09-04)
+
+Three concepts minted by the 2026-08-23 first-print wave (c2aa68d, manifest
+0015-fdcfd0e570214f6b) name Colorado in the concept string while their rows
+carry country-level geography copied from the observation payload
+(`{"level": "country", "id": "0100000US", "vintage": "current"}`):
+`bls.laus.colorado.labor_force` (d496bea3), `ssa.ssi.recipients.colorado`
+(5e368043) and `ssa.ssi.recipients.colorado.aged_65_plus` (2cb31293). The
+ledger already records state geography elsewhere (for example the SNAP payment
+error rate observation for Colorado, `0400000US08`), so the scope belongs in
+the geography, not the name. The same wave minted `bls.cps.LNU02374597`
+(34af6867) under the raw BLS series id, recorded deliberately by the adapter
+(`concept_relation: source_label`) where the other 227 rows use lowercase
+slugs; the catalog flags it as a suspect segment and the test pins it as the
+one expected suspect.
+
+Neither is wrong data, and neither changes what the derived pins must be.
+The correction path for either is an appended observation with
+`assertionVersion.supersedes`, never an in-place edit of a released row: all
+four rows sit under signed, timestamped manifests 0015 to 0020.
