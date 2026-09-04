@@ -188,3 +188,39 @@ Running the same operations against a checkout of the previous head:
 - Follow-up PR, after Max creates and backfills the new buckets: flip
   `DEFAULT_R2_RAW_BUCKET` / `DEFAULT_R2_DERIVED_BUCKET` to `chronicle-raw` /
   `chronicle-derived`.
+
+## Review fixes (Sol gate round 3)
+
+### State
+
+- Detached HEAD: `fb1bc1df`, the PR #226 head supplied for the ten-finding Sol
+  gate round.
+- Scope: ten operational-rename findings in artifact fetch/publish/inventory,
+  Supabase compatibility aliases, and the README cutover procedure. No tracked
+  `db/data/**` manifest will be changed.
+- `CLAUDE.md`, one of the requested initial reads, is absent from both this
+  worktree and `/Users/maxghenis/PolicyEngine/chronicle`; `AGENTS.md` and the
+  remaining requested guidance/code/tests are present.
+- PR #227 is available read-only at
+  `/Users/maxghenis/PolicyEngine/_worktrees/chronicle-227-fix`. Applicable
+  non-microdata hunks from `daafac0` and `c0d9d74` will be ported with the same
+  function names and shapes.
+
+### Done
+
+- Re-established the lane state in this committed progress log before making
+  gate-round code or test changes.
+- Read `AGENTS.md`, the Bucket Cutover and Publisher Revisions contracts in
+  `docs/storage-architecture.md`, the README cutover instructions, and the
+  named implementation/test surfaces. Confirmed Chronicle must preserve
+  publisher bytes and provenance, refuse unsafe fetches before I/O, and leave
+  schema/bucket value cutovers explicit.
+
+### Next
+
+- Add and run focused failing regression tests for findings 1-8, recording the
+  exact commands and observed failures for `out.md`.
+- Port the matching #227 validation, year-key selection, in-place entry update,
+  and package-manifest discovery hunks; implement the remaining artifact fixes.
+- Reproduce and fix findings 9-10, then run the required lint, format, full-test,
+  and tracked-USDA sweep verification.
