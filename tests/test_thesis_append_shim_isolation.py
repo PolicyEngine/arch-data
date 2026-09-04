@@ -116,8 +116,17 @@ def _initialize(root: pathlib.Path) -> None:
     _git(root, "config", "user.name", "Shim Isolation")
 
 
-def _commit(root: pathlib.Path, message: str) -> str:
+def _commit(root: pathlib.Path, message: str, index_mutation=None) -> str:
+    """Commit the working tree, and any entry only the index can carry.
+
+    ``index_mutation`` runs between the add and the commit, because an entry
+    with no file behind it -- a gitlink, say -- would be staged for deletion by
+    the add if it were written first.
+    """
+
     _git(root, "add", "-A")
+    if index_mutation is not None:
+        index_mutation(root)
     _git(root, "commit", "--quiet", "--allow-empty", "-m", message)
     return _git(root, "rev-parse", "HEAD")
 
@@ -131,6 +140,7 @@ def _replay_latest_release(
     *,
     prepare=None,
     mutate=None,
+    mutate_index=None,
 ) -> tuple[pathlib.Path, str, str]:
     """Build the prior release as base and the witnessed append as candidate.
 
@@ -138,6 +148,7 @@ def _replay_latest_release(
     commits and is therefore not part of the diff the gate judges. ``mutate``
     runs after the release files are restored and before the candidate commit,
     so whatever it writes is part of the candidate and of nothing else.
+    ``mutate_index`` does the same for an entry that exists only in the index.
     """
 
     root = _copy_custody_tree(destination)
@@ -159,7 +170,7 @@ def _replay_latest_release(
         shutil.copyfile(_release_file(ROOT, suffix), _release_file(root, suffix))
     if mutate is not None:
         mutate(root)
-    return root, base, _commit(root, "witnessed append")
+    return root, base, _commit(root, "witnessed append", mutate_index)
 
 
 def _replay_current_state(destination: pathlib.Path) -> tuple[pathlib.Path, str]:
@@ -522,16 +533,59 @@ def _commit_a_symlink_under_releases(root: pathlib.Path) -> None:
     link.symlink_to(pathlib.Path("..") / ".." / "ledger" / "immutable_prefix.json")
 
 
-def test_a_symlink_under_the_release_root_is_refused(tmp_path):
-    """A protected path that is a link is refused on its mode, not followed.
+def _stage_a_gitlink_under_releases(root: pathlib.Path) -> None:
+    """Record a submodule boundary under the release root, in the index only.
 
-    The refusal is the shim's, not the gate's -- the message says "refused" and
-    not "failed" -- so the mode was read before any verdict was reached about
-    what the tree holds.
+    A gitlink names a commit in another repository. Whatever a checkout puts at
+    that path belongs to that repository and is no part of this commit, so
+    nothing under it can be compared against anything this commit fixes.
+    """
+
+    head = _git(root, "rev-parse", "HEAD")
+    _git(
+        root,
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        f"160000,{head},releases/manifests/0000-elsewhere",
+    )
+
+
+@pytest.mark.parametrize(
+    ("case", "mutate", "mutate_index", "path", "mode"),
+    [
+        (
+            "symlink",
+            _commit_a_symlink_under_releases,
+            None,
+            "releases/manifests/0000-shortcut.json",
+            "120000",
+        ),
+        (
+            "gitlink",
+            None,
+            _stage_a_gitlink_under_releases,
+            "releases/manifests/0000-elsewhere",
+            "160000",
+        ),
+    ],
+)
+def test_a_protected_path_that_is_not_a_file_is_refused(
+    tmp_path, case, mutate, mutate_index, path, mode
+):
+    """A link and a submodule boundary are both refused on their tree mode.
+
+    Neither is a path whose bytes this commit fixes: a link is a name for
+    somewhere else, and a gitlink is a name for another repository whose
+    contents this commit does not carry. They are refused rather than followed.
+
+    The refusal is the shim's and not the gate's -- the message says "refused"
+    and not "failed" -- so the mode was read before any verdict was reached
+    about what the tree holds.
     """
 
     clone, base, candidate = _replay_latest_release(
-        tmp_path, mutate=_commit_a_symlink_under_releases
+        tmp_path / case, mutate=mutate, mutate_index=mutate_index
     )
 
     completed = _run_shim(
@@ -545,8 +599,8 @@ def test_a_symlink_under_the_release_root_is_refused(tmp_path):
     assert completed.stdout == ""
     assert FAILED not in completed.stderr
     assert REFUSED in completed.stderr
-    assert "releases/manifests/0000-shortcut.json" in completed.stderr
-    assert "tree mode 120000" in completed.stderr
+    assert path in completed.stderr
+    assert f"tree mode {mode}" in completed.stderr
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
