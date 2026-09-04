@@ -1064,24 +1064,8 @@ def publish_source_artifacts(
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
 
-        manifest_source_id = source_id or manifest.get("source_id")
-        manifest_package_id = package_id or manifest.get("package_id")
-        if not manifest_source_id:
-            errors.append(f"Manifest missing source_id: {manifest_path}")
-            continue
-        if not manifest_package_id:
-            errors.append(f"Manifest missing package_id: {manifest_path}")
-            continue
-        try:
-            resolved_r2_prefix = resolve_r2_prefix(
-                prefix=r2_prefix,
-                default_prefix=DEFAULT_R2_PREFIX,
-                source_id=str(manifest_source_id),
-                package_path=manifest_path,
-            )
-        except ValueError as exc:
-            errors.append(f"Could not resolve R2 prefix for {manifest_path}: {exc}")
-            continue
+        manifest_source_id = str(source_id or manifest.get("source_id") or "")
+        manifest_package_id = str(package_id or manifest.get("package_id") or "")
 
         updated = False
         for year, spec in files.items():
@@ -1092,7 +1076,7 @@ def publish_source_artifacts(
                 year,
                 spec,
                 r2_bucket=r2_bucket,
-                r2_prefix=resolved_r2_prefix,
+                r2_prefix=r2_prefix,
                 wrangler_command=wrangler_command,
             )
             entries.append(entry)
@@ -1100,8 +1084,10 @@ def publish_source_artifacts(
                 spec.update(updated_spec)
                 updated = True
         if updated:
-            manifest.setdefault("source_id", manifest_source_id)
-            manifest.setdefault("package_id", manifest_package_id)
+            if manifest_source_id:
+                manifest.setdefault("source_id", manifest_source_id)
+            if manifest_package_id:
+                manifest.setdefault("package_id", manifest_package_id)
             manifest_path.write_text(
                 yaml.safe_dump(manifest, sort_keys=False),
                 encoding="utf-8",
@@ -2210,7 +2196,7 @@ def _publish_raw_manifest_entry(
     spec: Any,
     *,
     r2_bucket: str,
-    r2_prefix: str,
+    r2_prefix: str | None,
     wrangler_command: str,
 ) -> tuple[RawArtifactPublishEntry, dict[str, Any] | None]:
     errors: list[str] = []
@@ -2304,37 +2290,20 @@ def _publish_raw_manifest_entry(
             f"local_filename={Path(filename).name}"
         )
 
-    location = ArtifactStorageLocation(
-        provider="r2",
-        bucket=r2_bucket,
-        key=build_r2_key(
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            sha256=sha256_actual or "",
-            filename=filename,
-            prefix=r2_prefix,
-            package_path=manifest_path,
-        ),
-    )
-    recorded_key = recorded_r2.key if recorded_r2 is not None else None
-    if recorded_key and recorded_key != location.key:
-        # Validate the full source/package/year route before the preserved-
-        # bucket shortcut below. A bucket rename does not make a misrouted
-        # object valid history.
-        return refuse(
-            "recorded_r2_key_disagrees_with_country_prefix:"
-            f"recorded={recorded_key}:expected={location.key}"
-        )
-    recorded_bucket = recorded_r2.bucket if recorded_r2 is not None else None
-    if recorded_r2 is not None and recorded_bucket != location.bucket:
-        # The recorded bucket is preserved history and, per the identity check
-        # above, its object holds exactly these bytes: the artifact is already
-        # published. Restating it under the configured bucket would rewrite
-        # where the bytes were first published (a backfill copy is not a
-        # restatement), so the entry is reported as skipped with nothing
-        # uploaded or rewritten. After the bucket-default flip every entry
-        # published before it takes this path, and the sweep stays green.
+    if recorded_r2 is not None:
+        # A recorded content-addressed object whose tail identifies the bytes
+        # in hand is published history. Its source/package/year route may
+        # predate today's country prefix or intentionally represent the
+        # publisher's explicit route (for example Statbel's 2023 snapshots and
+        # USDA's cross-manifest archive). Reconstructing a current route and
+        # requiring equality would rewrite that history during a bucket
+        # cutover. Only the checksum/filename tail decides byte identity.
+        skipped = "recorded_r2_already_published"
+        if recorded_r2.bucket != r2_bucket:
+            skipped = (
+                "recorded_r2_bucket_is_preserved_history:"
+                f"recorded={recorded_r2.bucket}:requested={r2_bucket}"
+            )
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
@@ -2352,13 +2321,38 @@ def _publish_raw_manifest_entry(
                 ),
                 upload=None,
                 errors=(),
-                skipped=(
-                    "recorded_r2_bucket_is_preserved_history:"
-                    f"recorded={recorded_bucket}:requested={location.bucket}"
-                ),
+                skipped=skipped,
             ),
             None,
         )
+
+    if not source_id:
+        return refuse("missing_source_id")
+    if not package_id:
+        return refuse("missing_package_id")
+    try:
+        resolved_r2_prefix = resolve_r2_prefix(
+            prefix=r2_prefix,
+            default_prefix=DEFAULT_R2_PREFIX,
+            source_id=source_id,
+            package_path=manifest_path,
+        )
+    except ValueError as error:
+        return refuse(f"r2_prefix_invalid:{error}")
+
+    location = ArtifactStorageLocation(
+        provider="r2",
+        bucket=r2_bucket,
+        key=build_r2_key(
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            sha256=sha256_actual or "",
+            filename=filename,
+            prefix=resolved_r2_prefix,
+            package_path=manifest_path,
+        ),
+    )
     upload = _upload_r2_object(
         location,
         artifact_path,

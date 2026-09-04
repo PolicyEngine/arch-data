@@ -331,7 +331,7 @@ def test_publish_source_artifacts_uses_country_for_each_manifest(tmp_path):
     assert "ledger-raw/raw/irs_soi/soi-table/2023/" in commands
 
 
-def test_publish_source_artifacts_refuses_stale_country_key(tmp_path):
+def test_publish_source_artifacts_preserves_a_legacy_countryless_key(tmp_path):
     output_dir = tmp_path / "data" / "ird" / "wff"
     source = tmp_path / "wff.xlsx"
     source.write_bytes(b"official WFF workbook")
@@ -365,13 +365,11 @@ def test_publish_source_artifacts_refuses_stale_country_key(tmp_path):
 
     report = publish_source_artifacts(output_dir, wrangler_command=str(wrangler))
 
-    assert not report.valid
+    assert report.valid
     assert report.entries[0].upload is None
-    assert (
-        report.entries[0]
-        .errors[0]
-        .startswith("recorded_r2_key_disagrees_with_country_prefix:")
-    )
+    assert report.entries[0].errors == ()
+    assert report.entries[0].skipped == "recorded_r2_already_published"
+    assert report.entries[0].r2_location.key == artifact["storage"]["r2"]["key"]
     assert not log.exists()
 
 
@@ -2771,7 +2769,7 @@ def test_sweeps_refuse_a_symlinked_artifact_without_reading_it(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_publish_checks_the_canonical_key_before_a_preserved_bucket_skip(
+def test_publish_preserves_an_explicit_historical_route_during_bucket_cutover(
     tmp_path, monkeypatch
 ):
     package = tmp_path / "db" / "data" / "irs_soi" / "table"
@@ -2803,14 +2801,14 @@ def test_publish_checks_the_canonical_key_before_a_preserved_bucket_skip(
 
     report = publish_source_artifacts(package, wrangler_command=str(wrangler))
 
-    assert not report.valid
+    assert report.valid
     assert report.entries[0].upload is None
-    assert report.entries[0].skipped is None
-    assert (
-        report.entries[0]
-        .errors[0]
-        .startswith("recorded_r2_key_disagrees_with_country_prefix:")
+    assert report.entries[0].errors == ()
+    assert report.entries[0].skipped == (
+        "recorded_r2_bucket_is_preserved_history:"
+        "recorded=ledger-raw:requested=chronicle-raw"
     )
+    assert report.entries[0].r2_location.key == wrong_key
     assert not log.exists()
     assert manifest_path.read_bytes() == before
 
