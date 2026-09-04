@@ -381,8 +381,20 @@ def test_workflow_has_a_base_owned_trusted_pr_gate():
         'python "$base_gate/scripts/check_thesis_facts_append.py"',
         '--root "$candidate"',
         '--base-ref "$BASE_SHA"',
+        # The commit under judgement is named on the command line in all three
+        # invocations. Dropping any of them would leave the gate judging
+        # whichever tree the checkout at --root happened to be sitting at,
+        # which is the divergence the shim exists to exclude.
+        '--commit "$MERGE_SHA"',
+        '--commit "$workspace_sha"',
+        '--commit "$GITHUB_SHA"',
     ):
         assert required in workflow
+
+    # And the pull_request job's id is read from the workspace and shape-checked
+    # before it is passed, the same way the other two are.
+    assert 'workspace_sha="$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"' in workflow
+    assert '[[ "$workspace_sha" =~ ^[0-9a-f]{40,64}$ ]]' in workflow
 
 
 def test_duplicate_identity_without_supersedes_is_rejected():
