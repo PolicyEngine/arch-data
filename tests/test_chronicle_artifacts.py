@@ -2038,6 +2038,44 @@ def _other_sha256():
     return hashlib.sha256(b"some other object entirely").hexdigest()
 
 
+@pytest.mark.parametrize(
+    "previous_r2",
+    [
+        pytest.param({}, id="mapping"),
+        pytest.param("not a list", id="scalar"),
+        pytest.param(None, id="null"),
+    ],
+)
+def test_fetch_refuses_non_list_previous_r2_before_publisher_io(
+    tmp_path, monkeypatch, previous_r2
+):
+    """Malformed archived provenance must not be replaced by a new history."""
+    package, source, _report = _recorded_package(tmp_path)
+    manifest_path = _rewrite_recorded_r2(
+        package,
+        lambda storage: storage.__setitem__("previous_r2", previous_r2),
+    )
+    artifact_path = package / "22in05ira.xlsx"
+    before = {
+        manifest_path: manifest_path.read_bytes(),
+        artifact_path: artifact_path.read_bytes(),
+    }
+    source.write_bytes(b"IRA table 5, revised publication")
+
+    def unexpected_read(_source_url):
+        raise AssertionError("malformed previous_r2 reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(
+        MalformedManifestError,
+        match=r"storage[.]previous_r2 must be a list",
+    ):
+        _fetch_local(package, source, upload_r2=False, record_revision=True)
+
+    assert {path: path.read_bytes() for path in before} == before
+
+
 def _contradict_key(storage):
     key = storage["r2"]["key"]
     storage["r2"]["key"] = key.replace(key.split("/")[-2], _other_sha256())
