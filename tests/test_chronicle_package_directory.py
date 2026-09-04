@@ -35,7 +35,7 @@ from chronicle.registration import (
     validate_file_entry,
     validate_package_directory,
 )
-from chronicle.source_package import SourceArtifactSpec
+from chronicle.source_package import SOURCE_ARTIFACT_FETCH_ENV, SourceArtifactSpec
 from tests.test_chronicle_microdata_registration import (
     ATTESTED,
     EVIDENCE,
@@ -1159,6 +1159,54 @@ def test_byte_reader_refuses_an_unpinned_public_alias_of_hash_only_bytes(
 
     with pytest.raises(ManifestAccessError, match=LICENSED_SHA):
         spec._artifact_content(2023)
+
+
+def test_byte_reader_does_not_cache_an_unpinned_alias_before_refusal(
+    tmp_path, monkeypatch
+):
+    from chronicle import source_package
+
+    cache_root = _isolated_reader(tmp_path, monkeypatch)
+    package_name = f"chronicle_test_{uuid.uuid4().hex}"
+    resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
+    resource_dir.mkdir(parents=True)
+    public = _public_table_entry("public-alias.tab", LICENSED_BYTES)
+    public.pop("sha256")
+    _write(
+        resource_dir / "manifest_tables.yaml",
+        _table_manifest(files={2023: public}),
+    )
+    _write(
+        resource_dir / "manifest_release.yaml",
+        _hash_only_manifest(sha256=LICENSED_SHA),
+    )
+    fetches = []
+
+    def record_fetch(source_url):
+        fetches.append(source_url)
+        return LICENSED_BYTES
+
+    monkeypatch.setattr(source_package, "_fetch_source_artifact_content", record_fetch)
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    monkeypatch.syspath_prepend(str(tmp_path / "pkgroot"))
+    spec = SourceArtifactSpec(
+        source_name="dwp",
+        source_table="Family Resources Survey",
+        resource_package=package_name,
+        resource_directory="data/dwp/frs",
+        manifest="manifest_tables.yaml",
+        vintage="2023_24",
+        extracted_at="2026-09-04",
+        extraction_method="none",
+        parser="delimited_text_full_rows",
+        delimiter="\t",
+        artifact_year=2023,
+    )
+
+    with pytest.raises(ManifestAccessError, match="sha256"):
+        spec._artifact_content(2023)
+    assert fetches == []
+    assert not cache_root.exists()
 
 
 @pytest.mark.parametrize(
