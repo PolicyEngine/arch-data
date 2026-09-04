@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+import shutil
 import sqlite3
 
 import pytest
@@ -12,6 +14,7 @@ import yaml
 from chronicle.cli import main as cli_main
 from chronicle.artifacts import (
     AmbiguousManifestError,
+    ArtifactCommandResult,
     MalformedManifestError,
     ManifestNameError,
     RecordedR2LocatorError,
@@ -808,6 +811,72 @@ def test_publish_raw_skips_an_object_already_held_by_a_preserved_bucket(
     assert report.counts["failed_count"] == 0
     assert not log.exists()
     assert manifest_path.read_bytes() == before
+
+
+def test_documented_bucket_cutover_sweep_accepts_the_tracked_registry(
+    tmp_path, monkeypatch, capsys
+):
+    """The documented bucket flip is green for every recorded historical key."""
+    tracked_data = Path(__file__).resolve().parents[1] / "db" / "data"
+    copied_data = tmp_path / "data"
+    shutil.copytree(tracked_data, copied_data)
+    manifest_bytes = {
+        path.relative_to(copied_data): path.read_bytes()
+        for path in copied_data.rglob("*")
+        if path.is_file() and path.name.lower().startswith("manifest")
+    }
+    uploads = []
+
+    def non_writing_uploader(location, local_path, *, wrangler_command):
+        uploads.append((location, local_path, wrangler_command))
+        return ArtifactCommandResult(
+            command=("non-writing-uploader",),
+            returncode=0,
+            stdout="",
+            stderr="",
+        )
+
+    monkeypatch.setenv("CHRONICLE_R2_RAW_BUCKET", "chronicle-raw")
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", non_writing_uploader)
+
+    exit_code = harness_main(
+        [
+            "publish-raw",
+            "--root",
+            str(copied_data),
+            "--wrangler-command",
+            "non-writing-uploader",
+        ]
+    )
+    report = json.loads(capsys.readouterr().out)
+    expected_counts = {
+        "manifest_count": 161,
+        "artifact_count": 194,
+        "uploaded_count": 0,
+        "skipped_count": 194,
+        "failed_count": 0,
+        "r2_link_count": 194,
+    }
+
+    observed = (
+        exit_code,
+        report["valid"],
+        report["counts"],
+        len(report["errors"]),
+    )
+    assert observed == (
+        0,
+        True,
+        expected_counts,
+        0,
+    ), json.dumps(observed, sort_keys=True)
+    assert all(entry["skipped"] or entry["upload"] for entry in report["entries"])
+    assert uploads == []
+    assert {
+        path.relative_to(copied_data): path.read_bytes()
+        for path in copied_data.rglob("*")
+        if path.is_file() and path.name.lower().startswith("manifest")
+    } == manifest_bytes
 
 
 def test_fetch_artifact_keeps_an_already_recorded_bucket(tmp_path, monkeypatch):
