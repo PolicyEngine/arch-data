@@ -1081,11 +1081,12 @@ class SourceArtifactSpec:
         self._assert_manifest_kind_is_parseable(manifest)
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
         _assert_entry_bytes_readable(spec)
-        self._resource_entry(
-            spec.get("filename"),
-            what="Source artifact filename",
-            forbid_manifest_name=True,
-        )
+        if isinstance(spec, dict):
+            self._resource_entry(
+                spec.get("filename"),
+                what="Source artifact filename",
+                forbid_manifest_name=True,
+            )
         self._assert_complete_manifest_valid(manifest)
         self._assert_no_sibling_hash_only_registration(spec, manifest)
         return manifest, spec

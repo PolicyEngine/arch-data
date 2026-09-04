@@ -49,6 +49,10 @@
   filesystem mutation; four corresponding package-validation cases accepted
   the conflict. Eight failures recorded in `finding2-red.log`.
 
+- Fixed the scalar-entry integration regression: filename resolution now only
+  runs on mapping entries; complete-manifest validation rejects other shapes.
+  All 33 scalar and inherited source-path cases pass (`source-entry-green.log`).
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
