@@ -244,9 +244,7 @@ def test_hmrc_cgt_reuses_one_publisher_series_across_definition_years():
     package = load_source_package("hmrc-cgt-statistics-2026")
     package_facts = package.build_facts(2026)
     facts = [
-        fact
-        for fact in package_facts
-        if fact.measure.concept == "hmrc.cgt_tax_total"
+        fact for fact in package_facts if fact.measure.concept == "hmrc.cgt_tax_total"
     ]
 
     assert {fact.entity.name for fact in package_facts} == {"tax_unit"}
@@ -1122,7 +1120,17 @@ def test_source_artifact_spec_refuses_unsafe_manifest_filename_before_read(
             sort_keys=False,
         )
     )
-    monkeypatch.setattr("chronicle.source_package.files", lambda _package: resource_root)
+    monkeypatch.setattr(
+        "chronicle.source_package.files", lambda _package: resource_root
+    )
+
+    def unexpected_artifact_read(_artifact_path, _spec):
+        raise AssertionError("unsafe artifact path reached artifact I/O")
+
+    monkeypatch.setattr(
+        "chronicle.source_package._read_source_artifact_content",
+        unexpected_artifact_read,
+    )
     artifact = SourceArtifactSpec(
         source_name="publisher",
         source_table="Table",
@@ -1181,7 +1189,9 @@ def test_source_artifact_spec_refuses_unsafe_manifest_path_before_artifact_read(
     else:
         manifest_name = "registry.yaml"
         (resource_dir / manifest_name).write_text(yaml.safe_dump(payload))
-    monkeypatch.setattr("chronicle.source_package.files", lambda _package: resource_root)
+    monkeypatch.setattr(
+        "chronicle.source_package.files", lambda _package: resource_root
+    )
 
     def unexpected_artifact_read(_artifact_path, _spec):
         raise AssertionError("unsafe manifest path reached artifact I/O")

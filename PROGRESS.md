@@ -435,12 +435,21 @@ Running the same operations against a checkout of the previous head:
   to describe compatible recorded history. The six focused path/CLI cases now
   pass. Complete-package publish preflight and sibling-owner validation remain
   the next coherent fix.
+- **Source-package reader follow-up reproduced and fixed.** Test-only commits
+  `92af48c`, `9a51d99`, `3228238`, and `578c8b2` showed that a package spec
+  could read an absolute or parent-traversing artifact, follow artifact and
+  manifest symlinks, accept a normalized filename alias or manifest-named
+  artifact, and select an unsafe/unsupported manifest path before artifact
+  I/O. `SourceArtifactSpec` now resolves both manifest and artifact resources
+  through the shared #227 filename-identity helpers before opening either.
+  The ten focused cases pass, and the full source-package module passes with
+  135 tests (13 warnings).
 
 ### Next
 
-1. Port #227's complete-manifest preflight shape and apply shared-owner
-   consistency checks to publish and inventory sweeps.
-2. Run the complete artifact module, then the requested lint/format checks and
-   full suite with the directly captured exit code and counts.
+1. Reproduce and close the audit finding that a bad later package in a root
+   publish sweep can be discovered only after an earlier package uploads.
+2. Finish the #227 port/adversarial audit, then run the complete artifact
+   module and requested lint/format/full-suite verification.
 3. Write the external `-o out.md` report with the per-finding command,
    observation, fix, regression, commit, and port provenance.

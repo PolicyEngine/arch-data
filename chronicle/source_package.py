@@ -33,7 +33,12 @@ from chronicle.core import (
 )
 from chronicle.env import env_flag, env_value
 from chronicle.epoch import SCHEMA_IDS, schema_id
-from chronicle.registration import load_manifest_document
+from chronicle.registration import (
+    is_bare_filename,
+    is_manifest_filename,
+    load_manifest_document,
+    matching_directory_entry,
+)
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
     SourceCell,
@@ -869,20 +874,87 @@ class SourceArtifactSpec:
             raw_r2_uri=raw_r2.get("uri"),
         )
 
+    def _resource_entry(
+        self,
+        value: Any,
+        *,
+        what: str,
+        require_manifest_name: bool = False,
+        forbid_manifest_name: bool = False,
+    ) -> Any:
+        """Resolve one safe file entry under the package resource directory."""
+        if not is_bare_filename(value):
+            raise ValueError(
+                f"{what} must be a bare filename inside "
+                f"{self.resource_directory}, not {value!r}."
+            )
+        name = str(value)
+        if require_manifest_name and not is_manifest_filename(name):
+            raise ValueError(
+                f"{what} must be named manifest.yaml or "
+                f"manifest_<package>.yaml, not {name!r}."
+            )
+        if forbid_manifest_name and is_manifest_filename(name):
+            raise ValueError(
+                f"{what} {name!r} is a manifest name and cannot be read as "
+                "source artifact bytes."
+            )
+
+        directory = files(self.resource_package).joinpath(self.resource_directory)
+        existing = matching_directory_entry(directory, name)
+        if existing is None:
+            return directory.joinpath(name)
+        is_symlink = getattr(existing, "is_symlink", None)
+        if callable(is_symlink) and is_symlink():
+            raise ValueError(
+                f"{what} {existing} is a symbolic link. Chronicle will not "
+                "read source-package data through it."
+            )
+        if existing.name != name:
+            raise ValueError(
+                f"{what} {existing} has the same normalized filename as "
+                f"{name!r}. Keep exactly one spelling in the package."
+            )
+        return existing
+
+    def manifest_resource(self) -> Any:
+        """Return the validated manifest file this package spec points at."""
+        return self._resource_entry(
+            self.manifest,
+            what="Source artifact manifest",
+            require_manifest_name=True,
+        )
+
+    def manifest_payload(self) -> dict[str, Any]:
+        """Load the artifact manifest strictly as a YAML mapping."""
+        with self.manifest_resource().open("r", encoding="utf-8") as file:
+            text = file.read()
+        try:
+            payload = load_manifest_document(text)
+        except yaml.YAMLError as exc:
+            raise ValueError(
+                f"{self.resource_directory}/{self.manifest} is not valid YAML: {exc}"
+            ) from exc
+        if payload is None:
+            return {}
+        if not isinstance(payload, dict):
+            raise ValueError(
+                f"{self.resource_directory}/{self.manifest} must be a YAML "
+                f"mapping; it parses as a {type(payload).__name__}."
+            )
+        return payload
+
     def _artifact_content(
         self,
         year: int,
     ) -> tuple[bytes, str, str, dict[str, str]]:
-        manifest_path = files(self.resource_package).joinpath(
-            self.resource_directory,
-            self.manifest,
-        )
-        with manifest_path.open("r", encoding="utf-8") as file:
-            manifest = load_manifest_document(file.read())
+        manifest = self.manifest_payload()
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
-        artifact_path = files(self.resource_package).joinpath(
-            self.resource_directory,
-            spec["filename"],
+        filename = spec.get("filename")
+        artifact_path = self._resource_entry(
+            filename,
+            what="Source artifact filename",
+            forbid_manifest_name=True,
         )
         content = _read_source_artifact_content(artifact_path, spec)
         expected_sha = spec.get("sha256")
@@ -890,11 +962,11 @@ class SourceArtifactSpec:
             _validate_source_artifact_sha(
                 content,
                 expected_sha=str(expected_sha),
-                filename=str(spec["filename"]),
+                filename=str(filename),
             )
         storage = spec.get("storage") if isinstance(spec, dict) else None
         raw_r2 = storage.get("r2") if isinstance(storage, dict) else {}
-        return content, spec["filename"], spec["source_url"], raw_r2 or {}
+        return content, str(filename), spec["source_url"], raw_r2 or {}
 
     def _sheet_name(self, filename: str, *, year: int) -> str:
         if self.sheet_name:
