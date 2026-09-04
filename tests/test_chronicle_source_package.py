@@ -1083,7 +1083,9 @@ def test_source_artifact_loader_fetches_missing_artifact_when_enabled(
     assert _source_artifact_cache_path(spec).read_bytes() == content
 
 
-@pytest.mark.parametrize("path_kind", ["absolute", "parent", "symlink"])
+@pytest.mark.parametrize(
+    "path_kind", ["absolute", "parent", "symlink", "normalized-alias"]
+)
 def test_source_artifact_spec_refuses_unsafe_manifest_filename_before_read(
     tmp_path, monkeypatch, path_kind
 ):
@@ -1098,7 +1100,10 @@ def test_source_artifact_spec_refuses_unsafe_manifest_filename_before_read(
         filename = "../outside.csv"
     else:
         filename = "table.csv"
-        (resource_dir / filename).symlink_to(outside)
+        if path_kind == "symlink":
+            (resource_dir / filename).symlink_to(outside)
+        else:
+            (resource_dir / "TABLE.csv").write_bytes(outside.read_bytes())
     (resource_dir / "manifest.yaml").write_text(
         yaml.safe_dump(
             {
@@ -1126,7 +1131,12 @@ def test_source_artifact_spec_refuses_unsafe_manifest_filename_before_read(
         artifact_year=2024,
     )
 
-    message = "symbolic link" if path_kind == "symlink" else "bare filename"
+    if path_kind == "symlink":
+        message = "symbolic link"
+    elif path_kind == "normalized-alias":
+        message = "normalized filename"
+    else:
+        message = "bare filename"
     with pytest.raises(ValueError, match=message):
         artifact._artifact_content(2024)
 
