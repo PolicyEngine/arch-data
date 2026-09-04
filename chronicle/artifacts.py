@@ -197,6 +197,22 @@ def _package_manifests(
     return manifests
 
 
+def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
+    """Return manifests selected by a recursive inventory or publish sweep.
+
+    An explicit name remains an exact selector.  The default means every
+    filename in Chronicle's manifest-name contract, including named manifests,
+    ``.yml`` spellings, and case variants on a case-sensitive filesystem.
+    """
+    if manifest_filename != DEFAULT_MANIFEST_FILENAME:
+        return sorted(root.rglob(manifest_filename))
+    return sorted(
+        path
+        for path in root.rglob("*")
+        if path.is_file() and is_manifest_filename(path.name)
+    )
+
+
 def _assert_no_hash_only_bytes(
     manifests: Mapping[str, dict[str, Any]],
     *,
@@ -1344,10 +1360,10 @@ def publish_source_artifacts(
 
     entries: list[RawArtifactPublishEntry] = []
     errors: list[str] = []
-    for manifest_path in sorted(root_path.rglob(manifest_filename)):
+    for manifest_path in _root_manifest_paths(root_path, manifest_filename):
         try:
             manifest = _read_manifest(manifest_path)
-        except (OSError, MalformedManifestError) as exc:
+        except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
 
@@ -1384,7 +1400,7 @@ def publish_source_artifacts(
                     _package_manifests(manifest_path.parent, manifest_path, manifest)
                 )
             )
-        except (OSError, MalformedManifestError) as exc:
+        except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read a manifest beside {manifest_path}: {exc}")
             continue
         if manifest_errors:
@@ -1502,11 +1518,11 @@ def inventory_source_artifacts(
             errors=(f"Root does not exist: {root_path}",),
         )
 
-    manifests = sorted(root_path.rglob(manifest_filename))
+    manifests = _root_manifest_paths(root_path, manifest_filename)
     for manifest_path in manifests:
         try:
             manifest = _read_manifest(manifest_path)
-        except (OSError, MalformedManifestError) as exc:
+        except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read {manifest_path}: {exc}")
             continue
         files = manifest.get("files") or {}
@@ -1526,7 +1542,7 @@ def inventory_source_artifacts(
                     _package_manifests(manifest_path.parent, manifest_path, manifest)
                 )
             )
-        except (OSError, MalformedManifestError) as exc:
+        except (OSError, SourceArtifactManifestError) as exc:
             errors.append(f"Could not read a manifest beside {manifest_path}: {exc}")
         for year, spec in files.items():
             for file_spec in iter_file_specs(spec, kind=kind):
@@ -3104,6 +3120,28 @@ def _inventory_entry(
         )
     )
     sha256_expected = spec.get("sha256")
+    validated_r2: RecordedR2Object | None = None
+    try:
+        validated_r2 = _validated_recorded_r2(
+            spec, manifest_path=manifest_path, year=year
+        )
+    except SourceArtifactManifestError as error:
+        errors.append(f"recorded_r2_locator_invalid:{error}")
+    if validated_r2 is not None:
+        declared_sha256 = str(sha256_expected or "")
+        declared_filename = Path(filename).name if bare else ""
+        if (validated_r2.sha256, validated_r2.filename) != (
+            declared_sha256,
+            declared_filename,
+        ):
+            errors.append(
+                "recorded_r2_identity_mismatch:"
+                f"recorded_sha256={validated_r2.sha256}:"
+                f"recorded_filename={validated_r2.filename}:"
+                f"declared_sha256={declared_sha256}:"
+                f"declared_filename={declared_filename}"
+            )
+            validated_r2 = None
     if release and not hash_only and bare and sha256_expected:
         artifact_path = microdata_staging_path(
             staging_dir=staging_dir,
@@ -3133,7 +3171,7 @@ def _inventory_entry(
         # A public release is archived, not committed: its registration is
         # complete once the raw bucket records the object. Staged bytes are
         # transient and checked when present.
-        if recorded_r2(spec) is None:
+        if validated_r2 is None:
             errors.append("r2_object_not_recorded")
         if exists:
             content = artifact_path.read_bytes()
@@ -3149,7 +3187,12 @@ def _inventory_entry(
         size_bytes = len(content)
         if sha256_expected and sha256_actual != sha256_expected:
             errors.append("checksum_mismatch")
-    r2 = recorded_r2(spec)
+    recorded_locator = recorded_r2(spec)
+    r2 = (
+        dict(recorded_locator)
+        if validated_r2 is not None and recorded_locator is not None
+        else None
+    )
     return ArtifactInventoryEntry(
         manifest_path=str(manifest_path),
         year=str(year),
@@ -3160,7 +3203,7 @@ def _inventory_entry(
         sha256_actual=sha256_actual,
         size_bytes=size_bytes,
         source_url=spec.get("source_url"),
-        r2=dict(r2) if r2 is not None else None,
+        r2=r2,
         errors=tuple(dict.fromkeys(errors)),
         access=access,
         licence=spec.get("licence"),
