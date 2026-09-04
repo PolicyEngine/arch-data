@@ -292,8 +292,16 @@ def is_derived_r2_route(bucket: str, key: str) -> bool:
             default_prefix=default_r2_derived_prefix(),
         ),
     }
-    return bucket in derived_buckets or any(
-        key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
+    # Configured routes extend the boundary; they never narrow it. A bucket
+    # ending in ``-derived`` (any case) or a ``derived/`` key was derived
+    # before routes became configurable, and archived facts still cite such
+    # routes, so the legacy spelling rule stays alongside the configured set.
+    return (
+        bucket in derived_buckets
+        or bucket.casefold().endswith("-derived")
+        or any(
+            key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
+        )
     )
 
 
@@ -936,7 +944,12 @@ def fetch_source_artifact(
             sha256=sha256,
         )
     for owner in owners:
-        if owner.manifest_path == manifest_path and owner.spec is selected_spec:
+        # The selected owner is (manifest, vintage key): a YAML anchor can make
+        # two vintages share one dict object, and object identity would skip
+        # both.
+        if owner.manifest_path == manifest_path and str(owner.vintage) == str(
+            vintage_key
+        ):
             continue
         _assert_recorded_identity_holds_these_bytes(
             owner.identity,
@@ -2456,7 +2469,7 @@ def _upsert_manifest(
     changed_paths = {manifest_path}
     if record_revision and revision:
         for owner in owners:
-            if owner.manifest_path == manifest_path and owner.spec is recorded_spec:
+            if owner.manifest_path == manifest_path and str(owner.vintage) == str(key):
                 continue
             revised_entry = dict(owner.spec)
             revised_entry.update(
