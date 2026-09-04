@@ -119,9 +119,33 @@ _REGISTRATION_FIELD_ORDER: tuple[str, ...] = (
 )
 
 
-#: Every field a manifest file entry may carry, for the misspelling check.
+#: Legacy publisher-table extensions that remain part of the accepted entry
+#: schema. They are read by table-specific consumers rather than the generic
+#: artifact commands, but are explicit so an ordinary typo is never silently
+#: treated as an extension.
+_ENTRY_EXTENSION_FIELDS: frozenset[str] = frozenset(
+    {
+        "archive_member",
+        "csv_member",
+        "download_url",
+        "source_table",
+        "source_urls",
+        "year",
+        "years",
+    }
+)
+
+#: Every field a manifest file entry may carry. This is a closed top-level
+#: schema: writers may add a field only by adding it to the registration
+#: contract or the explicit legacy extension allowlist above.
 _ENTRY_FIELDS: frozenset[str] = frozenset(
-    {*_REGISTRATION_FIELD_ORDER, "storage", "size_bytes", "source_url"}
+    {
+        *_REGISTRATION_FIELD_ORDER,
+        *_ENTRY_EXTENSION_FIELDS,
+        "storage",
+        "size_bytes",
+        "source_url",
+    }
 )
 
 
@@ -736,15 +760,19 @@ def validate_file_entry(
 
     errors: list[str] = []
     for field in spec:
-        if (
-            isinstance(field, str)
-            and field not in _ENTRY_FIELDS
-            and field.strip().casefold() in _ENTRY_FIELDS
-        ):
+        if field in _ENTRY_FIELDS:
+            continue
+        if isinstance(field, str) and field.strip().casefold() in _ENTRY_FIELDS:
             # A field the writer meant but the reader would ignore: ``Access``
             # is not ``access``, and an entry whose access class sits under
             # the wrong key is not public by omission.
             errors.append(f"misspelled_field:{field}")
+        else:
+            # The schema is closed. Treating an arbitrary key as an extension
+            # would make ordinary typos such as ``acess`` indistinguishable
+            # from intentional metadata, allowing missing ``access`` to fall
+            # through to the publisher-table public default.
+            errors.append(f"unknown_field:{field}")
     filename = spec.get("filename")
     if not _text(filename):
         errors.append("missing_filename")

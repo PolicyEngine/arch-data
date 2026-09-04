@@ -44,8 +44,12 @@ from chronicle.registration import (
     is_hash_only,
     is_manifest_filename,
     is_microdata_release,
+    iter_file_specs,
     load_manifest_document,
+    manifest_kind,
     resolve_vintage_key,
+    validate_file_entry,
+    validate_manifest_files,
 )
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
@@ -884,7 +888,24 @@ class SourceArtifactSpec:
             raise ValueError(
                 f"{self.resource_directory}/{self.manifest} is not valid YAML: {exc}"
             ) from exc
-        return payload or {}
+        if payload is None:
+            return {}
+        if not isinstance(payload, dict):
+            raise ValueError(
+                f"{self.resource_directory}/{self.manifest} must be a YAML "
+                f"mapping; it parses as a {type(payload).__name__}."
+            )
+        return payload
+
+    def _assert_manifest_kind_is_parseable(self, manifest: dict[str, Any]) -> None:
+        """Refuse a release manifest using an already-loaded payload."""
+        if is_microdata_release(manifest, manifest_path=self.manifest_resource()):
+            raise MicrodataReleaseNotParseableError(
+                f"{self.resource_directory}/{self.manifest} registers a "
+                "microdata release. Registration is identity only: no source "
+                "package parses a microdata release and no microdata rows, "
+                "cells, or facts enter Chronicle."
+            )
 
     def assert_parseable_manifest(self) -> None:
         """Refuse to parse a manifest that registers a microdata release.
@@ -895,13 +916,38 @@ class SourceArtifactSpec:
         declares no kind and is not frozen kindless is refused too: the reader
         never assumes a publisher table.
         """
-        manifest = self.manifest_payload()
-        if is_microdata_release(manifest, manifest_path=self.manifest_resource()):
-            raise MicrodataReleaseNotParseableError(
-                f"{self.resource_directory}/{self.manifest} registers a "
-                "microdata release. Registration is identity only: no source "
-                "package parses a microdata release and no microdata rows, "
-                "cells, or facts enter Chronicle."
+        self._assert_manifest_kind_is_parseable(self.manifest_payload())
+
+    def _assert_complete_manifest_valid(self, manifest: dict[str, Any]) -> None:
+        """Validate every current-manifest entry before selecting one to read."""
+        manifest_path = self.manifest_resource()
+        kind = manifest_kind(manifest, manifest_path=manifest_path)
+        codes: list[str] = list(validate_manifest_files(manifest))
+        files_by_year = manifest.get("files")
+        directory = files(self.resource_package).joinpath(self.resource_directory)
+        if isinstance(files_by_year, dict):
+            for key, value in files_by_year.items():
+                for entry in iter_file_specs(value, kind=kind):
+                    name = entry.get("filename") if isinstance(entry, dict) else None
+                    exists = (
+                        bool(name)
+                        and is_bare_filename(name)
+                        and directory.joinpath(str(name)).is_file()
+                    )
+                    codes.extend(
+                        f"{key!r}/{name}: {code}"
+                        for code in validate_file_entry(
+                            entry,
+                            kind=kind,
+                            manifest=manifest,
+                            local_file_exists=exists,
+                        )
+                    )
+        if codes:
+            raise ManifestAccessError(
+                f"{self.resource_directory}/{self.manifest} is not a valid "
+                f"{kind} manifest: {'; '.join(codes)}. No source artifact "
+                "bytes will be read until the complete manifest is valid."
             )
 
     def assert_parseable(self, year: int) -> dict[str, Any]:
@@ -912,10 +958,11 @@ class SourceArtifactSpec:
         entry's own access class -- a licensed or restricted entry is identity
         only whatever manifest it sits in.
         """
-        self.assert_parseable_manifest()
         manifest = self.manifest_payload()
+        self._assert_manifest_kind_is_parseable(manifest)
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
         _assert_entry_bytes_readable(spec)
+        self._assert_complete_manifest_valid(manifest)
         self._assert_no_sibling_hash_only_registration(spec)
         return spec
 

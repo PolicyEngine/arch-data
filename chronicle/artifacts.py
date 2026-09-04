@@ -168,11 +168,30 @@ def _package_manifests(
     sibling manifest Chronicle cannot read is a refusal, because the boundary
     cannot be decided without it.
     """
+    paths = package_manifest_paths(output)
+    by_name: dict[str, Path] = {}
+    for path in paths:
+        key = filename_key(path.name)
+        previous = by_name.get(key)
+        if previous is not None and previous != path:
+            raise AmbiguousManifestError(
+                f"{previous} and {path} have the same normalized manifest name "
+                f"{key!r}. Physically distinct manifest aliases can hide one "
+                "another's access declarations; keep exactly one spelling."
+            )
+        by_name[key] = path
+    selected_alias = by_name.get(filename_key(manifest_path.name))
+    if selected_alias is not None and selected_alias != manifest_path:
+        raise AmbiguousManifestError(
+            f"{manifest_path} and existing {selected_alias} have the same "
+            "normalized manifest name. Selecting one spelling would hide the "
+            "other's access declarations; address the existing manifest or "
+            "remove the duplicate."
+        )
+
     manifests: dict[str, dict[str, Any]] = {str(manifest_path): existing_manifest}
-    for path in package_manifest_paths(output):
-        if path == manifest_path or filename_key(path.name) == filename_key(
-            manifest_path.name
-        ):
+    for path in paths:
+        if path == manifest_path:
             continue
         manifests[str(path)] = _read_manifest(path)
     return manifests
@@ -929,6 +948,23 @@ def fetch_source_artifact(
     # serious refusal, and its message is the one the caller needs, not a
     # prompt about the manifest's kind or licence.
     manifests = _package_manifests(output, manifest_path, existing_manifest)
+    for sibling_path, sibling in manifests.items():
+        if sibling_path == str(manifest_path):
+            continue
+        try:
+            sibling_kind = normalize_manifest_kind(
+                sibling, manifest_path=Path(sibling_path)
+            )
+        except ManifestAccessError as exc:
+            raise ManifestAccessError(
+                f"{sibling_path} cannot be classified safely: {exc}"
+            ) from exc
+        _assert_manifest_valid_for_fetch(
+            sibling,
+            Path(sibling_path),
+            kind=sibling_kind,
+            package_dir=output,
+        )
     for sibling_path, sibling in manifests.items():
         _assert_no_hash_only_entry(sibling, Path(sibling_path), artifact_filename)
     if expected.sha256:
