@@ -26,7 +26,13 @@ from chronicle.database import (
 )
 from chronicle.env import env_value
 from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
-from chronicle.registration import load_manifest_document
+from chronicle.registration import (
+    is_bare_filename,
+    is_manifest_filename,
+    load_manifest_document,
+    matching_directory_entry,
+    package_manifest_paths,
+)
 
 
 R2_RAW_BUCKET_ENV = "CHRONICLE_R2_RAW_BUCKET"
@@ -49,25 +55,6 @@ DEFAULT_R2_DERIVED_PREFIX = "derived"
 # name is an input, not a constant, wherever a caller addresses a package.
 DEFAULT_MANIFEST_FILENAME = "manifest.yaml"
 
-# The names a package directory's manifests may carry. Match case-insensitively
-# because Chronicle is also used on case-insensitive filesystems.
-_MANIFEST_FILENAME_RE = re.compile(
-    r"^manifest(?:_[^/\\]+)?\.ya?ml$",
-    re.IGNORECASE,
-)
-
-
-def is_bare_filename(value: Any) -> bool:
-    """Whether ``value`` names a file inside a directory, with no path."""
-    if value is None:
-        return False
-    text = str(value).strip()
-    if not text or text != str(value) or text in (".", ".."):
-        return False
-    if "/" in text or "\\" in text or "\x00" in text:
-        return False
-    return Path(text).name == text
-
 
 def bare_filename(value: Any, *, what: str = "filename") -> str:
     """Return ``value`` as a bare filename, refusing any other spelling.
@@ -85,23 +72,6 @@ def bare_filename(value: Any, *, what: str = "filename") -> str:
     return str(value)
 
 
-def is_manifest_filename(value: Any) -> bool:
-    """Whether ``value`` is a package-manifest filename."""
-    return is_bare_filename(value) and bool(_MANIFEST_FILENAME_RE.fullmatch(str(value)))
-
-
-def package_manifest_paths(package_dir: Path) -> list[Path]:
-    """Return every manifest file a package directory keeps, sorted by name."""
-    directory = Path(package_dir)
-    if not directory.is_dir():
-        return []
-    return sorted(
-        path
-        for path in directory.iterdir()
-        if path.is_file() and is_manifest_filename(path.name)
-    )
-
-
 def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
     """Return the manifests a root sweep addresses.
 
@@ -109,8 +79,13 @@ def _root_manifest_paths(root: Path, manifest_filename: str) -> list[Path]:
     extensions and every ``manifest_<package>`` sibling participate. A caller
     that supplies another filename keeps the historical exact-name override.
     """
-    if manifest_filename != DEFAULT_MANIFEST_FILENAME:
-        return sorted(path for path in root.rglob(manifest_filename) if path.is_file())
+    selected_name = _manifest_path(Path(), manifest_filename).name
+    if selected_name != DEFAULT_MANIFEST_FILENAME:
+        return sorted(
+            path
+            for path in root.rglob("*")
+            if path.is_file() and path.name == selected_name
+        )
     return sorted(
         path
         for path in root.rglob("*")
@@ -125,7 +100,12 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
     package directory keeps, and must not reach outside it.
     """
     name = manifest_filename.strip()
-    if not name or name in (".", "..") or name != Path(name).name:
+    if (
+        not name
+        or name in (".", "..")
+        or name != Path(name).name
+        or any(character in name for character in "*?[]")
+    ):
         raise ManifestNameError(
             "Manifest must name a file inside the package directory, not "
             f"{manifest_filename!r}."
@@ -140,33 +120,29 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
     return output / name
 
 
-def _sibling_manifests(output: Path) -> list[str]:
-    """Return the ``manifest_*.yaml`` files a package directory keeps."""
-    return sorted(
-        path.name
-        for path in package_manifest_paths(output)
-        if path.stem.lower().startswith("manifest_")
-    )
-
-
 def _refuse_a_stray_default_manifest(output: Path, manifest_path: Path) -> None:
-    """Refuse to create ``manifest.yaml`` beside a package's named manifests.
+    """Refuse to create any new manifest beside a package's registry.
 
-    A publisher directory that feeds several source packages keeps one
-    ``manifest_<package>.yaml`` per package and no ``manifest.yaml``. A fetch
-    that omits ``--manifest`` there would create a third manifest none of the
-    packages read, and would bypass the revision guard of the one it should
-    have addressed (PolicyEngine/chronicle#225).
+    Every supported spelling participates: a missing ``manifest.yaml`` beside
+    ``manifest.yml`` or ``Manifest.yaml`` is just as ambiguous as one beside a
+    named manifest, and a mistyped named selector must not create a parallel
+    registry. Operators may create an intentional empty sibling explicitly,
+    then select that existing file.
     """
-    if manifest_path.name != DEFAULT_MANIFEST_FILENAME or manifest_path.exists():
+    paths = package_manifest_paths(output)
+    if (
+        any(path.name == manifest_path.name for path in paths)
+        or manifest_path.is_symlink()
+    ):
         return
-    siblings = _sibling_manifests(output)
+    siblings = [path.name for path in paths]
     if not siblings:
         return
     raise AmbiguousManifestError(
-        f"{output} keeps {', '.join(siblings)} and no {DEFAULT_MANIFEST_FILENAME}; "
-        "pass --manifest to name the manifest this fetch records into rather "
-        f"than creating {DEFAULT_MANIFEST_FILENAME} beside them."
+        f"{output} already keeps {', '.join(siblings)}; refusing to create "
+        f"{manifest_path.name} beside that registry. Pass --manifest to name "
+        "an existing manifest, or create an intentional empty sibling "
+        "explicitly before fetching into it."
     )
 
 
@@ -1456,6 +1432,11 @@ def _read_manifest(manifest_path: Path) -> dict[str, Any]:
     not an absent manifest, and treating it as one would let the fetch replace
     it with a single entry and drop everything it recorded.
     """
+    if manifest_path.is_symlink():
+        raise MalformedManifestError(
+            f"{manifest_path} is a symlink; manifest reads and writes require "
+            "a regular file at its lexical package path."
+        )
     if not manifest_path.exists():
         return {}
     try:
@@ -2004,13 +1985,35 @@ def _publish_raw_manifest_entry(
         spec = {}
         errors.append("malformed_file_spec")
     filename = str(spec.get("filename") or "")
-    artifact_path = manifest_path.parent / filename
+    if filename and not is_bare_filename(filename):
+        return (
+            RawArtifactPublishEntry(
+                manifest_path=str(manifest_path),
+                source_id=source_id,
+                package_id=package_id,
+                year=str(year),
+                filename=filename,
+                local_path=str(manifest_path.parent),
+                sha256=None,
+                size_bytes=None,
+                r2_location=None,
+                upload=None,
+                errors=(f"non_canonical_filename:{filename}",),
+            ),
+            None,
+        )
+    artifact_path = (
+        matching_directory_entry(manifest_path.parent, filename)
+        or manifest_path.parent / filename
+    )
     sha256_expected = spec.get("sha256")
     sha256_actual = None
     size_bytes = None
     if not filename:
         errors.append("missing_filename")
-    elif not artifact_path.exists():
+    elif artifact_path.is_symlink():
+        errors.append(f"artifact_path_is_symlink:{filename}")
+    elif not artifact_path.is_file():
         errors.append("missing_file")
     else:
         content = artifact_path.read_bytes()
@@ -2172,13 +2175,35 @@ def _inventory_entry(
         spec = {}
         errors.append("malformed_file_spec")
     filename = str(spec.get("filename") or "")
-    artifact_path = manifest_path.parent / filename
-    exists = bool(filename) and artifact_path.exists()
+    storage = spec.get("storage") if isinstance(spec, dict) else None
+    r2 = storage.get("r2") if isinstance(storage, dict) else None
+    if filename and not is_bare_filename(filename):
+        return ArtifactInventoryEntry(
+            manifest_path=str(manifest_path),
+            year=str(year),
+            filename=filename,
+            local_path=str(manifest_path.parent),
+            exists=False,
+            sha256_expected=spec.get("sha256"),
+            sha256_actual=None,
+            size_bytes=None,
+            source_url=spec.get("source_url"),
+            r2=r2,
+            errors=(f"non_canonical_filename:{filename}",),
+        )
+    artifact_path = (
+        matching_directory_entry(manifest_path.parent, filename)
+        or manifest_path.parent / filename
+    )
+    symlink = bool(filename) and artifact_path.is_symlink()
+    exists = bool(filename) and not symlink and artifact_path.is_file()
     sha256_expected = spec.get("sha256")
     sha256_actual = None
     size_bytes = None
     if not filename:
         errors.append("missing_filename")
+    elif symlink:
+        errors.append(f"artifact_path_is_symlink:{filename}")
     elif not exists:
         errors.append("missing_file")
     else:
@@ -2187,8 +2212,6 @@ def _inventory_entry(
         size_bytes = len(content)
         if sha256_expected and sha256_actual != sha256_expected:
             errors.append("checksum_mismatch")
-    storage = spec.get("storage") if isinstance(spec, dict) else None
-    r2 = storage.get("r2") if isinstance(storage, dict) else None
     return ArtifactInventoryEntry(
         manifest_path=str(manifest_path),
         year=str(year),

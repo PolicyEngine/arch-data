@@ -1254,6 +1254,17 @@ def test_fetch_artifact_writes_the_manifest_it_was_given(tmp_path):
     package = tmp_path / "db" / "data" / "irs_soi" / "ira_contributions"
     traditional = _publish(tmp_path, "22in05ira.xlsx", b"traditional IRA table")
     roth = _publish(tmp_path, "22in06ira.xlsx", b"roth IRA table")
+    package.mkdir(parents=True)
+    for name, package_id in (
+        (TRADITIONAL_MANIFEST, "soi-ira-traditional-contributions-2022"),
+        (ROTH_MANIFEST, "soi-ira-roth-contributions-2022"),
+    ):
+        (package / name).write_text(
+            yaml.safe_dump(
+                {"source_id": "irs_soi", "package_id": package_id, "files": {}},
+                sort_keys=False,
+            )
+        )
 
     _fetch_local(
         package,
@@ -1573,7 +1584,7 @@ def test_fetch_refuses_to_create_any_manifest_beside_an_existing_registry(
         )
 
     assert existing.read_bytes() == before
-    assert not (package / requested_name).exists()
+    assert requested_name not in {path.name for path in package.iterdir()}
 
 
 def test_fetch_refuses_a_symlinked_manifest_before_publisher_io(tmp_path, monkeypatch):

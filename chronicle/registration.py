@@ -8,9 +8,91 @@ without inventing parallel helpers.
 
 from __future__ import annotations
 
+from pathlib import Path
+import re
 from typing import Any
+import unicodedata
 
 import yaml
+
+
+class ArtifactFilenameError(ValueError):
+    """Raised when a filename is not a bare name inside a package directory."""
+
+
+def is_bare_filename(value: Any) -> bool:
+    """Whether ``value`` names a file inside a directory, with no path."""
+    if value is None:
+        return False
+    text = str(value).strip()
+    if not text or text != str(value) or text in (".", ".."):
+        return False
+    if "/" in text or "\\" in text or "\x00" in text:
+        return False
+    return Path(text).name == text
+
+
+def bare_filename(value: Any, *, what: str = "filename") -> str:
+    """Return ``value`` as a bare filename, refusing any other spelling.
+
+    ``./adult.tab``, ``sub/../adult.tab``, ``adult.tab/`` and an absolute path
+    all resolve to the same file as ``adult.tab`` once joined under the package
+    directory, so the manifest and every guard use one spelling.
+    """
+    if not is_bare_filename(value):
+        raise ArtifactFilenameError(
+            f"{what} must be a bare filename inside the package directory, not "
+            f"{value!r}; it may not carry a directory, '.', '..', a trailing "
+            "slash, surrounding whitespace, or an absolute path."
+        )
+    return str(value)
+
+
+def filename_key(value: Any) -> str:
+    """Return the case-folded, Unicode-normalized comparison key for a name."""
+    return unicodedata.normalize("NFC", Path(str(value)).name).casefold()
+
+
+_MANIFEST_FILENAME_RE = re.compile(
+    r"^manifest(?:_[^/\\]+)?\.ya?ml$",
+    re.IGNORECASE,
+)
+
+
+def is_manifest_filename(value: Any) -> bool:
+    """Whether ``value`` is a package-manifest filename."""
+    return is_bare_filename(value) and bool(_MANIFEST_FILENAME_RE.fullmatch(str(value)))
+
+
+def package_manifest_paths(package_dir: Path) -> list[Path]:
+    """Return every manifest file a package directory keeps, sorted by name."""
+    directory = Path(package_dir)
+    if not directory.is_dir():
+        return []
+    return sorted(
+        path
+        for path in directory.iterdir()
+        if path.is_file() and is_manifest_filename(path.name)
+    )
+
+
+def matching_directory_entry(directory: Any, filename: Any) -> Any | None:
+    """Return the actual directory entry matching a bare filename's safe key.
+
+    Scanning real entries makes the identity rule the same on case-sensitive
+    and case-folding filesystems, including Unicode-normalized aliases.
+    """
+    if not is_bare_filename(filename) or not directory.is_dir():
+        return None
+    wanted = filename_key(filename)
+    return next(
+        (
+            path
+            for path in sorted(directory.iterdir(), key=lambda item: item.name)
+            if filename_key(path.name) == wanted
+        ),
+        None,
+    )
 
 
 class StrictManifestLoader(yaml.SafeLoader):
@@ -64,4 +146,14 @@ def load_manifest_document(text: str) -> Any:
     return yaml.load(text, Loader=StrictManifestLoader)  # noqa: S506
 
 
-__all__ = ["StrictManifestLoader", "load_manifest_document"]
+__all__ = [
+    "ArtifactFilenameError",
+    "StrictManifestLoader",
+    "bare_filename",
+    "filename_key",
+    "is_bare_filename",
+    "is_manifest_filename",
+    "load_manifest_document",
+    "matching_directory_entry",
+    "package_manifest_paths",
+]
