@@ -692,3 +692,10 @@ the per-finding reproduction/fix/test/commit/port map.
 - Additional failing-first checks cover date/set report serialization (8 failed),
   vintage namespace escapes and build-ID separators (8 failed), and fetch
   vintage namespace escapes. These publication fixes precede the full restart.
+
+- Committed the publication follow-up regressions before their fixes. Red
+  commands/logs: `report-identity-red.log` (8 failed),
+  `namespace-followup-red.log` (8 failed, 99 deselected), and
+  `fetch-vintage-red.log` (3 failed); all direct exits 1. CLI refusals hit
+  non-JSON date/set values; malformed vintage/build segments reached reads or
+  upload sentinels. Exact commands will be included in the final report.

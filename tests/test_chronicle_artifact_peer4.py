@@ -428,3 +428,98 @@ def test_raw_publication_preserves_history_without_new_identity_requirements(
     assert report.entries[0].skipped
     assert report.entries[0].r2_location.uri == f"r2://archive/{key}"
     assert manifest_path.read_text() == before
+
+
+@pytest.mark.parametrize("field", ["source_id", "package_id"])
+@pytest.mark.parametrize("yaml_identity", ["2024-01-01", "!!set {legacy: null}"])
+@pytest.mark.parametrize("entrypoint", ["harness", "cli"])
+def test_raw_cli_serializes_noncanonical_yaml_identity_refusals(
+    tmp_path, monkeypatch, capsys, field, yaml_identity, entrypoint
+):
+    package, manifest_path, manifest = _package(tmp_path)
+    manifest[field] = yaml.safe_load(yaml_identity)
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    before = manifest_path.read_text()
+    _no_upload(monkeypatch)
+    args = ["publish-raw", "--root", str(package)]
+    if entrypoint == "harness":
+        assert harness_main(args) == 1
+    else:
+        monkeypatch.setattr("sys.argv", ["chronicle", *args])
+        with pytest.raises(SystemExit) as exit_info:
+            cli_main()
+        assert exit_info.value.code == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert not payload["valid"]
+    assert isinstance(payload["entries"][0][field], str)
+    assert "r2_identity_invalid" in " ".join(payload["entries"][0]["errors"])
+    assert manifest_path.read_text() == before
+
+
+@pytest.mark.parametrize("bad_year", ["/2024", "..", "2024/elsewhere"])
+@pytest.mark.parametrize("operation", ["raw", "derived"])
+def test_publication_refuses_vintage_namespace_escape_before_reads(
+    tmp_path, monkeypatch, bad_year, operation
+):
+    package, manifest_path, manifest = _package(tmp_path)
+    manifest["files"][bad_year] = manifest["files"].pop(2024)
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False))
+    _no_upload(monkeypatch)
+
+    def unexpected_read(*args, **kwargs):
+        pytest.fail("publication read reached with a vintage namespace escape")
+
+    monkeypatch.setattr(Path, "read_bytes", unexpected_read)
+    if operation == "raw":
+        report = publish_source_artifacts(package)
+    else:
+        report = publish_derived_artifacts(
+            package,
+            source_id="publisher",
+            package_id="package",
+            year=bad_year,
+            build_id="ledger.build.v1:peer4",
+            r2_bucket="custom-store",
+        )
+    assert not report.valid
+
+
+@pytest.mark.parametrize(
+    "bad_build_id", ["ledger.build.v1:bad/id", "ledger.build.v1:bad id"]
+)
+def test_derived_publication_refuses_noncanonical_build_segment(
+    tmp_path, monkeypatch, bad_build_id
+):
+    suite = tmp_path / "suite"
+    suite.mkdir()
+    (suite / "facts.jsonl").write_bytes(b"{}\n")
+    _no_upload(monkeypatch)
+    report = publish_derived_artifacts(
+        suite,
+        source_id="publisher",
+        package_id="package",
+        year=2024,
+        build_id=bad_build_id,
+    )
+    assert not report.valid
+    assert report.errors == ("malformed_build_id",)
+
+
+@pytest.mark.parametrize("bad_year", ["/2024", "..", "2024/elsewhere"])
+def test_fetch_refuses_vintage_namespace_escape_before_publisher_io(
+    tmp_path, monkeypatch, bad_year
+):
+    package, _manifest_path, _manifest = _package(tmp_path)
+
+    def unexpected_read(*args, **kwargs):
+        pytest.fail("fetch reached publisher with a vintage namespace escape")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+    with pytest.raises(SourceArtifactManifestError, match="year"):
+        fetch_source_artifact(
+            "https://example.test/table.csv",
+            source_id="publisher",
+            package_id="package",
+            year=bad_year,
+            output_dir=package,
+        )
