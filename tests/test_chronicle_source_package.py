@@ -4417,3 +4417,59 @@ def test_build_facts_with_label_year_does_not_crash():
     # Record-set periods are literal 2024, so a label build still resolves them.
     assert facts
     assert all(fact.period.value == 2024 for fact in facts)
+
+
+@pytest.mark.parametrize(
+    "bad_directory",
+    ["/etc", "../outside", "data/../../outside", "data/./publisher"],
+)
+def test_resource_directory_must_stay_inside_the_resource_package(
+    tmp_path, monkeypatch, bad_directory
+):
+    """`resource_directory` is joined under the resource package root; an
+    absolute or parent-traversing value escapes it and must be refused
+    before any read."""
+    resource_root = tmp_path / "pkg"
+    resource_root.mkdir()
+    monkeypatch.setattr(
+        "chronicle.source_package.files", lambda _package: resource_root
+    )
+    artifact = SourceArtifactSpec(
+        source_name="publisher",
+        source_table="Table",
+        resource_package="test_resources",
+        resource_directory=bad_directory,
+        manifest="manifest.yaml",
+        vintage="2024",
+        extracted_at="2026-09-04",
+        extraction_method="test",
+        artifact_year=2024,
+    )
+
+    with pytest.raises(ValueError, match="resource_directory"):
+        artifact._artifact_content(2024)
+
+
+def test_resource_directory_refuses_a_symlinked_ancestor(tmp_path, monkeypatch):
+    resource_root = tmp_path / "pkg"
+    real = tmp_path / "elsewhere" / "package"
+    real.mkdir(parents=True)
+    (resource_root / "data").mkdir(parents=True)
+    (resource_root / "data" / "publisher").symlink_to(real.parent)
+    monkeypatch.setattr(
+        "chronicle.source_package.files", lambda _package: resource_root
+    )
+    artifact = SourceArtifactSpec(
+        source_name="publisher",
+        source_table="Table",
+        resource_package="test_resources",
+        resource_directory="data/publisher/package",
+        manifest="manifest.yaml",
+        vintage="2024",
+        extracted_at="2026-09-04",
+        extraction_method="test",
+        artifact_year=2024,
+    )
+
+    with pytest.raises(ValueError, match="symbolic link|resource_directory"):
+        artifact._artifact_content(2024)

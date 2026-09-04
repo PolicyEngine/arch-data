@@ -3289,3 +3289,130 @@ def test_publish_refuses_a_self_consistent_non_r2_locator(tmp_path, monkeypatch)
     assert "provider" in report.entries[0].errors[0]
     assert not log.exists()
     assert manifest_path.read_bytes() == before
+
+
+# ---------------------------------------------------------------------------
+# Sol gate round 3: identity segments, alias enumeration, non-regular manifests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "bad_id",
+    ["irs soi", "a/b", "..", " irs_soi", "irs_soi ", "a\\b", "a\tb"],
+)
+@pytest.mark.parametrize("field", ["source_id", "package_id"])
+def test_fetch_refuses_noncanonical_identity_segments_before_io(
+    tmp_path, monkeypatch, bad_id, field
+):
+    """A registration identity that _clean_key_part would rewrite (or that
+    embeds separators) must be refused, never normalized into a different
+    R2 namespace."""
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    source = _publish(tmp_path, "table.xlsx", b"table")
+
+    def unexpected_read(_url):
+        raise AssertionError("publisher read reached with a bad identity")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+    kwargs = {"source_id": "irs_soi", "package_id": "soi-table-5"}
+    kwargs[field] = bad_id
+
+    with pytest.raises(SourceArtifactManifestError, match="segment"):
+        fetch_source_artifact(
+            str(source),
+            year=2022,
+            output_dir=package,
+            **kwargs,
+        )
+
+    assert not package.exists()
+
+
+def test_matching_directory_entry_refuses_multiple_normalized_aliases():
+    """Two physical entries sharing one normalized key are a package defect;
+    returning the first spelling would silently ignore the other bytes."""
+    from types import SimpleNamespace
+
+    entries = [
+        SimpleNamespace(name="TABLE.CSV"),
+        SimpleNamespace(name="other.csv"),
+        SimpleNamespace(name="table.csv"),
+    ]
+    directory = SimpleNamespace(
+        is_dir=lambda: True, iterdir=lambda: iter(entries)
+    )
+
+    with pytest.raises(ValueError, match="TABLE.CSV.*table.csv|table.csv.*TABLE.CSV"):
+        matching_directory_entry(directory, "table.csv")
+
+    assert (
+        matching_directory_entry(directory, "other.csv").name == "other.csv"
+    )
+
+
+def test_publish_and_inventory_report_duplicate_artifact_aliases(
+    tmp_path, monkeypatch
+):
+    """A duplicate-alias defect surfaces as an entry error, not a crash and
+    not a silent first-match read."""
+    output_dir = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    source = _publish(tmp_path, "22in05ira.xlsx", b"IRA table 5")
+    _fetch_local(output_dir, source, upload_r2=False)
+
+    def duplicate_alias(_directory, filename):
+        raise ValueError(
+            f"{filename!r} matches two physical spellings in the package."
+        )
+
+    monkeypatch.setattr(
+        "chronicle.artifacts.matching_directory_entry", duplicate_alias
+    )
+
+    inventory = inventory_source_artifacts(output_dir)
+    published = publish_source_artifacts(output_dir)
+
+    assert not inventory.valid
+    assert any(
+        "duplicate_artifact_spellings" in error
+        for entry in inventory.entries
+        for error in entry.errors
+    )
+    assert not published.valid
+    assert any(
+        "duplicate_artifact_spellings" in error
+        for entry in published.entries
+        for error in entry.errors
+    )
+
+
+@pytest.mark.parametrize("shape", ["dangling", "directory"])
+def test_sweeps_refuse_non_regular_manifest_entries(tmp_path, shape):
+    """A manifest-named entry that is not a regular file must fail the sweep
+    loudly instead of vanishing from it."""
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    package.mkdir(parents=True)
+    target = package / "manifest.yaml"
+    if shape == "dangling":
+        target.symlink_to(package / "nowhere.yaml")
+    else:
+        target.mkdir()
+
+    with pytest.raises(SourceArtifactManifestError, match="regular file"):
+        inventory_source_artifacts(tmp_path / "db" / "data")
+    with pytest.raises(SourceArtifactManifestError, match="regular file"):
+        publish_source_artifacts(tmp_path / "db" / "data")
+
+
+def test_fetch_refuses_a_dangling_manifest_symlink_instead_of_creating_one(
+    tmp_path,
+):
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    package.mkdir(parents=True)
+    (package / "manifest.yaml").symlink_to(package / "nowhere.yaml")
+    source = _publish(tmp_path, "table.xlsx", b"table")
+
+    with pytest.raises(SourceArtifactManifestError, match="regular file"):
+        _fetch_local(package, source, upload_r2=False)
+
+    assert (package / "manifest.yaml").is_symlink()
+    assert not (package / "table.xlsx").exists()
