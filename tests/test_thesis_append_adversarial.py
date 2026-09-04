@@ -396,6 +396,17 @@ def test_workflow_has_a_base_owned_trusted_pr_gate():
     assert 'workspace_sha="$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"' in workflow
     assert '[[ "$workspace_sha" =~ ^[0-9a-f]{40,64}$ ]]' in workflow
 
+    # Both base-gate jobs ask the base gate what it accepts before invoking it,
+    # because the base gate on any pull request opened before --commit merged
+    # does not accept it and the one after requires it. The question goes to
+    # base-owned code about its own interface. The fallback is never silent, so
+    # a run that took it says so in its own log; requiring the notice here is
+    # what stops the fallback being quietly widened into the ordinary path.
+    assert workflow.count('base_gate_help="$(') == 2
+    assert workflow.count('case "$base_gate_help" in') == 2
+    assert workflow.count("*--commit*)") == 2
+    assert workflow.count('echo "note: the base gate at') == 2
+
 
 def test_duplicate_identity_without_supersedes_is_rejected():
     lines = _read_lines()
