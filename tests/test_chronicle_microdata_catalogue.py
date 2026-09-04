@@ -179,6 +179,32 @@ def test_frs_catalogue_selector_refuses_cross_stage_pin_drift(field, value):
         )
 
 
+def test_frs_catalogue_selector_refuses_relabelled_cross_stage_byte_identity():
+    payload = json.loads((FIXTURE_ROOT / UK_STAGES).read_text())
+    release = next(
+        release
+        for release in script.CATALOGUE
+        if release.release_id == "dwp-frs-2023-24:adult"
+    )
+    employment = next(
+        stage for stage in payload["stages"] if stage["stage"] == "frs_employment"
+    )
+    adult = next(
+        artifact
+        for artifact in employment["artifacts"]
+        if artifact.get("locator") == "adult.tab"
+    )
+    adult["table"] = "adult_relabelled"
+    adult["kind"] = "restricted_microdata"
+
+    with pytest.raises(script.CatalogueError, match="conflicting values"):
+        script.select_artifact(
+            payload,
+            release.selector,
+            release_id=release.release_id,
+        )
+
+
 def test_resolve_refuses_a_missing_consumer_manifest(tmp_path):
     with pytest.raises(script.CatalogueError, match="manifest not found"):
         script.resolve(tmp_path / "no-such-checkout", script.CATALOGUE[:1])
