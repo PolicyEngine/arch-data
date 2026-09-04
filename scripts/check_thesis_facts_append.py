@@ -197,11 +197,16 @@ PROTECTED_TREE_MODES = ("100644", "100755")
 # to trust (peer review, round 1). ``core.fsmonitor`` is also refused by the
 # configuration audit.
 SCAN_SETTINGS = (
-    "-c", "core.untrackedCache=false",
-    "-c", "core.fsmonitor=false",
-    "-c", "core.trustctime=true",
-    "-c", "core.checkStat=default",
-    "-c", "feature.manyFiles=false",
+    "-c",
+    "core.untrackedCache=false",
+    "-c",
+    "core.fsmonitor=false",
+    "-c",
+    "core.trustctime=true",
+    "-c",
+    "core.checkStat=default",
+    "-c",
+    "feature.manyFiles=false",
 )
 
 # The two ways a run can end without a verdict of "OK", kept apart on purpose.
@@ -303,9 +308,10 @@ def _gate_environment(
     git calls out of ``os.environ`` -- on the pinned receipt,
     ``release_chain._git_environment`` returns ``os.environ`` with
     ``GIT_NO_REPLACE_OBJECTS`` set and four pathspec variables removed, and its
-    docstring says in as many words that it is not a sanitizer and that a
-    caller which does not control the environment it invokes the package in has
-    a problem outside that function's scope. So ``main`` replaces ``os.environ``
+    docstring says in as many words that it is still not a sanitizer: the five
+    redirecting variables are refused at the package's public verifier entries
+    rather than dropped there, and everything else in the ambient environment
+    is carried through. So ``main`` replaces ``os.environ``
     with this mapping for exactly the duration of the gate call (see
     ``_frozen_environment``); that is the control the package asks its callers
     for. Running the gate in a child process with ``env=`` would work equally
@@ -608,7 +614,11 @@ def _protected_entries(
     the RFC 3161 receipts and the trust anchors live, plus everything else
     under the state files' directory, so the byte comparison covers the whole
     of the gate's data surface (``ledger/**`` and ``releases/manifests/**``)
-    and not only the paths the gate reads (peer review, round 1). A commit that carries no
+    and not only the paths the gate reads (peer review, round 1). The prefixes
+    are the chain specification's, not the data-surface globs themselves;
+    ``test_the_byte_comparison_covers_the_whole_data_surface`` holds the two
+    together, so a widened data surface cannot outgrow this comparison
+    unnoticed. A commit that carries no
     entry at one of the two state paths is refused here: the gate would refuse
     it too, but this says which of the two is missing and says it before any
     file is read.
@@ -761,7 +771,11 @@ def _assert_exact_checkout(
                 f"not an ordinary tracked file ({reason}): {path}"
             )
     tree_entries = sum(
-        1 for record in _git(["ls-tree", "-r", "-z", oid], cwd=checkout, env=env).split(b"\0") if record
+        1
+        for record in _git(["ls-tree", "-r", "-z", oid], cwd=checkout, env=env).split(
+            b"\0"
+        )
+        if record
     )
     if index_entries != tree_entries:
         raise ShimRefusal(

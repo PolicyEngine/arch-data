@@ -418,8 +418,8 @@ def test_workflow_has_a_base_owned_trusted_pr_gate():
         assert fallback is not None
         fallback_arm = fallback.start()
         assert commit_arm < fallback_arm
-        assert "--commit " in body[commit_arm:fallback_arm]
-        assert "--commit " not in body[fallback_arm:]
+        assert '--commit "$' in body[commit_arm:fallback_arm]
+        assert '--commit "$' not in body[fallback_arm:]
 
 
 def test_duplicate_identity_without_supersedes_is_rejected():

@@ -84,7 +84,10 @@ APPEND_GATE_OK = (
 def _git(root: pathlib.Path, *arguments: str) -> str:
     """Run git in a fixture repository, ignoring the machine's own settings."""
 
-    environment = os.environ.copy()
+    # Every GIT_-prefixed name goes, as in the shim: GIT_CONFIG_COUNT and its
+    # numbered channels outrank every file, and GIT_DIR or GIT_WORK_TREE would
+    # point the fixture at another repository (peer review, round 2).
+    environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     environment.update(
         {
             "GIT_CONFIG_GLOBAL": "/dev/null",
@@ -1135,7 +1138,9 @@ shim._scratch_root = _record_the_mode
 def _sparse_patterns(root: pathlib.Path, *patterns: str) -> None:
     info = root / ".git" / "info"
     info.mkdir(parents=True, exist_ok=True)
-    (info / "sparse-checkout").write_text("".join(f"{p}\n" for p in patterns), encoding="utf-8")
+    (info / "sparse-checkout").write_text(
+        "".join(f"{p}\n" for p in patterns), encoding="utf-8"
+    )
 
 
 @pytest.mark.parametrize("scope", ["local", "worktree"])
@@ -1148,10 +1153,12 @@ def test_a_sparse_checkout_is_refused_before_it_can_pass(tmp_path, scope):
     omitted entry is marked skip-worktree, so ``git status`` and the ignored
     listing both stay empty, and on the push invocation (no ``--base-ref``)
     the gate reads only the state files and the release tree and said OK
-    (peer review, round 1). The key is refused by the configuration audit
-    before any checkout happens, in both scopes it can be set in; and the
-    checkout assertions refuse a skip-worktree entry and an index shorter
-    than the commit, so the second line holds even if the first is bypassed.
+    (peer review, round 1). What this test shows is the first line: the key
+    is refused by the configuration audit before any checkout happens, in both
+    scopes it can be set in, so the sparse checkout never occurs here. The
+    second line — the checkout assertions refusing a skip-worktree entry, and
+    an index shorter than the commit — is shown by the two tests that follow,
+    which bypass the audit.
     """
 
     def prepare(root: pathlib.Path) -> None:
@@ -1204,7 +1211,7 @@ shim._audit_repository_config = _audit_then_sparse
     assert completed.returncode == 1, completed.stdout + completed.stderr
     assert completed.stdout == ""
     assert completed.stderr.startswith(REFUSED)
-    assert "skip-worktree" in completed.stderr or "indexes" in completed.stderr
+    assert "skip-worktree" in completed.stderr
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
@@ -1223,7 +1230,9 @@ def test_git_runs_post_checkout_on_worktree_add_when_hooks_are_not_redirected(tm
     hook.write_text(f"#!/bin/sh\nprintf 'ran' > {marker}\n", encoding="utf-8")
     hook.chmod(0o755)
     _git(clone, "worktree", "add", "--detach", str(tmp_path / "plain"), candidate)
-    assert marker.exists(), "git did not run post-checkout on worktree add; the hook test would be vacuous"
+    assert marker.exists(), (
+        "git did not run post-checkout on worktree add; the hook test would be vacuous"
+    )
     _git(clone, "worktree", "remove", "--force", str(tmp_path / "plain"))
 
 
@@ -1248,10 +1257,88 @@ def test_the_documented_variable_list_covers_the_installed_manual(tmp_path):
     page = next((c for c in candidates if c.exists()), None)
     if page is None:
         pytest.skip(f"git(1) manual page not installed under {man}")
-    raw = gzip.decompress(page.read_bytes()) if page.suffix == ".gz" else page.read_bytes()
+    raw = (
+        gzip.decompress(page.read_bytes())
+        if page.suffix == ".gz"
+        else page.read_bytes()
+    )
     text = raw.decode("utf-8", "replace").replace("\\-", "-").replace("\\_", "_")
-    mentioned = set(re.findall(r"\bGIT_[A-Z0-9_]+\b", text))
+    # roff writes most names as \\fBGIT_DIR\\fR, so a leading word boundary
+    # would miss them (peer review, round 2); the class itself ends the match.
+    mentioned = set(re.findall(r"GIT_[A-Z0-9_]+\b", text))
     mentioned.discard("GIT_")
     documented = set(_documented_git_variables())
-    missing = sorted(name for name in mentioned if name not in documented and not name.endswith("_"))
+    missing = sorted(
+        name for name in mentioned if name not in documented and not name.endswith("_")
+    )
     assert missing == [], f"documented in git(1) but not in the tuple: {missing}"
+
+
+def test_an_index_shorter_than_the_commit_is_refused(tmp_path):
+    """The entry-count half of the checkout assertion, exercised on its own.
+
+    Every tag is ``H`` here; the shim's ``ls-files -v -z`` read is made to
+    return one record fewer than the commit has entries, which is the shape
+    the count check exists for (peer review, round 2).
+    """
+
+    clone, base, candidate = _replay_latest_release(tmp_path)
+    injection = """
+_real_git = shim._git
+def _short_index(arguments, **kwargs):
+    payload = _real_git(arguments, **kwargs)
+    if "ls-files" in arguments and "-v" in arguments:
+        records = [r for r in payload.split(b"\\0") if r]
+        payload = b"\\0".join(records[:-1]) + b"\\0"
+    return payload
+shim._git = _short_index
+"""
+    completed = _run_shim(
+        clone,
+        commit=candidate,
+        temporary_root=tmp_path / "tmp",
+        injection=injection,
+        workspace=tmp_path / "workspace",
+    )
+    assert completed.returncode == 1, completed.stdout + completed.stderr
+    assert completed.stdout == ""
+    assert completed.stderr.startswith(REFUSED)
+    assert "indexes" in completed.stderr and "where the commit has" in completed.stderr
+    _assert_nothing_left_behind(clone, tmp_path / "tmp")
+
+
+def test_the_byte_comparison_covers_the_whole_data_surface(tmp_path):
+    """Every tracked path on the gate's data surface is in the protected set.
+
+    The protected prefixes come from the chain specification; the data surface
+    is a separate set of globs on the gate specification. This holds the two
+    together at the repository's own head, so a widened data surface cannot
+    outgrow the byte comparison unnoticed (peer review, round 2).
+    """
+
+    import fnmatch
+    import importlib
+
+    sys.path.insert(0, str(SHIM_SCRIPTS))
+    shim = importlib.import_module("check_thesis_facts_append")
+    clone, commit = _replay_current_state(tmp_path)
+    scratch = tmp_path / "scratch"
+    scratch.mkdir()
+    environment = shim._gate_environment(clone, scratch)
+    protected = {
+        entry[3] for entry in shim._protected_entries(clone, commit, environment)
+    }
+    tracked = _git(clone, "ls-tree", "-r", "--name-only", commit).splitlines()
+    patterns = list(shim.APPEND_GATE_SPEC.data_surface)
+    on_surface = {
+        path
+        for path in tracked
+        if any(
+            (pattern.endswith("/**") and path.startswith(pattern[:-2]))
+            or path == pattern
+            or fnmatch.fnmatchcase(path, pattern)
+            for pattern in patterns
+        )
+    }
+    assert on_surface, "the data surface matched nothing; the test is vacuous"
+    assert on_surface <= protected, sorted(on_surface - protected)
