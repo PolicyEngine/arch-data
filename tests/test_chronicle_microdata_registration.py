@@ -1209,7 +1209,9 @@ def test_fetch_into_a_microdata_release_manifest_requires_the_evidence(
         "licence": "OGL-UK-3.0",
         "publisher": "Department for Work and Pensions",
         "vintage": "2023_24",
-        "expected_sha256": FIXTURE_SHA,
+        # Not the digest the manifest registers hash-only: those bytes are
+        # refused as the gated artifact whatever name they arrive under.
+        "expected_sha256": OTHER_SHA,
         "licence_evidence": {**EVIDENCE, "issuer": "DWP"},
         "staging_dir": tmp_path / "staging",
     }

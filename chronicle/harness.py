@@ -429,6 +429,7 @@ def register_artifact_file(
     fetched_at: str | None = None,
     notes: str | None = None,
     allow_reissue: bool = False,
+    manifest_filename: str = DEFAULT_MANIFEST_FILENAME,
 ) -> ArtifactRegistrationReport:
     """Register a licensed or restricted artifact by identity, without bytes."""
     return register_hash_only_artifact(
@@ -458,6 +459,7 @@ def register_artifact_file(
         fetched_at=fetched_at,
         notes=notes,
         allow_reissue=allow_reissue,
+        manifest_filename=manifest_filename,
     )
 
 
@@ -1190,6 +1192,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Directory where manifest.yaml should live. No bytes are written.",
     )
     registration_parser.add_argument(
+        "--manifest",
+        default=DEFAULT_MANIFEST_FILENAME,
+        help=(
+            "Manifest filename inside --out-dir to record into, for a "
+            "directory that keeps one manifest_<package>.yaml per package. "
+            "Must be manifest.yaml or manifest_<package>.yaml; the default "
+            "name is refused beside named manifests."
+        ),
+    )
+    registration_parser.add_argument(
         "--filename",
         required=True,
         help="Publisher filename this registration identifies.",
@@ -1821,6 +1833,7 @@ def main(argv: list[str] | None = None) -> int:
                 fetched_at=args.fetched_at,
                 notes=args.notes,
                 allow_reissue=args.allow_reissue,
+                manifest_filename=args.manifest,
             )
         except (HashOnlyRegistrationError, ManifestAccessError) as error:
             print(f"error: {error}", file=sys.stderr)

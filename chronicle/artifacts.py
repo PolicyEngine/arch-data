@@ -40,24 +40,30 @@ from chronicle.registration import (
     MANIFEST_KINDS,
     MICRODATA_RELEASE_KIND,
     AmbiguousVintageKeyError,
+    ArtifactFilenameError,
     ListSpecRejected,
     ManifestAccessError,
     ManifestKindError,
     bare_filename,
     filename_key,
     has_file_entries,
+    hash_only_registrations,
     is_bare_filename,
     is_hash_only,
+    is_manifest_filename,
+    iter_directory_entries,
     iter_file_specs,
     iter_manifest_entries,
     manifest_kind as normalize_manifest_kind,
     normalize_access,
+    package_manifest_paths,
     recorded_r2,
     resolve_vintage_key,
     safe_entry_access,
     safe_manifest_kind,
     validate_file_entry,
     validate_manifest_files,
+    validate_package_directory,
 )
 
 
@@ -138,7 +144,114 @@ def _manifest_path(output: Path, manifest_filename: str) -> Path:
             "Manifest must name a file inside the package directory, not "
             f"{manifest_filename!r}."
         )
+    if not is_manifest_filename(name):
+        raise ManifestNameError(
+            f"Manifest must be named {DEFAULT_MANIFEST_FILENAME} or "
+            f"manifest_<package>.yaml, not {manifest_filename!r}: the sweeps "
+            "address a package's manifests by those names, and a manifest "
+            "under any other name is invisible to them."
+        )
     return output / name
+
+
+def _package_manifests(
+    output: Path,
+    manifest_path: Path,
+    existing_manifest: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Return every manifest the package directory keeps, by path.
+
+    The byte boundary is the file in the directory, not the manifest that
+    records it: a name or a digest registered hash-only in any manifest there
+    must not be fetched, published, or reclassified through another. A
+    sibling manifest Chronicle cannot read is a refusal, because the boundary
+    cannot be decided without it.
+    """
+    manifests: dict[str, dict[str, Any]] = {str(manifest_path): existing_manifest}
+    for path in package_manifest_paths(output):
+        if path == manifest_path or filename_key(path.name) == filename_key(
+            manifest_path.name
+        ):
+            continue
+        manifests[str(path)] = _read_manifest(path)
+    return manifests
+
+
+def _assert_no_hash_only_bytes(
+    manifests: Mapping[str, dict[str, Any]],
+    *,
+    sha256: str,
+    filename: str,
+    what: str,
+) -> None:
+    """Refuse to archive bytes any manifest in the directory registers hash-only.
+
+    The same bytes under another name are the same gated artifact.
+    """
+    for name, key, entry in hash_only_registrations(manifests, sha256=sha256):
+        raise ManifestAccessError(
+            f"{name} registers {entry.get('filename')!r} for {key!r} as "
+            f"access={safe_entry_access(entry)!r} with sha256={sha256}; {what} "
+            "are those exact bytes. A gated artifact is not archived under "
+            f"another name ({filename!r}); keep the hash-only registration."
+        )
+
+
+def _assert_siblings_record_these_bytes(
+    manifests: Mapping[str, dict[str, Any]],
+    *,
+    manifest_path: Path,
+    filename: str,
+    sha256: str,
+) -> None:
+    """Refuse to overwrite a file another manifest records as other bytes.
+
+    Two manifests may record one public file only as the same bytes; a fetch
+    of different bytes under that name would silently rewrite what the other
+    manifest describes. A revision is recorded through the manifest that
+    holds the entry.
+    """
+    wanted = filename_key(filename)
+    for name, key, _index, entry in iter_directory_entries(manifests):
+        if name == str(manifest_path) or not isinstance(entry, dict):
+            continue
+        recorded_name = entry.get("filename")
+        if recorded_name is None or filename_key(recorded_name) != wanted:
+            continue
+        recorded = entry.get("sha256")
+        recorded = recorded.strip() if isinstance(recorded, str) else None
+        if recorded and recorded != sha256:
+            raise ManifestAccessError(
+                f"{name} records {recorded_name!r} for {key!r} as "
+                f"sha256={recorded}; this fetch would write sha256={sha256} to "
+                "the same file. One file in a package directory has one record "
+                "of its bytes: revise it through the manifest that records it "
+                f"(fetch-artifact --manifest {Path(name).name} --record-revision)."
+            )
+
+
+def _assert_manifest_identifies(
+    existing_manifest: dict[str, Any],
+    manifest_path: Path,
+    *,
+    source_id: str,
+    package_id: str,
+) -> None:
+    """Refuse to fetch into a manifest that identifies another package.
+
+    The R2 key and the registration identity are built from the fetch's
+    identifiers; recording the entry under a manifest that declares others
+    would leave the two disagreeing about which package the bytes belong to.
+    """
+    for field, value in (("source_id", source_id), ("package_id", package_id)):
+        declared = existing_manifest.get(field)
+        declared = declared.strip() if isinstance(declared, str) else declared
+        if declared not in (None, "") and str(declared) != value:
+            raise ManifestAccessError(
+                f"{manifest_path} declares {field}={declared!r}; refusing to "
+                f"fetch {field}={value!r} into it. Fetch into the package the "
+                "manifest identifies, or into that package's own directory."
+            )
 
 
 def _sibling_manifests(output: Path) -> list[str]:
@@ -781,14 +894,19 @@ def fetch_source_artifact(
     # resolved -- and any alias of a registered name refused -- before the
     # publisher is read. Reading first and refusing afterwards would pull
     # gated bytes to decide their name.
+    what = (
+        "--filename" if filename is not None else "The filename inferred from the URL"
+    )
     artifact_filename = bare_filename(
         filename if filename is not None else _infer_artifact_filename(source_url),
-        what=(
-            "--filename"
-            if filename is not None
-            else "The filename inferred from the URL"
-        ),
+        what=what,
     )
+    if is_manifest_filename(artifact_filename):
+        raise ArtifactFilenameError(
+            f"{what} {artifact_filename!r} is a manifest name. An artifact may "
+            "not be named like a manifest, which it would overwrite; pass "
+            "--filename with the publisher's name for the bytes."
+        )
     expected = _expected_identity(expected_sha256, expected_size_bytes)
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
@@ -805,10 +923,32 @@ def fetch_source_artifact(
     _refuse_a_stray_default_manifest(output, manifest_path)
     existing_manifest = _read_manifest(manifest_path)
     _manifest_files(existing_manifest, manifest_path)
-    # The byte boundary is checked first: overwriting a hash-only registration
-    # with bytes is the more serious refusal, and its message is the one the
-    # caller needs, not a prompt about the manifest's kind or licence.
-    _assert_no_hash_only_entry(existing_manifest, manifest_path, artifact_filename)
+    # The byte boundary is checked first, across every manifest the directory
+    # keeps: overwriting a hash-only registration with bytes is the more
+    # serious refusal, and its message is the one the caller needs, not a
+    # prompt about the manifest's kind or licence.
+    manifests = _package_manifests(output, manifest_path, existing_manifest)
+    for sibling_path, sibling in manifests.items():
+        _assert_no_hash_only_entry(sibling, Path(sibling_path), artifact_filename)
+    if expected.sha256:
+        _assert_no_hash_only_bytes(
+            manifests,
+            sha256=expected.sha256,
+            filename=artifact_filename,
+            what="the reviewed pin's bytes",
+        )
+        _assert_siblings_record_these_bytes(
+            manifests,
+            manifest_path=manifest_path,
+            filename=artifact_filename,
+            sha256=expected.sha256,
+        )
+    _assert_manifest_identifies(
+        existing_manifest,
+        manifest_path,
+        source_id=source_id,
+        package_id=package_id,
+    )
     manifest_kind_value = _resolve_manifest_kind(
         existing_manifest,
         manifest_path=manifest_path,
@@ -901,6 +1041,18 @@ def fetch_source_artifact(
         size_bytes=size_bytes,
         r2_bucket=r2_bucket,
         record_revision=record_revision,
+    )
+    _assert_no_hash_only_bytes(
+        manifests,
+        sha256=sha256,
+        filename=artifact_filename,
+        what=f"the bytes served by {source_url}",
+    )
+    _assert_siblings_record_these_bytes(
+        manifests,
+        manifest_path=manifest_path,
+        filename=artifact_filename,
+        sha256=sha256,
     )
 
     if release:
@@ -1189,10 +1341,20 @@ def publish_source_artifacts(
         kind, kind_error = safe_manifest_kind(manifest, manifest_path=manifest_path)
         manifest_errors = [kind_error] if kind_error else []
         manifest_errors.extend(validate_manifest_files(manifest))
+        try:
+            manifest_errors.extend(
+                validate_package_directory(
+                    _package_manifests(manifest_path.parent, manifest_path, manifest)
+                )
+            )
+        except (OSError, MalformedManifestError) as exc:
+            errors.append(f"Could not read a manifest beside {manifest_path}: {exc}")
+            continue
         if manifest_errors:
-            # Validate, then touch: a manifest Chronicle cannot classify or
-            # whose entries collide is reported and left alone; publishing any
-            # entry under it could ship bytes through the wrong record.
+            # Validate, then touch: a manifest Chronicle cannot classify, whose
+            # entries collide, or whose directory's other manifests disagree
+            # with it is reported and left alone; publishing any entry under
+            # it could ship bytes through the wrong record.
             errors.extend(f"{code}: {manifest_path}" for code in manifest_errors)
             continue
         updated = False
@@ -1320,6 +1482,15 @@ def inventory_source_artifacts(
         errors.extend(
             f"{code}: {manifest_path}" for code in validate_manifest_files(manifest)
         )
+        try:
+            errors.extend(
+                f"{code}: {manifest_path}"
+                for code in validate_package_directory(
+                    _package_manifests(manifest_path.parent, manifest_path, manifest)
+                )
+            )
+        except (OSError, MalformedManifestError) as exc:
+            errors.append(f"Could not read a manifest beside {manifest_path}: {exc}")
         for year, spec in files.items():
             for file_spec in iter_file_specs(spec, kind=kind):
                 entries.append(
@@ -2355,7 +2526,15 @@ def _upsert_manifest(
     kind = _resolve_manifest_kind(
         payload, manifest_path=manifest_path, requested_kind=kind
     )
-    _assert_no_hash_only_entry(payload, manifest_path, filename)
+    manifests = _package_manifests(manifest_path.parent, manifest_path, payload)
+    for sibling_path, sibling in manifests.items():
+        _assert_no_hash_only_entry(sibling, Path(sibling_path), filename)
+    _assert_no_hash_only_bytes(
+        manifests, sha256=sha256, filename=filename, what="the fetched bytes"
+    )
+    _assert_siblings_record_these_bytes(
+        manifests, manifest_path=manifest_path, filename=filename, sha256=sha256
+    )
     payload.setdefault("source_id", source_id)
     payload.setdefault("package_id", package_id)
     payload = _with_declared_kind(payload, kind)

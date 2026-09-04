@@ -62,6 +62,9 @@ ACCESS_CLASSES: tuple[str, ...] = (ACCESS_PUBLIC, ACCESS_LICENSED, ACCESS_RESTRI
 #: Access class inferred for a publisher-table entry that does not declare one.
 DEFAULT_ACCESS = ACCESS_PUBLIC
 
+#: The manifest a package directory keeps unless it feeds several packages.
+DEFAULT_MANIFEST_FILENAME = "manifest.yaml"
+
 PUBLISHER_TABLE_KIND = "publisher_table"
 MICRODATA_RELEASE_KIND = "microdata_release"
 #: The closed set of manifest kinds.
@@ -338,6 +341,122 @@ def filename_key(value: Any) -> str:
     return Path(str(value)).name.casefold()
 
 
+#: The names a package directory's manifests may carry: ``manifest.yaml`` or
+#: ``manifest_<package>.yaml`` (``.yml`` accepted), matched case-insensitively
+#: because the directory is as often as not on a case-insensitive filesystem.
+_MANIFEST_FILENAME_RE = re.compile(r"^manifest(?:_[^/\\]+)?\.ya?ml$", re.IGNORECASE)
+
+
+def is_manifest_filename(value: Any) -> bool:
+    """Whether ``value`` is a name a package manifest may carry.
+
+    The sweeps address manifests by name (``manifest.yaml`` by default,
+    ``manifest_<package>.yaml`` for a directory that feeds several source
+    packages), so a manifest under any other name is invisible to them, and
+    an artifact under one of these names would overwrite a manifest.
+    """
+    return is_bare_filename(value) and bool(_MANIFEST_FILENAME_RE.match(str(value)))
+
+
+def package_manifest_paths(package_dir: Path) -> list[Path]:
+    """Return every manifest file a package directory keeps, sorted by name."""
+    directory = Path(package_dir)
+    if not directory.is_dir():
+        return []
+    return sorted(
+        path
+        for path in directory.iterdir()
+        if path.is_file() and is_manifest_filename(path.name)
+    )
+
+
+def iter_directory_entries(
+    manifests: Mapping[str, Mapping[str, Any] | None],
+) -> Iterator[tuple[str, Any, int | None, Any]]:
+    """Yield ``(manifest_name, key, index, entry)`` across a directory's manifests."""
+    for name, manifest in manifests.items():
+        for key, index, entry in iter_manifest_entries(manifest):
+            yield name, key, index, entry
+
+
+def hash_only_registrations(
+    manifests: Mapping[str, Mapping[str, Any] | None],
+    *,
+    filename: Any = None,
+    sha256: Any = None,
+) -> list[tuple[str, Any, Mapping[str, Any]]]:
+    """Return the hash-only entries across ``manifests`` matching a name or digest.
+
+    A match by case-folded bare filename is the same path in the package
+    directory; a match by digest is the same bytes under another name. Both
+    identify the gated artifact, whichever manifest registers it. An entry
+    whose access class cannot be read is treated as hash-only (never public).
+    """
+    wanted_name = filename_key(filename) if filename else None
+    wanted_digest = _text(sha256)
+    matches: list[tuple[str, Any, Mapping[str, Any]]] = []
+    for name, key, _index, entry in iter_directory_entries(manifests):
+        if not isinstance(entry, Mapping):
+            continue
+        if not is_hash_only(safe_entry_access(entry)):
+            continue
+        entry_name = entry.get("filename")
+        same_name = (
+            wanted_name is not None
+            and entry_name is not None
+            and filename_key(entry_name) == wanted_name
+        )
+        same_bytes = wanted_digest is not None and _text(entry.get("sha256")) == (
+            wanted_digest
+        )
+        if same_name or same_bytes:
+            matches.append((name, key, entry))
+    return matches
+
+
+def validate_package_directory(
+    manifests: Mapping[str, Mapping[str, Any] | None],
+) -> tuple[str, ...]:
+    """Return the collision codes across every manifest a directory keeps.
+
+    Two manifests may record one public file only as the same bytes (the
+    tracked shape: ``manifest.yaml`` beside ``manifest_<package>.yaml`` both
+    recording one publisher zip with one digest). A name held public in one
+    manifest and hash-only in another, public under two digests, or a digest
+    held public in one and hash-only in another, is one file that two records
+    disagree about, and no command may act through either record.
+    """
+    by_name: dict[str, list[tuple[str, bool, str]]] = {}
+    by_digest: dict[str, list[tuple[str, bool]]] = {}
+    for name, _key, _index, entry in iter_directory_entries(manifests):
+        if not isinstance(entry, Mapping):
+            continue
+        hash_only = is_hash_only(safe_entry_access(entry))
+        digest = _text(entry.get("sha256")) or ""
+        filename = entry.get("filename")
+        if filename is not None:
+            by_name.setdefault(filename_key(filename), []).append(
+                (name, hash_only, digest)
+            )
+        if digest:
+            by_digest.setdefault(digest, []).append((name, hash_only))
+
+    errors: list[str] = []
+    for key, records in by_name.items():
+        if len({name for name, _hash_only, _digest in records}) < 2:
+            continue
+        classes = {hash_only for _name, hash_only, _digest in records}
+        digests = {digest for _name, _hash_only, digest in records}
+        if len(classes) > 1 or (not classes.pop() and len(digests) > 1):
+            errors.append(f"filename_collision_across_manifests:{key}")
+    for digest, records in by_digest.items():
+        if len({name for name, _hash_only in records}) < 2:
+            continue
+        if len({hash_only for _name, hash_only in records}) > 1:
+            errors.append(f"sha256_collision_across_manifests:{digest}")
+    return tuple(_dedupe(errors))
+
+
 def vintage_key_forms(year: Any) -> tuple[Any, ...]:
     """Return the key spellings that address the same vintage as ``year``.
 
@@ -481,6 +600,22 @@ def validate_manifest_files(manifest: Mapping[str, Any] | None) -> tuple[str, ..
             errors.append(f"non_canonical_filename:{filename}")
         by_name.setdefault(filename_key(filename), []).append((key, entry))
 
+    by_digest: dict[str, set[bool]] = {}
+    for _key, _index, entry in iter_manifest_entries(manifest):
+        if not isinstance(entry, Mapping):
+            continue
+        digest = _text(entry.get("sha256"))
+        if digest:
+            by_digest.setdefault(digest, set()).add(
+                is_hash_only(safe_entry_access(entry))
+            )
+    for digest, classes in by_digest.items():
+        if len(classes) > 1:
+            # The same bytes are the same artifact whatever name they carry:
+            # a digest is not both bytes Chronicle holds and bytes it must
+            # never hold.
+            errors.append(f"sha256_collision:{digest}")
+
     for name, entries in by_name.items():
         if len(entries) < 2:
             continue
@@ -534,6 +669,8 @@ def validate_file_entry(
     filename = spec.get("filename")
     if filename is not None and not is_bare_filename(filename):
         errors.append(f"non_canonical_filename:{filename}")
+    elif filename is not None and is_manifest_filename(filename):
+        errors.append(f"manifest_named_filename:{filename}")
 
     declared_access = spec.get("access")
     if declared_access is None:
@@ -812,6 +949,7 @@ def register_hash_only_artifact(
     fetched_at: str | None = None,
     notes: str | None = None,
     allow_reissue: bool = False,
+    manifest_filename: str = DEFAULT_MANIFEST_FILENAME,
 ) -> ArtifactRegistrationReport:
     """Register a licensed or restricted artifact by identity, without bytes.
 
@@ -820,6 +958,11 @@ def register_hash_only_artifact(
     asserts the checksum. No bytes are read, written, or uploaded, and no R2
     key is recorded. Every refusal below happens before the manifest is
     touched.
+
+    ``manifest_filename`` names the manifest inside ``output_dir`` the entry
+    belongs to, exactly as ``fetch-artifact --manifest`` does: a directory
+    that keeps ``manifest_<package>.yaml`` files and no ``manifest.yaml`` is
+    refused the default name rather than given a stray third manifest.
     """
     access_class = normalize_access(access)
     if stores_bytes(access_class):
@@ -846,6 +989,11 @@ def register_hash_only_artifact(
         raise HashOnlyRegistrationError(
             f"Registration filename must be a bare filename; got {filename!r}."
         )
+    if is_manifest_filename(filename):
+        raise HashOnlyRegistrationError(
+            f"Registration filename {filename!r} is a manifest name; an "
+            "artifact may not be named like a manifest."
+        )
     artifact_name = str(filename)
     provenance = _hash_only_attestation(
         hash_source=hash_source,
@@ -865,8 +1013,16 @@ def register_hash_only_artifact(
             "must not live in a Chronicle store."
         )
 
-    manifest_path = output / "manifest.yaml"
+    manifest_path = _registration_manifest_path(output, manifest_filename)
     payload = _load_manifest(manifest_path)
+    # Every manifest the directory keeps takes part in the identity checks:
+    # the boundary is the file in the directory, not the manifest naming it.
+    siblings = {
+        str(path): _load_manifest(path)
+        for path in package_manifest_paths(output)
+        if path != manifest_path
+        and filename_key(path.name) != filename_key(manifest_path.name)
+    }
     try:
         existing_kind = manifest_kind(payload, manifest_path=manifest_path)
     except ManifestAccessError as exc:
@@ -922,7 +1078,13 @@ def register_hash_only_artifact(
             f"{', '.join(manifest_errors)}. Fix it by hand before registering "
             "into it."
         )
-    _assert_no_archived_identity(payload, manifest_path, artifact_name, access_class)
+    _assert_no_archived_identity(
+        payload, manifest_path, artifact_name, access_class, sha256=checksum
+    )
+    for sibling_path, sibling in siblings.items():
+        _assert_no_archived_identity(
+            sibling, Path(sibling_path), artifact_name, access_class, sha256=checksum
+        )
 
     try:
         vintage_key = resolve_vintage_key(files or {}, year)
@@ -1084,31 +1246,39 @@ def _assert_no_archived_identity(
     manifest_path: Path,
     artifact_name: str,
     access_class: str,
+    *,
+    sha256: str | None = None,
 ) -> None:
-    """Refuse to register hash-only a filename the manifest holds as public.
+    """Refuse to register hash-only an identity the manifest holds as public.
 
     A public entry may have been archived: its object sits in the raw bucket
     under ``storage.r2`` (or in ``storage.previous_r2`` once revised).
     Replacing that entry with a hash-only one would leave the bytes in a
     Chronicle store with nothing recording them, and inventory would report
     the tree clean. The transition is refused until the public entry, and the
-    object it names, have been explicitly removed.
+    object it names, have been explicitly removed. The identity is matched by
+    case-folded bare filename and by digest: the same bytes archived under
+    another name are the same artifact.
     """
     wanted = filename_key(artifact_name)
     for key, _index, existing in iter_manifest_entries(payload):
         if not isinstance(existing, Mapping):
             continue
-        if filename_key(existing.get("filename")) != wanted:
+        existing_name = existing.get("filename")
+        same_name = existing_name is not None and filename_key(existing_name) == wanted
+        same_bytes = sha256 is not None and _text(existing.get("sha256")) == sha256
+        if not (same_name or same_bytes):
             continue
         recorded = [
             str(block.get("uri") or block.get("key") or block)
             for block in (recorded_r2(existing), *recorded_previous_r2(existing))
             if isinstance(block, Mapping)
         ]
+        how = "" if same_name else f" (the same bytes as {artifact_name!r})"
         if recorded:
             raise HashOnlyRegistrationError(
                 f"{manifest_path} records the R2 object(s) {recorded} for "
-                f"{existing.get('filename')!r} ({key!r}, "
+                f"{existing_name!r}{how} ({key!r}, "
                 f"access={safe_entry_access(existing)!r}). Registering it "
                 f"{access_class} would leave those bytes in a Chronicle store "
                 "with nothing recording them. Remove the object and its "
@@ -1117,11 +1287,41 @@ def _assert_no_archived_identity(
             )
         if not is_hash_only(safe_entry_access(existing)):
             raise HashOnlyRegistrationError(
-                f"{manifest_path} already registers {existing.get('filename')!r} "
+                f"{manifest_path} already registers {existing_name!r}{how} "
                 f"({key!r}) as access={safe_entry_access(existing)!r}. A change "
                 f"of access class to {access_class!r} is an explicit decision: "
                 "remove the public entry by hand, then register the release."
             )
+
+
+def _registration_manifest_path(output: Path, manifest_filename: Any) -> Path:
+    """Return the manifest a registration records into, refusing a stray one.
+
+    Mirrors ``fetch-artifact --manifest``: the name is a bare manifest name
+    inside the package directory, and the default name is refused beside a
+    package's named manifests (PolicyEngine/chronicle#225), so a
+    registration never creates a manifest no sweep or package reads.
+    """
+    name = str(manifest_filename).strip() if manifest_filename is not None else ""
+    if not is_manifest_filename(name):
+        raise HashOnlyRegistrationError(
+            f"--manifest must name {DEFAULT_MANIFEST_FILENAME} or "
+            f"manifest_<package>.yaml inside the package directory, not "
+            f"{manifest_filename!r}."
+        )
+    manifest_path = output / name
+    if name == DEFAULT_MANIFEST_FILENAME and not manifest_path.exists():
+        siblings = [
+            path.name for path in package_manifest_paths(output) if path.name != name
+        ]
+        if siblings:
+            raise HashOnlyRegistrationError(
+                f"{output} keeps {', '.join(siblings)} and no "
+                f"{DEFAULT_MANIFEST_FILENAME}; pass --manifest to name the "
+                "manifest this registration records into rather than creating "
+                f"{DEFAULT_MANIFEST_FILENAME} beside them."
+            )
+    return manifest_path
 
 
 def _assert_manifest_identity(
@@ -1210,6 +1410,7 @@ __all__ = [
     "ArtifactRegistrationReport",
     "CHRONICLE_ATTESTER",
     "DEFAULT_ACCESS",
+    "DEFAULT_MANIFEST_FILENAME",
     "DEFAULT_MANIFEST_KIND",
     "HASH_ONLY_HASH_SOURCES",
     "HASH_SOURCES",
@@ -1229,14 +1430,18 @@ __all__ = [
     "entry_access",
     "filename_key",
     "has_file_entries",
+    "hash_only_registrations",
     "is_bare_filename",
     "is_hash_only",
+    "is_manifest_filename",
     "is_microdata_release",
+    "iter_directory_entries",
     "iter_file_specs",
     "iter_manifest_entries",
     "manifest_kind",
     "normalize_access",
     "normalize_hash_source",
+    "package_manifest_paths",
     "recorded_previous_r2",
     "recorded_r2",
     "records_r2_object",
@@ -1249,5 +1454,6 @@ __all__ = [
     "strict_entry_access",
     "validate_file_entry",
     "validate_manifest_files",
+    "validate_package_directory",
     "vintage_key_forms",
 ]

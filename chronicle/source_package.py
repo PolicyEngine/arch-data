@@ -39,8 +39,10 @@ from chronicle.registration import (
     ManifestKindError,
     MicrodataReleaseNotParseableError,
     entry_access,
+    hash_only_registrations,
     is_bare_filename,
     is_hash_only,
+    is_manifest_filename,
     is_microdata_release,
     resolve_vintage_key,
 )
@@ -902,7 +904,56 @@ class SourceArtifactSpec:
         manifest = self.manifest_payload()
         spec = _year_mapping(manifest["files"], self.artifact_year or year)
         _assert_entry_bytes_readable(spec)
+        self._assert_no_sibling_hash_only_registration(spec)
         return spec
+
+    def _assert_no_sibling_hash_only_registration(self, spec: Any) -> None:
+        """Refuse a file another manifest in the directory registers hash-only.
+
+        The boundary is the file in the package directory, not the manifest
+        that names it: a name or a digest registered ``licensed`` or
+        ``restricted`` in a sibling manifest is identity only, whichever
+        manifest this package reads through. A sibling Chronicle cannot read
+        is a refusal too, because the boundary cannot be decided without it.
+        """
+        if not isinstance(spec, dict):
+            return
+        directory = files(self.resource_package).joinpath(self.resource_directory)
+        siblings: dict[str, dict[str, Any]] = {}
+        for item in directory.iterdir():
+            if item.name == self.manifest or not is_manifest_filename(item.name):
+                continue
+            if not item.is_file():
+                continue
+            try:
+                with item.open("r", encoding="utf-8") as file:
+                    payload = yaml.safe_load(file) or {}
+            except (OSError, yaml.YAMLError) as exc:
+                raise ManifestAccessError(
+                    f"{self.resource_directory}/{item.name} cannot be read "
+                    f"({exc}), so whether it registers "
+                    f"{spec.get('filename')!r} hash-only cannot be decided; "
+                    "fix the manifest before parsing beside it."
+                ) from exc
+            if not isinstance(payload, dict):
+                raise ManifestAccessError(
+                    f"{self.resource_directory}/{item.name} is not a YAML "
+                    "mapping, so whether it registers "
+                    f"{spec.get('filename')!r} hash-only cannot be decided."
+                )
+            siblings[item.name] = payload
+        for name, key, entry in hash_only_registrations(
+            siblings, filename=spec.get("filename"), sha256=spec.get("sha256")
+        ):
+            raise ManifestAccessError(
+                f"{self.resource_directory}/{name} registers "
+                f"{entry.get('filename')!r} for {key!r} as "
+                f"access={entry.get('access')!r}: the same file, or the same "
+                f"bytes, as {spec.get('filename')!r}. A licensed or restricted "
+                "artifact is identity only, so no source package reads, caches, "
+                "fetches, or parses it through another manifest "
+                "(docs/adr-chronicle-raw-microdata-identity.md)."
+            )
 
     def _artifact_content(
         self,
