@@ -1831,6 +1831,72 @@ def test_a_malformed_manifest_is_reported_by_inventory_and_publish(tmp_path):
     assert "must be a YAML mapping" in published.errors[0]
 
 
+@pytest.mark.parametrize(
+    "duplicate_document",
+    [
+        pytest.param(
+            "source_id: hidden_source\n"
+            "source_id: irs_soi\n"
+            "package_id: soi-table-5\n"
+            "files: {}\n",
+            id="source-id",
+        ),
+        pytest.param(
+            "source_id: irs_soi\n"
+            "package_id: hidden-package\n"
+            "package_id: soi-table-5\n"
+            "files: {}\n",
+            id="package-id",
+        ),
+        pytest.param(
+            "source_id: irs_soi\n"
+            "package_id: soi-table-5\n"
+            "files:\n"
+            "  2022:\n"
+            "    filename: hidden.xlsx\n"
+            f"    sha256: {hashlib.sha256(b'hidden bytes').hexdigest()}\n"
+            "files: {}\n",
+            id="files",
+        ),
+        pytest.param(
+            "source_id: irs_soi\n"
+            "package_id: soi-table-5\n"
+            "files:\n"
+            "  2022:\n"
+            "    filename: hidden.xlsx\n"
+            f"    sha256: {hashlib.sha256(b'hidden bytes').hexdigest()}\n"
+            "  2022: {}\n",
+            id="vintage",
+        ),
+    ],
+)
+def test_fetch_refuses_duplicate_manifest_keys_before_publisher_io(
+    tmp_path, monkeypatch, duplicate_document
+):
+    """A lossy YAML parse must never decide which identity gets rewritten."""
+    package = tmp_path / "db" / "data" / "irs_soi" / "soi-table-5"
+    package.mkdir(parents=True)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(duplicate_document)
+    before = manifest_path.read_bytes()
+
+    def unexpected_read(_source_url):
+        raise AssertionError("duplicate manifest keys reached publisher I/O")
+
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", unexpected_read)
+
+    with pytest.raises(MalformedManifestError, match="duplicate key"):
+        fetch_source_artifact(
+            "https://example.test/table.xlsx",
+            source_id="irs_soi",
+            package_id="soi-table-5",
+            year=2022,
+            output_dir=package,
+        )
+
+    assert manifest_path.read_bytes() == before
+
+
 # ---------------------------------------------------------------------------
 # Sol gate round 3: fetch preflight and in-place manifest updates
 # ---------------------------------------------------------------------------
