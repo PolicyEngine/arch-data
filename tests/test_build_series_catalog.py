@@ -774,12 +774,14 @@ def test_committed_catalog_is_current_and_valid() -> None:
     # digit run 2374 trips the year hint; it is an identifier, not a date,
     # and stays in the identity because the observation was recorded so.
     assert committed["suspect_segments"] == ["LNU02374597"]
-    # Pin extended 2026-09-04 to the catalog at 55bbf3d: week_2026-07-13
-    # arrived at c2aa68d (va.vba.mmwr.claims_inventory; the segment is the
-    # VA MMWR report Monday, which falls inside the row's own week ending
-    # 2026-07-11, so the strip stands), week_2026-08-15 at 54dbabc8 and
-    # week_2026-08-22 at 55bbf3d (both dol.eta.continued_claims.sa and
-    # us.dol.initial_claims.sa).
+    # Pin extended 2026-09-04 to the catalog at 55bbf3d. Spellings first seen:
+    # week_2026-07-13 at c2aa68d (va.vba.mmwr.claims_inventory: the VA MMWR
+    # publication date for the week ending 2026-07-11, the row's own period,
+    # so a period spelling of this row and not a colliding label; the strip
+    # stands), week_2026-08-15 at 54dbabc8 and week_2026-08-22 at 55bbf3d.
+    # Occurrences as of 55bbf3d: both August keys map to
+    # dol.eta.continued_claims.sa (joined week_2026-08-15 at d77afe2) and
+    # us.dol.initial_claims.sa.
     # EVERY stripped spelling is auditable, mapped to the canonical
     # concepts it touched — a statute or edition label colliding with a
     # period spelling can only be caught here.
@@ -1231,11 +1233,14 @@ def test_identity_uuid_map_matches_reviewed_anchor() -> None:
     # context admission adds the U.S. annual EIA N9040US2 vented-and-flared
     # identity in million cubic feet. All 218 prior live bindings are
     # unchanged (218 -> 219).
-    # Updated 2026-09-04 to the catalog at 55bbf3d, four resolve_pending.py
+    # Updated 2026-09-04 to the catalog at 55bbf3d, six resolve_pending.py
     # waves after the previous pin: c2aa68d (2026-08-23, manifest
     # 0015-fdcfd0e570214f6b), 54dbabc8 (0016-5226191699ae168d), 734beb8
-    # (0017-efa7d60fece304f7) and 55bbf3d (2026-09-03,
-    # 0020-7f669f1e1364c5cc). Recomputed per commit
+    # (0017-efa7d60fece304f7), 9526211 (0018-20974a5bdeeace01), d77afe2
+    # (0019-01d2f0bfb2ebff75) and 55bbf3d (2026-09-03,
+    # 0020-7f669f1e1364c5cc); 0018 and 0019 changed occurrences and
+    # aliases only, so the anchor tuples are identical from 734beb8 through
+    # d77afe2. Recomputed per commit
     # with this test's algorithm, the previous pin was exact at c2aa68d^ and
     # the delta to 55bbf3d is nine mints from first observed identities, all
     # at c2aa68d (bls.ces.home_health_care_services.employment,
