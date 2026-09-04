@@ -1342,3 +1342,50 @@ def test_the_stray_default_manifest_rule_reaches_register_before_any_write(tmp_p
         )
 
     assert _snapshot(package) == before
+
+
+@pytest.mark.parametrize("upload_r2", [False, True])
+def test_fetch_validates_proposed_cross_vintage_table_before_writes(
+    tmp_path, monkeypatch, upload_r2
+):
+    package = tmp_path / "package"
+    original = b"published table for 2022"
+    _write(
+        package / "manifest.yaml",
+        _table_manifest(files={2022: _public_table_entry("table.csv", original)}),
+    )
+    (package / "table.csv").write_bytes(original)
+    before = _snapshot(package)
+    _serve(monkeypatch, b"different publisher bytes for 2023")
+    uploads = _record_uploads(monkeypatch)
+    writes = []
+
+    def record_bytes(path, content):
+        writes.append((path.name, content))
+        return len(content)
+
+    def record_text(path, content, *args, **kwargs):
+        writes.append((path.name, content))
+        return len(content)
+
+    monkeypatch.setattr(Path, "write_bytes", record_bytes)
+    monkeypatch.setattr(Path, "write_text", record_text)
+    refusal = None
+    try:
+        _fetch_table(
+            tmp_path / "table.csv",
+            package,
+            source_id="dwp",
+            package_id="dwp-frs-2023-24",
+            year=2023,
+            filename="table.csv",
+            upload_r2=upload_r2,
+        )
+    except ManifestAccessError as error:
+        refusal = error
+
+    assert writes == [], "proposed manifest must be valid before writing any bytes"
+    assert uploads == []
+    assert refusal is not None
+    assert "filename_collision:table.csv" in str(refusal)
+    assert _snapshot(package) == before

@@ -37,6 +37,10 @@
   `AttributeError` before the complete-manifest refusal. Red test committed
   before the integration correction; evidence is in `source-entry-red.log`.
 
+- Finding 1 reproduced red with and without upload: fetch attempted to write
+  the 2023 table and manifest over the 2022 filename. Both cases failed the
+  no-write assertion (`finding1-red.log`); fix not yet applied.
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
