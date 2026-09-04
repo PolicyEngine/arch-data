@@ -13,7 +13,7 @@ import re
 import shlex
 import sqlite3
 import subprocess
-from typing import Any
+from typing import Any, Mapping
 from urllib.parse import unquote, urlparse
 
 import httpx
@@ -27,6 +27,7 @@ from chronicle.database import (
 from chronicle.env import env_value
 from chronicle.epoch import EMIT_EPOCH, Epoch, canonicalize_key, hash_domain
 from chronicle.registration import (
+    filename_key,
     is_bare_filename,
     is_manifest_filename,
     load_manifest_document,
@@ -144,6 +145,29 @@ def _refuse_a_stray_default_manifest(output: Path, manifest_path: Path) -> None:
         "an existing manifest, or create an intentional empty sibling "
         "explicitly before fetching into it."
     )
+
+
+def _package_manifests(
+    output: Path,
+    manifest_path: Path,
+    existing_manifest: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Return every manifest the package directory keeps, by path.
+
+    The byte boundary is the file in the directory, not whichever manifest a
+    fetch selected. A malformed sibling is therefore a pre-I/O refusal: until
+    Chronicle can read every owner, it cannot safely overwrite shared bytes.
+    """
+    manifests: dict[str, dict[str, Any]] = {str(manifest_path): existing_manifest}
+    for path in package_manifest_paths(output):
+        if path == manifest_path or filename_key(path.name) == filename_key(
+            manifest_path.name
+        ):
+            continue
+        sibling = _read_manifest(path)
+        _manifest_files(sibling, path)
+        manifests[str(path)] = sibling
+    return manifests
 
 
 def _manifest_files(payload: dict[str, Any], manifest_path: Path) -> dict[str, Any]:
@@ -364,6 +388,16 @@ class RecordedIdentity:
         if self.sha256 != sha256:
             return False
         return not self.filename or self.filename == Path(filename).name
+
+
+@dataclass(frozen=True)
+class _ManifestFileOwner:
+    """One manifest entry that names a package-local artifact."""
+
+    manifest_path: Path
+    vintage: Any
+    spec: dict[str, Any]
+    identity: RecordedIdentity | None
 
 
 @dataclass(frozen=True)
@@ -758,6 +792,9 @@ def fetch_source_artifact(
         manifest_path=manifest_path,
         year=vintage_key,
     )
+    manifests = _package_manifests(output, manifest_path, existing_manifest)
+    owners = _manifest_file_owners(manifests, filename=artifact_filename)
+    _assert_shared_owner_identities_agree(owners, filename=artifact_filename)
 
     fetched_at = datetime.now(UTC).replace(microsecond=0).isoformat()
     content, _inferred_filename = _read_artifact(source_url)
@@ -777,6 +814,26 @@ def fetch_source_artifact(
         r2_bucket=r2_bucket,
         record_revision=record_revision,
     )
+    if not record_revision:
+        _assert_siblings_record_these_bytes(
+            manifests,
+            manifest_path=manifest_path,
+            filename=artifact_filename,
+            sha256=sha256,
+        )
+    for owner in owners:
+        if owner.manifest_path == manifest_path and owner.spec is selected_spec:
+            continue
+        _assert_recorded_identity_holds_these_bytes(
+            owner.identity,
+            manifest_path=owner.manifest_path,
+            year=owner.vintage,
+            filename=artifact_filename,
+            sha256=sha256,
+            size_bytes=size_bytes,
+            r2_bucket=r2_bucket,
+            record_revision=record_revision,
+        )
 
     output.mkdir(parents=True, exist_ok=True)
     local_path = output / artifact_filename
@@ -1713,6 +1770,106 @@ def _recorded_identity(
     )
 
 
+def _manifest_file_owners(
+    manifests: Mapping[str, dict[str, Any]],
+    *,
+    filename: str,
+) -> list[_ManifestFileOwner]:
+    """Return every entry in a package directory that names ``filename``."""
+    wanted = filename_key(filename)
+    owners: list[_ManifestFileOwner] = []
+    for name, payload in manifests.items():
+        manifest_path = Path(name)
+        for vintage, spec in _manifest_files(payload, manifest_path).items():
+            if not isinstance(spec, dict):
+                raise MalformedManifestError(
+                    f"{manifest_path} entry {vintage!r} must be a mapping; it "
+                    f"is a {type(spec).__name__}. Chronicle cannot decide "
+                    "whether it owns a shared package-local file."
+                )
+            recorded_name = spec.get("filename")
+            if recorded_name is None:
+                continue
+            if not is_bare_filename(recorded_name):
+                raise MalformedManifestError(
+                    f"{manifest_path} entry {vintage!r} filename must be a "
+                    f"bare package-local name, not {recorded_name!r}."
+                )
+            if filename_key(recorded_name) != wanted:
+                continue
+            identity = _recorded_identity(
+                spec,
+                manifest_path=manifest_path,
+                year=vintage,
+            )
+            if identity is None:
+                raise MalformedManifestError(
+                    f"{manifest_path} entry {vintage!r} names "
+                    f"{recorded_name!r} but records no sha256 identity. "
+                    "Chronicle cannot safely overwrite an unidentifiable "
+                    "shared file."
+                )
+            owners.append(
+                _ManifestFileOwner(
+                    manifest_path=manifest_path,
+                    vintage=vintage,
+                    spec=spec,
+                    identity=identity,
+                )
+            )
+    return owners
+
+
+def _assert_shared_owner_identities_agree(
+    owners: list[_ManifestFileOwner],
+    *,
+    filename: str,
+) -> None:
+    """Refuse an already-contradictory set of owners before publisher I/O."""
+    if not owners:
+        return
+    first = owners[0]
+    first_identity = first.identity
+    assert first_identity is not None
+    for owner in owners[1:]:
+        identity = owner.identity
+        assert identity is not None
+        if identity.sha256 == first_identity.sha256 and filename_key(
+            identity.filename
+        ) == filename_key(first_identity.filename):
+            continue
+        raise SourceArtifactManifestError(
+            f"{first.manifest_path} entry {first.vintage!r} and "
+            f"{owner.manifest_path} entry {owner.vintage!r} both name "
+            f"{filename!r} but identify different bytes. One package-local "
+            "file must have one recorded identity; reconcile the manifests "
+            "before fetching it again."
+        )
+
+
+def _assert_siblings_record_these_bytes(
+    manifests: Mapping[str, dict[str, Any]],
+    *,
+    manifest_path: Path,
+    filename: str,
+    sha256: str,
+) -> None:
+    """Refuse a default fetch that would stale another manifest's owner."""
+    for owner in _manifest_file_owners(manifests, filename=filename):
+        if owner.manifest_path == manifest_path:
+            continue
+        identity = owner.identity
+        assert identity is not None
+        if identity.sha256 == sha256:
+            continue
+        raise SourceArtifactRevisionError(
+            f"{owner.manifest_path} entry {owner.vintage!r} records "
+            f"{filename!r} as sha256={identity.sha256}; this fetch would write "
+            f"sha256={sha256} to the same package-local file. Re-run with "
+            "--record-revision to update every owner together."
+        )
+
+
 def _revision_error_message(
     *,
     manifest_path: Path,
@@ -1851,6 +2008,36 @@ _FETCH_OWNED_FIELDS: frozenset[str] = frozenset(
 )
 
 
+def _storage_for_fetched_identity(
+    recorded_spec: dict[str, Any],
+    *,
+    identity: RecordedIdentity | None,
+    filename: str,
+    sha256: str,
+    new_r2: dict[str, Any] | None,
+    fetched_at: str,
+) -> dict[str, Any]:
+    """Return one owner's storage after a refetch or explicit revision."""
+    recorded_storage = _recorded_storage(recorded_spec)
+    holds = identity is not None and identity.holds(
+        sha256=sha256,
+        filename=filename,
+    )
+    if holds and identity.r2 is not None:
+        # A same-byte copy does not replace the object's recorded history.
+        return {**recorded_storage, "r2": _recorded_r2(recorded_spec)}
+    if identity is not None and not holds:
+        return _superseding_storage(
+            recorded_spec,
+            recorded_r2=identity.r2,
+            new_r2=new_r2,
+            superseded_at=fetched_at,
+        )
+    if new_r2 is not None:
+        return {**recorded_storage, "r2": new_r2}
+    return dict(recorded_storage)
+
+
 def _upsert_manifest(
     manifest_path: Path,
     *,
@@ -1876,6 +2063,9 @@ def _upsert_manifest(
         source_id=source_id,
         package_id=package_id,
     )
+    manifests = _package_manifests(manifest_path.parent, manifest_path, payload)
+    owners = _manifest_file_owners(manifests, filename=filename)
+    _assert_shared_owner_identities_agree(owners, filename=filename)
     payload.setdefault("source_id", source_id)
     payload.setdefault("package_id", package_id)
     payload.setdefault("dataset", dataset)
@@ -1900,51 +2090,94 @@ def _upsert_manifest(
     for field, value in recorded_spec.items():
         if field not in _FETCH_OWNED_FIELDS and field not in file_entry:
             file_entry[field] = value
-    recorded_storage = _recorded_storage(recorded_spec)
     identity = _recorded_identity(recorded_spec, manifest_path=manifest_path, year=key)
     new_r2 = r2_location.to_dict() if r2_location is not None else None
-    holds = identity is not None and identity.holds(sha256=sha256, filename=filename)
-    if identity is not None and not holds and not record_revision:
-        # Different bytes under the same vintage. The guard in
-        # fetch_source_artifact refuses this without --record-revision; repeat
-        # the check here so no caller can reach a false-provenance write.
-        raise SourceArtifactRevisionError(
-            _revision_error_message(
-                manifest_path=manifest_path,
-                year=key,
-                filename=filename,
-                identity=identity,
-                sha256=sha256,
-                size_bytes=size_bytes,
-                r2_bucket=(new_r2 or {}).get("bucket") or default_r2_raw_bucket(),
-            )
+    r2_bucket = (new_r2 or {}).get("bucket") or default_r2_raw_bucket()
+    _assert_recorded_identity_holds_these_bytes(
+        identity,
+        manifest_path=manifest_path,
+        year=key,
+        filename=filename,
+        sha256=sha256,
+        size_bytes=size_bytes,
+        r2_bucket=r2_bucket,
+        record_revision=record_revision,
+    )
+    if not record_revision:
+        _assert_siblings_record_these_bytes(
+            manifests,
+            manifest_path=manifest_path,
+            filename=filename,
+            sha256=sha256,
         )
-    if holds and identity.r2 is not None:
-        # A recorded storage.r2 block for these exact bytes is historical
-        # truth: archived witness records pin raw R2 URLs by hash. Re-fetching
-        # under a renamed bucket copies bytes; it does not restate where the
-        # bytes were first published (PolicyEngine/chronicle#143, mechanism 3).
-        storage = {**recorded_storage, "r2": _recorded_r2(recorded_spec)}
-    elif identity is not None and not holds:
-        storage = _superseding_storage(
-            recorded_spec,
-            recorded_r2=identity.r2,
-            new_r2=new_r2,
-            superseded_at=fetched_at,
+    for owner in owners:
+        if owner.manifest_path == manifest_path and owner.spec is recorded_spec:
+            continue
+        _assert_recorded_identity_holds_these_bytes(
+            owner.identity,
+            manifest_path=owner.manifest_path,
+            year=owner.vintage,
+            filename=filename,
+            sha256=sha256,
+            size_bytes=size_bytes,
+            r2_bucket=r2_bucket,
+            record_revision=record_revision,
         )
-    elif new_r2 is not None:
-        storage = {**recorded_storage, "r2": new_r2}
-    else:
-        storage = dict(recorded_storage)
+
+    storage = _storage_for_fetched_identity(
+        recorded_spec,
+        identity=identity,
+        filename=filename,
+        sha256=sha256,
+        new_r2=new_r2,
+        fetched_at=fetched_at,
+    )
     # An entry that has no storage to record carries no empty block: a
     # revision over a never-published entry supersedes nothing.
     if storage:
         file_entry["storage"] = storage
     payload["files"][key] = file_entry
-    manifest_path.write_text(
-        yaml.safe_dump(payload, sort_keys=False),
-        encoding="utf-8",
-    )
+
+    revision = any(
+        owner.identity is not None
+        and not owner.identity.holds(sha256=sha256, filename=filename)
+        for owner in owners
+    ) or (identity is not None and not identity.holds(sha256=sha256, filename=filename))
+    changed_paths = {manifest_path}
+    if record_revision and revision:
+        for owner in owners:
+            if owner.manifest_path == manifest_path and owner.spec is recorded_spec:
+                continue
+            revised_entry = dict(owner.spec)
+            revised_entry.update(
+                {
+                    "filename": filename,
+                    "sha256": sha256,
+                    "size_bytes": size_bytes,
+                    "fetched_at": fetched_at,
+                }
+            )
+            owner_storage = _storage_for_fetched_identity(
+                owner.spec,
+                identity=owner.identity,
+                filename=filename,
+                sha256=sha256,
+                new_r2=new_r2,
+                fetched_at=fetched_at,
+            )
+            if owner_storage:
+                revised_entry["storage"] = owner_storage
+            else:
+                revised_entry.pop("storage", None)
+            manifests[str(owner.manifest_path)]["files"][owner.vintage] = revised_entry
+            changed_paths.add(owner.manifest_path)
+
+    rendered = {
+        path: yaml.safe_dump(manifests[str(path)], sort_keys=False)
+        for path in changed_paths
+    }
+    for path, text in sorted(rendered.items(), key=lambda item: str(item[0])):
+        path.write_text(text, encoding="utf-8")
 
 
 def _upload_r2_object(

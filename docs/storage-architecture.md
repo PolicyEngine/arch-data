@@ -164,11 +164,16 @@ Most packages keep one `manifest.yaml`. A publisher directory that feeds
 several source packages keeps one manifest each —
 `db/data/irs_soi/ira_contributions/` holds
 `manifest_traditional_source_package.yaml` beside
-`manifest_roth_source_package.yaml` — and the entry being revised lives in
-exactly one of them. `fetch-artifact --manifest <filename>` selects it;
-defaulting to `manifest.yaml` there would write a third manifest neither
-package reads, and the recorded block would never be compared at all. The name
-must be a filename inside `--out-dir`, not a path.
+`manifest_roth_source_package.yaml`. `fetch-artifact --manifest <filename>`
+selects the entry whose publisher metadata the fetch updates; defaulting to
+`manifest.yaml` there would write a third manifest neither package reads. A
+physical artifact can also be owned by several entries in that directory (the
+tracked USDA SNAP archive spans two manifests, and SSA extracts have semantic
+aliases within one). Chronicle compares every such owner before overwriting the
+file. A changed archive is refused by default; `--record-revision` updates every
+owner to the new checksum and preserves each owner's own R2 block in
+`storage.previous_r2`. The manifest selector must be a filename inside
+`--out-dir`, not a path.
 
 ### What a recorded block has to say
 
