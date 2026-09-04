@@ -1849,6 +1849,21 @@ def test_a_public_release_without_a_recorded_object_is_incomplete(
             "recorded_r2_locator_invalid:",
             id="wrong-provider",
         ),
+        pytest.param(
+            {
+                "provider": "r2",
+                "bucket": "ledger-raw",
+                "key": (
+                    f"raw/wrong-source/wrong-package/1999/{PUBLIC_SHA}/csv_hus.zip"
+                ),
+                "uri": (
+                    "r2://ledger-raw/raw/wrong-source/wrong-package/1999/"
+                    f"{PUBLIC_SHA}/csv_hus.zip"
+                ),
+            },
+            "recorded_r2_locator_invalid:",
+            id="wrong-registration-identity",
+        ),
     ],
 )
 def test_inventory_refuses_an_invalid_or_identity_mismatched_r2_locator(

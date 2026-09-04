@@ -325,6 +325,46 @@ def test_fetch_validation_finds_a_normalized_alias_of_hash_only_bytes(
     assert actual_path.read_bytes() == LICENSED_BYTES
 
 
+def test_release_fetch_finds_a_normalized_alias_beside_the_manifest(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "db" / "data" / "dwp" / "frs_2023_24"
+    _write(
+        package / "manifest.yaml",
+        _hash_only_manifest(files={}) | {"files": {}, "publisher": "DWP"},
+    )
+    actual_path = package / "CODEBOOK.PDF"
+    actual_path.write_bytes(PUBLIC_BYTES)
+    declared_path = package / "codebook.pdf"
+    real_exists = Path.exists
+
+    def case_sensitive_exists(path: Path) -> bool:
+        if path == declared_path:
+            return False
+        return real_exists(path)
+
+    monkeypatch.setattr(Path, "exists", case_sensitive_exists)
+    reads = _refuse_read(monkeypatch)
+
+    with pytest.raises(ManifestAccessError, match="exists beside the manifest"):
+        _fetch_release(
+            package,
+            staging_dir=tmp_path / "staging",
+            filename="codebook.pdf",
+            content=PUBLIC_BYTES,
+            source_id="dwp",
+            package_id="dwp-frs-2023-24",
+            year=2023,
+            licence="OGL-UK-3.0",
+            publisher="DWP",
+            vintage="2023_24",
+            licence_evidence={**EVIDENCE, "issuer": "DWP"},
+            upload_r2=True,
+        )
+
+    assert reads == []
+
+
 def test_package_manifests_refuses_distinct_normalized_name_aliases(
     tmp_path, monkeypatch
 ):
@@ -475,6 +515,38 @@ def test_default_publish_discovers_named_yaml_and_yml_manifests(tmp_path, monkey
     assert report.counts["artifact_count"] == 3
     assert report.counts["uploaded_count"] == 3
     assert len(uploads) == 3
+
+
+@pytest.mark.parametrize("operation", ["inventory", "publish"])
+def test_artifact_sweeps_find_a_normalized_alias_of_hash_only_bytes(
+    tmp_path, monkeypatch, operation
+):
+    package = tmp_path / "data" / "dwp" / "frs_2023_24"
+    _write(package / "manifest.yaml", _hash_only_manifest(sha256=LICENSED_SHA))
+    actual_path = package / "ADULT.TAB"
+    actual_path.write_bytes(LICENSED_BYTES)
+    declared_path = package / "adult.tab"
+    real_exists = Path.exists
+
+    def case_sensitive_exists(path: Path) -> bool:
+        if path == declared_path:
+            return False
+        return real_exists(path)
+
+    monkeypatch.setattr(Path, "exists", case_sensitive_exists)
+    if operation == "inventory":
+        report = inventory_source_artifacts(package)
+    else:
+        uploads = _record_uploads(monkeypatch)
+        report = publish_source_artifacts(package, skip_hash_only=True)
+        assert uploads == []
+
+    assert not report.valid
+    assert any(
+        "bytes_present_for_hash_only_entry" in error
+        for entry in report.entries
+        for error in entry.errors
+    )
 
 
 def test_publish_raw_never_uploads_what_a_sibling_manifest_registers_hash_only(
@@ -708,6 +780,49 @@ def test_byte_reader_validates_the_complete_selected_manifest(
         spec.assert_parseable(2023)
 
 
+def test_byte_reader_finds_a_normalized_alias_for_another_current_entry(
+    tmp_path, monkeypatch
+):
+    _isolated_reader(tmp_path, monkeypatch)
+    package_name = f"chronicle_test_{uuid.uuid4().hex}"
+    resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
+    resource_dir.mkdir(parents=True)
+    files = {
+        2023: _public_table_entry("table.csv", PUBLIC_BYTES),
+        2022: _attested_entry(filename="adult.tab", sha256=LICENSED_SHA),
+    }
+    _write(resource_dir / "manifest.yaml", _table_manifest(files=files))
+    (resource_dir / "table.csv").write_bytes(PUBLIC_BYTES)
+    actual_path = resource_dir / "ADULT.TAB"
+    actual_path.write_bytes(LICENSED_BYTES)
+    declared_path = resource_dir / "adult.tab"
+    real_is_file = Path.is_file
+
+    def case_sensitive_is_file(path: Path) -> bool:
+        if path == declared_path:
+            return False
+        return real_is_file(path)
+
+    monkeypatch.setattr(Path, "is_file", case_sensitive_is_file)
+    monkeypatch.syspath_prepend(str(tmp_path / "pkgroot"))
+    spec = SourceArtifactSpec(
+        source_name="dwp",
+        source_table="Family Resources Survey",
+        resource_package=package_name,
+        resource_directory="data/dwp/frs",
+        manifest="manifest.yaml",
+        vintage="2023_24",
+        extracted_at="2026-09-02",
+        extraction_method="none",
+        parser="delimited_text_full_rows",
+        delimiter=",",
+        artifact_year=2023,
+    )
+
+    with pytest.raises(ManifestAccessError, match="bytes_present_for_hash_only_entry"):
+        spec.assert_parseable(2023)
+
+
 def test_byte_reader_refuses_a_file_a_sibling_manifest_registers_hash_only(
     tmp_path, monkeypatch
 ):
@@ -747,6 +862,39 @@ def test_byte_reader_refuses_a_file_a_sibling_manifest_registers_hash_only(
         spec.assert_parseable(2023)
     with pytest.raises(ManifestAccessError, match="manifest_release.yaml"):
         spec.build_source_rows(2023)
+
+
+def test_byte_reader_strictly_validates_a_sibling_manifest(tmp_path, monkeypatch):
+    _isolated_reader(tmp_path, monkeypatch)
+    package_name = f"chronicle_test_{uuid.uuid4().hex}"
+    resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
+    resource_dir.mkdir(parents=True)
+    _write(
+        resource_dir / "manifest.yaml",
+        _table_manifest(files={2023: _public_table_entry("adult.tab", PUBLIC_BYTES)}),
+    )
+    malformed = _hash_only_manifest(sha256=LICENSED_SHA)
+    malformed["files"][2023][0]["Access"] = "licensed"
+    malformed["files"][2023][0].pop("access")
+    _write(resource_dir / "manifest_release.yaml", malformed)
+    (resource_dir / "adult.tab").write_bytes(PUBLIC_BYTES)
+    monkeypatch.syspath_prepend(str(tmp_path / "pkgroot"))
+    spec = SourceArtifactSpec(
+        source_name="dwp",
+        source_table="Family Resources Survey",
+        resource_package=package_name,
+        resource_directory="data/dwp/frs",
+        manifest="manifest.yaml",
+        vintage="2023_24",
+        extracted_at="2026-09-02",
+        extraction_method="none",
+        parser="delimited_text_full_rows",
+        delimiter="\t",
+        artifact_year=2023,
+    )
+
+    with pytest.raises(ManifestAccessError, match="manifest_release.yaml"):
+        spec.assert_parseable(2023)
 
 
 def test_the_stray_default_manifest_rule_reaches_register_before_any_write(tmp_path):
