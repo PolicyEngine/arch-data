@@ -289,6 +289,10 @@ def build_source_suite(
     source_package = try_load_source_package(source)
     source_id = source_package.package_id if source_package else source
     output_path = Path(output_dir)
+    if source_package is not None:
+        # Validate, then touch: a package whose artifact must not be parsed is
+        # refused before the output directory is created or replaced.
+        source_package.artifact.assert_parseable(year)
     _prepare_output_dir(output_path, replace=replace)
     reports_path = output_path / "reports"
     reports_path.mkdir(parents=True, exist_ok=True)

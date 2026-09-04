@@ -34,8 +34,15 @@ from chronicle.core import (
 from chronicle.env import env_flag, env_value
 from chronicle.epoch import SCHEMA_IDS, schema_id
 from chronicle.registration import (
+    AmbiguousVintageKeyError,
+    ManifestAccessError,
+    ManifestKindError,
     MicrodataReleaseNotParseableError,
+    entry_access,
+    is_bare_filename,
+    is_hash_only,
     is_microdata_release,
+    resolve_vintage_key,
 )
 from chronicle.sources.cells import (
     SourceArtifactMetadata,
@@ -853,13 +860,16 @@ class SourceArtifactSpec:
             raw_r2_uri=raw_r2.get("uri"),
         )
 
-    def manifest_payload(self) -> dict[str, Any]:
-        """Load the artifact manifest this package spec points at."""
-        manifest_path = files(self.resource_package).joinpath(
+    def manifest_resource(self) -> Any:
+        """Return the manifest file this package spec points at."""
+        return files(self.resource_package).joinpath(
             self.resource_directory,
             self.manifest,
         )
-        with manifest_path.open("r", encoding="utf-8") as file:
+
+    def manifest_payload(self) -> dict[str, Any]:
+        """Load the artifact manifest this package spec points at."""
+        with self.manifest_resource().open("r", encoding="utf-8") as file:
             return yaml.safe_load(file) or {}
 
     def assert_parseable_manifest(self) -> None:
@@ -867,10 +877,12 @@ class SourceArtifactSpec:
 
         Microdata registration is manifest-level identity: no source package
         parses a release, and no microdata row, cell, or fact enters Chronicle
-        (``docs/adr-chronicle-raw-microdata-identity.md``).
+        (``docs/adr-chronicle-raw-microdata-identity.md``). A manifest that
+        declares no kind and is not frozen kindless is refused too: the reader
+        never assumes a publisher table.
         """
         manifest = self.manifest_payload()
-        if is_microdata_release(manifest):
+        if is_microdata_release(manifest, manifest_path=self.manifest_resource()):
             raise MicrodataReleaseNotParseableError(
                 f"{self.resource_directory}/{self.manifest} registers a "
                 "microdata release. Registration is identity only: no source "
@@ -878,14 +890,30 @@ class SourceArtifactSpec:
                 "cells, or facts enter Chronicle."
             )
 
+    def assert_parseable(self, year: int) -> dict[str, Any]:
+        """Return the entry a parse would read, refusing any it must not.
+
+        Two carve-outs, decided from the manifest alone before any byte is
+        read: the manifest-level microdata-release kind, and the selected
+        entry's own access class -- a licensed or restricted entry is identity
+        only whatever manifest it sits in.
+        """
+        self.assert_parseable_manifest()
+        manifest = self.manifest_payload()
+        spec = _year_mapping(manifest["files"], self.artifact_year or year)
+        _assert_entry_bytes_readable(spec)
+        return spec
+
     def _artifact_content(
         self,
         year: int,
     ) -> tuple[bytes, str, str, dict[str, str]]:
-        manifest = self.manifest_payload()
-        if is_microdata_release(manifest):
-            self.assert_parseable_manifest()
-        spec = _year_mapping(manifest["files"], self.artifact_year or year)
+        spec = self.assert_parseable(year)
+        if not is_bare_filename(spec.get("filename")):
+            raise ValueError(
+                f"Source artifact filename must be a bare filename inside "
+                f"{self.resource_directory}, not {spec.get('filename')!r}."
+            )
         artifact_path = files(self.resource_package).joinpath(
             self.resource_directory,
             spec["filename"],
@@ -1239,10 +1267,14 @@ def validate_source_package(
 
     try:
         package.artifact.assert_parseable_manifest()
-    except MicrodataReleaseNotParseableError as exc:
+    except (MicrodataReleaseNotParseableError, ManifestKindError) as exc:
         errors.append(
             SourcePackageIssue(
-                code="microdata_release_not_parseable",
+                code=(
+                    "microdata_release_not_parseable"
+                    if isinstance(exc, MicrodataReleaseNotParseableError)
+                    else "manifest_kind_missing"
+                ),
                 message=str(exc),
             )
         )
@@ -1261,6 +1293,29 @@ def validate_source_package(
                 message=str(exc),
             )
         )
+    else:
+        try:
+            package.artifact.assert_parseable(year)
+        except ManifestAccessError as exc:
+            # Decided from the manifest alone: no package tree, cache, or
+            # publisher is consulted for an entry a parser must never read.
+            errors.append(
+                SourcePackageIssue(
+                    code="hash_only_artifact_not_parseable",
+                    message=str(exc),
+                )
+            )
+            return SourcePackageValidationReport(
+                package_id=package.package_id,
+                package_path=str(package.package_path),
+                year=year,
+                counts=counts,
+                errors=tuple(errors),
+                warnings=tuple(warnings),
+            )
+        except (FileNotFoundError, KeyError, OSError, ValueError):
+            # Reported below by the artifact read itself.
+            pass
 
     try:
         package.artifact._artifact_content(year)
@@ -2268,11 +2323,42 @@ def _required(payload: dict[str, Any], key: str, context: str) -> Any:
 
 
 def _year_mapping(files_by_year: dict[Any, Any], year: int) -> dict[str, str]:
-    if year in files_by_year:
-        return _single_year_spec(files_by_year[year], year)
-    if str(year) in files_by_year:
-        return _single_year_spec(files_by_year[str(year)], year)
-    raise ValueError(f"No source artifact for year {year}")
+    """Return the file spec for ``year``, whichever key spelling records it.
+
+    ``2023`` and ``'2023'`` are one vintage; a manifest that records both is
+    refused rather than silently read through the integer key, which would
+    hide whichever entry -- often the one carrying the R2 history -- a writer
+    left under the other spelling.
+    """
+    try:
+        key = resolve_vintage_key(files_by_year, year)
+    except AmbiguousVintageKeyError as exc:
+        raise ValueError(f"Source artifact for year {year}: {exc}") from exc
+    if key is None:
+        raise ValueError(f"No source artifact for year {year}")
+    return _single_year_spec(files_by_year[key], year)
+
+
+def _assert_entry_bytes_readable(spec: Any) -> None:
+    """Refuse to read a hash-only entry's bytes from any store.
+
+    This is the lowest byte-reader boundary: it runs before the package tree,
+    the content-addressed cache, or the publisher is consulted, so a licensed
+    or restricted entry is never read, cached, fetched, or parsed -- whatever
+    manifest kind it sits under. An access class Chronicle cannot parse is
+    refused too, never read as public.
+    """
+    if not isinstance(spec, dict):
+        return
+    access = entry_access(spec)
+    if is_hash_only(access):
+        raise ManifestAccessError(
+            f"Source artifact {spec.get('filename')!r} is registered as "
+            f"access={access!r}. Its bytes must not enter a Chronicle store or "
+            "a parser: a licensed or restricted artifact is identity only, so "
+            "no source package reads, caches, fetches, or parses it "
+            "(docs/adr-chronicle-raw-microdata-identity.md)."
+        )
 
 
 def _single_year_spec(spec: Any, year: int) -> dict[str, str]:
@@ -2295,7 +2381,12 @@ def _read_source_artifact_content(
     artifact_path: Any,
     spec: dict[str, Any],
 ) -> bytes:
-    """Read a source artifact from package data, cache, or explicit fetch."""
+    """Read a source artifact from package data, cache, or explicit fetch.
+
+    Refuses a hash-only entry before touching any of the three: none of them
+    may hold its bytes, and the fetch branch would write them into the cache.
+    """
+    _assert_entry_bytes_readable(spec)
     try:
         return artifact_path.read_bytes()
     except FileNotFoundError:
