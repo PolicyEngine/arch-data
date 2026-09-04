@@ -427,8 +427,9 @@ def test_commit_validation_uses_the_snapshot_resolve_actually_parsed(tmp_path):
         )
 
 
+@pytest.mark.parametrize("explicit", [False, True], ids=("automatic", "explicit"))
 def test_emit_refuses_a_microcosm_root_nested_in_an_enclosing_repository(
-    tmp_path, capsys
+    tmp_path, capsys, explicit
 ):
     repository = tmp_path / "repository"
     checkout = _fixture_copy(repository / "vendor" / "microcosm")
@@ -437,20 +438,21 @@ def test_emit_refuses_a_microcosm_root_nested_in_an_enclosing_repository(
     _git(repository, "config", "user.name", "t")
     _git(repository, "add", ".")
     _git(repository, "commit", "-q", "-m", "nested consumer checkout")
+    commit = _git(repository, "rev-parse", "HEAD")
     root = tmp_path / "data"
+    argv = [
+        "--microcosm-root",
+        str(checkout),
+        "--root",
+        str(root),
+        "--release",
+        "dwp-frs-2023-24:adult",
+        "emit",
+    ]
+    if explicit:
+        argv += ["--microcosm-commit", commit]
 
-    exit_code, _out, err = _run(
-        [
-            "--microcosm-root",
-            str(checkout),
-            "--root",
-            str(root),
-            "--release",
-            "dwp-frs-2023-24:adult",
-            "emit",
-        ],
-        capsys,
-    )
+    exit_code, _out, err = _run(argv, capsys)
 
     assert exit_code == 1
     assert "Git repository root" in err

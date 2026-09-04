@@ -682,6 +682,33 @@ def resolve(
     return resolved
 
 
+def assert_consumer_repository_root(microcosm_root: Path) -> Path:
+    """Require the consumer checkout root to be the Git repository root."""
+    expected = microcosm_root.resolve()
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(microcosm_root), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise CatalogueError(
+            f"Cannot read the Git repository root for {microcosm_root}: {exc}. "
+            "Pass --microcosm-commit with the reviewed commit after using the "
+            "actual PolicyEngine/microcosm checkout root."
+        ) from exc
+    repository_root = Path(completed.stdout.strip()).resolve()
+    if repository_root != expected:
+        raise CatalogueError(
+            f"Git repository root {repository_root} does not equal "
+            f"--microcosm-root {expected}. The recorded "
+            "PolicyEngine/microcosm path must identify the exact blob checked; "
+            "pass the repository root itself."
+        )
+    return repository_root
+
+
 def pin_commit(microcosm_root: Path, relative: str) -> str:
     """Return the last commit that changed a consumer manifest, read-only.
 
@@ -689,6 +716,7 @@ def pin_commit(microcosm_root: Path, relative: str) -> str:
     exact byte snapshot it parsed. Keeping discovery and verification separate
     lets explicit commit overrides pass through the same mandatory check.
     """
+    assert_consumer_repository_root(microcosm_root)
     try:
         completed = subprocess.run(
             [
@@ -754,6 +782,7 @@ def assert_manifest_matches_commit(
             f"Consumer manifest pin {commit} names a Git {object_type or 'unknown'} "
             "object, not a commit. Refusing to record it as pinned_from.commit."
         )
+    assert_consumer_repository_root(microcosm_root)
     object_name = f"{commit}:./{relative_path.as_posix()}"
     try:
         completed = subprocess.run(
