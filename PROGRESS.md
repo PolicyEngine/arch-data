@@ -677,3 +677,18 @@ the per-finding reproduction/fix/test/commit/port map.
 - Four failing-first route integration cases now pass: direct exit 0,
   4 passed, 87 deselected, 16 warnings. All nine findings are implemented;
   focused integration verification and full final checks remain.
+
+### Final review follow-ups
+
+- Focused integration passed: direct exit 0, 409 passed, 40 warnings in 15.10s.
+  Ruff lint passed and all 8 changed Python files passed formatting checks.
+- Interrupted the first full pytest run (direct exit 130) after peer review
+  found that date/set YAML identity refusals could fail CLI JSON serialization.
+  It is not a completed full-suite verification and will be restarted.
+- Reproduced a remaining configured-route bypass with uppercase `R2://` in
+  raw URI, source_file, or source URL: 3 failed, 3 lowercase controls passed.
+  URI scheme matching is now case-insensitive. Full consumer module now passes:
+  direct exit 0, 101 passed, 32 warnings; scoped Ruff checks pass.
+- Additional failing-first checks cover date/set report serialization (8 failed),
+  vintage namespace escapes and build-ID separators (8 failed), and fetch
+  vintage namespace escapes. These publication fixes precede the full restart.

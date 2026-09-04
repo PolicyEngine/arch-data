@@ -471,7 +471,7 @@ def validate_consumer_fact_contract(
 
 def _r2_uri_parts(uri: str) -> tuple[str, str]:
     """Split an ``r2://bucket/key`` URI into its bucket and key."""
-    if not uri.startswith("r2://"):
+    if uri[: len("r2://")].lower() != "r2://":
         return "", ""
     bucket, _, key = uri[len("r2://") :].partition("/")
     return bucket, key
@@ -517,7 +517,7 @@ def _derived_source_provenance_issue(fact: AggregateFact) -> str | None:
             "itself. Target construction, aging, and reconciliation belong in "
             "Microcosm."
         )
-    if source_file.startswith("r2://"):
+    if source_file[: len("r2://")].lower() == "r2://":
         source_file_bucket, source_file_key = _r2_uri_parts(source_file)
     else:
         source_file_bucket, bucket_separator, source_file_key = source_file.partition(

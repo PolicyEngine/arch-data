@@ -1027,6 +1027,31 @@ def test_consumer_contract_derived_routes_match_complete_names(monkeypatch):
     assert validate_consumer_fact_contract([publisher]).valid
 
 
+@pytest.mark.parametrize("field", ["raw_r2_uri", "source_file", "url"])
+@pytest.mark.parametrize("scheme", ["R2", "r2"])
+def test_consumer_contract_rejects_derived_uri_scheme_case(
+    monkeypatch, tmp_path, field, scheme
+):
+    monkeypatch.setenv("CHRONICLE_R2_DERIVED_BUCKET", "chronicle-builds")
+    monkeypatch.setenv("CHRONICLE_R2_DERIVED_PREFIX", "builds")
+    fact = _soi_agi_fact()
+    derived = replace(
+        fact,
+        source=replace(
+            fact.source,
+            **{field: f"{scheme}://chronicle-builds/builds/source/fact.json"},
+        ),
+    )
+
+    report = validate_consumer_fact_contract([derived])
+
+    assert "derived_fact_provenance" in {error.code for error in report.errors}
+    output = tmp_path / "new-directory" / "consumer_facts.jsonl"
+    with pytest.raises(ValueError, match="consumer-contract"):
+        write_consumer_facts_jsonl([derived], output)
+    assert not output.parent.exists()
+
+
 def test_derived_record_marker_is_rejected_in_either_spelling():
     """Both rename-window spellings produce the identical boundary error."""
     fact = _soi_agi_fact()
