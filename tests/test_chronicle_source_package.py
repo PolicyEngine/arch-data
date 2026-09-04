@@ -1147,6 +1147,65 @@ def test_source_artifact_spec_refuses_unsafe_manifest_filename_before_read(
         artifact._artifact_content(2024)
 
 
+@pytest.mark.parametrize(
+    "path_kind", ["absolute", "parent", "symlink", "normalized-alias", "unsupported"]
+)
+def test_source_artifact_spec_refuses_unsafe_manifest_path_before_artifact_read(
+    tmp_path, monkeypatch, path_kind
+):
+    resource_root = tmp_path / "resources"
+    resource_dir = resource_root / "data" / "publisher" / "package"
+    resource_dir.mkdir(parents=True)
+    payload = {
+        "files": {
+            2024: {
+                "filename": "table.csv",
+                "source_url": "https://example.test/table.csv",
+            }
+        }
+    }
+    outside_manifest = resource_dir.parent / "outside-manifest.yaml"
+    outside_manifest.write_text(yaml.safe_dump(payload, sort_keys=False))
+    if path_kind == "absolute":
+        manifest_name = str(outside_manifest)
+    elif path_kind == "parent":
+        manifest_name = "../outside-manifest.yaml"
+    elif path_kind == "symlink":
+        manifest_name = "manifest.yaml"
+        (resource_dir / manifest_name).symlink_to(outside_manifest)
+    elif path_kind == "normalized-alias":
+        manifest_name = "manifest.yaml"
+        (resource_dir / "Manifest.yaml").write_text(
+            yaml.safe_dump(payload, sort_keys=False)
+        )
+    else:
+        manifest_name = "registry.yaml"
+        (resource_dir / manifest_name).write_text(yaml.safe_dump(payload))
+    monkeypatch.setattr("chronicle.source_package.files", lambda _package: resource_root)
+
+    def unexpected_artifact_read(_artifact_path, _spec):
+        raise AssertionError("unsafe manifest path reached artifact I/O")
+
+    monkeypatch.setattr(
+        "chronicle.source_package._read_source_artifact_content",
+        unexpected_artifact_read,
+    )
+    artifact = SourceArtifactSpec(
+        source_name="publisher",
+        source_table="Table",
+        resource_package="test_resources",
+        resource_directory="data/publisher/package",
+        manifest=manifest_name,
+        vintage="2024",
+        extracted_at="2026-09-04",
+        extraction_method="test",
+        artifact_year=2024,
+    )
+
+    with pytest.raises(ValueError):
+        artifact._artifact_content(2024)
+
+
 def test_source_package_path_builds_valid_soi_table_1_4_facts():
     package_path = REPO_ROOT / "packages" / "irs_soi" / "table_1_4"
     package = load_source_package(package_path)
