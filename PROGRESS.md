@@ -450,12 +450,17 @@ Running the same operations against a checkout of the previous head:
   failures. Both slash-only R2 identity fields reached the publisher-read
   sentinel; a root sweep uploaded and rewrote the valid `a_good` package before
   reporting the unsafe filename in `z_bad`.
+- Fetch now validates the source/package object-key components before reading
+  publisher bytes. Raw publish now completes one root-wide read/identity/entry
+  preflight and returns every refusal before its first uploader call or
+  manifest rewrite. The three red cases plus the existing entry-, sibling-,
+  and tracked-cutover preflight controls pass (9 tests).
 
 ### Next
 
-1. Validate raw-key identity before publisher I/O and make publish's preflight
-   cover the complete selected root before any upload or manifest rewrite.
-2. Finish the #227 port/adversarial audit, then run the complete artifact
+1. Finish the #227 port/adversarial audit, including normalized-alias edge
+   cases and multi-owner write consistency.
+2. Run the complete artifact
    module and requested lint/format/full-suite verification.
 3. Write the external `-o out.md` report with the per-finding command,
    observation, fix, regression, commit, and port provenance.

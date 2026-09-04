@@ -3111,8 +3111,7 @@ def test_publish_preflights_entire_root_before_any_upload(tmp_path, monkeypatch)
     assert not report.valid
     assert uploads == []
     assert any(
-        "non_canonical_filename:../bad.csv" in entry.errors
-        for entry in report.entries
+        "non_canonical_filename:../bad.csv" in entry.errors for entry in report.entries
     )
     assert {path: path.read_bytes() for path in manifests} == before
 

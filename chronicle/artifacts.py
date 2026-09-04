@@ -779,6 +779,12 @@ def fetch_source_artifact(
             "not be named like a manifest, which it would overwrite; pass "
             "--filename with the publisher's name for the bytes."
         )
+    # These fields become object-key path segments even when this fetch does
+    # not upload. Validate them before reading the publisher so a malformed
+    # registration identity cannot overwrite package-local bytes and fail only
+    # when the prospective R2 key is constructed below.
+    _clean_key_part(source_id)
+    _clean_key_part(package_id)
     resolved_r2_prefix = resolve_r2_prefix(
         prefix=r2_prefix,
         default_prefix=DEFAULT_R2_PREFIX,
@@ -1092,6 +1098,8 @@ def publish_source_artifacts(
 
     entries: list[RawArtifactPublishEntry] = []
     errors: list[str] = []
+    prepared: list[tuple[Path, dict[str, Any], dict[str, Any], str, str]] = []
+    preflight_failures: list[RawArtifactPublishEntry] = []
     for manifest_path in _root_manifest_paths(root_path, manifest_filename):
         try:
             manifest = _read_manifest(manifest_path)
@@ -1107,7 +1115,6 @@ def publish_source_artifacts(
         manifest_source_id = str(source_id or manifest.get("source_id") or "")
         manifest_package_id = str(package_id or manifest.get("package_id") or "")
 
-        preflight_failures: list[RawArtifactPublishEntry] = []
         for package_manifest_name, package_manifest in package_manifests.items():
             package_manifest_path = Path(package_manifest_name)
             package_source_id = str(
@@ -1131,10 +1138,35 @@ def publish_source_artifacts(
                 )
                 if entry.errors:
                     preflight_failures.append(entry)
-        if preflight_failures:
-            entries.extend(preflight_failures)
-            continue
+        prepared.append(
+            (
+                manifest_path,
+                manifest,
+                files,
+                manifest_source_id,
+                manifest_package_id,
+            )
+        )
 
+    # A root sweep is one requested publish operation. Validate every selected
+    # package before the first uploader call or manifest rewrite, otherwise a
+    # malformed later package can make the command fail after earlier packages
+    # have already changed external and local state.
+    if errors or preflight_failures:
+        entries.extend(preflight_failures)
+        return RawArtifactPublishReport(
+            root=str(root_path),
+            entries=tuple(entries),
+            errors=tuple(errors),
+        )
+
+    for (
+        manifest_path,
+        manifest,
+        files,
+        manifest_source_id,
+        manifest_package_id,
+    ) in prepared:
         updated = False
         for year, spec in files.items():
             entry, updated_spec = _publish_raw_manifest_entry(
