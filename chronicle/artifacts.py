@@ -1405,6 +1405,7 @@ def publish_source_artifacts(
             continue
         structural_errors: list[str] = []
         entry_errors: list[str] = []
+        selected_entry_errors: list[str] = []
         for package_manifest_name, package_manifest in package_manifests.items():
             package_manifest_path = Path(package_manifest_name)
             package_kind, package_kind_error = safe_manifest_kind(
@@ -1419,14 +1420,16 @@ def publish_source_artifacts(
                 f"{code}: {package_manifest_path}"
                 for code in validate_manifest_files(package_manifest)
             )
-            entry_errors.extend(
-                f"{code}: {package_manifest_path}"
-                for code in _manifest_entry_validation_errors(
-                    package_manifest,
-                    kind=package_kind,
-                    package_dir=package_manifest_path.parent,
-                )
+            package_entry_errors = _manifest_entry_validation_errors(
+                package_manifest,
+                kind=package_kind,
+                package_dir=package_manifest_path.parent,
             )
+            entry_errors.extend(
+                f"{code}: {package_manifest_path}" for code in package_entry_errors
+            )
+            if package_manifest_path == manifest_path:
+                selected_entry_errors = package_entry_errors
         structural_errors.extend(
             f"{code}: {manifest_path}"
             for code in validate_package_directory(package_manifests)
@@ -1437,6 +1440,48 @@ def publish_source_artifacts(
             # disagree with it is reported and left alone; publishing any
             # entry under it could ship bytes through the wrong record.
             errors.extend((*structural_errors, *entry_errors))
+            continue
+
+        if entry_errors:
+            # The complete package schema is known-invalid. Refuse before a
+            # byte-capable preflight, but retain the selected manifest's
+            # established per-entry diagnostics without opening its content.
+            errors.extend(entry_errors)
+            if selected_entry_errors:
+                for year, spec in files.items():
+                    for file_spec in iter_file_specs(spec, kind=kind):
+                        name = (
+                            file_spec.get("filename")
+                            if isinstance(file_spec, dict)
+                            else None
+                        )
+                        validation_errors = validate_file_entry(
+                            file_spec,
+                            kind=kind,
+                            manifest=manifest,
+                            local_file_exists=matching_directory_entry(
+                                manifest_path.parent, name
+                            )
+                            is not None,
+                        )
+                        if not validation_errors:
+                            continue
+                        entry, _updated_spec = _publish_raw_manifest_entry(
+                            manifest_path,
+                            manifest_source_id,
+                            manifest_package_id,
+                            year,
+                            file_spec,
+                            manifest=manifest,
+                            kind=kind,
+                            r2_bucket=r2_bucket,
+                            r2_prefix=resolved_r2_prefix,
+                            wrangler_command=wrangler_command,
+                            skip_hash_only=skip_hash_only,
+                            staging_dir=staging_dir,
+                            preflight_only=True,
+                        )
+                        entries.append(entry)
             continue
 
         preflight_entries: list[RawArtifactPublishEntry] = []
@@ -1459,12 +1504,9 @@ def publish_source_artifacts(
                 )
                 preflight_entries.append(entry)
         preflight_failures = [entry for entry in preflight_entries if entry.errors]
-        if entry_errors or preflight_failures:
-            # Preserve per-entry diagnostics for the selected manifest while
-            # still refusing the package before the first upload. Sibling
-            # defects remain package errors because those entries were not
-            # selected for publishing.
-            errors.extend(entry_errors)
+        if preflight_failures:
+            # Preserve per-entry diagnostics while still refusing the complete
+            # selected manifest before the first upload.
             entries.extend(preflight_failures)
             continue
 
@@ -3052,16 +3094,6 @@ def _publish_raw_manifest_entry(
         artifact_path = local_entry or manifest_path.parent / filename
     sha256_actual = None
     size_bytes = None
-    if not filename:
-        errors.append("missing_filename")
-    elif not artifact_path.exists():
-        errors.append("staged_bytes_missing" if release else "missing_file")
-    else:
-        content = artifact_path.read_bytes()
-        sha256_actual = hashlib.sha256(content).hexdigest()
-        size_bytes = len(content)
-        if sha256_expected and sha256_actual != sha256_expected:
-            errors.append("checksum_mismatch")
 
     def refuse(reason: str | None = None) -> tuple[RawArtifactPublishEntry, None]:
         """Report the entry unpublished, with nothing uploaded or rewritten."""
@@ -3083,6 +3115,22 @@ def _publish_raw_manifest_entry(
             ),
             None,
         )
+
+    if errors:
+        # A malformed access declaration must be honored before even a dry
+        # publish preflight opens content under the public default.
+        return refuse()
+
+    if not filename:
+        errors.append("missing_filename")
+    elif not artifact_path.exists():
+        errors.append("staged_bytes_missing" if release else "missing_file")
+    else:
+        content = artifact_path.read_bytes()
+        sha256_actual = hashlib.sha256(content).hexdigest()
+        size_bytes = len(content)
+        if sha256_expected and sha256_actual != sha256_expected:
+            errors.append("checksum_mismatch")
 
     if errors:
         return refuse()
