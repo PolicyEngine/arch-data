@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+import shutil
 import sqlite3
 
 import pytest
@@ -852,6 +854,48 @@ def test_publish_refuses_a_wrong_route_before_a_preserved_bucket_skip(
     )
     assert not log.exists()
     assert manifest_path.read_bytes() == before
+
+
+@pytest.mark.parametrize(
+    ("relative_package", "expected_entries"),
+    [
+        ("usda_snap/fy69_to_current", 2),
+        ("statbel/fiscal_income_distribution_2023", 9),
+    ],
+    ids=("sibling-owned-object", "labelled-table-vintages"),
+)
+def test_publish_preserves_tracked_legacy_routes_during_bucket_cutover(
+    tmp_path, monkeypatch, relative_package, expected_entries
+):
+    source = Path(__file__).resolve().parents[1] / "db" / "data" / relative_package
+    package = tmp_path / "db" / "data" / relative_package
+    shutil.copytree(source, package)
+    manifests_before = {
+        path.name: path.read_bytes()
+        for path in package.iterdir()
+        if path.is_file() and path.name.lower().startswith("manifest")
+    }
+
+    def unexpected_upload(*_args, **_kwargs):
+        raise AssertionError("preserved history must not be re-uploaded")
+
+    monkeypatch.setenv("CHRONICLE_R2_RAW_BUCKET", "chronicle-raw")
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", unexpected_upload)
+
+    report = publish_source_artifacts(package)
+
+    assert report.valid, [
+        error for entry in report.entries for error in entry.errors
+    ] + list(report.errors)
+    assert report.counts["artifact_count"] == expected_entries
+    assert report.counts["skipped_count"] == expected_entries
+    assert report.counts["uploaded_count"] == 0
+    assert all(entry.upload is None and entry.errors == () for entry in report.entries)
+    assert {
+        path.name: path.read_bytes()
+        for path in package.iterdir()
+        if path.is_file() and path.name.lower().startswith("manifest")
+    } == manifests_before
 
 
 def test_fetch_artifact_keeps_an_already_recorded_bucket(tmp_path, monkeypatch):
