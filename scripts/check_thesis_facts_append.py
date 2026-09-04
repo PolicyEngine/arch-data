@@ -15,19 +15,16 @@ import receipt.append_gate as _receipt
 from receipt.release_chain import MANIFEST_RE, ReleaseChainError
 
 try:
-    from receipt_pins import APPEND_GATE_SPEC, LEDGER_SPEC
+    from receipt_pins import APPEND_GATE_SPEC
 except ModuleNotFoundError as exc:
     if exc.name != "receipt_pins":
         raise
     # The test suite copies the legacy three-script surface into temporary
     # repositories. The editable consumer tree remains the sole pin owner.
-    from scripts.receipt_pins import APPEND_GATE_SPEC, LEDGER_SPEC
+    from scripts.receipt_pins import APPEND_GATE_SPEC
 
 
 CODE_ROOT = pathlib.Path(__file__).resolve().parents[1]
-ROOT = CODE_ROOT
-LEDGER_PATH = ROOT / LEDGER_SPEC.state_relative
-PREFIX_PATH = ROOT / LEDGER_SPEC.prefix_relative
 RELEASE_MANIFEST_PREFIX = APPEND_GATE_SPEC.release_manifest_prefix
 GENESIS_SUPPORT_FILES = APPEND_GATE_SPEC.genesis_support_files
 GATE_SURFACE = APPEND_GATE_SPEC.gate_surface
@@ -37,23 +34,6 @@ ASSERTION_CONTENT_KEYS = APPEND_GATE_SPEC.assertion_content_keys
 AppendError = _receipt.AppendError
 AppendGateSpec = _receipt.AppendGateSpec
 reject_non_append_bytes = _receipt.reject_non_append_bytes
-
-
-def _set_root(root: pathlib.Path) -> None:
-    """Select candidate paths while leaving the trusted code root unchanged."""
-
-    global ROOT, LEDGER_PATH, PREFIX_PATH
-    ROOT = root.resolve()
-    LEDGER_PATH = ROOT / LEDGER_SPEC.state_relative
-    PREFIX_PATH = ROOT / LEDGER_SPEC.prefix_relative
-
-
-def _candidate() -> Any:
-    return _receipt._set_root(ROOT, APPEND_GATE_SPEC)
-
-
-def check_surface_separation(base_ref: str) -> tuple[set[str], set[str]]:
-    return _receipt.check_surface_separation(base_ref, _candidate())
 
 
 def expected_assertion_version_id(row: dict[str, Any]) -> str:
@@ -66,56 +46,12 @@ def effective_current_rows(
     return _receipt.effective_current_rows(rows, APPEND_GATE_SPEC)
 
 
-def check_prefix(lines: list[str]) -> dict[str, Any]:
-    return _receipt.check_prefix(lines, _candidate())
-
-
 def check_rows(lines: list[str], prefix_count: int) -> None:
     return _receipt.check_rows(lines, prefix_count, APPEND_GATE_SPEC)
 
 
-def check_append_only(base_ref: str, lines: list[str]) -> int:
-    return _receipt.check_append_only(base_ref, lines, _candidate())
-
-
-def check_prefix_anchored_to_base(
-    base_ref: str, candidate_prefix: dict[str, Any]
-) -> int:
-    return _receipt.check_prefix_anchored_to_base(
-        base_ref,
-        candidate_prefix,
-        _candidate(),
-    )
-
-
-def check_release_proposal(
-    base_ref: str,
-    *,
-    anchor_dir: pathlib.Path | None = None,
-    enforce_production_pins: bool | None = None,
-) -> int | None:
-    return _receipt.check_release_proposal(
-        base_ref,
-        candidate=_candidate(),
-        anchor_dir=anchor_dir,
-        enforce_production_pins=enforce_production_pins,
-    )
-
-
-def check_release_chain_without_base(
-    *,
-    anchor_dir: pathlib.Path | None = None,
-    enforce_production_pins: bool | None = None,
-) -> int | None:
-    return _receipt.check_release_chain_without_base(
-        candidate=_candidate(),
-        anchor_dir=anchor_dir,
-        enforce_production_pins=enforce_production_pins,
-    )
-
-
 def verify_append_gate(
-    root: pathlib.Path = ROOT,
+    root: pathlib.Path,
     *,
     base_ref: str | None = None,
     trusted_code_root: pathlib.Path = CODE_ROOT,
@@ -171,19 +107,10 @@ __all__ = [
     "DATA_SURFACE",
     "GATE_SURFACE",
     "GENESIS_SUPPORT_FILES",
-    "LEDGER_PATH",
     "MANIFEST_RE",
-    "PREFIX_PATH",
     "RELEASE_MANIFEST_PREFIX",
-    "ROOT",
     "ReleaseChainError",
-    "check_append_only",
-    "check_prefix",
-    "check_prefix_anchored_to_base",
-    "check_release_chain_without_base",
-    "check_release_proposal",
     "check_rows",
-    "check_surface_separation",
     "effective_current_rows",
     "expected_assertion_version_id",
     "main",
