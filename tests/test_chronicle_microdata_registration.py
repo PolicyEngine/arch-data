@@ -3413,3 +3413,119 @@ def test_registration_hashes_are_not_hashes_of_anything_chronicle_holds():
             (package / "manifest.yaml").read_bytes()
         ).hexdigest()
         assert manifest_hash not in (package / "manifest.yaml").read_text()
+
+
+def _public_manifest_with_archived_revision() -> dict:
+    """A renamed public release keeps the old immutable object's identity."""
+    current_key = f"raw/census_cps/census-cps-asec-2023/2023/{PUBLIC_SHA}/current.zip"
+    archived_key = (
+        f"raw/census_cps/census-cps-asec-2023/2023/{FIXTURE_SHA}/archived.tab"
+    )
+    return {
+        "kind": "microdata_release",
+        "source_id": "census_cps",
+        "package_id": "census-cps-asec-2023",
+        "files": {
+            2023: [
+                _public_release_entry(
+                    filename="current.zip",
+                    storage={
+                        "r2": {
+                            "provider": "r2",
+                            "uri": f"r2://ledger-raw/{current_key}",
+                        },
+                        "previous_r2": [
+                            {
+                                "provider": "r2",
+                                "key": archived_key,
+                                "uri": f"r2://ledger-raw/{archived_key}",
+                            }
+                        ],
+                    },
+                )
+            ]
+        },
+    }
+
+
+@pytest.mark.parametrize("manifest_scope", ["selected", "sibling"])
+@pytest.mark.parametrize(
+    ("filename", "sha256"),
+    [("licensed-alias.tab", FIXTURE_SHA), ("ARCHIVED.TAB", OTHER_SHA)],
+    ids=["archived-digest", "archived-filename"],
+)
+def test_registration_refuses_archived_revision_alias_before_mutation(
+    tmp_path, monkeypatch, manifest_scope, filename, sha256
+):
+    package = tmp_path / "package"
+    package.mkdir()
+    public_manifest = _public_manifest_with_archived_revision()
+    selected = package / "manifest.yaml"
+    if manifest_scope == "selected":
+        selected.write_text(yaml.safe_dump(public_manifest, sort_keys=False))
+    else:
+        selected.write_text(
+            yaml.safe_dump({**public_manifest, "files": {}}, sort_keys=False)
+        )
+        (package / "manifest_public.yaml").write_text(
+            yaml.safe_dump(public_manifest, sort_keys=False)
+        )
+    before = {path.name: path.read_bytes() for path in package.iterdir()}
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    def unexpected_mutation(*args, **kwargs):
+        pytest.fail("archived revision alias reached a filesystem mutation")
+
+    monkeypatch.setattr(Path, "mkdir", unexpected_mutation)
+    monkeypatch.setattr(
+        "chronicle.registration._registration_lock", unexpected_mutation
+    )
+    monkeypatch.setattr(
+        "chronicle.registration._atomic_replace_manifest", unexpected_mutation
+    )
+    with pytest.raises(HashOnlyRegistrationError, match="records the R2 object"):
+        _register(
+            package,
+            source_id="census_cps",
+            package_id="census-cps-asec-2023",
+            filename=filename,
+            sha256=sha256,
+        )
+
+    assert {path.name: path.read_bytes() for path in package.iterdir()} == before
+
+
+@pytest.mark.parametrize("manifest_scope", ["selected", "sibling"])
+@pytest.mark.parametrize(
+    ("filename", "sha256", "expected_error"),
+    [
+        (
+            "licensed-alias.tab",
+            FIXTURE_SHA,
+            f"archived_sha256_collision:{FIXTURE_SHA}",
+        ),
+        ("ARCHIVED.TAB", OTHER_SHA, "archived_filename_collision:archived.tab"),
+    ],
+    ids=["archived-digest", "archived-filename"],
+)
+def test_package_validation_refuses_hash_only_archived_revision_alias(
+    manifest_scope, filename, sha256, expected_error
+):
+    from chronicle.registration import validate_package_directory
+
+    public_manifest = _public_manifest_with_archived_revision()
+    licensed_entry = _attested_entry(filename=filename, sha256=sha256)
+    if manifest_scope == "selected":
+        public_manifest["files"][2023].append(licensed_entry)
+        manifests = {"manifest.yaml": public_manifest}
+    else:
+        manifests = {
+            "manifest_public.yaml": public_manifest,
+            "manifest.yaml": {
+                "kind": "microdata_release",
+                "files": {2023: [licensed_entry]},
+            },
+        }
+
+    assert expected_error in validate_package_directory(manifests)

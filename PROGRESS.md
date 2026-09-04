@@ -45,6 +45,10 @@
   repository with matching consumer blobs emitted Microcosm provenance. Both
   variants incorrectly returned success (`finding3-red.log`).
 
+- Finding 2 reproduced red: four archived filename/digest variants reached a
+  filesystem mutation; four corresponding package-validation cases accepted
+  the conflict. Eight failures recorded in `finding2-red.log`.
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
