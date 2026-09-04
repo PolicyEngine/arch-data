@@ -327,12 +327,21 @@ Running the same operations against a checkout of the previous head:
   fetch updates only its selected manifest; `_superseding_storage` converts a
   non-list `previous_r2` to an empty history; and the Supabase compatibility
   constants are hard-coded defaults.
+- **Finding 6 reproduced and fixed.** Red command:
+  `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p
+  no:cacheprovider tests/test_chronicle_artifacts.py::test_fetch_refuses_duplicate_manifest_keys_before_publisher_io`
+  exited 1 with four failures; every duplicate (`source_id`, `package_id`,
+  `files`, vintage) reached the publisher-read sentinel. Test-only commit:
+  `56f9ce1`. Ported #227 commit `7f9bfe6`'s `StrictManifestLoader` and
+  `load_manifest_document` verbatim into `chronicle/registration.py`, switched
+  artifact manifest reads to it, and shared it with source-package artifact
+  manifest reads. Fix commit: `77e6fda`. The same focused command now exits 0
+  with 4 passed.
 
 ### Next
 
-1. Audit and port the exact non-microdata #227 hunks, preserving names/shapes.
-2. Add focused failing regressions before each fix and capture every red
+1. Add focused failing regressions before each remaining fix and capture every red
    command/observation for the external `-o out.md` report.
-3. Commit each coherent red-test and implementation step, updating this log.
-4. Run focused tests, lint/format checks on changed files, and the full suite
+2. Commit each coherent red-test and implementation step, updating this log.
+3. Run focused tests, lint/format checks on changed files, and the full suite
    with the directly captured exit code and counts.
