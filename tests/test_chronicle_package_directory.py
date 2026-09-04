@@ -1077,6 +1077,59 @@ def test_byte_reader_strictly_validates_a_sibling_manifest(tmp_path, monkeypatch
         spec.assert_parseable(2023)
 
 
+def test_byte_reader_refuses_a_public_filename_collision_before_reading(
+    tmp_path, monkeypatch
+):
+    from chronicle import source_package
+
+    _isolated_reader(tmp_path, monkeypatch)
+    package_name = f"chronicle_test_{uuid.uuid4().hex}"
+    resource_dir = tmp_path / "pkgroot" / package_name / "data" / "dwp" / "frs"
+    resource_dir.mkdir(parents=True)
+    _write(
+        resource_dir / "manifest.yaml",
+        _table_manifest(
+            files={2023: _public_table_entry("adult.tab", LICENSED_BYTES)}
+        ),
+    )
+    _write(
+        resource_dir / "manifest_tables.yaml",
+        _table_manifest(
+            files={2023: _public_table_entry("ADULT.TAB", PUBLIC_BYTES)}
+        ),
+    )
+    (resource_dir / "adult.tab").write_bytes(LICENSED_BYTES)
+    reads = []
+    real_read = source_package._read_source_artifact_content
+
+    def record_read(path, artifact):
+        reads.append(path)
+        return real_read(path, artifact)
+
+    monkeypatch.setattr(source_package, "_read_source_artifact_content", record_read)
+    monkeypatch.syspath_prepend(str(tmp_path / "pkgroot"))
+    spec = SourceArtifactSpec(
+        source_name="dwp",
+        source_table="Family Resources Survey",
+        resource_package=package_name,
+        resource_directory="data/dwp/frs",
+        manifest="manifest.yaml",
+        vintage="2023_24",
+        extracted_at="2026-09-04",
+        extraction_method="none",
+        parser="delimited_text_full_rows",
+        delimiter="\t",
+        artifact_year=2023,
+    )
+
+    with pytest.raises(
+        ManifestAccessError,
+        match="filename_collision_across_manifests:adult.tab",
+    ):
+        spec._artifact_content(2023)
+    assert reads == []
+
+
 def test_byte_reader_refuses_an_unpinned_public_alias_of_hash_only_bytes(
     tmp_path, monkeypatch
 ):
