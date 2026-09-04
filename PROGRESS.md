@@ -526,3 +526,19 @@ the per-finding reproduction/fix/test/commit/port map.
   in the external report.
 - Run full Ruff lint, formatting checks for changed Python files, and the full
   pytest suite with direct exit codes; record counts and final commit map.
+
+### Round 4 reproduction checkpoint
+
+- Added publication/tree/identity/alias/sibling regression coverage in
+  `tests/test_chronicle_artifact_peer4.py` before any associated fix.
+- Red command: `UV_CACHE_DIR=/tmp/chronicle-uv-cache uv run pytest -q -p
+  no:cacheprovider tests/test_chronicle_artifact_peer4.py` (stdout/stderr saved
+  to `/tmp/chronicle-226-round4/main-red.log`) exited 1: 60 failed, 12 warnings.
+- Finding 3: all 4 non-regular tree cases reached build-ID inference before
+  refusal. Finding 4: all 24 invalid publication identity cases reached an
+  artifact read or build-ID inference. Finding 5: all 10 noncanonical manifest
+  declarations reached the publisher read. Finding 6: all 4 single case/Unicode
+  aliases reached artifact reads. Finding 8: all 18 explicit-selector sibling
+  cases escaped as plain `ValueError`, including both CLI entry points.
+- Consumer guard, source resolver, and shared vintage regressions are being
+  developed independently; all implementations remain gated on observed red.
