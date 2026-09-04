@@ -993,6 +993,129 @@ def test_concurrent_registrations_preserve_both_manifest_updates(tmp_path, monke
     }
 
 
+def test_fetch_shares_the_registration_lock_before_publisher_read(
+    tmp_path, monkeypatch
+):
+    from chronicle import registration
+
+    output_dir = tmp_path / "pkg"
+    staging = tmp_path / "staging"
+    registration_inside_replace = threading.Event()
+    release_registration = threading.Event()
+    publisher_read = threading.Event()
+    real_atomic_replace = registration._atomic_replace_manifest
+
+    def blocked_registration_replace(manifest_path, document):
+        registration_inside_replace.set()
+        assert release_registration.wait(5)
+        real_atomic_replace(manifest_path, document)
+
+    def served_after_lock(_source_url):
+        publisher_read.set()
+        return PUBLIC_BYTES, "public-alias.zip"
+
+    monkeypatch.setattr(
+        registration, "_atomic_replace_manifest", blocked_registration_replace
+    )
+    monkeypatch.setattr("chronicle.artifacts._read_artifact", served_after_lock)
+    uploads = _record_uploads(monkeypatch)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        registration_future = executor.submit(
+            _register,
+            output_dir,
+            source_id="census_acs",
+            package_id="census-acs-pums-2022-1yr",
+            year=2022,
+            filename="adult.tab",
+            sha256=PUBLIC_SHA,
+            vintage="2022",
+        )
+        assert registration_inside_replace.wait(5)
+        fetch_future = executor.submit(
+            _fetch_release,
+            output_dir,
+            staging_dir=staging,
+            filename="public-alias.zip",
+            content=PUBLIC_BYTES,
+            upload_r2=True,
+        )
+        try:
+            assert not publisher_read.wait(0.25)
+        finally:
+            release_registration.set()
+        assert registration_future.result(timeout=5).valid
+        with pytest.raises(ManifestAccessError):
+            fetch_future.result(timeout=5)
+
+    assert uploads == []
+    assert not staging.exists()
+    entries = _manifest(output_dir)["files"][2022]
+    assert [(entry["filename"], entry["access"]) for entry in entries] == [
+        ("adult.tab", "licensed")
+    ]
+
+
+def test_publish_holds_the_registration_lock_through_manifest_write(
+    tmp_path, monkeypatch
+):
+    from chronicle import registration
+
+    output_dir = tmp_path / "pkg"
+    staging = tmp_path / "staging"
+    _serve(monkeypatch, PUBLIC_BYTES)
+    _fetch_release(output_dir, staging_dir=staging)
+    upload_started = threading.Event()
+    release_upload = threading.Event()
+    registration_inside_replace = threading.Event()
+    real_atomic_replace = registration._atomic_replace_manifest
+
+    def blocked_upload(location, local_path, *, wrangler_command):
+        upload_started.set()
+        assert release_upload.wait(5)
+        return ArtifactCommandResult(
+            command=("stub",), returncode=0, stdout="ok", stderr=""
+        )
+
+    def observed_registration_replace(manifest_path, document):
+        registration_inside_replace.set()
+        real_atomic_replace(manifest_path, document)
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", blocked_upload)
+    monkeypatch.setattr(
+        registration, "_atomic_replace_manifest", observed_registration_replace
+    )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        publish_future = executor.submit(
+            publish_source_artifacts,
+            output_dir,
+            staging_dir=staging,
+            skip_hash_only=True,
+        )
+        assert upload_started.wait(5)
+        registration_future = executor.submit(
+            _register,
+            output_dir,
+            source_id="census_acs",
+            package_id="census-acs-pums-2022-1yr",
+            year=2022,
+            filename="child.tab",
+            vintage="2022",
+        )
+        try:
+            assert not registration_inside_replace.wait(0.25)
+        finally:
+            release_upload.set()
+        assert publish_future.result(timeout=5).valid
+        assert registration_future.result(timeout=5).valid
+
+    entries = _manifest(output_dir)["files"][2022]
+    assert {entry["filename"] for entry in entries} == {"csv_hus.zip", "child.tab"}
+    public = next(entry for entry in entries if entry["filename"] == "csv_hus.zip")
+    assert public["storage"]["r2"]["provider"] == "r2"
+
+
 def test_atomic_registration_failure_preserves_the_original_manifest(
     tmp_path, monkeypatch
 ):
