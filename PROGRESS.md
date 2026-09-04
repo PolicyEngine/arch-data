@@ -33,6 +33,10 @@
   exited 0 with **1,587 passed, 7 skipped, 42 warnings** in **1,430.28 seconds**
   (23:50). Log: `/tmp/chronicle-227-fix/baseline-full.log`.
 
+- Reproduced the rebase scalar-entry concern: six cases fail with uncaught
+  `AttributeError` before the complete-manifest refusal. Red test committed
+  before the integration correction; evidence is in `source-entry-red.log`.
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.

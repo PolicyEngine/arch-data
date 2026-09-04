@@ -19,6 +19,7 @@ from chronicle.consumer_contract import (
 )
 from chronicle.core import validate_facts
 from chronicle.epoch import SCHEMA_IDS
+from chronicle.registration import ManifestAccessError
 from chronicle.source_package import (
     SOURCE_ARTIFACT_CACHE_ENV,
     SOURCE_ARTIFACT_FETCH_ENV,
@@ -1118,6 +1119,31 @@ def recorded_r2_artifact(tmp_path, monkeypatch):
         "chronicle.source_package.files", lambda _package: resource_root
     )
     return artifact, resource_dir, content, entry
+
+
+@pytest.mark.parametrize("entry", [None, "not a file entry", 42])
+@pytest.mark.parametrize("method", ["assert_parseable", "_artifact_content"])
+def test_source_artifact_spec_refuses_scalar_entry_before_artifact_io(
+    recorded_r2_artifact, monkeypatch, entry, method
+):
+    artifact, resource_dir, _content, _valid_entry = recorded_r2_artifact
+    manifest_path = resource_dir / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump({"kind": "publisher_table", "files": {2024: entry}})
+    )
+    original_manifest = manifest_path.read_bytes()
+    reads = []
+    monkeypatch.setattr(
+        "chronicle.source_package._read_source_artifact_content",
+        lambda *args: reads.append(args) or b"unexpected source bytes",
+    )
+
+    with pytest.raises(ManifestAccessError, match="malformed_file_spec"):
+        getattr(artifact, method)(2024)
+
+    assert reads == []
+    assert manifest_path.read_bytes() == original_manifest
+    assert list(resource_dir.iterdir()) == [manifest_path]
 
 
 @pytest.mark.parametrize(
