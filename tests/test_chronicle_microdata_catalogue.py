@@ -149,6 +149,31 @@ def test_selection_accepts_agreeing_duplicates_and_refuses_conflicts():
         )
 
 
+def test_frs_catalogue_selector_refuses_cross_stage_pin_drift():
+    payload = json.loads((FIXTURE_ROOT / UK_STAGES).read_text())
+    release = next(
+        release
+        for release in script.CATALOGUE
+        if release.release_id == "dwp-frs-2023-24:adult"
+    )
+    employment = next(
+        stage for stage in payload["stages"] if stage["stage"] == "frs_employment"
+    )
+    adult = next(
+        artifact
+        for artifact in employment["artifacts"]
+        if artifact.get("table") == "adult"
+    )
+    adult["sha256"] = "f" * 64
+
+    with pytest.raises(script.CatalogueError, match="conflicting values"):
+        script.select_artifact(
+            payload,
+            release.selector,
+            release_id=release.release_id,
+        )
+
+
 def test_resolve_refuses_a_missing_consumer_manifest(tmp_path):
     with pytest.raises(script.CatalogueError, match="manifest not found"):
         script.resolve(tmp_path / "no-such-checkout", script.CATALOGUE[:1])
@@ -274,6 +299,78 @@ def _git(repo: Path, *args: str) -> str:
     return subprocess.run(
         ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
     ).stdout.strip()
+
+
+def _committed_fixture_checkout(destination: Path) -> tuple[Path, str]:
+    checkout = _fixture_copy(destination)
+    _git(checkout, "init", "-q")
+    _git(checkout, "config", "user.email", "t@example.com")
+    _git(checkout, "config", "user.name", "t")
+    _git(checkout, "add", ".")
+    _git(checkout, "commit", "-q", "-m", "consumer pins")
+    return checkout, _git(checkout, "rev-parse", "HEAD")
+
+
+@pytest.mark.parametrize("staged", [False, True], ids=("dirty", "staged"))
+def test_emit_refuses_dirty_or_staged_consumer_manifest_bytes(tmp_path, capsys, staged):
+    checkout, pinned = _committed_fixture_checkout(tmp_path / "consumer")
+    manifest_path = checkout / UK_STAGES
+    manifest_path.write_bytes(manifest_path.read_bytes() + b"\n")
+    if staged:
+        _git(checkout, "add", UK_STAGES)
+    root = tmp_path / "data"
+
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(checkout),
+            "--root",
+            str(root),
+            "--release",
+            "dwp-frs-2023-24:adult",
+            "emit",
+        ],
+        capsys,
+    )
+
+    assert exit_code == 1
+    assert "do not match" in err
+    assert UK_STAGES in err
+    assert pinned in err
+    assert not root.exists()
+
+
+def test_emit_refuses_an_explicit_commit_whose_blob_differs_from_loaded_manifest(
+    tmp_path, capsys
+):
+    checkout, old_commit = _committed_fixture_checkout(tmp_path / "consumer")
+    manifest_path = checkout / UK_STAGES
+    manifest_path.write_bytes(manifest_path.read_bytes() + b"\n")
+    _git(checkout, "add", UK_STAGES)
+    _git(checkout, "commit", "-q", "-m", "new consumer pin blob")
+    assert _git(checkout, "rev-parse", "HEAD") != old_commit
+    root = tmp_path / "data"
+
+    exit_code, _out, err = _run(
+        [
+            "--microcosm-root",
+            str(checkout),
+            "--root",
+            str(root),
+            "--release",
+            "dwp-frs-2023-24:adult",
+            "emit",
+            "--microcosm-commit",
+            old_commit,
+        ],
+        capsys,
+    )
+
+    assert exit_code == 1
+    assert "do not match" in err
+    assert UK_STAGES in err
+    assert old_commit in err
+    assert not root.exists()
 
 
 def test_emit_needs_a_commit_it_can_read_or_be_told(tmp_path, capsys):
