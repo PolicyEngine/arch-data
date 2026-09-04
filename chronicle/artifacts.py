@@ -3002,6 +3002,31 @@ def _upload_r2_object(
     return _run_command(command)
 
 
+def _legacy_raw_r2_key(
+    *,
+    source_id: str,
+    package_id: str,
+    year: Any,
+    sha256: str,
+    filename: str,
+    resolved_prefix: str,
+    package_path: Path,
+) -> str | None:
+    """Return the compatible pre-country raw key, when this route has one."""
+    country = infer_r2_country(source_id=source_id, package_path=package_path)
+    prefix, separator, suffix = resolved_prefix.rpartition("/")
+    if country is None or not separator or suffix != country or not prefix:
+        return None
+    return posixpath.join(
+        prefix,
+        _clean_key_part(source_id),
+        _clean_key_part(package_id),
+        str(year),
+        sha256,
+        Path(filename).name,
+    )
+
+
 def _publish_raw_manifest_entry(
     manifest_path: Path,
     source_id: str,
@@ -3219,14 +3244,32 @@ def _publish_raw_manifest_entry(
         ),
     )
     recorded_bucket = recorded_r2.bucket if recorded_r2 is not None else None
-    if recorded_r2 is not None and recorded_bucket != location.bucket:
-        # The recorded bucket is preserved history and, per the identity check
-        # above, its object holds exactly these bytes: the artifact is already
-        # published. Restating it under the configured bucket would rewrite
-        # where the bytes were first published (a backfill copy is not a
-        # restatement), so the entry is reported as skipped with nothing
-        # uploaded or rewritten. After the bucket-default flip every entry
-        # published before it takes this path, and the sweep stays green.
+    recorded_key = recorded_r2.key if recorded_r2 is not None else None
+    legacy_key = _legacy_raw_r2_key(
+        source_id=source_id,
+        package_id=package_id,
+        year=year,
+        sha256=sha256_actual or "",
+        filename=filename,
+        resolved_prefix=r2_prefix,
+        package_path=manifest_path,
+    )
+    if recorded_key and recorded_key not in {location.key, legacy_key}:
+        return refuse(
+            "recorded_r2_key_disagrees_with_country_prefix:"
+            f"recorded={recorded_key}:expected={location.key}"
+        )
+    if recorded_r2 is not None:
+        # An exact canonical route, or its pre-country legacy equivalent, is
+        # immutable published history. Validate that route before considering
+        # a bucket cutover: changing buckets never excuses a key for another
+        # country, source, package, or vintage.
+        skipped = "recorded_r2_already_published"
+        if recorded_bucket != location.bucket:
+            skipped = (
+                "recorded_r2_bucket_is_preserved_history:"
+                f"recorded={recorded_bucket}:requested={location.bucket}"
+            )
         return (
             RawArtifactPublishEntry(
                 manifest_path=str(manifest_path),
@@ -3244,18 +3287,9 @@ def _publish_raw_manifest_entry(
                 ),
                 upload=None,
                 errors=(),
-                skipped=(
-                    "recorded_r2_bucket_is_preserved_history:"
-                    f"recorded={recorded_bucket}:requested={location.bucket}"
-                ),
+                skipped=skipped,
             ),
             None,
-        )
-    recorded_key = recorded_r2.key if recorded_r2 is not None else None
-    if recorded_key and recorded_key != location.key:
-        return refuse(
-            "recorded_r2_key_disagrees_with_country_prefix:"
-            f"recorded={recorded_key}:expected={location.key}"
         )
     if preflight_only:
         return (
