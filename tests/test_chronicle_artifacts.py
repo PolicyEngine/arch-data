@@ -3802,3 +3802,77 @@ def test_fetch_still_refuses_an_unidentified_owner_in_another_manifest(tmp_path)
 
     assert not (package / "table.csv").exists()
     assert {path: path.read_text() for path in (manifest_a, manifest_b)} == before
+
+
+@pytest.mark.parametrize("missing", ["source_id", "package_id"])
+def test_selected_publication_overrides_apply_only_to_the_selected_manifest(
+    tmp_path, missing
+):
+    """``--source-id`` / ``--package-id`` complete the selected manifest's
+    identity. An unselected sibling that declares a different identifier is
+    preflighted with its own identifiers, not the override, so the selected
+    publication succeeds and the sibling is left untouched."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    content_a = b"table a"
+    content_b = b"table b"
+    (package / "table_a.csv").write_bytes(content_a)
+    (package / "table_b.csv").write_bytes(content_b)
+    identity_a = {"source_id": "publisher_a", "package_id": "package_a"}
+    identity_b = {"source_id": "publisher_b", "package_id": "package_b"}
+    override = {missing: identity_a[missing]}
+    declared_a = {key: value for key, value in identity_a.items() if key != missing}
+    manifest_a = package / "manifest_a.yaml"
+    manifest_b = package / "manifest_b.yaml"
+    manifest_a.write_text(
+        yaml.safe_dump(
+            {
+                **declared_a,
+                "files": {
+                    2024: {
+                        "filename": "table_a.csv",
+                        "source_url": "https://publisher.test/a",
+                        "sha256": hashlib.sha256(content_a).hexdigest(),
+                        "size_bytes": len(content_a),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    manifest_b.write_text(
+        yaml.safe_dump(
+            {
+                **identity_b,
+                "files": {
+                    2024: {
+                        "filename": "table_b.csv",
+                        "source_url": "https://publisher.test/b",
+                        "sha256": hashlib.sha256(content_b).hexdigest(),
+                        "size_bytes": len(content_b),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    before_b = manifest_b.read_text()
+    wrangler, log = _fake_wrangler(tmp_path)
+
+    report = publish_source_artifacts(
+        package,
+        manifest_filename="manifest_a.yaml",
+        wrangler_command=str(wrangler),
+        **override,
+    )
+
+    assert report.valid, report.errors
+    assert report.counts["uploaded_count"] == 1
+    assert report.counts["failed_count"] == 0
+    recorded = yaml.safe_load(manifest_a.read_text())
+    assert recorded[missing] == identity_a[missing]
+    assert recorded["files"][2024]["storage"]["r2"]["key"].startswith(
+        "raw/publisher_a/package_a/2024/"
+    )
+    assert manifest_b.read_text() == before_b
+    assert len(log.read_text().splitlines()) == 1
