@@ -29,3 +29,15 @@ Done:
 - Provisioned the released local wheel offline and verified ordinary uv sync --frozen succeeds using writable /tmp/chronicle-uv-cache. Lock metadata copies the exact published artifact URLs, sizes and SHA-256s; UV_FROZEN=false uv lock --check --offline succeeds.
 
 Next: finish exact requested suite and released-pin byte proof, include the necessary release-chain shim compatibility change discovered by the proof, then commit and attempt delivery.
+
+Done:
+- Exact requested command at receipt 0.6.0: `uv run --frozen -q pytest -q tests/test_thesis_append_shim_isolation.py tests/test_thesis_append_adversarial.py tests/test_build_series_catalog.py` -> 217 passed, 5 xfailed in 52.87s. Runs use UV_CACHE_DIR=/tmp/chronicle-uv-cache and UV_OFFLINE=1 because shell network access is blocked.
+- Released-pin proof plus workflow companions: tests/test_receipt_shim_transparency.py, tests/test_release_chain.py, tests/test_policyengine_ledger.py -> 91 passed in 31.31s (18 + 64 + 9). Authenticated oracle fixtures unchanged.
+- Current census: isolation 34, adversarial 33 (5 strict xfails), catalog 155, transparency 18, release chain 64, ledger 9; 313 total cases, 308 passed and 5 xfailed across these suites.
+- Removed ten tests whose subject was the deleted exact checkout/worktree logic; retained and adapted committed mode/configuration tests, added seven installed-wheel cases for mandatory commit and the three workflow paths' divergent/repaired local state.
+- The byte proof exposed obsolete release-chain shim exports. Removed four unused git helper aliases and materialize_base_tree; migrated live history/base wrappers and CLI --base-ref to entered snapshots and candidate materialization. Added two CLI cases for committed history despite dirty/repaired working trees. Ordinary directory verification and all original oracle bytes are preserved.
+- Independent review approved append shim, dependency lock, workflows and tests with no actionable findings. Ruff check passes on all changed Python files; formatted the isolation test.
+
+Next: finish release-chain compatibility review, commit implementation, run the gate on that committed head, and attempt both branch pushes.
+
+Review: release-chain compatibility approved with no blocking defects. Kept the legacy standalone --full help bytes for the required help differential; the module docstring states that adding --base-ref selects HEAD objects and verifies their private materialization.

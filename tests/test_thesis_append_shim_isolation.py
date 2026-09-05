@@ -1,24 +1,15 @@
-"""What the append-gate shim establishes before the gate reaches a verdict.
+"""Exercise receipt's released commit-addressed gate through the Chronicle shim.
 
-The gate states its verdict about a clean checkout of one named commit, read
-once, with no concurrent writer. The shim is the part that makes that true: it
-checks the named commit out itself, under a git environment the candidate
-cannot redirect, and refuses rather than reaching a verdict when the checkout is
-not exactly that commit.
+The shim supplies a full candidate OID, freezes the caller's git environment,
+and prints the OIDs returned by the package. The installed wheel reads the
+named commit's objects, so HEAD, the index and workspace may disagree without
+changing its verdict. These subprocess tests cover all three workflow paths,
+committed refusals, environment/configuration boundaries and scratch cleanup.
 
-Every case here is one way a repository could have handed the old shim a
-directory that was not the commit it claimed to be, run code during the
-checkout, or made the bytes on disk differ from the bytes the commit fixes. Each
-runs the shim in a subprocess and asserts what it printed and what it exited
-with, so the refusal text and the exit code are the assertions rather than an
-internal state.
-
-Some cases need something to happen between the checkout and the assertion --
-a writer, a permission change -- which is a window no repository setting can
-open on its own, because the shim disables hooks and owns the directory. Those
-cases run the shim through a small driver that imports the module and wraps one
-function, and each says in its own docstring what it wrapped and why the thing
-it simulates has no other construction. Everything else runs the script itself.
+The former exact-checkout tests are removed where their subject was a private
+worktree, its index, byte comparison or registration: the 0.6 shim creates none.
+Cases for committed unsafe entries and caller configuration remain because the
+package now enforces those refusals itself.
 """
 
 from __future__ import annotations
@@ -31,6 +22,7 @@ import shutil
 import stat
 import subprocess
 import sys
+from importlib import metadata
 
 import pytest
 
@@ -57,6 +49,26 @@ CANDIDATE_LINE = re.compile(
 
 # A commit id of the right shape that no repository holds.
 ABSENT_OBJECT_ID = "0" * 40
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _released_receipt_wheel():
+    """Every subprocess uses the released installed distribution, not a checkout."""
+
+    import receipt.append_gate
+
+    distribution = metadata.distribution("receipt")
+    assert distribution.version == "0.6.0"
+    assert distribution.read_text("WHEEL") is not None
+    direct_url = distribution.read_text("direct_url.json")
+    if direct_url is not None:
+        source = json.loads(direct_url)
+        assert "archive_info" in source
+        assert source["url"].endswith("receipt-0.6.0-py3-none-any.whl")
+    installed = pathlib.Path(distribution.locate_file("")).resolve()
+    assert (
+        pathlib.Path(receipt.append_gate.__file__).resolve().is_relative_to(installed)
+    )
 
 
 def _release_manifests() -> list[pathlib.Path]:
@@ -258,204 +270,14 @@ def _assert_nothing_left_behind(
 ) -> None:
     """No scratch directory survives, and no registration names one."""
 
-    leftovers = sorted(temporary_root.glob("thesis-facts-gate-*"))
+    leftovers = sorted(temporary_root.iterdir())
     assert leftovers == [], leftovers
     listing = _git(clone, "worktree", "list", "--porcelain")
     assert "thesis-facts-gate-" not in listing, listing
 
 
-def test_a_checkout_of_another_commit_is_refused(tmp_path):
-    """HEAD must be the commit that was named, not one near it.
-
-    The writer simulated here is a checkout that answered for a different
-    commit. There is no repository setting that produces it -- the shim passes
-    the object id to `git worktree add` itself -- so the driver wraps
-    `_isolated_checkout` and has it check out the candidate's parent, which is
-    the closest thing to a checkout that looks right and is not.
-    """
-
-    clone, base, candidate = _replay_latest_release(tmp_path)
-    parent = _git(clone, "rev-parse", f"{candidate}^")
-    injection = """\
-_real_checkout = shim._isolated_checkout
-
-
-def _checkout_the_parent(clone_root, scratch_root, oid, env):
-    parent = subprocess.run(
-        ["git", "-C", str(clone_root), "rev-parse", oid + "^"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
-    return _real_checkout(clone_root, scratch_root, parent, env)
-
-
-shim._isolated_checkout = _checkout_the_parent
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        base_ref=base,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "driver",
-    )
-
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert completed.stdout == ""
-    assert REFUSED in completed.stderr
-    assert (
-        f"the isolated checkout is at {parent}, not the named commit "
-        f"{candidate}" in completed.stderr
-    )
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_a_modified_tracked_file_in_the_checkout_is_refused(tmp_path):
-    """A tracked file written after the checkout is refused.
-
-    A `post-checkout` hook is the realistic writer, and the shim disables hooks
-    by construction, which is proved separately. So the writer here is the
-    driver: it wraps `_isolated_checkout` and appends a byte to the ledger in
-    the directory the real function returned, which is exactly what a hook
-    would have had the opportunity to do.
-    """
-
-    clone, base, candidate = _replay_latest_release(tmp_path)
-    injection = """\
-_real_checkout = shim._isolated_checkout
-
-
-def _write_into_the_checkout(clone_root, scratch_root, oid, env):
-    checkout = _real_checkout(clone_root, scratch_root, oid, env)
-    ledger = checkout / "ledger" / "official_observations.jsonl"
-    ledger.write_bytes(ledger.read_bytes() + b"{}\\n")
-    return checkout
-
-
-shim._isolated_checkout = _write_into_the_checkout
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        base_ref=base,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "driver",
-    )
-
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert completed.stdout == ""
-    assert f"{REFUSED}the isolated checkout of {candidate} is not clean" in (
-        completed.stderr
-    )
-    assert LEDGER_RELATIVE in completed.stderr
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_an_untracked_file_is_refused_though_the_clone_hides_untracked_files(
-    tmp_path,
-):
-    """`status.showUntrackedFiles=no` in the clone does not hide the file.
-
-    The setting is the repository's, and it is the kind of setting the shim
-    deliberately does not refuse in the configuration audit, because it changes
-    what a report says rather than what a checkout does. It is answered
-    instead: the shim forces `status.showUntrackedFiles=all` on the command
-    line, where it outranks any configured value, and passes
-    `--untracked-files=all` as well.
-    """
-
-    clone, base, candidate = _replay_latest_release(tmp_path)
-    _git(clone, "config", "status.showUntrackedFiles", "no")
-    injection = """\
-_real_checkout = shim._isolated_checkout
-
-
-def _leave_an_untracked_file(clone_root, scratch_root, oid, env):
-    checkout = _real_checkout(clone_root, scratch_root, oid, env)
-    (checkout / "unexpected.txt").write_text("left behind\\n", encoding="utf-8")
-    return checkout
-
-
-shim._isolated_checkout = _leave_an_untracked_file
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        base_ref=base,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "driver",
-    )
-
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert f"{REFUSED}the isolated checkout of {candidate} is not clean" in (
-        completed.stderr
-    )
-    assert "?? unexpected.txt" in completed.stderr
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_an_ignored_file_is_refused(tmp_path):
-    """A file the commit's own .gitignore hides is still a file in the tree.
-
-    `git status` says nothing about an ignored file however untracked files are
-    configured, so the clean-tree assertion cannot see one. The separate
-    `ls-files --others --ignored` is what does.
-    """
-
-    def _ignore_a_directory(root: pathlib.Path) -> None:
-        (root / ".gitignore").write_text("workspace/\n", encoding="utf-8")
-
-    clone, base, candidate = _replay_latest_release(
-        tmp_path, prepare=_ignore_a_directory
-    )
-    injection = """\
-_real_checkout = shim._isolated_checkout
-
-
-def _leave_an_ignored_file(clone_root, scratch_root, oid, env):
-    checkout = _real_checkout(clone_root, scratch_root, oid, env)
-    hidden = checkout / "workspace"
-    hidden.mkdir()
-    (hidden / "smuggled.txt").write_text("ignored\\n", encoding="utf-8")
-    return checkout
-
-
-shim._isolated_checkout = _leave_an_ignored_file
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        base_ref=base,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "driver",
-    )
-
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert f"{REFUSED}the isolated checkout of {candidate} carries an ignored " in (
-        completed.stderr
-    )
-    assert "workspace/smuggled.txt" in completed.stderr
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_an_attribute_that_rewrites_the_checkout_bytes_is_refused(tmp_path):
-    """Committed attributes cannot make the gate read bytes the commit fixes.
-
-    A `text eol=crlf` attribute over an LF blob is the whole attack in one
-    line: the checkout writes CRLF, `git status` stays clean because git
-    normalises on the way back in, and a content hash taken the ordinary way
-    reproduces the blob id by construction whatever is on disk. Hashing with
-    `--no-filters` is what makes the comparison a comparison, and this is the
-    case that fails without it.
-
-    A `filter.*` driver would do the same thing with a program instead of a
-    conversion; the configuration audit refuses that one earlier, and its own
-    case is below.
-    """
+def test_checkout_line_endings_do_not_change_the_committed_verdict(tmp_path):
+    """Raw committed blobs stay authoritative when eol rewrites the workspace."""
 
     def _convert_the_ledger_to_crlf(root: pathlib.Path) -> None:
         (root / ".gitattributes").write_text(
@@ -465,7 +287,12 @@ def test_an_attribute_that_rewrites_the_checkout_bytes_is_refused(tmp_path):
     clone, base, candidate = _replay_latest_release(
         tmp_path, prepare=_convert_the_ledger_to_crlf
     )
-    blob = _git(clone, "rev-parse", f"{candidate}:{LEDGER_RELATIVE}")
+    tree = _git(clone, "rev-parse", f"{candidate}^{{tree}}")
+    ledger = clone / LEDGER_RELATIVE
+    ledger.write_bytes(ledger.read_bytes().replace(b"\n", b"\r\n"))
+    assert _git(clone, "hash-object", "--no-filters", LEDGER_RELATIVE) != _git(
+        clone, "rev-parse", f"{candidate}:{LEDGER_RELATIVE}"
+    )
 
     completed = _run_shim(
         clone,
@@ -474,60 +301,10 @@ def test_an_attribute_that_rewrites_the_checkout_bytes_is_refused(tmp_path):
         temporary_root=tmp_path / "tmp",
     )
 
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert completed.stdout == ""
-    assert f"{REFUSED}the protected path {LEDGER_RELATIVE} holds bytes hashing" in (
-        completed.stderr
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert completed.stdout == (
+        f"{APPEND_GATE_OK}\ncandidate commit {candidate} tree {tree}\n"
     )
-    assert f"against the {blob} the commit names" in completed.stderr
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_an_execute_bit_that_disagrees_with_the_tree_mode_is_refused(tmp_path):
-    """The owner-execute bit on disk must be the one the commit states.
-
-    `core.fileMode=false` tells git to stop comparing the bit, so `git status`
-    reports a clean tree while the file's permissions are not the ones the
-    commit records. That is why this is a separate assertion and not something
-    the clean-tree check already covers: under that setting the clean-tree check
-    cannot see it. The clearing of the bit itself is done by the driver, because
-    with the setting in place nothing in the repository has to do it for the
-    tree to still look clean.
-    """
-
-    clone, base, candidate = _replay_latest_release(
-        tmp_path,
-        prepare=lambda root: (root / LEDGER_RELATIVE).chmod(0o755),
-    )
-    assert _git(clone, "ls-tree", candidate, "--", LEDGER_RELATIVE).startswith("100755")
-    _git(clone, "config", "core.fileMode", "false")
-    injection = """\
-_real_checkout = shim._isolated_checkout
-
-
-def _clear_the_execute_bit(clone_root, scratch_root, oid, env):
-    checkout = _real_checkout(clone_root, scratch_root, oid, env)
-    (checkout / "ledger" / "official_observations.jsonl").chmod(0o644)
-    return checkout
-
-
-shim._isolated_checkout = _clear_the_execute_bit
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        base_ref=base,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "driver",
-    )
-
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert (
-        f"{REFUSED}the protected path {LEDGER_RELATIVE} is not executable"
-        in completed.stderr
-    )
-    assert "against tree mode 100755" in completed.stderr
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
@@ -576,20 +353,13 @@ def _stage_a_gitlink_under_releases(root: pathlib.Path) -> None:
 def test_a_protected_path_that_is_not_a_file_is_refused(
     tmp_path, case, mutate, mutate_index, path, mode
 ):
-    """A link and a submodule boundary are both refused on their tree mode.
-
-    Neither is a path whose bytes this commit fixes: a link is a name for
-    somewhere else, and a gitlink is a name for another repository whose
-    contents this commit does not carry. They are refused rather than followed.
-
-    The refusal is the shim's and not the gate's -- the message says "refused"
-    and not "failed" -- so the mode was read before any verdict was reached
-    about what the tree holds.
-    """
+    """The package refuses committed links and gitlinks without following them."""
 
     clone, base, candidate = _replay_latest_release(
         tmp_path / case, mutate=mutate, mutate_index=mutate_index
     )
+
+    assert _git(clone, "ls-tree", candidate, "--", path).startswith(mode)
 
     completed = _run_shim(
         clone,
@@ -600,27 +370,24 @@ def test_a_protected_path_that_is_not_a_file_is_refused(
 
     assert completed.returncode == 1, completed.stdout + completed.stderr
     assert completed.stdout == ""
-    assert FAILED not in completed.stderr
-    assert REFUSED in completed.stderr
+    assert FAILED in completed.stderr
     assert path in completed.stderr
-    assert f"tree mode {mode}" in completed.stderr
+    assert ("symlink" if mode == "120000" else "not regular") in completed.stderr
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
 def test_a_symlink_materialised_as_a_file_is_still_refused(tmp_path):
-    """`core.symlinks=false` turns the link into a regular file, and it is
-    still refused.
-
-    Under that setting git writes the link's target text into an ordinary file,
-    which passes every test that asks what the thing on disk is. The tree mode
-    is what says the commit does not fix that file's bytes, and the tree mode is
-    what the refusal names.
-    """
+    """A repaired regular workspace file cannot hide a committed symlink."""
 
     clone, base, candidate = _replay_latest_release(
         tmp_path, mutate=_commit_a_symlink_under_releases
     )
     _git(clone, "config", "core.symlinks", "false")
+    link = clone / "releases" / "manifests" / "0000-shortcut.json"
+    target = os.readlink(link)
+    link.unlink()
+    link.write_text(target, encoding="utf-8")
+    assert link.is_file() and not link.is_symlink()
 
     completed = _run_shim(
         clone,
@@ -630,19 +397,13 @@ def test_a_symlink_materialised_as_a_file_is_still_refused(tmp_path):
     )
 
     assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert REFUSED in completed.stderr
-    assert "tree mode 120000" in completed.stderr
+    assert FAILED in completed.stderr
+    assert "symlink" in completed.stderr
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
-def test_a_checkout_that_never_happened_leaves_no_registration(tmp_path):
-    """An object id nothing holds fails the add, and leaves nothing behind.
-
-    git validates the commit before it writes a registration, so the ordinary
-    outcome is that there is nothing to deregister and only a directory to
-    delete. The assertion is that both are true afterwards, which is what the
-    `finally` is for.
-    """
+def test_an_absent_candidate_object_is_refused_without_a_verdict(tmp_path):
+    """An unavailable named object fails closed and leaves no scratch state."""
 
     clone, _base, _candidate = _replay_latest_release(tmp_path)
     before = _git(clone, "worktree", "list", "--porcelain")
@@ -655,9 +416,8 @@ def test_a_checkout_that_never_happened_leaves_no_registration(tmp_path):
 
     assert completed.returncode == 1, completed.stdout + completed.stderr
     assert completed.stdout == ""
-    assert f"{REFUSED}cannot check {ABSENT_OBJECT_ID} out in isolation" in (
-        completed.stderr
-    )
+    assert FAILED in completed.stderr
+    assert ABSENT_OBJECT_ID in completed.stderr
     assert _git(clone, "worktree", "list", "--porcelain") == before
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
@@ -672,22 +432,19 @@ import sys as _sys
 
 RECORDING = __RECORDING__
 
-import receipt.append_gate as gate  # noqa: E402
-
 _real_run = subprocess.run
+_real_popen = subprocess.Popen
 _records = []
 
 
-def _spy(*args, **kwargs):
+def _record(args, kwargs, caller):
     argv = args[0] if args else kwargs.get("args")
     given = kwargs.get("env")
-    # A call that passes no environment gets the process's, so what the child
-    # actually receives is os.environ at the moment of the call either way.
     effective = dict(given) if given is not None else dict(os.environ)
     _records.append(
         {
             "argv": [str(item) for item in argv],
-            "caller": _sys._getframe(1).f_globals.get("__name__", "?"),
+            "caller": caller,
             "explicit": given is not None,
             "git": {
                 name: value
@@ -696,11 +453,20 @@ def _spy(*args, **kwargs):
             },
         }
     )
+
+
+def _spy_run(*args, **kwargs):
+    _record(args, kwargs, _sys._getframe(1).f_globals.get("__name__", "?"))
     return _real_run(*args, **kwargs)
 
 
-subprocess.run = _spy
-gate.subprocess.run = _spy
+def _spy_popen(*args, **kwargs):
+    _record(args, kwargs, _sys._getframe(1).f_globals.get("__name__", "?"))
+    return _real_popen(*args, **kwargs)
+
+
+subprocess.run = _spy_run
+subprocess.Popen = _spy_popen
 
 
 def _record_and_exit(code):
@@ -714,22 +480,11 @@ shim.main = lambda: _record_and_exit(_real_main())
 
 
 def test_no_inherited_git_variable_reaches_any_child(tmp_path):
-    """Every git the run starts sees exactly three GIT_ variables.
+    """No inherited GIT_ value reaches shim calls or the package's batch child.
 
-    The caller's environment is loaded with every GIT_ name git(1) documents,
-    plus GIT_CONFIG_COUNT, which git-config(1) documents and git(1) does not --
-    the shim drops by prefix rather than by list, so a name outside the list is
-    dropped too.
-
-    Both halves of the run are checked, told apart by which module made the
-    call. The shim passes its environment explicitly. The gate builds its own
-    from ``os.environ`` and says in as many words that it is not a sanitizer and
-    that a caller which does not control the environment it invokes the package
-    in has a problem outside that function's scope. Controlling ``os.environ``
-    for the duration of the gate call is how the shim answers that, and this is
-    the test that it works: whichever module made the call, and whether or not
-    an environment was passed, what the child receives carries exactly the three
-    variables and none of the hostile values.
+    The shim drops all names by prefix; receipt then freezes its own object
+    reader environment. Recording both run and Popen includes the long-lived
+    cat-file child, not just discovery/configuration calls.
     """
 
     clone, base, candidate = _replay_latest_release(tmp_path)
@@ -771,6 +526,12 @@ def test_no_inherited_git_variable_reaches_any_child(tmp_path):
     ]
     assert by_shim, [record["caller"] for record in git_calls]
     assert by_gate, [record["caller"] for record in git_calls]
+    assert any("cat-file" in record["argv"] for record in by_gate)
+    assert all("worktree" not in record["argv"] for record in git_calls)
+    shim_globals = {record["git"]["GIT_CONFIG_GLOBAL"] for record in by_shim}
+    assert all(
+        record["git"]["GIT_CONFIG_GLOBAL"] not in shim_globals for record in by_gate
+    )
 
     for record in git_calls:
         assert set(record["git"]) == {
@@ -813,13 +574,7 @@ def test_the_documented_variable_list_is_not_narrower_than_the_drop():
 
 
 def test_a_post_checkout_hook_in_the_clone_does_not_run(tmp_path):
-    """`git worktree add` runs post-checkout, and here it does not.
-
-    The hook is a real one, installed where git looks by default. It is not
-    reached because the shim points `core.hooksPath` at an empty directory it
-    made, from a global configuration file the repository's own configuration
-    is separately checked for not overriding.
-    """
+    """Object reads never invoke the clone's executable post-checkout hook."""
 
     clone, base, candidate = _replay_latest_release(tmp_path)
     marker = tmp_path / "the-hook-ran"
@@ -844,36 +599,6 @@ def test_a_post_checkout_hook_in_the_clone_does_not_run(tmp_path):
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
-def test_an_unrelated_prunable_worktree_keeps_its_registration(tmp_path):
-    """Cleanup removes this run's checkout by name and nothing else.
-
-    `git worktree prune` would have removed the other registration too -- the
-    second half of this test shows that it does -- which is why the shim never
-    calls it. A worktree whose directory has gone is prunable, and a repository
-    in which other work is going on can hold several at any moment.
-    """
-
-    clone, base, candidate = _replay_latest_release(tmp_path)
-    other = tmp_path / "somebody-elses-worktree"
-    _git(clone, "worktree", "add", "--detach", str(other), base)
-    shutil.rmtree(other)
-    assert str(other) in _git(clone, "worktree", "list", "--porcelain")
-
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        base_ref=base,
-        temporary_root=tmp_path / "tmp",
-    )
-
-    assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert str(other) in _git(clone, "worktree", "list", "--porcelain")
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-    _git(clone, "worktree", "prune")
-    assert str(other) not in _git(clone, "worktree", "list", "--porcelain")
-
-
 @pytest.mark.parametrize(
     ("key", "value", "reported"),
     [
@@ -883,17 +608,8 @@ def test_an_unrelated_prunable_worktree_keeps_its_registration(tmp_path):
         ("include.path", "extra-config", "include.path"),
     ],
 )
-def test_a_clone_that_redirects_the_checkout_is_refused_before_it_happens(
-    tmp_path, key, value, reported
-):
-    """Four repository settings decide what a checkout does, and all are refused.
-
-    Each of them outranks the global file the shim wrote: a hook path moves the
-    directory the shim emptied, a filesystem monitor and a content filter each
-    name a program git runs, and an include pulls in a file this audit has not
-    read and which could set any of the other three. The audit runs before the
-    checkout, so nothing has been created when the refusal is made.
-    """
+def test_repository_configuration_redirects_are_refused(tmp_path, key, value, reported):
+    """The package audits hooks, fsmonitor and includes; the shim keeps filters."""
 
     clone, _base, candidate = _replay_latest_release(tmp_path)
     _git(clone, "config", key, value)
@@ -907,8 +623,8 @@ def test_a_clone_that_redirects_the_checkout_is_refused_before_it_happens(
 
     assert completed.returncode == 1, completed.stdout + completed.stderr
     assert completed.stdout == ""
-    assert REFUSED in completed.stderr
-    assert f"sets {reported} in its local configuration" in completed.stderr
+    assert (REFUSED if key.startswith("filter.") else FAILED) in completed.stderr
+    assert reported in completed.stderr.lower()
     assert _git(clone, "worktree", "list", "--porcelain") == before
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
@@ -948,7 +664,20 @@ def test_a_commit_that_is_not_a_full_object_id_is_refused_by_the_parser(
     assert "a full object id is required" in completed.stderr
 
 
-def test_an_exception_after_the_checkout_still_removes_everything(tmp_path):
+def test_a_commit_argument_is_required(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, str(SHIM), "--root", str(tmp_path)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 2
+    assert "--commit" in completed.stderr
+    assert "required" in completed.stderr
+
+
+def test_an_exception_during_verification_removes_the_frozen_configuration(tmp_path):
     """The cleanup is in a `finally`, so it does not need the run to succeed.
 
     The gate is replaced by something that raises, which stands for every way
@@ -977,12 +706,119 @@ shim.verify_append_gate = _explode
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
+WORKFLOW_PATHS = ("pull_request_target", "candidate", "push")
+
+
+def _workflow_arguments(clone, workflow, base, candidate):
+    """Select the full OID exactly where each workflow obtains its argument."""
+
+    if workflow == "pull_request_target":
+        # GitHub's test merge has the accepted candidate tree and two parents.
+        merge = _git(
+            clone,
+            "commit-tree",
+            f"{candidate}^{{tree}}",
+            "-p",
+            base,
+            "-p",
+            candidate,
+            "-m",
+            "synthetic pull request merge",
+        )
+        environment = {"MERGE_SHA": merge, "BASE_SHA": base}
+        return environment["MERGE_SHA"], environment["BASE_SHA"]
+    if workflow == "candidate":
+        return _git(clone, "rev-parse", "HEAD"), base
+    assert workflow == "push"
+    environment = {"GITHUB_SHA": candidate}
+    return environment["GITHUB_SHA"], None
+
+
+@pytest.mark.parametrize("workflow", WORKFLOW_PATHS)
+def test_every_workflow_verifies_the_named_commit_when_local_state_disagrees(
+    tmp_path, workflow
+):
+    """Each installed-wheel path prints its selected OIDs despite other state."""
+
+    clone, base, candidate = _replay_latest_release(tmp_path)
+    selected, base_ref = _workflow_arguments(clone, workflow, base, candidate)
+    tree = _git(clone, "rev-parse", f"{selected}^{{tree}}")
+    ledger = clone / LEDGER_RELATIVE
+    committed_blob = _git(clone, "rev-parse", f"{selected}:{LEDGER_RELATIVE}")
+
+    # HEAD, the index and the workspace each disagree with the selected tree.
+    _git(clone, "update-ref", "HEAD", base)
+    ledger.write_bytes(b"{}\n")
+    _git(clone, "add", LEDGER_RELATIVE)
+    ledger.write_bytes(b"[]\n")
+    ledger.chmod(0o755)
+    (clone / "untracked.txt").write_text("untracked\n", encoding="utf-8")
+    (clone / ".git" / "info" / "exclude").write_text("ignored.txt\n", encoding="utf-8")
+    (clone / "ignored.txt").write_text("ignored\n", encoding="utf-8")
+    _git(clone, "config", "status.showUntrackedFiles", "no")
+    assert _git(clone, "rev-parse", "HEAD") != selected
+    assert _git(clone, "rev-parse", f":{LEDGER_RELATIVE}") != committed_blob
+    assert _git(clone, "hash-object", "--no-filters", LEDGER_RELATIVE) != committed_blob
+
+    completed = _run_shim(
+        clone, commit=selected, base_ref=base_ref, temporary_root=tmp_path / "tmp"
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert completed.stderr == ""
+    lines = completed.stdout.splitlines()
+    assert len(lines) == 2
+    assert lines[0].startswith("thesis-facts append check OK:")
+    assert lines[1] == f"candidate commit {selected} tree {tree}"
+    if base_ref is not None:
+        assert lines[0] == APPEND_GATE_OK
+    _assert_nothing_left_behind(clone, tmp_path / "tmp")
+
+
+@pytest.mark.parametrize("workflow", WORKFLOW_PATHS)
+def test_every_workflow_refuses_bad_committed_data_after_the_workspace_is_repaired(
+    tmp_path, workflow
+):
+    """Repairing HEAD, index and disk cannot turn a refused candidate into PASS."""
+
+    clone, base = _replay_current_state(tmp_path)
+    ledger = clone / LEDGER_RELATIVE
+    trusted = ledger.read_bytes()
+    _drop_the_last_row(clone)
+    candidate = _commit(clone, "truncate the committed ledger")
+    selected, base_ref = _workflow_arguments(clone, workflow, base, candidate)
+    before = _run_shim(
+        clone, commit=selected, base_ref=base_ref, temporary_root=tmp_path / "tmp"
+    )
+    assert before.returncode == 1, before.stdout + before.stderr
+    assert before.stdout == ""
+    assert FAILED in before.stderr
+
+    _git(clone, "update-ref", "HEAD", base)
+    ledger.write_bytes(trusted)
+    _git(clone, "add", LEDGER_RELATIVE)
+    assert _git(clone, "rev-parse", "HEAD") != selected
+    assert _git(clone, "rev-parse", f":{LEDGER_RELATIVE}") == _git(
+        clone, "rev-parse", f"{base}:{LEDGER_RELATIVE}"
+    )
+    completed = _run_shim(
+        clone, commit=selected, base_ref=base_ref, temporary_root=tmp_path / "tmp"
+    )
+    assert completed.returncode == 1, completed.stdout + completed.stderr
+    assert completed.stdout == ""
+    assert FAILED in completed.stderr
+    if base_ref is not None:
+        assert "change truncates the ledger" in completed.stderr
+        assert completed.stderr == before.stderr
+    _assert_nothing_left_behind(clone, tmp_path / "tmp")
+
+
 def test_the_witnessed_release_passes_and_names_its_commit(tmp_path):
     """The accepting case, end to end, over a committed replay of the last
     release.
 
     stdout is the gate's own summary line and then one line the shim adds,
-    naming the commit it checked out and that commit's tree.
+    naming the candidate commit and tree returned by the installed package.
     """
 
     clone, base, candidate = _replay_latest_release(tmp_path)
@@ -1095,11 +931,8 @@ def test_a_true_append_is_accepted_end_to_end(tmp_path):
 def test_the_scratch_directory_is_private_to_the_run(tmp_path):
     """The private directory is created 0700, and the shim asserts that it was.
 
-    Everything the run writes lives under it: the global configuration file
-    whose contents decide whether hooks run, the empty hook directory itself,
-    and the checkout the gate reads. The assertion here is on the other side of
-    the same fact -- that the shim records the mode it requires and would refuse
-    a directory that did not have it.
+    The shim keeps its frozen global safe.directory configuration under this
+    private directory and removes it when verification ends.
     """
 
     clone, base, candidate = _replay_latest_release(tmp_path)
@@ -1144,22 +977,8 @@ def _sparse_patterns(root: pathlib.Path, *patterns: str) -> None:
 
 
 @pytest.mark.parametrize("scope", ["local", "worktree"])
-def test_a_sparse_checkout_is_refused_before_it_can_pass(tmp_path, scope):
-    """A clone configured for sparse checkout cannot produce the commit.
-
-    With ``core.sparseCheckout`` on and a patterns file in the shared git
-    directory keeping the protected paths but dropping an unprotected tracked
-    file, ``git worktree add`` materialises a strict subset of the commit; the
-    omitted entry is marked skip-worktree, so ``git status`` and the ignored
-    listing both stay empty, and on the push invocation (no ``--base-ref``)
-    the gate reads only the state files and the release tree and said OK
-    (peer review, round 1). What this test shows is the first line: the key
-    is refused by the configuration audit before any checkout happens, in both
-    scopes it can be set in, so the sparse checkout never occurs here. The
-    second line — the checkout assertions refusing a skip-worktree entry, and
-    an index shorter than the commit — is shown by the two tests that follow,
-    which bypass the audit.
-    """
+def test_the_shim_retains_its_sparse_checkout_policy(tmp_path, scope):
+    """The caller retains sparse-configuration refusals receipt does not audit."""
 
     def prepare(root: pathlib.Path) -> None:
         (root / "notes.txt").write_text("unprotected, tracked\n", encoding="utf-8")
@@ -1177,63 +996,7 @@ def test_a_sparse_checkout_is_refused_before_it_can_pass(tmp_path, scope):
     assert completed.stdout == ""
     assert completed.stderr.startswith(REFUSED)
     assert "core.sparsecheckout" in completed.stderr.lower()
-    assert "subset of the commit" in completed.stderr
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_a_checkout_that_is_not_the_whole_commit_is_refused(tmp_path):
-    """The second line: a skip-worktree entry, however it arose, refuses.
-
-    The audit is bypassed here by injecting the sparse configuration through
-    the shim's own frozen global file after the audit ran, so the checkout
-    itself is sparse; the index assertion names the omitted entry.
-    """
-
-    def prepare(root: pathlib.Path) -> None:
-        (root / "notes.txt").write_text("unprotected, tracked\n", encoding="utf-8")
-
-    clone, base, candidate = _replay_latest_release(tmp_path, prepare=prepare)
-    _sparse_patterns(clone, "/ledger/", "/releases/")
-    injection = """
-_real_audit = shim._audit_repository_config
-def _audit_then_sparse(clone_root, env):
-    _real_audit(clone_root, env)
-    subprocess.run(["git", "config", "-f", env["GIT_CONFIG_GLOBAL"], "core.sparseCheckout", "true"], check=True, env=env)
-shim._audit_repository_config = _audit_then_sparse
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "workspace",
-    )
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert completed.stdout == ""
-    assert completed.stderr.startswith(REFUSED)
-    assert "skip-worktree" in completed.stderr
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_git_runs_post_checkout_on_worktree_add_when_hooks_are_not_redirected(tmp_path):
-    """Positive control for the hook test above (peer review, round 1).
-
-    Without the shim's ``core.hooksPath`` redirection, ``git worktree add``
-    does run ``post-checkout``; so the absence of the marker in the shim's run
-    is the shim's doing and not git's.
-    """
-
-    clone, base, candidate = _replay_latest_release(tmp_path)
-    marker = tmp_path / "the-hook-ran"
-    hook = clone / ".git" / "hooks" / "post-checkout"
-    hook.parent.mkdir(parents=True, exist_ok=True)
-    hook.write_text(f"#!/bin/sh\nprintf 'ran' > {marker}\n", encoding="utf-8")
-    hook.chmod(0o755)
-    _git(clone, "worktree", "add", "--detach", str(tmp_path / "plain"), candidate)
-    assert marker.exists(), (
-        "git did not run post-checkout on worktree add; the hook test would be vacuous"
-    )
-    _git(clone, "worktree", "remove", "--force", str(tmp_path / "plain"))
 
 
 def test_the_documented_variable_list_covers_the_installed_manual(tmp_path):
@@ -1272,73 +1035,3 @@ def test_the_documented_variable_list_covers_the_installed_manual(tmp_path):
         name for name in mentioned if name not in documented and not name.endswith("_")
     )
     assert missing == [], f"documented in git(1) but not in the tuple: {missing}"
-
-
-def test_an_index_shorter_than_the_commit_is_refused(tmp_path):
-    """The entry-count half of the checkout assertion, exercised on its own.
-
-    Every tag is ``H`` here; the shim's ``ls-files -v -z`` read is made to
-    return one record fewer than the commit has entries, which is the shape
-    the count check exists for (peer review, round 2).
-    """
-
-    clone, base, candidate = _replay_latest_release(tmp_path)
-    injection = """
-_real_git = shim._git
-def _short_index(arguments, **kwargs):
-    payload = _real_git(arguments, **kwargs)
-    if "ls-files" in arguments and "-v" in arguments:
-        records = [r for r in payload.split(b"\\0") if r]
-        payload = b"\\0".join(records[:-1]) + b"\\0"
-    return payload
-shim._git = _short_index
-"""
-    completed = _run_shim(
-        clone,
-        commit=candidate,
-        temporary_root=tmp_path / "tmp",
-        injection=injection,
-        workspace=tmp_path / "workspace",
-    )
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    assert completed.stdout == ""
-    assert completed.stderr.startswith(REFUSED)
-    assert "indexes" in completed.stderr and "where the commit has" in completed.stderr
-    _assert_nothing_left_behind(clone, tmp_path / "tmp")
-
-
-def test_the_byte_comparison_covers_the_whole_data_surface(tmp_path):
-    """Every tracked path on the gate's data surface is in the protected set.
-
-    The protected prefixes come from the chain specification; the data surface
-    is a separate set of globs on the gate specification. This holds the two
-    together at the repository's own head, so a widened data surface cannot
-    outgrow the byte comparison unnoticed (peer review, round 2).
-    """
-
-    import fnmatch
-    import importlib
-
-    sys.path.insert(0, str(SHIM_SCRIPTS))
-    shim = importlib.import_module("check_thesis_facts_append")
-    clone, commit = _replay_current_state(tmp_path)
-    scratch = tmp_path / "scratch"
-    scratch.mkdir()
-    environment = shim._gate_environment(clone, scratch)
-    protected = {
-        entry[3] for entry in shim._protected_entries(clone, commit, environment)
-    }
-    tracked = _git(clone, "ls-tree", "-r", "--name-only", commit).splitlines()
-    patterns = list(shim.APPEND_GATE_SPEC.data_surface)
-    on_surface = {
-        path
-        for path in tracked
-        if any(
-            (pattern.endswith("/**") and path.startswith(pattern[:-2]))
-            or path == pattern
-            or fnmatch.fnmatchcase(path, pattern)
-            for pattern in patterns
-        )
-    }
-    assert on_surface, "the data surface matched nothing; the test is vacuous"
-    assert on_surface <= protected, sorted(on_surface - protected)
