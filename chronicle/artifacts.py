@@ -1170,23 +1170,6 @@ def fetch_source_artifact(
             sha256=sha256,
         )
 
-    if release:
-        # Public microdata never lands in the package tree: it is staged in an
-        # untracked, transient directory and uploaded from there.
-        local_path = microdata_staging_path(
-            staging_dir=staging_dir,
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            sha256=sha256,
-            filename=artifact_filename,
-        )
-        local_path.parent.mkdir(parents=True, exist_ok=True)
-    else:
-        output.mkdir(parents=True, exist_ok=True)
-        local_path = output / artifact_filename
-    local_path.write_bytes(content)
-
     r2_location = ArtifactStorageLocation(
         provider="r2",
         bucket=r2_bucket,
@@ -1200,19 +1183,7 @@ def fetch_source_artifact(
             package_path=output,
         ),
     )
-    r2_upload = None
-    errors: list[str] = []
-    if upload_r2:
-        r2_upload = _upload_r2_object(
-            r2_location,
-            local_path,
-            wrangler_command=wrangler_command,
-        )
-        if not r2_upload.ok:
-            errors.append("r2_upload_failed")
-
-    _upsert_manifest(
-        manifest_path,
+    manifest_update = dict(
         source_id=source_id,
         package_id=package_id,
         dataset=dataset or f"{source_id}_{package_id}",
@@ -1231,8 +1202,47 @@ def fetch_source_artifact(
         vintage=vintage,
         licence_evidence=evidence,
         expected=expected,
-        r2_location=(r2_location if upload_r2 and r2_upload and r2_upload.ok else None),
         record_revision=record_revision,
+    )
+    _upsert_manifest(
+        manifest_path,
+        **manifest_update,
+        r2_location=r2_location if upload_r2 else None,
+        _preflight_only=True,
+    )
+
+    if release:
+        # Public microdata never lands in the package tree: it is staged in an
+        # untracked, transient directory and uploaded from there.
+        local_path = microdata_staging_path(
+            staging_dir=staging_dir,
+            source_id=source_id,
+            package_id=package_id,
+            year=year,
+            sha256=sha256,
+            filename=artifact_filename,
+        )
+        local_path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        output.mkdir(parents=True, exist_ok=True)
+        local_path = output / artifact_filename
+    local_path.write_bytes(content)
+
+    r2_upload = None
+    errors: list[str] = []
+    if upload_r2:
+        r2_upload = _upload_r2_object(
+            r2_location,
+            local_path,
+            wrangler_command=wrangler_command,
+        )
+        if not r2_upload.ok:
+            errors.append("r2_upload_failed")
+
+    _upsert_manifest(
+        manifest_path,
+        **manifest_update,
+        r2_location=(r2_location if upload_r2 and r2_upload and r2_upload.ok else None),
     )
 
     return ArtifactFetchReport(
@@ -2746,8 +2756,13 @@ def _upsert_manifest(
     expected: ExpectedIdentity,
     r2_location: ArtifactStorageLocation | None,
     record_revision: bool = False,
+    _preflight_only: bool = False,
 ) -> None:
-    """Write one fetched entry into its manifest, in place.
+    """Prepare and validate a complete package update before persisting it.
+
+    ``_preflight_only`` performs the identical proposal and validation without
+    creating directories or writing manifests, so fetch can refuse the update
+    before staging or uploading publisher bytes.
 
     The guards fetch_source_artifact ran are repeated against the freshly
     re-read manifest, so no caller can reach a false-provenance write by
@@ -2948,10 +2963,38 @@ def _upsert_manifest(
             else:
                 owner_payload["files"][owner.vintage] = revised_entry
             changed_paths.add(owner.manifest_path)
+    for proposed_path, proposed in manifests.items():
+        path = Path(proposed_path)
+        proposed_kind = normalize_manifest_kind(proposed, manifest_path=path)
+        _assert_manifest_valid_for_fetch(
+            proposed, path, kind=proposed_kind, package_dir=path.parent
+        )
+        for proposed_year, _index, entry in iter_manifest_entries(proposed):
+            locator = _validated_recorded_r2(
+                entry,
+                manifest_path=path,
+                year=proposed_year,
+                source_id=proposed.get("source_id"),
+                package_id=proposed.get("package_id"),
+                bind_registration_identity=proposed_kind == MICRODATA_RELEASE_KIND,
+            )
+            if locator is not None and (
+                locator.filename != entry.get("filename")
+                or (
+                    entry.get("sha256") is not None
+                    and locator.sha256 != entry["sha256"]
+                )
+            ):
+                raise RecordedR2LocatorError(
+                    f"{path} entry {proposed_year!r}: recorded_r2_identity_mismatch"
+                )
+    _assert_package_file_owner_identities_agree(manifests)
     rendered = {
         path: yaml.safe_dump(manifests[str(path)], sort_keys=False, allow_unicode=True)
         for path in changed_paths
     }
+    if _preflight_only:
+        return
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     for path, text in sorted(rendered.items(), key=lambda item: str(item[0])):
         path.write_text(text, encoding="utf-8")

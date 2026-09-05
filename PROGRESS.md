@@ -57,6 +57,10 @@
   the publisher and returned success instead of refusing unsafe staging.
   Writes, uploads, and locks were mocked (`finding4-red.log`).
 
+- Finding 1 fixed: fetch renders and validates the complete proposed package
+  before any artifact write or upload, including every vintage and locator.
+  Both regressions and 336 artifact/peer/package tests pass.
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
