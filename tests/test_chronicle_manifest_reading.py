@@ -93,6 +93,30 @@ def test_strict_loader_keeps_merge_sequence_precedence_for_artifact_selection():
     assert nested["source_url"] == "https://publisher.test/nested"
 
 
+def test_strict_loader_refuses_recursive_merges_as_yaml_errors():
+    """A mapping that merges itself (directly or through a nested merge) has
+    no expansion. The loader must refuse it with a ``yaml.YAMLError`` that the
+    manifest-reading commands already handle, never a ``RecursionError``."""
+    from chronicle.registration import load_manifest_document
+
+    for document in (
+        # Direct self-merge.
+        "files: &f\n  2024:\n    filename: table.csv\n  <<: *f\n",
+        # Self-merge through a nested merge sequence.
+        "files: &f\n  2024:\n    filename: table.csv\n  <<:\n    - {filename: other.csv}\n    - *f\n",
+        # Self-merge through a merged mapping's own merge.
+        "a: &a\n  filename: table.csv\n  <<: {<<: *a}\n",
+    ):
+        with pytest.raises(yaml.YAMLError, match="recursive"):
+            load_manifest_document(document)
+
+    # A merge that only *repeats* a source is not a cycle.
+    repeated = load_manifest_document(
+        "d: &d\n  filename: table.csv\nfiles:\n  2024:\n    <<: [*d, *d]\n"
+    )
+    assert repeated["files"][2024] == {"filename": "table.csv"}
+
+
 def test_strict_loader_does_not_mutate_anchored_entries_when_merged_later():
     """Constructing a later merge of an anchored entry must not turn that
     entry's inherited keys into 'explicit' ones: PyYAML constructs lazily and

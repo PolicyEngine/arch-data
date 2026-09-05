@@ -3448,3 +3448,93 @@ def test_record_revision_updates_every_owner_even_when_yaml_aliases_share_one_en
         "the aliased owner kept the superseded checksum"
     )
     assert old_sha != new_sha
+
+
+def test_identical_byte_refetch_keeps_r2_identified_shared_file_valid(tmp_path):
+    """Two manifests may identify one package-local file through identical
+    content-addressed R2 locators without declaring ``sha256``. Refetching
+    the same bytes records ``sha256`` on the selected manifest only; the
+    sibling's effective identity (its recorded R2 key) still agrees, so the
+    package directory must stay valid for every sweep."""
+    from chronicle.artifacts import (
+        _effective_recorded_digest,
+        default_r2_raw_bucket,
+    )
+    from chronicle.registration import validate_package_directory
+
+    def collisions(manifests):
+        # The sweeps resolve each entry's effective identity (its recorded
+        # content-addressed R2 key when no ``sha256`` is declared) exactly
+        # like this before comparing owners.
+        return validate_package_directory(
+            manifests, entry_digest=_effective_recorded_digest
+        )
+
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    content = b"shared publisher table"
+    filename = "shared.csv"
+    sha256 = hashlib.sha256(content).hexdigest()
+    (package / filename).write_bytes(content)
+    source = tmp_path / "publisher-download.csv"
+    source.write_bytes(content)
+    bucket = default_r2_raw_bucket()
+    manifest_paths = (package / "manifest_a.yaml", package / "manifest_b.yaml")
+    for path in manifest_paths:
+        key = build_r2_key(
+            source_id="publisher",
+            package_id=path.stem,
+            year=2024,
+            sha256=sha256,
+            filename=filename,
+        )
+        path.write_text(
+            yaml.safe_dump(
+                {
+                    "source_id": "publisher",
+                    "package_id": path.stem,
+                    "files": {
+                        2024: {
+                            "filename": filename,
+                            "source_url": str(source),
+                            "storage": {
+                                "r2": {
+                                    "provider": "r2",
+                                    "bucket": bucket,
+                                    "key": key,
+                                    "uri": f"r2://{bucket}/{key}",
+                                }
+                            },
+                        }
+                    },
+                },
+                sort_keys=False,
+            )
+        )
+    manifests = {str(path): yaml.safe_load(path.read_text()) for path in manifest_paths}
+    assert collisions(manifests) == ()
+    assert inventory_source_artifacts(package).valid
+
+    report = fetch_source_artifact(
+        str(source),
+        source_id="publisher",
+        package_id="manifest_a",
+        year=2024,
+        output_dir=package,
+        filename=filename,
+        manifest_filename="manifest_a.yaml",
+    )
+    assert report.valid
+    assert report.sha256 == sha256
+
+    manifests = {str(path): yaml.safe_load(path.read_text()) for path in manifest_paths}
+    assert manifests[str(manifest_paths[0])]["files"][2024]["sha256"] == sha256
+    assert "sha256" not in manifests[str(manifest_paths[1])]["files"][2024]
+    assert collisions(manifests) == ()
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package)
+    for sweep in (inventory, published):
+        assert not any("filename_collision" in error for error in sweep.errors)
+        assert not any("identify different bytes" in error for error in sweep.errors)
+        assert sweep.valid
