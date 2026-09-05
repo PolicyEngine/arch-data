@@ -10,7 +10,13 @@ import yaml
 
 from chronicle.artifacts import ArtifactCommandResult
 from chronicle.registration import ManifestAccessError
-from tests.test_chronicle_microdata_registration import PUBLIC_BYTES, _fetch_release
+from tests.test_chronicle_microdata_registration import (
+    PUBLIC_BYTES,
+    PUBLIC_SHA,
+    _fetch_release,
+    _record_uploads,
+    _serve,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -23,9 +29,15 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
         "nested-output-directory",
         "repository-directory",
         "another-package-directory",
+        "another-package-yml",
+        "another-named-package",
+        "another-git-checkout",
+        "another-git-worktree",
+        "bare-git-repository",
         "symlink-component",
         "symlink-before-parent-component",
         "symlink-identity-component",
+        "symlink-filename-component",
     ],
 )
 def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
@@ -39,19 +51,54 @@ def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
         staging = output / "nested" / "staging"
     elif destination == "repository-directory":
         staging = REPO_ROOT / ".chronicle-test-staging-refusal" / "nested"
-    elif destination == "another-package-directory":
+    elif destination in {
+        "another-package-directory",
+        "another-package-yml",
+        "another-named-package",
+    }:
         package = tmp_path / "another-package"
         package.mkdir()
-        (package / "manifest.yaml").write_text(
+        manifest_name = {
+            "another-package-directory": "manifest.yaml",
+            "another-package-yml": "Manifest.yml",
+            "another-named-package": "manifest_public.YAML",
+        }[destination]
+        (package / manifest_name).write_text(
             yaml.safe_dump({"kind": "publisher_table", "files": {}})
         )
         staging = package / "nested" / "staging"
+    elif destination in {
+        "another-git-checkout",
+        "another-git-worktree",
+        "bare-git-repository",
+    }:
+        repository = tmp_path / "another-repository"
+        repository.mkdir()
+        if destination == "another-git-checkout":
+            (repository / ".git").mkdir()
+        elif destination == "another-git-worktree":
+            (repository / ".git").write_text("gitdir: /elsewhere/worktrees/example\n")
+        else:
+            (repository / "HEAD").write_text("ref: refs/heads/main\n")
+            (repository / "objects").mkdir()
+            (repository / "refs").mkdir()
+        staging = repository / "nested" / "staging"
     else:
         outside = tmp_path / "outside" / "child"
         outside.mkdir(parents=True)
         if destination == "symlink-identity-component":
             staging.mkdir()
             (staging / "census_acs").symlink_to(outside, target_is_directory=True)
+        elif destination == "symlink-filename-component":
+            identity = (
+                staging
+                / "census_acs"
+                / "census-acs-pums-2022-1yr"
+                / "2022"
+                / PUBLIC_SHA
+            )
+            identity.mkdir(parents=True)
+            (identity / "csv_hus.zip").symlink_to(outside / "missing.zip")
         else:
             alias = tmp_path / "alias"
             alias.symlink_to(outside, target_is_directory=True)
@@ -100,3 +147,27 @@ def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
         _fetch_release(output, staging_dir=staging, upload_r2=True)
 
     assert effects == []
+
+
+@pytest.mark.parametrize("spelling", ["absolute", "relative", "parent-component"])
+def test_fetch_accepts_external_microdata_staging(tmp_path, monkeypatch, spelling):
+    output = tmp_path / "package"
+    external = tmp_path / "package-external"
+    staging = external
+    if spelling == "relative":
+        monkeypatch.chdir(tmp_path)
+        staging = Path("package-external")
+    elif spelling == "parent-component":
+        (tmp_path / "existing").mkdir()
+        staging = tmp_path / "existing" / ".." / "package-external"
+    _serve(monkeypatch, PUBLIC_BYTES)
+    uploads = _record_uploads(monkeypatch)
+
+    report = _fetch_release(output, staging_dir=staging, upload_r2=True)
+
+    assert report.valid
+    staged = Path(report.local_path)
+    assert staged.is_relative_to(external)
+    assert staged.read_bytes() == PUBLIC_BYTES
+    assert uploads == [(report.r2_location.uri, str(staged))]
+    assert sorted(path.name for path in output.iterdir()) == ["manifest.yaml"]

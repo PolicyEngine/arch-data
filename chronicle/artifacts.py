@@ -60,6 +60,7 @@ from chronicle.registration import (
     matching_directory_entry,
     normalize_access,
     package_manifest_paths,
+    _assert_registration_target_safe,
     _registration_lock,
     resolve_vintage_key,
     safe_entry_access,
@@ -133,6 +134,54 @@ def microdata_staging_path(
         else (default_microdata_staging_dir())
     )
     return root / source_id / package_id / str(year) / sha256 / Path(filename).name
+
+
+def _validated_microdata_staging_destination(
+    destination: Path, *, package_dir: Path
+) -> Path:
+    """Resolve an external staging file before any lock or publisher access.
+
+    The registration path guard walks the original spelling before resolving
+    it, so a symlink followed by ``..`` cannot disappear from the check. Give
+    it the full content-addressed destination to cover identity components and
+    the artifact filename as well as the supplied staging directory.
+    """
+    try:
+        _assert_registration_target_safe(destination.parent, destination)
+        resolved = destination.resolve()
+        package_root = package_dir.resolve()
+        repository_root = Path(__file__).resolve().parents[1]
+        for root in (package_root, repository_root):
+            if resolved.is_relative_to(root):
+                raise ManifestAccessError(
+                    f"Microdata staging destination {destination} is inside "
+                    f"the repository or package tree {root}. Choose an "
+                    "external staging directory."
+                )
+        for ancestor in resolved.parents:
+            git_entry = ancestor / ".git"
+            bare_repository = (
+                (ancestor / "HEAD").is_file()
+                and (ancestor / "objects").is_dir()
+                and (ancestor / "refs").is_dir()
+            )
+            if git_entry.exists() or git_entry.is_symlink() or bare_repository:
+                raise ManifestAccessError(
+                    f"Microdata staging destination {destination} is inside "
+                    f"the Git repository {ancestor}. Choose an external "
+                    "staging directory."
+                )
+            if package_manifest_paths(ancestor):
+                raise ManifestAccessError(
+                    f"Microdata staging destination {destination} is inside "
+                    f"the package directory {ancestor}. Choose an external "
+                    "staging directory."
+                )
+    except (OSError, ValueError, ManifestAccessError) as exc:
+        raise ManifestAccessError(
+            f"Microdata staging destination {destination} is unsafe: {exc}"
+        ) from exc
+    return resolved
 
 
 def _manifest_path(output: Path, manifest_filename: str) -> Path:
@@ -1028,6 +1077,17 @@ def fetch_source_artifact(
             expected=expected,
             licence_evidence=licence_evidence,
         )
+        _validated_microdata_staging_destination(
+            microdata_staging_path(
+                staging_dir=staging_dir,
+                source_id=source_id,
+                package_id=package_id,
+                year=year,
+                sha256=expected.sha256,
+                filename=artifact_filename,
+            ),
+            package_dir=output,
+        )
 
     vintage_key, existing_value, selected_spec, _index = _select_vintage_entry(
         existing_manifest,
@@ -1214,13 +1274,16 @@ def fetch_source_artifact(
     if release:
         # Public microdata never lands in the package tree: it is staged in an
         # untracked, transient directory and uploaded from there.
-        local_path = microdata_staging_path(
-            staging_dir=staging_dir,
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            sha256=sha256,
-            filename=artifact_filename,
+        local_path = _validated_microdata_staging_destination(
+            microdata_staging_path(
+                staging_dir=staging_dir,
+                source_id=source_id,
+                package_id=package_id,
+                year=year,
+                sha256=sha256,
+                filename=artifact_filename,
+            ),
+            package_dir=output,
         )
         local_path.parent.mkdir(parents=True, exist_ok=True)
     else:

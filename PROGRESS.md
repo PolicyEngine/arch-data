@@ -4,7 +4,7 @@
 
 - Detached lane rebased from `28647088` onto `origin/ops-rename-slice1`
   (`ba8147a7`). Integration and the full baseline pass on code commit `426651e`.
-  The four finding regressions are next.
+  All four findings are fixed; final verification is next.
 - Evidence report: `/tmp/chronicle-227-fix/out.md`.
 - Prior PR #227 journal preserved beside the report as `pr227-prior-progress.md`.
   The #226 journal below is retained verbatim.
@@ -71,10 +71,17 @@
   missing, and wrong-host origins refuse; HTTPS/SSH variants pass. All 40
   catalogue tests and scoped Ruff checks pass (`finding3-green.log`).
 
+- Finding 4 fixed: the complete staging destination is checked for symlinks
+  and repository/package containment before locking or reading publisher bytes,
+  then checked again before persistence. Sixteen staging tests and 606 focused
+  integration tests pass. Independent audits found no remaining gap in findings
+  1--3; all changes are ready for the final required gates.
+
 ## Next
 
-- Reproduce and resolve the source-entry integration concern.
-- Reproduce each finding before fixing it, then run the final required gates.
+- Run final repository Ruff lint, changed-file formatting check, and exact full
+  pytest gate; record direct exit codes and counts.
+- Finalize `/tmp/chronicle-227-fix/out.md` and commit the completed journal.
 
 # Operational rename, slice 1 (chronicle#143, mechanism 3)
 
