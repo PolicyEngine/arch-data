@@ -89,9 +89,15 @@ def validate_package_directory(
 ) -> tuple[str, ...]:
     """Return filename-identity collisions across a package's manifests.
 
-    Two manifests may name one physical file only when they record the same
-    digest. A differing digest means the same package-local bytes have two
-    incompatible identities, so no command may act through either record.
+    Two manifests may name one physical file only when every identity they
+    record for it agrees. A differing digest means the same package-local
+    bytes have two incompatible identities, so no command may act through
+    either record. An entry that records no identity yet -- no ``sha256`` and
+    no locator, as a manifest looks before its first fetch or publication --
+    cannot contradict an identified owner and is not a collision: the command
+    that eventually identifies it hashes the shared bytes, so a selected or
+    partially failed publication never strands its siblings behind a false
+    collision.
 
     ``entry_digest(manifest_name, vintage, entry)`` resolves an entry's
     *effective* recorded digest -- for example the one its content-addressed
@@ -114,6 +120,9 @@ def validate_package_directory(
             if digest is None:
                 digest = entry.get("sha256")
             digest = digest.strip() if isinstance(digest, str) else ""
+            if not digest:
+                # No recorded identity yet: nothing to contradict.
+                continue
             by_name.setdefault(filename_key(filename), []).append((name, digest))
 
     errors: list[str] = []

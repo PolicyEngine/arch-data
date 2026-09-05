@@ -2158,6 +2158,7 @@ def _assert_package_file_owner_identities_agree(
 
     owners_by_filename: dict[str, list[_ManifestFileOwner]] = {}
     display_names: dict[str, str] = {}
+    unidentified: dict[str, list[tuple[Path, Any, str]]] = {}
     for name, payload in manifests.items():
         manifest_path = Path(name)
         for vintage, spec in _manifest_files(payload, manifest_path).items():
@@ -2176,10 +2177,13 @@ def _assert_package_file_owner_identities_agree(
                 # The complete per-entry preflight reports the precise locator
                 # or history error without letting another entry upload first.
                 continue
-            if identity is None:
-                continue
             key = filename_key(recorded_name)
             display_names.setdefault(key, str(recorded_name))
+            if identity is None:
+                unidentified.setdefault(key, []).append(
+                    (manifest_path, vintage, str(recorded_name))
+                )
+                continue
             owners_by_filename.setdefault(key, []).append(
                 _ManifestFileOwner(
                     manifest_path=manifest_path,
@@ -2193,6 +2197,37 @@ def _assert_package_file_owner_identities_agree(
             owners,
             filename=display_names[key],
         )
+    # An entry that records no identity yet is not a collision (nothing to
+    # contradict), but the command that identifies it will hash the shared
+    # bytes. Those bytes must already be what the identified owners record,
+    # otherwise identifying it would split one package-local file into two
+    # identities. Check before any upload or manifest rewrite.
+    for key, pending in unidentified.items():
+        owners = owners_by_filename.get(key)
+        if not owners:
+            continue
+        expected = owners[0].identity
+        assert expected is not None
+        for manifest_path, vintage, recorded_name in pending:
+            try:
+                local = matching_directory_entry(manifest_path.parent, recorded_name)
+            except ValueError:
+                # Conflicting spellings are the per-entry preflight's refusal.
+                continue
+            if local is None or local.is_symlink() or not local.is_file():
+                continue
+            actual = hashlib.sha256(local.read_bytes()).hexdigest()
+            if actual == expected.sha256:
+                continue
+            raise SourceArtifactManifestError(
+                f"{manifest_path} entry {vintage!r} names {recorded_name!r} "
+                f"without a recorded identity, and the package-local bytes "
+                f"(sha256={actual}) are not what {owners[0].manifest_path} entry "
+                f"{owners[0].vintage!r} records for it (sha256="
+                f"{expected.sha256}). Identifying this entry would give one "
+                "package-local file two identities; reconcile the manifests "
+                "or the file before publishing or inventorying the directory."
+            )
 
 
 def _assert_siblings_record_these_bytes(
