@@ -41,22 +41,27 @@ from chronicle.core import (
 from chronicle.env import env_flag, env_value
 from chronicle.epoch import SCHEMA_IDS, schema_id
 from chronicle.registration import (
+    MICRODATA_RELEASE_KIND,
     AmbiguousVintageKeyError,
     ManifestAccessError,
     ManifestKindError,
     MicrodataReleaseNotParseableError,
+    _recorded_object_identities,
     entry_access,
+    filename_key,
     hash_only_registrations,
     is_bare_filename,
     is_hash_only,
     is_manifest_filename,
     is_microdata_release,
+    iter_directory_entries,
     iter_file_specs,
     iter_manifest_entries,
     load_manifest_document,
     manifest_kind,
     matching_directory_entry,
     resolve_vintage_key,
+    safe_manifest_kind,
     validate_file_entry,
     validate_manifest_files,
     validate_package_directory,
@@ -1094,23 +1099,24 @@ class SourceArtifactSpec:
                 forbid_manifest_name=True,
             )
         self._assert_complete_manifest_valid(manifest)
-        self._assert_no_sibling_hash_only_registration(spec, manifest)
+        self._assert_package_identities_parseable(spec, manifest)
         return manifest, spec
 
-    def _assert_no_sibling_hash_only_registration(
+    def _assert_package_identities_parseable(
         self,
         spec: Any,
         manifest: dict[str, Any],
         *,
         sha256: str | None = None,
     ) -> None:
-        """Refuse shared owners that disagree on bytes or permit hash-only access.
+        """Refuse contradictory owners and identities that cannot be parsed.
 
         The boundary is the file in the package directory, not the manifest
         that names it: a name or a digest registered ``licensed`` or
         ``restricted`` in a sibling manifest is identity only, whichever
-        manifest this package reads through. A sibling Chronicle cannot read
-        is a refusal too, because the boundary cannot be decided without it.
+        manifest this package reads through. Public microdata is also identity
+        only for parsers, including its current and archived object aliases.
+        An unreadable sibling is a refusal because its kind cannot be decided.
         """
         if not isinstance(spec, dict):
             return
@@ -1178,6 +1184,48 @@ class SourceArtifactSpec:
                         "declare its digest before any source bytes may be read, "
                         "fetched, or cached beside a gated registration."
                     )
+        wanted_name = filename_key(spec.get("filename"))
+        wanted_digests = {
+            digest
+            for digest in (
+                sha256,
+                spec.get("sha256"),
+                _effective_recorded_digest(self.manifest, self.artifact_year, spec),
+            )
+            if digest
+        }
+        for name, key, _index, entry in iter_directory_entries(manifests):
+            kind, _error = safe_manifest_kind(
+                manifests[name], manifest_path=directory.joinpath(name)
+            )
+            if kind != MICRODATA_RELEASE_KIND or not isinstance(entry, dict):
+                continue
+            identities = [
+                (filename_key(entry.get("filename")), entry.get("sha256")),
+                *(
+                    (name, digest)
+                    for name, digest, _ in _recorded_object_identities(entry)
+                ),
+            ]
+            if any(
+                name == wanted_name or digest in wanted_digests
+                for name, digest in identities
+            ):
+                raise ManifestAccessError(
+                    f"{self.resource_directory}/{name} registers a microdata "
+                    f"release for {key!r} sharing the filename or checksum of "
+                    f"{spec.get('filename')!r}, including recorded R2 history. "
+                    "No source package reads, fetches, caches, or parses "
+                    "microdata through another manifest, even when public."
+                )
+            if not wanted_digests:
+                raise ManifestAccessError(
+                    f"{self.resource_directory}/{self.manifest} entry "
+                    f"{spec.get('filename')!r} has no recorded digest beside "
+                    f"microdata release {name}. Record its checksum before "
+                    "reading, fetching, or caching bytes whose identity "
+                    "cannot yet exclude that release."
+                )
         collision_errors = validate_package_directory(
             manifests, entry_digest=_effective_recorded_digest
         )
@@ -1241,7 +1289,7 @@ class SourceArtifactSpec:
             spec = {**spec, "sha256": expected_sha}
 
         def validate_content_owner_identities(content: bytes) -> None:
-            self._assert_no_sibling_hash_only_registration(
+            self._assert_package_identities_parseable(
                 spec,
                 manifest,
                 sha256=hashlib.sha256(content).hexdigest(),

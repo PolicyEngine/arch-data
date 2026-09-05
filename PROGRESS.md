@@ -26,11 +26,15 @@
   current identity mismatches refuse, and the shared owner validator checks
   every effective owner during both preparation passes. No artifact bytes
   are read. Final standalone registration suite: 228 passed.
+- Finding 1 fixed: parser identity checks classify all microdata siblings by
+  current and archived filename/digest, including R2-only selected pins,
+  before artifact I/O and in the existing content validation callback.
+  Known-distinct public tables remain readable. Focused reader/artifact suite:
+  106 passed; inherited hash-only diagnostic order is preserved.
+- Independent implementation review passes with no remaining findings.
 
 ## Next
 
-- Reproduce sibling microdata aliases and registration owner/locator gaps with
-  failing no-side-effect tests, then commit each coherent test/fix step.
 - Run focused verification, independent review, final Ruff checks, and the full
   pytest suite with direct exit status; record counts and commit SHAs.
 
