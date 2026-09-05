@@ -203,7 +203,6 @@ class StrictManifestLoader(yaml.SafeLoader):
             pairs.extend(explicit)
             return pairs
         if isinstance(source, yaml.SequenceNode):
-            pairs = []
             for subnode in source.value:
                 if not isinstance(subnode, yaml.MappingNode):
                     raise yaml.constructor.ConstructorError(
@@ -212,6 +211,11 @@ class StrictManifestLoader(yaml.SafeLoader):
                         f"expected a mapping for merging, but found {subnode.id}",
                         subnode.start_mark,
                     )
+            # YAML merge-key precedence: earlier mappings in a ``<<`` sequence
+            # win over later ones. Pairs are assigned last-wins, so contribute
+            # the later mappings first and the first mapping last.
+            pairs = []
+            for subnode in reversed(source.value):
                 pairs.extend(self._merged_pairs(subnode, deep))
             return pairs
         raise yaml.constructor.ConstructorError(
