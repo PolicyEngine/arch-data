@@ -3630,6 +3630,7 @@ def test_record_revision_updates_every_owner_even_when_yaml_aliases_share_one_en
     manifest_path = package / "manifest.yaml"
     entry = _entry(manifest_path)
     lines = [
+        "kind: publisher_table",
         "source_id: irs_soi",
         "package_id: soi-table-5",
         "files:",
@@ -3703,6 +3704,7 @@ def test_identical_byte_refetch_keeps_r2_identified_shared_file_valid(tmp_path):
         path.write_text(
             yaml.safe_dump(
                 {
+                    "kind": "publisher_table",
                     "source_id": "publisher",
                     "package_id": path.stem,
                     "files": {
@@ -3759,6 +3761,7 @@ def _write_unidentified_shared_manifests(package, source, *, filename="shared.cs
         path.write_text(
             yaml.safe_dump(
                 {
+                    "kind": "publisher_table",
                     "source_id": "publisher",
                     "package_id": path.stem,
                     "files": {
@@ -3946,6 +3949,7 @@ def test_first_fetch_initializes_a_predeclared_entry_without_identity(
     manifest_path.write_text(
         yaml.safe_dump(
             {
+                "kind": "publisher_table",
                 "source_id": "publisher",
                 "package_id": "package",
                 "files": {2024: {"filename": "table.csv", "source_url": str(source)}},
@@ -4039,6 +4043,7 @@ def test_selected_publication_overrides_apply_only_to_the_selected_manifest(
     manifest_a.write_text(
         yaml.safe_dump(
             {
+                "kind": "publisher_table",
                 **declared_a,
                 "files": {
                     2024: {
@@ -4055,6 +4060,7 @@ def test_selected_publication_overrides_apply_only_to_the_selected_manifest(
     manifest_b.write_text(
         yaml.safe_dump(
             {
+                "kind": "publisher_table",
                 **identity_b,
                 "files": {
                     2024: {
