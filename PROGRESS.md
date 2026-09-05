@@ -19,3 +19,13 @@ Next:
 Progress policy: committed under the standing order; asked for clarification because the Record paragraph also says untracked.
 
 Done: pre-bump byte-equivalence proof at installed receipt 0.5.2: 18 passed in 29.66s (`uv run --frozen --no-sync -q pytest -q tests/test_receipt_shim_transparency.py`; isolated writable UV_CACHE_DIR, offline). The environment was copied from the 0.5.2 shim worktree; ordinary frozen sync initially lacked cached build dependencies. No shim/pin edits preceded this proof.
+
+State: migration implemented; released-wheel verification running.
+
+Done:
+- Kept all three explicit workflow OID arguments and the base-owned help compatibility branches; updated object-read documentation and pipefail on every shell block.
+- Strengthened adversarial success/refusal assertions to bind the verdict line; 28 passed, 5 existing strict xfails against installed receipt 0.6.0.
+- Prepared the default-branch byte-identical workflow in local branch shim/receipt-0.6-workflow at 2f9f5de5c534d15fc64d70a6f742deb7ccf784ba, based on origin/main 743742c. All four workflow run blocks pass bash -n.
+- Provisioned the released local wheel offline and verified ordinary uv sync --frozen succeeds using writable /tmp/chronicle-uv-cache. Lock metadata copies the exact published artifact URLs, sizes and SHA-256s; UV_FROZEN=false uv lock --check --offline succeeds.
+
+Next: finish exact requested suite and released-pin byte proof, include the necessary release-chain shim compatibility change discovered by the proof, then commit and attempt delivery.
