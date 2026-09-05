@@ -3715,3 +3715,90 @@ def test_sweeps_refuse_identifying_a_shared_file_whose_bytes_changed(
         assert any("two identities" in error for error in sweep.errors), sweep.errors
     assert uploads == []
     assert "sha256" not in yaml.safe_load(manifest_b.read_text())["files"][2024]
+
+
+@pytest.mark.parametrize("record_revision", [False, True])
+def test_first_fetch_initializes_a_predeclared_entry_without_identity(
+    tmp_path, record_revision
+):
+    """A manifest may predeclare an entry with only ``filename`` and
+    ``source_url``. Its first fetch identifies it: the entry is the one being
+    initialized, not an unidentifiable owner, so both the fetch preflight
+    and the manifest writer must accept it (default and --record-revision)."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    source = tmp_path / "publisher-download.csv"
+    content = b"first publisher bytes"
+    source.write_bytes(content)
+    manifest_path = package / "manifest.yaml"
+    manifest_path.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "publisher",
+                "package_id": "package",
+                "files": {2024: {"filename": "table.csv", "source_url": str(source)}},
+            },
+            sort_keys=False,
+        )
+    )
+    assert not (package / "table.csv").exists()
+
+    report = fetch_source_artifact(
+        str(source),
+        source_id="publisher",
+        package_id="package",
+        year=2024,
+        output_dir=package,
+        filename="table.csv",
+        record_revision=record_revision,
+    )
+
+    assert report.valid, report.errors
+    expected_sha256 = hashlib.sha256(content).hexdigest()
+    assert report.sha256 == expected_sha256
+    assert (package / "table.csv").read_bytes() == content
+    entry = yaml.safe_load(manifest_path.read_text())["files"][2024]
+    assert entry["filename"] == "table.csv"
+    assert entry["sha256"] == expected_sha256
+    assert entry["size_bytes"] == len(content)
+    assert inventory_source_artifacts(package).valid
+
+    again = fetch_source_artifact(
+        str(source),
+        source_id="publisher",
+        package_id="package",
+        year=2024,
+        output_dir=package,
+        filename="table.csv",
+    )
+    assert again.valid, again.errors
+    assert again.sha256 == expected_sha256
+
+
+def test_fetch_still_refuses_an_unidentified_owner_in_another_manifest(tmp_path):
+    """Only the entry being initialized is exempt: another manifest naming the
+    same package-local file without an identity keeps refusing the fetch
+    before any byte is written, because the fetched bytes would silently
+    define what that sibling means."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    source = tmp_path / "publisher-download.csv"
+    source.write_bytes(b"first publisher bytes")
+    manifest_a, manifest_b = _write_unidentified_shared_manifests(
+        package, source, filename="table.csv"
+    )
+    before = {path: path.read_text() for path in (manifest_a, manifest_b)}
+
+    with pytest.raises(MalformedManifestError, match="records no sha256 identity"):
+        fetch_source_artifact(
+            str(source),
+            source_id="publisher",
+            package_id="manifest_a",
+            year=2024,
+            output_dir=package,
+            filename="table.csv",
+            manifest_filename="manifest_a.yaml",
+        )
+
+    assert not (package / "table.csv").exists()
+    assert {path: path.read_text() for path in (manifest_a, manifest_b)} == before
