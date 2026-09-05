@@ -4,8 +4,8 @@
 
 - Detached lane rebased from `28647088` onto `origin/ops-rename-slice1`
   (`ba8147a7`). Integration and the full baseline pass on code commit `426651e`.
-  All four findings are fixed. Final Ruff gates pass; the full suite is
-  running on code commit `838ab2c`.
+  All four findings and the scalar-entry integration correction are complete.
+  Final Ruff and full pytest gates pass on code commit `838ab2c`.
 - Evidence report: `/tmp/chronicle-227-fix/out.md`.
 - Prior PR #227 journal preserved beside the report as `pr227-prior-progress.md`.
   The #226 journal below is retained verbatim.
@@ -82,10 +82,18 @@
   files changed in this lane. The exact final full pytest gate is running on
   `838ab2c`; `out.md` has the complete evidence and awaits only final counts.
 
+- Final exact full gate completed with direct exit 0: **1,633 passed, 7 skipped,
+  42 warnings** in **1,319.40 seconds (21:59)**. Log:
+  `/tmp/chronicle-227-fix/final-pytest.log`. Repository Ruff lint and all 14
+  changed Python format checks pass. No tested code changed after the run began.
+- Final scope checks confirm upstream ancestry, a clean worktree before this
+  journal update, no lane edits to protected/data/proof files, and unchanged
+  15 UK pins. Final report: `/tmp/chronicle-227-fix/out.md`.
+
 ## Next
 
-- Record the final full pytest direct exit code and counts.
-- Finalize `/tmp/chronicle-227-fix/out.md` and commit the completed journal.
+- None. Work and verification are complete; commits remain on detached HEAD.
+  No push, branch creation, stash, or GitHub network was performed.
 
 # Operational rename, slice 1 (chronicle#143, mechanism 3)
 
