@@ -13,6 +13,9 @@
   starting state. No source packages, contract schemas, or protected files
   need modification. GitNexus tools are unavailable; trace using local source.
 - Established the external report and a committed state/done/next journal.
+- Finding 2 reproduced before implementation: 10 failures reached mocked
+  filesystem/replacement sentinels; 1 agreeing-owner/history control passed.
+  Evidence: `bbd833a9-round2/finding2-red.log`; no unsafe mutation occurred.
 
 ## Next
 

@@ -3646,3 +3646,174 @@ def test_registration_rechecks_sibling_collision_under_lock_before_replacement(
     assert lock_entries == [package]
     assert (package / "manifest.yaml").read_bytes() == original
     assert sibling.read_bytes() == sibling_bytes
+
+
+def _registration_recorded_sibling(defect: str | None = None) -> tuple[dict, str]:
+    """A sibling whose effective owners and R2 locators must all be valid."""
+
+    def entry(year, digest=FIXTURE_SHA, filename="table.csv"):
+        key = f"raw/dwp/dwp-tables/{year}/{digest}/{filename}"
+        return {
+            "filename": filename,
+            "storage": {
+                "r2": {
+                    "provider": "r2",
+                    "bucket": "ledger-raw",
+                    "key": key,
+                    "uri": f"r2://ledger-raw/{key}",
+                }
+            },
+        }
+
+    first = entry(2023)
+    files = {2023: first}
+    expected_error = ""
+    if defect == "effective-owner":
+        files[2024] = entry(2024, OTHER_SHA)
+        expected_error = "identify different bytes"
+    elif defect == "malformed-locator":
+        first["storage"]["r2"]["uri"] = "not-an-r2-locator"
+        expected_error = "storage.r2"
+    elif defect == "checksum-mismatch":
+        first["sha256"] = OTHER_SHA
+        expected_error = "recorded_r2_identity_mismatch"
+    elif defect == "filename-mismatch":
+        first["filename"] = "renamed.csv"
+        expected_error = "recorded_r2_identity_mismatch"
+    elif defect == "malformed-archived-locator":
+        first["storage"]["previous_r2"] = [
+            {"provider": "r2", "uri": "not-an-r2-locator"}
+        ]
+        expected_error = "storage.previous_r2"
+    else:
+        assert defect is None
+        files[2024] = entry(2024)
+        first["storage"]["previous_r2"] = [
+            entry(2023, OTHER_SHA, "archived.csv")["storage"]["r2"]
+        ]
+    return {
+        "kind": "publisher_table",
+        "source_id": "dwp",
+        "package_id": "dwp-tables",
+        "files": files,
+    }, expected_error
+
+
+@pytest.mark.parametrize(
+    "defect",
+    [
+        "effective-owner",
+        "malformed-locator",
+        "checksum-mismatch",
+        "filename-mismatch",
+        "malformed-archived-locator",
+    ],
+)
+def test_registration_refuses_invalid_recorded_sibling_before_mutation(
+    tmp_path, monkeypatch, defect
+):
+    package = tmp_path / "package"
+    package.mkdir()
+    (package / "manifest.yaml").write_text(
+        yaml.safe_dump({"kind": "microdata_release", "files": {}})
+    )
+    sibling, expected_error = _registration_recorded_sibling(defect)
+    (package / "manifest_tables.yaml").write_text(yaml.safe_dump(sibling))
+    before = {path.name: path.read_bytes() for path in package.iterdir()}
+    lock_path = _registration_lock_path(package)
+    assert not lock_path.exists()
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    def unexpected_mutation(*args, **kwargs):
+        pytest.fail("invalid recorded sibling reached a filesystem mutation")
+
+    monkeypatch.setattr(Path, "mkdir", unexpected_mutation)
+    monkeypatch.setattr(
+        "chronicle.registration._registration_lock", unexpected_mutation
+    )
+    monkeypatch.setattr(
+        "chronicle.registration._atomic_replace_manifest", unexpected_mutation
+    )
+    with pytest.raises(HashOnlyRegistrationError, match=expected_error):
+        _register(package, filename="unrelated.tab", sha256="c" * 64)
+
+    assert not lock_path.exists()
+    assert {path.name: path.read_bytes() for path in package.iterdir()} == before
+
+
+@pytest.mark.parametrize(
+    "defect",
+    [
+        "effective-owner",
+        "malformed-locator",
+        "checksum-mismatch",
+        "filename-mismatch",
+        "malformed-archived-locator",
+    ],
+)
+def test_registration_rechecks_recorded_sibling_under_lock_before_replacement(
+    tmp_path, monkeypatch, defect
+):
+    package = tmp_path / "package"
+    package.mkdir()
+    selected = package / "manifest.yaml"
+    selected.write_text(yaml.safe_dump({"kind": "microdata_release", "files": {}}))
+    original = selected.read_bytes()
+    sibling_path = package / "manifest_tables.yaml"
+    valid_sibling, _ = _registration_recorded_sibling()
+    sibling_path.write_text(yaml.safe_dump(valid_sibling))
+    invalid_sibling, expected_error = _registration_recorded_sibling(defect)
+    invalid_document = yaml.safe_dump(invalid_sibling)
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+    lock_entries = []
+
+    @contextmanager
+    def invalidation_while_acquiring_lock(output):
+        assert output == package
+        lock_entries.append(output)
+        sibling_path.write_text(invalid_document)
+        yield
+
+    def unexpected_replacement(*args, **kwargs):
+        pytest.fail("invalid recorded sibling under lock reached replacement")
+
+    monkeypatch.setattr(
+        "chronicle.registration._registration_lock", invalidation_while_acquiring_lock
+    )
+    monkeypatch.setattr(
+        "chronicle.registration._atomic_replace_manifest", unexpected_replacement
+    )
+    with pytest.raises(HashOnlyRegistrationError, match=expected_error):
+        _register(package, filename="unrelated.tab", sha256="c" * 64)
+
+    assert lock_entries == [package]
+    assert selected.read_bytes() == original
+    assert sibling_path.read_text() == invalid_document
+    assert not _registration_lock_path(package).exists()
+    assert {path.name for path in package.iterdir()} == {
+        "manifest.yaml",
+        "manifest_tables.yaml",
+    }
+
+
+def test_registration_accepts_agreeing_recorded_sibling_owners_and_history(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "package"
+    package.mkdir()
+    (package / "manifest.yaml").write_text(
+        yaml.safe_dump({"kind": "microdata_release", "files": {}})
+    )
+    sibling, _ = _registration_recorded_sibling()
+    sibling_path = package / "manifest_tables.yaml"
+    sibling_path.write_text(yaml.safe_dump(sibling))
+    original = sibling_path.read_bytes()
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    report = _register(package, filename="unrelated.tab", sha256="c" * 64)
+
+    assert report.filename == "unrelated.tab"
+    assert sibling_path.read_bytes() == original
