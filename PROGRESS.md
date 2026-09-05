@@ -2,64 +2,54 @@
 
 ## State
 
-- Started on detached HEAD `cb4c7ef`; scope is the three supplied findings in
-  source reads, public microdata publication staging, and registration.
-- Report: `/tmp/chronicle-227-fix/out.md`. Prior report preserved in
-  `/tmp/chronicle-227-fix/bbd833a9-round1/prior-out.md`; new evidence lives
-  in that same round-specific directory. Prior journals below are preserved.
-- All three findings are reproduced, fixed, and covered by regressions.
-  Independent review passes. Required full pytest is running on fixed code
-  commit `adb030c`; final Ruff lint and six-file formatting checks passed.
+- Complete. Started detached at `cb4c7ef`; final code commit `adb030c` fixes
+  all three findings. Only journal commits follow the tested code.
+- Full final pytest passes with direct exit 0: **1,691 passed, 1 skipped,
+  42 warnings in 1,280.60 seconds (21:20)**. Repository Ruff lint and formatting
+  checks for all six changed Python files pass.
+- Report: `/tmp/chronicle-227-fix/out.md`. Evidence and prior report:
+  `/tmp/chronicle-227-fix/bbd833a9-round1/`. Prior journals below are unchanged.
 
 ## Done
 
-- Read prior lane journals and approved-agent rules; inspected the named code
-  and shared validators. This lane changes infrastructure and hermetic tests,
-  not publisher data, source packages, or contract schemas.
-- Established this committed state/done/next journal before implementation.
-- Read GitNexus debugging guidance; graph tools are unavailable, so use local
-  code tracing and failing-first regression tests.
-
-- Finding 2 reproduced before its fix: 13 unsafe publish staging cases
-  reached mocked side effects; the final-file symlink control passed. Direct
-  pytest exit 1, 13 failed and 1 passed. Exact command and observations are
-  recorded in the external report (`finding2-red-confirmed.log`).
-
-- Finding 1 reproduced before its fix: six source-reader cases returned
-  contradictory shared-file bytes (R2-only identities plus local/cache/fetched/ZIP
-  unidentified bytes). Direct exit 1, six failed; evidence is in `finding1-red.log`.
-
-- Finding 3 reproduced before its fix: four unrelated existing sibling
-  collision variants reached filesystem-mutation sentinels; a conflict added
-  at lock acquisition reached replacement. Direct exit 1, five failed; exact
-  evidence is in `finding3-red.log` and the external report.
-
-- Finding 2 fixed with the shared full staging validator in raw publication
-  preflight and actual publication. All 33 staging/publication/locking tests
-  pass; scoped Ruff lint and format checks pass (`finding2-green.log`).
-
-- Finding 3 fixed in `b820b18` by validating the complete proposed manifest
-  set with effective R2 digests in both preparation passes. All 263 registration
-  and package-directory tests pass; scoped Ruff lint/format pass. Fix uses the
-  existing validator and retains archived-collision checks.
-
-- Finding 1 fixed by passing effective R2 digests to directory validation
-  and reusing the shared owner-agreement validator with the observed digest
-  from each local/cache/fetched/ZIP read, before return or cache writes.
-  Six failing-first regressions pass; positive fetch/ZIP controls added. Final
-  focused source/shared-owner coverage passes: 72 passed, 341 deselected.
-- Whole-repository Ruff lint passes; formatting checks pass for all six
-  changed Python files. No protected paths changed; prior journal preserved.
+- Committed this lane's initial state/done/next journal in `7c8e0a7`, then
+  committed each failing-first reproduction before its implementation.
+- Finding 1: six red source-reader cases returned contradictory bytes through
+  local, cache, fetch, and ZIP paths. Reproduction `4f7aea5`; fix `adb030c`
+  reuses effective R2 directory validation and the shared owner-agreement
+  helper with observed digests before return/cache mutation. Four positive
+  resource controls added; final focused coverage passes (72 tests).
+- Finding 2: 13 unsafe publish staging cases reached mocked side effects;
+  the existing final-file symlink control passed. Reproduction `a164a2b`;
+  fix `63c6bb9` applies the shared complete staging validator before reads,
+  locks, or uploads and repeats it in locked publication. All 33 focused
+  staging/publication/locking tests pass. No unsafe fixture bytes were written.
+- Finding 3: four unrelated sibling collisions reached mutation sentinels;
+  a conflict added during lock acquisition reached replacement. Reproduction
+  `2040886`; fix `b820b18` validates the complete proposal with effective R2
+  digests and archived collision checks in both preparation passes. All 263
+  registration/package-directory tests pass.
+- Exact failing commands, observations, fix/test names, commit map, and green
+  commands are in the external report and per-finding evidence files.
+- Final `uv run ruff check .`: direct exit 0 (`All checks passed!`). Final
+  `uv run ruff format --check` on the six changed Python files: direct exit 0
+  (`6 files already formatted`). Logs: `final-ruff.log`, `final-format.log`.
+- Full `uv run pytest -q -p no:cacheprovider`: direct exit 0; complete counts
+  above. Log: `final-pytest.log`. Used permitted UV cache, offline resolution,
+  cached OTS 0.7.2 executable, and removed live Supabase credentials. No pytest
+  pipeline and no code changes while the suite ran.
+- Independent read-only review finds no remaining correctness gap. Scope audit
+  verifies only the three implementation modules, three test modules, and this
+  journal changed. AST audit preserves all 250 inherited source/registration
+  test functions and the existing staging refusal assertion body.
+- No protected/data/OTS edits; all 15 UK checksum/size pins unchanged. No
+  source packages, schemas, publisher facts, or consumer computations changed.
+  No GitHub/network operations, pushes, branches, stash, or real publication.
 
 ## Next
 
-- Await the full pytest suite direct exit status on fixed code. The invocation
-  uses UV offline, the cached OTS 0.7.2 executable, and removes live Supabase
-  credentials. Log: `bbd833a9-round1/final-pytest.log` beside the report.
-- Record final counts and commit map in the external report; commit final
-  state/done/next journal and scope verification.
-- Keep detached HEAD; no push, branches, stash, tracked data, protected files,
-  timestamp proofs, or UK pin edits.
+- None. All requested fixes and verification are complete. Commits remain on
+  detached HEAD; final report is in the external output file.
 
 # PR #227 integration lane — merge current PR #226 head
 
