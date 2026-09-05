@@ -19,6 +19,9 @@
 - Finding 1 reproduced before implementation: all 32 alias cases failed
   with DID NOT RAISE, including build_source_rows and artifact content through
   cache/mock fetch with current/archived filename/digest and R2-only pins.
+- Expanded reader reproduction: 33 failures and 1 known-distinct control pass.
+  An unpinned table beside public microdata also needs identity before I/O;
+  otherwise its digest cannot be classified before fetching.
 
 ## Next
 

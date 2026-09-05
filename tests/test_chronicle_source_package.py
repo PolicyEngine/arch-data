@@ -1347,6 +1347,23 @@ def test_source_reader_refuses_unpinned_bytes_that_contradict_shared_owner(
     )
 
 
+def _public_microdata_sibling(entry):
+    return {
+        **deepcopy(entry),
+        "access": "public",
+        "licence": "CC0-1.0",
+        "licence_evidence": {
+            "issuer": "Fixture publisher",
+            "scope": "This fixture public microdata release is dedicated to CC0.",
+            "url": "https://example.test/licence",
+        },
+        "vintage": "2024",
+        "hash_source": "chronicle_fetch",
+        "attested_by": "chronicle",
+        "verified_at": "2026-09-05",
+    }
+
+
 @pytest.mark.parametrize(
     "alias", ["filename", "sha256", "archived-filename", "archived-sha256"]
 )
@@ -1380,20 +1397,7 @@ def test_source_reader_refuses_public_microdata_sibling_alias_before_io(
 
     entry["sha256"] = digest
     entry["storage"]["r2"] = locator("table.csv", digest)
-    sibling = {
-        **deepcopy(entry),
-        "access": "public",
-        "licence": "CC0-1.0",
-        "licence_evidence": {
-            "issuer": "Fixture publisher",
-            "scope": "This fixture public microdata release is dedicated to CC0.",
-            "url": "https://example.test/licence",
-        },
-        "vintage": "2024",
-        "hash_source": "chronicle_fetch",
-        "attested_by": "chronicle",
-        "verified_at": "2026-09-05",
-    }
+    sibling = _public_microdata_sibling(entry)
     if alias == "sha256":
         sibling["filename"] = "microdata.csv"
     elif alias.startswith("archived-"):
@@ -1456,6 +1460,56 @@ def test_source_reader_refuses_public_microdata_sibling_alias_before_io(
         assert original_read(cache_path) == content
         assert [path for path in cache.rglob("*") if path.is_file()] == [cache_path]
     else:
+        assert not cache.exists()
+    assert {path.name: path.read_bytes() for path in resource_dir.iterdir()} == before
+
+
+@pytest.mark.parametrize(
+    "identified", [True, False], ids=["known-distinct", "unpinned"]
+)
+def test_source_reader_requires_identity_beside_unrelated_public_microdata(
+    recorded_r2_artifact, tmp_path, monkeypatch, identified
+):
+    artifact, resource_dir, content, entry = recorded_r2_artifact
+    sibling = _public_microdata_sibling(entry)
+    sibling["filename"] = "microdata.csv"
+    sibling["sha256"] = "a" * 64
+    sibling["storage"]["r2"] = {
+        field: value.replace("table.csv", "microdata.csv").replace(
+            entry["sha256"], "a" * 64
+        )
+        for field, value in sibling["storage"]["r2"].items()
+    }
+    sibling["licence_evidence"].update(
+        licence=sibling["licence"], sha256=sibling["sha256"]
+    )
+    if not identified:
+        entry.pop("sha256")
+        entry.pop("storage")
+    for name, kind, owner in (
+        ("manifest.yaml", "publisher_table", entry),
+        ("manifest_release.yaml", "microdata_release", sibling),
+    ):
+        (resource_dir / name).write_text(
+            yaml.safe_dump({"kind": kind, "files": {2024: owner}})
+        )
+    before = {path.name: path.read_bytes() for path in resource_dir.iterdir()}
+    cache = tmp_path / "cache"
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(cache))
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    fetches = []
+    monkeypatch.setattr(
+        "chronicle.source_package._fetch_source_artifact_content",
+        lambda url: fetches.append(url) or content,
+    )
+    if identified:
+        assert artifact._artifact_content(2024)[0] == content
+        assert fetches == [entry["source_url"]]
+        assert _source_artifact_cache_path(entry).read_bytes() == content
+    else:
+        with pytest.raises(ManifestAccessError, match="microdata"):
+            artifact._artifact_content(2024)
+        assert fetches == []
         assert not cache.exists()
     assert {path.name: path.read_bytes() for path in resource_dir.iterdir()} == before
 
