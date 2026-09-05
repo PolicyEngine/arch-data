@@ -41,3 +41,13 @@ Done:
 Next: finish release-chain compatibility review, commit implementation, run the gate on that committed head, and attempt both branch pushes.
 
 Review: release-chain compatibility approved with no blocking defects. Kept the legacy standalone --full help bytes for the required help differential; the module docstring states that adding --base-ref selects HEAD objects and verifies their private materialization.
+
+State: local implementation and verification complete; remote delivery blocked by sandbox DNS.
+
+Done:
+- Implementation commit d16804162e7e0da3620e5eb23e0e365e8bcdbaba has tree a1d9b9f4c23290358b1448f37de4283c4d05c8a6. Direct released-wheel base-relative and push invocations both pass and print those exact OIDs.
+- Verified every installed receipt package file (14) matches the published wheel byte for byte.
+- Both `git push -u origin shim/receipt-0.6` and the workflow branch push fail: Could not resolve host: github.com. No PR was opened, no hosted workflow result is claimed, and branch protection is unchanged.
+- Draft PR bodies are prepared at /tmp/chronicle-receipt-0.6-pr-body.md and /tmp/chronicle-receipt-0.6-workflow-pr-body.md. The main draft title is: Run the append gate on receipt 0.6.0: commit-addressed verification. The bodies include test census, proof, removal rationale, responsibilities, workflow arguments, and the up-to-date-branch recommendation.
+
+Next (requires network): push both local branches; open draft PR shim/receipt-0.6 -> codex/thesis-ledger-facts and the byte-identical workflow-copy PR -> main; require Append gate and Trusted base append gate to pass. Final report is OUTPUT.md in this worktree; its last lines record PR status, final head and totals.
