@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 import hashlib
 from io import BytesIO
 import os
@@ -19,7 +20,7 @@ from chronicle.consumer_contract import (
 )
 from chronicle.core import validate_facts
 from chronicle.epoch import SCHEMA_IDS
-from chronicle.registration import ManifestAccessError
+from chronicle.registration import ManifestAccessError, validate_file_entry
 from chronicle.source_package import (
     SOURCE_ARTIFACT_CACHE_ENV,
     SOURCE_ARTIFACT_FETCH_ENV,
@@ -1344,6 +1345,119 @@ def test_source_reader_refuses_unpinned_bytes_that_contradict_shared_owner(
     assert all(
         (resource_dir / name).read_bytes() == data for name, data in before.items()
     )
+
+
+@pytest.mark.parametrize(
+    "alias", ["filename", "sha256", "archived-filename", "archived-sha256"]
+)
+@pytest.mark.parametrize(
+    "declared_checksum", [True, False], ids=["declared", "r2-only"]
+)
+@pytest.mark.parametrize("location", ["cache", "fetch"])
+@pytest.mark.parametrize("method", ["_artifact_content", "build_source_rows"])
+def test_source_reader_refuses_public_microdata_sibling_alias_before_io(
+    recorded_r2_artifact,
+    tmp_path,
+    monkeypatch,
+    alias,
+    declared_checksum,
+    location,
+    method,
+):
+    artifact, resource_dir, _content, entry = recorded_r2_artifact
+    artifact = replace(artifact, parser="delimited_text_full_rows")
+    content = b"person_id,age\n1,45\n2,31\n"
+    digest = hashlib.sha256(content).hexdigest()
+
+    def locator(filename, checksum):
+        key = f"raw/publisher/package/2024/{checksum}/{filename}"
+        return {
+            "provider": "r2",
+            "bucket": "ledger-raw",
+            "key": key,
+            "uri": f"r2://ledger-raw/{key}",
+        }
+
+    entry["sha256"] = digest
+    entry["storage"]["r2"] = locator("table.csv", digest)
+    sibling = {
+        **deepcopy(entry),
+        "access": "public",
+        "licence": "CC0-1.0",
+        "licence_evidence": {
+            "issuer": "Fixture publisher",
+            "scope": "This fixture public microdata release is dedicated to CC0.",
+            "url": "https://example.test/licence",
+        },
+        "vintage": "2024",
+        "hash_source": "chronicle_fetch",
+        "attested_by": "chronicle",
+        "verified_at": "2026-09-05",
+    }
+    if alias == "sha256":
+        sibling["filename"] = "microdata.csv"
+    elif alias.startswith("archived-"):
+        sibling["filename"] = "new-microdata.csv"
+        sibling["sha256"] = "a" * 64
+        sibling["storage"]["previous_r2"] = [
+            locator("table.csv", "b" * 64)
+            if alias == "archived-filename"
+            else locator("old-microdata.csv", digest)
+        ]
+    sibling["storage"]["r2"] = locator(sibling["filename"], sibling["sha256"])
+    sibling["licence_evidence"].update(
+        licence=sibling["licence"], sha256=sibling["sha256"]
+    )
+    assert (
+        validate_file_entry(
+            sibling, kind="microdata_release", manifest={}, local_file_exists=False
+        )
+        == ()
+    )
+    if not declared_checksum:
+        entry.pop("sha256")
+    for name, kind, owner in (
+        ("manifest.yaml", "publisher_table", entry),
+        ("manifest_release.yaml", "microdata_release", sibling),
+    ):
+        (resource_dir / name).write_text(
+            yaml.safe_dump({"kind": kind, "files": {2024: owner}})
+        )
+    before = {path.name: path.read_bytes() for path in resource_dir.iterdir()}
+    cache = tmp_path / "cache"
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(cache))
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    cache_path = _source_artifact_cache_path({**entry, "sha256": digest})
+    if location == "cache":
+        cache_path.parent.mkdir(parents=True)
+        cache_path.write_bytes(content)
+    fetches = []
+    monkeypatch.setattr(
+        "chronicle.source_package._fetch_source_artifact_content",
+        lambda url: fetches.append(url) or content,
+    )
+    reads = []
+    original_read = Path.read_bytes
+
+    def read_bytes(path):
+        if path.name == "table.csv":
+            reads.append(path)
+        return original_read(path)
+
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+    emitted = []
+    with pytest.raises(ManifestAccessError, match="microdata"):
+        emitted.extend(getattr(artifact, method)(2024))
+
+    assert emitted == []
+    assert reads == []
+    assert fetches == []
+    if location == "cache":
+        assert original_read(cache_path) == content
+        assert [path for path in cache.rglob("*") if path.is_file()] == [cache_path]
+    else:
+        assert not cache.exists()
+    assert {path.name: path.read_bytes() for path in resource_dir.iterdir()} == before
 
 
 @pytest.mark.parametrize("identity", ["r2-only", "unpinned"])

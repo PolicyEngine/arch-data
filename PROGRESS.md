@@ -16,6 +16,9 @@
 - Finding 2 reproduced before implementation: 10 failures reached mocked
   filesystem/replacement sentinels; 1 agreeing-owner/history control passed.
   Evidence: `bbd833a9-round2/finding2-red.log`; no unsafe mutation occurred.
+- Finding 1 reproduced before implementation: all 32 alias cases failed
+  with DID NOT RAISE, including build_source_rows and artifact content through
+  cache/mock fetch with current/archived filename/digest and R2-only pins.
 
 ## Next
 
