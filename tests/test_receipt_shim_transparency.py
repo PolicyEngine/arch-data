@@ -163,16 +163,19 @@ def _assert_byte_identical(
 
 CANDIDATE_LINE = re.compile(
     rb"(?m)^candidate commit [0-9a-f]{40}(?:[0-9a-f]{24})? "
-    rb"tree [0-9a-f]{40}(?:[0-9a-f]{24})?\n\Z"
+    rb"tree [0-9a-f]{40}(?:[0-9a-f]{24})?"
+    rb"(?: base commit [0-9a-f]{40}(?:[0-9a-f]{24})? "
+    rb"tree [0-9a-f]{40}(?:[0-9a-f]{24})?)?\n\Z"
 )
 
 
 def _split_candidate_line(stdout: bytes) -> tuple[bytes, bytes | None]:
     """Separate the shim's own last line from the gate's output.
 
-    The shim prints one line the original never printed: the commit it checked
-    out and that commit's tree. Everything before it is the gate's own bytes,
-    and those are what the differential compares.
+    The shim prints one line the original never printed: the commit and tree
+    the package judged, and the base pair when a base was supplied. Everything
+    before it is the gate's own bytes, and those are what the differential
+    compares.
     """
 
     match = CANDIDATE_LINE.search(stdout)
@@ -188,17 +191,23 @@ def _assert_gate_bytes_identical(
     expected_code: int,
     candidate: str | None,
     tree: str | None,
+    base: str | None = None,
+    base_tree: str | None = None,
 ) -> None:
     """Compare the pair on the gate's bytes, and check the shim's extra line.
 
-    The shim reaches its verdict about a checkout it makes itself, so its
-    stdout carries one line the original's does not. That line is asserted
+    The package reaches its verdict about the named commit's objects, and the
+    shim prints one line the original never did: the candidate commit and
+    tree, and the base pair when a base was supplied. That line is asserted
     against the object ids the fixture committed; the rest must be identical.
     """
 
     body, tail = _split_candidate_line(shim.stdout)
     if expected_code == 0:
-        assert tail == f"candidate commit {candidate} tree {tree}\n".encode("utf-8")
+        expected = f"candidate commit {candidate} tree {tree}"
+        if base is not None:
+            expected += f" base commit {base} tree {base_tree}"
+        assert tail == f"{expected}\n".encode("utf-8")
     else:
         assert tail is None, shim.stdout
     assert original.returncode == expected_code
@@ -386,7 +395,7 @@ def _replay_latest_release(
 
     Returns the clone, the base commit, and the candidate commit. The candidate
     is a commit rather than a working-tree state because that is the only thing
-    the shim will judge: it checks the named commit out for itself.
+    the shim will judge: the package reads the named commit's objects.
     """
 
     root = _copy_custody_tree(destination)
@@ -420,7 +429,8 @@ def _plain_checkout(
 
     The original script judges whatever directory it is pointed at, so the fair
     comparison hands it a directory holding exactly the candidate commit --
-    which is what the shim now builds for itself instead of being handed one.
+    the same bytes the package reads from that commit's objects and
+    materializes privately for its leaf verifier.
     """
 
     _git(clone, "worktree", "add", "--detach", str(destination), oid)
@@ -515,6 +525,8 @@ def test_valid_base_ref_append_is_byte_identical(
         expected_code=0,
         candidate=oid,
         tree=_tree_of(candidate, oid),
+        base=base,
+        base_tree=_tree_of(candidate, base),
     )
     assert shim.stderr == b""
     assert _split_candidate_line(shim.stdout)[0] == APPEND_GATE_OK
@@ -575,9 +587,9 @@ def test_corrupt_base_ref_append_refusals_are_byte_identical(
 ) -> None:
     candidate, base, _accepted = _replay_latest_release(tmp_path / case)
     mutation(candidate)
-    # The corruption has to be committed: an uncommitted one is a divergence
-    # between the commit and the working tree, which is the precondition the
-    # shim now establishes rather than a refusal it is being asked to make.
+    # The corruption has to be committed: the package judges the named
+    # commit's objects, so an uncommitted change is not part of the candidate
+    # at all and would not be seen.
     oid = _commit_candidate(candidate, f"corrupt: {case}")
     original, shim = _run_append_pair(original_oracle, candidate, base, oid)
     _assert_gate_bytes_identical(

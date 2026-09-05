@@ -131,8 +131,8 @@ def _write_checker_fixture(path: Path, ledger_text: str, manifest: dict) -> None
 def _commit_candidate(path: Path) -> str:
     """Commit whatever the fixture has just written and name that commit.
 
-    The checker judges a commit it checks out itself, so a fixture that mutated
-    a working tree has not yet said anything the checker can be asked about.
+    The installed receipt package judges the named commit's objects, so a
+    fixture that mutated a working tree has not yet stated the candidate.
     Committing is how the fixture states its candidate. An empty commit is
     allowed because some fixtures change nothing and the question -- does this
     commit pass -- is still a real one.
@@ -155,7 +155,31 @@ def _run_checker(
     ]
     if base_ref is not None:
         command.extend(["--base-ref", base_ref])
-    return subprocess.run(command, cwd=path, capture_output=True, text=True)
+    completed = subprocess.run(command, cwd=path, capture_output=True, text=True)
+    _assert_verdict_subject(completed, path, commit, base_ref=base_ref)
+    return completed
+
+
+def _assert_verdict_subject(
+    completed: subprocess.CompletedProcess,
+    path: Path,
+    commit: str,
+    *,
+    base_ref: str | None = None,
+) -> None:
+    """The second line names the candidate pair, and the base pair when a base was given."""
+
+    if completed.returncode == 0:
+        tree = _git(path, "rev-parse", f"{commit}^{{tree}}")
+        subject = f"candidate commit {commit} tree {tree}"
+        if base_ref is not None:
+            base = _git(path, "rev-parse", base_ref)
+            subject += (
+                f" base commit {base} tree {_git(path, 'rev-parse', base + '^{tree}')}"
+            )
+        assert completed.stdout.splitlines()[1:] == [subject]
+    else:
+        assert "candidate commit " not in completed.stdout
 
 
 def _git(path: Path, *args: str) -> str:
@@ -351,6 +375,7 @@ def test_base_gate_uses_base_script_and_dependency_imports(
 
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "gate-only proposal" in completed.stdout
+    _assert_verdict_subject(completed, candidate, candidate_commit, base_ref=base)
     assert not candidate_gate_marker.exists()
     assert not candidate_dependency_marker.exists()
 
@@ -384,11 +409,12 @@ def test_workflow_has_a_base_owned_trusted_pr_gate():
         '--base-ref "$BASE_SHA"',
         # The commit under judgement is named on the command line in all three
         # invocations. Dropping any of them would leave the gate judging
-        # whichever tree the checkout at --root happened to be sitting at,
-        # which is the divergence the shim exists to exclude.
+        # whichever HEAD the clone at --root happened to name. The package's
+        # object reader binds its verdict to this explicit commit and tree.
         '--commit "$MERGE_SHA"',
         '--commit "$workspace_sha"',
         '--commit "$GITHUB_SHA"',
+        "fetch-depth: 0",
     ):
         assert required in workflow
 
@@ -742,6 +768,7 @@ def test_full_file_check_alone_rejects_joint_manifest_and_file_rewrite(tmp_path)
     lines[0] = _json_line(rewritten)
     manifest = _rehash_manifest(lines)
     _write_checker_fixture(tmp_path, "\n".join(lines) + "\n", manifest)
+    _init_fixture_repo(tmp_path)
 
     completed = _run_checker(tmp_path)
 

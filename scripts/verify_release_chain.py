@@ -2,7 +2,13 @@
 # Thin shim over the receipt pin recorded in uv.lock. Any receipt upgrade
 # requires a fresh byte-equivalence proof at this repo's then-current pin BEFORE
 # the bump.
-"""Offline verification for the witnessed thesis-ledger release chain."""
+"""Offline verification for the witnessed thesis-ledger release chain.
+
+The ordinary directory verifier retains its directory-as-read contract. With
+``--base-ref``, receipt 0.6 compares the selected HEAD and base objects, then
+verifies that same candidate's private materialization. The index and working
+tree cannot substitute a different candidate between those two checks.
+"""
 
 from __future__ import annotations
 
@@ -13,6 +19,7 @@ from datetime import datetime
 from typing import Any
 
 import receipt.release_chain as _receipt
+from receipt.snapshot import SnapshotError, TreeSnapshot
 
 try:
     from receipt_pins import LEDGER_SPEC
@@ -53,14 +60,10 @@ GitEntry = _receipt.GitEntry
 ReleaseChainError = _receipt.ReleaseChainError
 ReleaseRecord = _receipt.ReleaseRecord
 
-git_blob_bytes = _receipt.git_blob_bytes
-git_file_entry = _receipt.git_file_entry
-git_tree_entries = _receipt.git_tree_entries
 jsonl_line_offsets = _receipt.jsonl_line_offsets
 manifest_filename = _receipt.manifest_filename
 parse_created_at = _receipt.parse_created_at
 producer_signature_path_for_manifest = _receipt.producer_signature_path_for_manifest
-resolve_base_commit = _receipt.resolve_base_commit
 sha256_bytes = _receipt.sha256_bytes
 
 
@@ -179,40 +182,25 @@ def verify_release_chain(
 
 
 def verify_release_history_immutable(
-    root: pathlib.Path, base_ref: str
+    *, candidate: TreeSnapshot, base: TreeSnapshot
 ) -> tuple[str, set[str], dict[str, GitEntry]]:
-    return _receipt.verify_release_history_immutable(root, base_ref, LEDGER_SPEC)
-
-
-def materialize_base_tree(
-    root: pathlib.Path,
-    commit: str,
-    destination: pathlib.Path,
-    release_entries: dict[str, GitEntry],
-) -> None:
-    return _receipt.materialize_base_tree(
-        root,
-        commit,
-        destination,
-        release_entries,
+    return _receipt.verify_release_history_immutable(
         LEDGER_SPEC,
+        candidate=candidate,
+        base=base,
     )
 
 
 def verify_base_release_chain(
-    root: pathlib.Path,
-    commit: str,
-    release_entries: dict[str, GitEntry],
     *,
+    base: TreeSnapshot,
     anchor_dir: pathlib.Path | None = None,
     enforce_production_pins: bool = True,
     clock_skew_seconds: int = DEFAULT_CLOCK_SKEW_SECONDS,
 ) -> ChainVerification:
     return _receipt.verify_base_release_chain(
-        root,
-        commit,
-        release_entries,
-        spec=LEDGER_SPEC,
+        LEDGER_SPEC,
+        base=base,
         anchor_dir=anchor_dir,
         enforce_production_pins=enforce_production_pins,
         clock_skew_seconds=clock_skew_seconds,
@@ -255,16 +243,31 @@ def main() -> int:
     enforce_pins = anchor_dir is None
     try:
         if args.base_ref:
-            verify_release_history_immutable(root, args.base_ref)
-        verification = verify_release_chain(
-            root,
-            anchor_dir=anchor_dir,
-            require_chain=args.full or bool(args.base_ref),
-            verify_state=True,
-            enforce_production_pins=enforce_pins,
-            clock_skew_seconds=args.clock_skew_seconds,
-        )
-    except (OSError, ReleaseChainError) as exc:
+            with (
+                TreeSnapshot.select(root, "HEAD") as candidate,
+                TreeSnapshot.select(root, args.base_ref) as base,
+            ):
+                candidate.assert_ancestor(base)
+                verify_release_history_immutable(candidate=candidate, base=base)
+                # This package helper verifies any selected snapshot through
+                # its private materialization. Here the snapshot is HEAD,
+                # already compared against the selected base above.
+                verification = verify_base_release_chain(
+                    base=candidate,
+                    anchor_dir=anchor_dir,
+                    enforce_production_pins=enforce_pins,
+                    clock_skew_seconds=args.clock_skew_seconds,
+                )
+        else:
+            verification = verify_release_chain(
+                root,
+                anchor_dir=anchor_dir,
+                require_chain=args.full,
+                verify_state=True,
+                enforce_production_pins=enforce_pins,
+                clock_skew_seconds=args.clock_skew_seconds,
+            )
+    except (OSError, ReleaseChainError, SnapshotError) as exc:
         print(f"release chain verification failed: {exc}", file=sys.stderr)
         return 1
     if not verification.releases:
@@ -304,18 +307,13 @@ __all__ = [
     "ReleaseRecord",
     "SCHEMA_VERSION",
     "STATE_PATH",
-    "git_blob_bytes",
-    "git_file_entry",
-    "git_tree_entries",
     "jsonl_line_offsets",
     "load_manifest",
     "main",
     "manifest_filename",
-    "materialize_base_tree",
     "parse_created_at",
     "producer_signature_path_for_manifest",
     "receipt_paths_for_manifest",
-    "resolve_base_commit",
     "sha256_bytes",
     "validate_manifest_schema",
     "verify_base_release_chain",

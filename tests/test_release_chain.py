@@ -341,8 +341,8 @@ def _run_gate(
 ) -> subprocess.CompletedProcess[str]:
     """Commit whatever the fixture just wrote and judge that commit.
 
-    The gate judges a commit it checks out for itself, so a fixture that has
-    only written into a working tree has not yet stated a candidate. Each of
+    The gate judges the named commit's objects, so a fixture that has only
+    written into a working tree has not yet stated a candidate. Each of
     these tests takes its base ref before it writes, so committing here makes
     the base the parent of what is judged.
     """
@@ -365,7 +365,9 @@ def _run_gate(
     )
 
 
-def _run_verifier(environment: ReleaseEnvironment) -> subprocess.CompletedProcess[str]:
+def _run_verifier(
+    environment: ReleaseEnvironment, *, base_ref: str | None = None
+) -> subprocess.CompletedProcess[str]:
     return _run(
         [
             sys.executable,
@@ -375,6 +377,7 @@ def _run_verifier(environment: ReleaseEnvironment) -> subprocess.CompletedProces
             "--anchor-dir",
             str(environment.anchors),
             "--full",
+            *(["--base-ref", base_ref] if base_ref is not None else []),
         ],
         cwd=environment.repo,
         check=False,
@@ -702,6 +705,39 @@ def test_verifier_cli_full_chain_passes(
 
     assert completed.returncode == 0, completed.stderr
     assert "release chain OK: 2 releases" in completed.stdout
+
+
+def test_verifier_cli_base_ref_uses_committed_chain_despite_dirty_workspace(
+    full_chain_environment: ReleaseEnvironment,
+):
+    root = full_chain_environment.repo
+    base = _git(root, "rev-parse", "HEAD^")
+    (root / "ledger" / "official_observations.jsonl").write_text("{}\n")
+
+    completed = _run_verifier(full_chain_environment, base_ref=base)
+
+    assert completed.returncode == 0, completed.stderr
+    assert "release chain OK: 2 releases" in completed.stdout
+
+
+def test_verifier_cli_base_ref_rejects_committed_rewrite_despite_repaired_workspace(
+    full_chain_environment: ReleaseEnvironment,
+):
+    root = full_chain_environment.repo
+    base = _git(root, "rev-parse", "HEAD")
+    manifest = next((root / "releases" / "manifests").glob("0000-*.json"))
+    original = manifest.read_bytes()
+    manifest.write_bytes(original + b"\n")
+    _git(root, "add", str(manifest.relative_to(root)))
+    _git(root, "commit", "-qm", "rewrite historical release")
+    manifest.write_bytes(original)
+
+    completed = _run_verifier(full_chain_environment, base_ref=base)
+
+    assert completed.returncode == 1
+    assert "existing release file bytes changed relative to" in completed.stderr
+    assert manifest.name in completed.stderr
+    assert completed.stdout == ""
 
 
 @pytest.mark.parametrize("index", [0, 1])
