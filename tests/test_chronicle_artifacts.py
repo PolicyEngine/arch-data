@@ -4144,3 +4144,74 @@ def test_default_publication_sweep_preflights_overrides_for_every_selected_manif
     assert uploads == []
     assert {path: path.read_bytes() for path in package.iterdir()} == before
     assert any(field in error for entry in report.entries for error in entry.errors)
+
+
+@pytest.mark.parametrize("missing", ["source_id", "package_id"])
+def test_default_sweep_overrides_apply_to_every_selected_sibling(tmp_path, missing):
+    """A default sweep selects every manifest in the directory. The override
+    must complete the manifest that lacks the identifier and confirm the
+    sibling that declares the same value, whichever order they are processed
+    in -- a selected sibling met through another selected manifest's package
+    preflight is not an unselected one."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    content_a = b"table a"
+    content_b = b"table b"
+    (package / "table_a.csv").write_bytes(content_a)
+    (package / "table_b.csv").write_bytes(content_b)
+    identity = {"source_id": "publisher", "package_id": "package"}
+    override = {missing: identity[missing]}
+    declared_a = {key: value for key, value in identity.items() if key != missing}
+    manifest_a = package / "manifest_a.yaml"
+    manifest_b = package / "manifest_b.yaml"
+    manifest_a.write_text(
+        yaml.safe_dump(
+            {
+                "kind": "publisher_table",
+                **declared_a,
+                "files": {
+                    2024: {
+                        "filename": "table_a.csv",
+                        "source_url": "https://publisher.test/a",
+                        "sha256": hashlib.sha256(content_a).hexdigest(),
+                        "size_bytes": len(content_a),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    manifest_b.write_text(
+        yaml.safe_dump(
+            {
+                "kind": "publisher_table",
+                **identity,
+                "files": {
+                    2024: {
+                        "filename": "table_b.csv",
+                        "source_url": "https://publisher.test/b",
+                        "sha256": hashlib.sha256(content_b).hexdigest(),
+                        "size_bytes": len(content_b),
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+    wrangler, log = _fake_wrangler(tmp_path)
+
+    report = publish_source_artifacts(
+        package, wrangler_command=str(wrangler), **override
+    )
+
+    assert report.valid, report.errors
+    assert report.counts["uploaded_count"] == 2
+    assert report.counts["failed_count"] == 0
+    assert not any("r2_identity_invalid" in error for error in report.errors)
+    for path in (manifest_a, manifest_b):
+        recorded = yaml.safe_load(path.read_text())
+        assert recorded[missing] == identity[missing]
+        assert recorded["files"][2024]["storage"]["r2"]["key"].startswith(
+            "raw/publisher/package/2024/"
+        )
+    assert len(log.read_text().splitlines()) == 2
