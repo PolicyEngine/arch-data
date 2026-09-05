@@ -395,7 +395,7 @@ def _replay_latest_release(
 
     Returns the clone, the base commit, and the candidate commit. The candidate
     is a commit rather than a working-tree state because that is the only thing
-    the shim will judge: it checks the named commit out for itself.
+    the shim will judge: the package reads the named commit's objects.
     """
 
     root = _copy_custody_tree(destination)
@@ -429,7 +429,8 @@ def _plain_checkout(
 
     The original script judges whatever directory it is pointed at, so the fair
     comparison hands it a directory holding exactly the candidate commit --
-    which is what the shim now builds for itself instead of being handed one.
+    the same bytes the package reads from that commit's objects and
+    materializes privately for its leaf verifier.
     """
 
     _git(clone, "worktree", "add", "--detach", str(destination), oid)
@@ -586,9 +587,9 @@ def test_corrupt_base_ref_append_refusals_are_byte_identical(
 ) -> None:
     candidate, base, _accepted = _replay_latest_release(tmp_path / case)
     mutation(candidate)
-    # The corruption has to be committed: an uncommitted one is a divergence
-    # between the commit and the working tree, which is the precondition the
-    # shim now establishes rather than a refusal it is being asked to make.
+    # The corruption has to be committed: the package judges the named
+    # commit's objects, so an uncommitted change is not part of the candidate
+    # at all and would not be seen.
     oid = _commit_candidate(candidate, f"corrupt: {case}")
     original, shim = _run_append_pair(original_oracle, candidate, base, oid)
     _assert_gate_bytes_identical(
