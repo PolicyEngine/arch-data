@@ -23,6 +23,10 @@
   pytest exit 1, 13 failed and 1 passed. Exact command and observations are
   recorded in the external report (`finding2-red-confirmed.log`).
 
+- Finding 1 reproduced before its fix: six source-reader cases returned
+  contradictory shared-file bytes (R2-only identities plus local/cache/fetched/ZIP
+  unidentified bytes). Direct exit 1, six failed; evidence is in `finding1-red.log`.
+
 ## Next
 
 - Reproduce each finding with failing tests and record exact commands and

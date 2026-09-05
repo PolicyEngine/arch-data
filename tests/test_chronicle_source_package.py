@@ -1238,6 +1238,114 @@ def test_source_artifact_spec_accepts_consistent_recorded_r2(recorded_r2_artifac
     )
 
 
+@pytest.mark.parametrize("location", ["local", "fetch"])
+def test_source_reader_refuses_conflicting_r2_only_shared_owners_before_read(
+    recorded_r2_artifact, tmp_path, monkeypatch, location
+):
+    artifact, resource_dir, content, entry = recorded_r2_artifact
+    digest = entry.pop("sha256")
+    sibling = deepcopy(entry)
+    other_digest = hashlib.sha256(b"different sibling bytes").hexdigest()
+    for field in ("key", "uri"):
+        sibling["storage"]["r2"][field] = sibling["storage"]["r2"][field].replace(
+            digest, other_digest
+        )
+    for name, owner in (("manifest.yaml", entry), ("manifest_sibling.yaml", sibling)):
+        (resource_dir / name).write_text(
+            yaml.safe_dump({"kind": "publisher_table", "files": {2024: owner}})
+        )
+    before = {path.name: path.read_bytes() for path in resource_dir.iterdir()}
+    cache = tmp_path / "cache"
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(cache))
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    fetches = []
+    monkeypatch.setattr(
+        "chronicle.source_package._fetch_source_artifact_content",
+        lambda url: fetches.append(url) or content,
+    )
+    reads = []
+    original_read = Path.read_bytes
+
+    def read_bytes(path):
+        if path == resource_dir / "table.csv":
+            reads.append(path)
+        return original_read(path)
+
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+    if location == "local":
+        (resource_dir / "table.csv").write_bytes(content)
+
+    with pytest.raises(ManifestAccessError, match="filename_collision|different bytes"):
+        artifact._artifact_content(2024)
+
+    assert reads == []
+    assert fetches == []
+    assert not cache.exists()
+    assert all(
+        (resource_dir / name).read_bytes() == data for name, data in before.items()
+    )
+
+
+@pytest.mark.parametrize("location", ["local", "cache", "fetch", "zip"])
+def test_source_reader_refuses_unpinned_bytes_that_contradict_shared_owner(
+    recorded_r2_artifact, tmp_path, monkeypatch, location
+):
+    artifact, resource_dir, _content, sibling = recorded_r2_artifact
+    entry = {
+        "filename": "table.csv",
+        "source_url": sibling["source_url"],
+    }
+    sibling.pop("storage")
+    for name, owner in (("manifest.yaml", entry), ("manifest_sibling.yaml", sibling)):
+        (resource_dir / name).write_text(
+            yaml.safe_dump({"kind": "publisher_table", "files": {2024: owner}})
+        )
+    before = {path.name: path.read_bytes() for path in resource_dir.iterdir()}
+    changed_content = b"unpinned bytes contradict the identified sibling"
+    cache = tmp_path / "cache"
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(cache))
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    fetches = []
+    monkeypatch.setattr(
+        "chronicle.source_package._fetch_source_artifact_content",
+        lambda url: fetches.append(url) or changed_content,
+    )
+    if location == "local":
+        (resource_dir / "table.csv").write_bytes(changed_content)
+    elif location == "cache":
+        cache_path = _source_artifact_cache_path(entry)
+        cache_path.parent.mkdir(parents=True)
+        cache_path.write_bytes(changed_content)
+    if location == "zip":
+        buffer = BytesIO()
+        with ZipFile(buffer, "w") as archive:
+            for name, data in before.items():
+                archive.writestr(f"data/publisher/package/{name}", data)
+            archive.writestr("data/publisher/package/table.csv", changed_content)
+        with ZipFile(buffer) as archive:
+            monkeypatch.setattr(
+                "chronicle.source_package.files", lambda _package: ZipPath(archive)
+            )
+            with pytest.raises(
+                ManifestAccessError, match="filename_collision|two identities"
+            ):
+                artifact._artifact_content(2024)
+    else:
+        with pytest.raises(
+            ManifestAccessError, match="filename_collision|two identities"
+        ):
+            artifact._artifact_content(2024)
+
+    assert fetches == ([entry["source_url"]] if location == "fetch" else [])
+    if location == "cache":
+        assert cache_path.read_bytes() == changed_content
+    else:
+        assert not cache.exists()
+    assert all(
+        (resource_dir / name).read_bytes() == data for name, data in before.items()
+    )
+
+
 @pytest.mark.parametrize("entry_kind", ["directory", "fifo"])
 @pytest.mark.parametrize("resource_kind", ["manifest", "artifact"])
 def test_source_artifact_spec_refuses_non_regular_resource_before_open(
