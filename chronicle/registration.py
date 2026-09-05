@@ -1547,6 +1547,21 @@ def _prepare_registration_payload(
         kind=MICRODATA_RELEASE_KIND,
         final=True,
     )
+    # Import lazily: artifact commands also depend on this module. Use their
+    # effective R2 identity so an undeclared checksum cannot hide a conflict.
+    from chronicle.artifacts import _effective_recorded_digest
+
+    proposed_manifests = {str(path): sibling for path, sibling in siblings.items()}
+    proposed_manifests[str(manifest_path)] = payload
+    collision_errors = validate_package_directory(
+        proposed_manifests, entry_digest=_effective_recorded_digest
+    )
+    if collision_errors:
+        raise HashOnlyRegistrationError(
+            f"{output} is not a valid package directory; refusing to persist "
+            f"{manifest_path}: {'; '.join(collision_errors)}. Fix the manifests "
+            "before registering into that directory."
+        )
     return payload, replaced
 
 
