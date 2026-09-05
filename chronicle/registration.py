@@ -54,6 +54,7 @@ import stat
 import tempfile
 from typing import Any
 import unicodedata
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -546,6 +547,8 @@ def validate_package_directory(
     """
     by_name: dict[str, list[tuple[str, bool, str]]] = {}
     by_digest: dict[str, list[tuple[str, bool]]] = {}
+    archived_names: set[str] = set()
+    archived_digests: set[str] = set()
     for name, _key, _index, entry in iter_directory_entries(manifests):
         if not isinstance(entry, Mapping):
             continue
@@ -558,6 +561,13 @@ def validate_package_directory(
             )
         if digest:
             by_digest.setdefault(digest, []).append((name, hash_only))
+        for archived_name, archived_digest, _locator in _recorded_object_identities(
+            entry
+        ):
+            if archived_name is not None:
+                archived_names.add(archived_name)
+            if archived_digest is not None:
+                archived_digests.add(archived_digest)
 
     errors: list[str] = []
     for key, records in by_name.items():
@@ -572,6 +582,15 @@ def validate_package_directory(
             continue
         if len({hash_only for _name, hash_only in records}) > 1:
             errors.append(f"sha256_collision_across_manifests:{digest}")
+    # An immutable object remains archived after its current entry changes
+    # filename or checksum. Compare gated registrations with every recorded
+    # object, including history in the same manifest as the registration.
+    for key in sorted(archived_names.intersection(by_name)):
+        if any(hash_only for _name, hash_only, _digest in by_name[key]):
+            errors.append(f"archived_filename_collision:{key}")
+    for digest in sorted(archived_digests.intersection(by_digest)):
+        if any(hash_only for _name, hash_only in by_digest[digest]):
+            errors.append(f"archived_sha256_collision:{digest}")
     return tuple(_dedupe(errors))
 
 
@@ -1018,6 +1037,42 @@ def recorded_previous_r2(spec: Any) -> tuple[Any, ...]:
     if isinstance(previous, list):
         return tuple(previous)
     return (previous,) if previous else ()
+
+
+def _recorded_object_identities(
+    spec: Any,
+) -> Iterator[tuple[str | None, str | None, str]]:
+    """Yield filename/checksum identities from every current and archived object.
+
+    Read both locator fields independently: a conflicting or incomplete block
+    must not hide an archived identity simply because another field was chosen.
+    Locator validity remains the artifact reader's separate responsibility.
+    """
+    for block in (recorded_r2(spec), *recorded_previous_r2(spec)):
+        if not isinstance(block, Mapping):
+            continue
+        for field in ("key", "uri"):
+            locator = block.get(field)
+            if not isinstance(locator, str) or not locator:
+                continue
+            if field == "uri":
+                try:
+                    key = urlsplit(locator).path
+                except ValueError:
+                    continue
+            else:
+                key = locator
+            segments = key.rsplit("/", 2)
+            filename = (
+                filename_key(segments[-1]) if is_bare_filename(segments[-1]) else None
+            )
+            digest = (
+                segments[-2]
+                if len(segments) >= 2 and _SHA256_RE.fullmatch(segments[-2])
+                else None
+            )
+            if filename is not None or digest is not None:
+                yield filename, digest, locator
 
 
 def records_r2_object(spec: Any) -> bool:
@@ -1721,14 +1776,24 @@ def _assert_no_archived_identity(
         existing_name = existing.get("filename")
         same_name = existing_name is not None and filename_key(existing_name) == wanted
         same_bytes = sha256 is not None and _text(existing.get("sha256")) == sha256
-        if not (same_name or same_bytes):
+        archived_matches = [
+            locator
+            for name, digest, locator in _recorded_object_identities(existing)
+            if name == wanted or (sha256 is not None and digest == sha256)
+        ]
+        if not (same_name or same_bytes or archived_matches):
             continue
         recorded = [
             str(block.get("uri") or block.get("key") or block)
             for block in (recorded_r2(existing), *recorded_previous_r2(existing))
             if isinstance(block, Mapping)
         ]
-        how = "" if same_name else f" (the same bytes as {artifact_name!r})"
+        if same_name:
+            how = ""
+        elif same_bytes:
+            how = f" (the same bytes as {artifact_name!r})"
+        else:
+            how = f" (whose archived filename or checksum matches {artifact_name!r})"
         if recorded:
             raise HashOnlyRegistrationError(
                 f"{manifest_path} records the R2 object(s) {recorded} for "

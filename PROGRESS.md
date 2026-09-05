@@ -61,6 +61,11 @@
   before any artifact write or upload, including every vintage and locator.
   Both regressions and 336 artifact/peer/package tests pass.
 
+- Finding 2 fixed: current and historical R2 key/URI identities are compared
+  independently of current entry metadata before registration mutation; package
+  validation shares that check. Eight regressions and 258 package/registration
+  cases pass; scoped Ruff lint and formatting pass.
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
