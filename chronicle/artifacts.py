@@ -1263,7 +1263,14 @@ def publish_source_artifacts(
     errors: list[str] = []
     prepared: list[tuple[Path, dict[str, Any], dict[str, Any], str, str]] = []
     preflight_failures: list[RawArtifactPublishEntry] = []
-    for manifest_path in _root_manifest_paths(root_path, manifest_filename):
+    # ``--source-id`` / ``--package-id`` complete or confirm the identity of
+    # every manifest this sweep selects (one with an explicit selector, all of
+    # a directory's manifests by default). Decide eligibility from the whole
+    # selection up front, so a selected sibling met through another selected
+    # manifest's package preflight is not mistaken for an unselected one.
+    selected_manifest_paths = list(_root_manifest_paths(root_path, manifest_filename))
+    selected_manifests = set(selected_manifest_paths)
+    for manifest_path in selected_manifest_paths:
         try:
             manifest = _read_manifest(manifest_path)
             files = _manifest_files(manifest, manifest_path)
@@ -1284,13 +1291,24 @@ def publish_source_artifacts(
 
         for package_manifest_name, package_manifest in package_manifests.items():
             package_manifest_path = Path(package_manifest_name)
-            # ``--source-id`` / ``--package-id`` complete or confirm the
-            # *selected* manifest's identity. An unselected sibling is only
-            # preflighted so the package boundary holds; it keeps its own
-            # identifiers, which may legitimately differ.
+            # A selected sibling takes the overrides like the selected manifest
+            # itself; an unselected sibling is only preflighted so the package
+            # boundary holds and keeps its own identifiers, which may
+            # legitimately differ.
             if package_manifest_path == manifest_path:
                 package_source_id = manifest_source_id
                 package_id_value = manifest_package_id
+            elif package_manifest_path in selected_manifests:
+                package_source_id = (
+                    source_id
+                    if source_id is not None
+                    else package_manifest.get("source_id")
+                )
+                package_id_value = (
+                    package_id
+                    if package_id is not None
+                    else package_manifest.get("package_id")
+                )
             else:
                 package_source_id = package_manifest.get("source_id")
                 package_id_value = package_manifest.get("package_id")
