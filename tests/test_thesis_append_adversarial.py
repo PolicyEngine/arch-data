@@ -156,18 +156,28 @@ def _run_checker(
     if base_ref is not None:
         command.extend(["--base-ref", base_ref])
     completed = subprocess.run(command, cwd=path, capture_output=True, text=True)
-    _assert_verdict_subject(completed, path, commit)
+    _assert_verdict_subject(completed, path, commit, base_ref=base_ref)
     return completed
 
 
 def _assert_verdict_subject(
-    completed: subprocess.CompletedProcess, path: Path, commit: str
+    completed: subprocess.CompletedProcess,
+    path: Path,
+    commit: str,
+    *,
+    base_ref: str | None = None,
 ) -> None:
+    """The second line names the candidate pair, and the base pair when a base was given."""
+
     if completed.returncode == 0:
         tree = _git(path, "rev-parse", f"{commit}^{{tree}}")
-        assert completed.stdout.splitlines()[1:] == [
-            f"candidate commit {commit} tree {tree}"
-        ]
+        subject = f"candidate commit {commit} tree {tree}"
+        if base_ref is not None:
+            base = _git(path, "rev-parse", base_ref)
+            subject += (
+                f" base commit {base} tree {_git(path, 'rev-parse', base + '^{tree}')}"
+            )
+        assert completed.stdout.splitlines()[1:] == [subject]
     else:
         assert "candidate commit " not in completed.stdout
 
@@ -365,7 +375,7 @@ def test_base_gate_uses_base_script_and_dependency_imports(
 
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "gate-only proposal" in completed.stdout
-    _assert_verdict_subject(completed, candidate, candidate_commit)
+    _assert_verdict_subject(completed, candidate, candidate_commit, base_ref=base)
     assert not candidate_gate_marker.exists()
     assert not candidate_dependency_marker.exists()
 

@@ -44,8 +44,18 @@ FAILED = "thesis-facts append check failed: "
 
 CANDIDATE_LINE = re.compile(
     r"(?m)^candidate commit (?P<commit>[0-9a-f]{40,64}) "
-    r"tree (?P<tree>[0-9a-f]{40,64})$"
+    r"tree (?P<tree>[0-9a-f]{40,64})"
+    r"(?: base commit (?P<base>[0-9a-f]{40,64}) tree (?P<base_tree>[0-9a-f]{40,64}))?$"
 )
+
+
+def _subject_line(clone: pathlib.Path, candidate: str, base: str | None) -> str:
+    """The shim's second line: the candidate pair, and the base pair when given."""
+
+    line = f"candidate commit {candidate} tree {_git(clone, 'rev-parse', candidate + '^{tree}')}"
+    if base is not None:
+        line += f" base commit {base} tree {_git(clone, 'rev-parse', base + '^{tree}')}"
+    return line
 
 # A commit id of the right shape that no repository holds.
 ABSENT_OBJECT_ID = "0" * 40
@@ -303,8 +313,9 @@ def test_checkout_line_endings_do_not_change_the_committed_verdict(tmp_path):
 
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert completed.stdout == (
-        f"{APPEND_GATE_OK}\ncandidate commit {candidate} tree {tree}\n"
+        f"{APPEND_GATE_OK}\n{_subject_line(clone, candidate, base)}\n"
     )
+    assert tree in completed.stdout
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 
@@ -769,7 +780,8 @@ def test_every_workflow_verifies_the_named_commit_when_local_state_disagrees(
     lines = completed.stdout.splitlines()
     assert len(lines) == 2
     assert lines[0].startswith("thesis-facts append check OK:")
-    assert lines[1] == f"candidate commit {selected} tree {tree}"
+    assert lines[1] == _subject_line(clone, selected, base_ref)
+    assert tree in lines[1]
     if base_ref is not None:
         assert lines[0] == APPEND_GATE_OK
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
@@ -834,12 +846,14 @@ def test_the_witnessed_release_passes_and_names_its_commit(tmp_path):
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert completed.stderr == ""
     assert completed.stdout == (
-        f"{APPEND_GATE_OK}\ncandidate commit {candidate} tree {tree}\n"
+        f"{APPEND_GATE_OK}\n{_subject_line(clone, candidate, base)}\n"
     )
     match = CANDIDATE_LINE.search(completed.stdout)
     assert match is not None
     assert match.group("commit") == candidate
     assert match.group("tree") == tree
+    assert match.group("base") == base
+    assert match.group("base_tree") == _git(clone, "rev-parse", f"{base}^{{tree}}")
     _assert_nothing_left_behind(clone, tmp_path / "tmp")
 
 

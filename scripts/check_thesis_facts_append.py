@@ -506,7 +506,12 @@ def main() -> int:
         print(f"{VERDICT_REFUSAL_PREFIX}{exc}", file=sys.stderr)
         return 1
     print(verdict.summary)
-    print(f"candidate commit {verdict.candidate_commit} tree {verdict.candidate_tree}")
+    # The second line names every object the verdict is a function of: the
+    # candidate pair always, and the base pair whenever a base was supplied.
+    subject = f"candidate commit {verdict.candidate_commit} tree {verdict.candidate_tree}"
+    if verdict.base_commit is not None:
+        subject += f" base commit {verdict.base_commit} tree {verdict.base_tree}"
+    print(subject)
     return 0
 
 
