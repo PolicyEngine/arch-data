@@ -3538,3 +3538,180 @@ def test_identical_byte_refetch_keeps_r2_identified_shared_file_valid(tmp_path):
         assert not any("filename_collision" in error for error in sweep.errors)
         assert not any("identify different bytes" in error for error in sweep.errors)
         assert sweep.valid
+
+
+def _write_unidentified_shared_manifests(package, source, *, filename="shared.csv"):
+    """Two manifests naming one package-local file with no identity yet."""
+    manifest_paths = (package / "manifest_a.yaml", package / "manifest_b.yaml")
+    for path in manifest_paths:
+        path.write_text(
+            yaml.safe_dump(
+                {
+                    "source_id": "publisher",
+                    "package_id": path.stem,
+                    "files": {
+                        2024: {
+                            "filename": filename,
+                            "source_url": str(source),
+                        }
+                    },
+                },
+                sort_keys=False,
+            )
+        )
+    return manifest_paths
+
+
+def _fake_wrangler(tmp_path):
+    log = tmp_path / "wrangler.log"
+    wrangler = tmp_path / "wrangler"
+    wrangler.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$*\" >> {log}\necho ok\n")
+    wrangler.chmod(0o755)
+    return wrangler, log
+
+
+def test_selected_publication_of_a_shared_unidentified_file_keeps_siblings_valid(
+    tmp_path,
+):
+    """Two manifests may name one package-local file before either records an
+    identity. Publishing only one of them records its checksum and locator;
+    the sibling, which still records nothing, must not become a false
+    collision, and its own later publication must record the same identity."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    content = b"shared publisher table"
+    (package / "shared.csv").write_bytes(content)
+    source = tmp_path / "publisher-download.csv"
+    source.write_bytes(content)
+    manifest_a, manifest_b = _write_unidentified_shared_manifests(package, source)
+    wrangler, log = _fake_wrangler(tmp_path)
+    expected_sha256 = hashlib.sha256(content).hexdigest()
+
+    assert inventory_source_artifacts(package).valid
+
+    selected = publish_source_artifacts(
+        package, manifest_filename="manifest_a.yaml", wrangler_command=str(wrangler)
+    )
+    assert selected.valid
+    assert selected.counts["uploaded_count"] == 1
+    assert yaml.safe_load(manifest_a.read_text())["files"][2024]["sha256"] == (
+        expected_sha256
+    )
+    assert "sha256" not in yaml.safe_load(manifest_b.read_text())["files"][2024]
+
+    inventory = inventory_source_artifacts(package)
+    assert inventory.valid, inventory.errors
+    assert not any("filename_collision" in error for error in inventory.errors)
+
+    sibling = publish_source_artifacts(
+        package, manifest_filename="manifest_b.yaml", wrangler_command=str(wrangler)
+    )
+    assert sibling.valid, sibling.errors
+    assert sibling.counts["uploaded_count"] == 1
+    recorded_b = yaml.safe_load(manifest_b.read_text())["files"][2024]
+    recorded_a = yaml.safe_load(manifest_a.read_text())["files"][2024]
+    assert recorded_b["sha256"] == expected_sha256
+    assert recorded_b["storage"]["r2"]["key"].endswith(f"/{expected_sha256}/shared.csv")
+    assert recorded_a["storage"]["r2"]["key"].endswith(f"/{expected_sha256}/shared.csv")
+    assert len(log.read_text().splitlines()) == 2
+
+    everything = publish_source_artifacts(package, wrangler_command=str(wrangler))
+    assert everything.valid, everything.errors
+    assert everything.counts["uploaded_count"] == 0
+    assert everything.counts["skipped_count"] == 2
+
+
+def test_partial_upload_failure_of_a_shared_file_stays_retryable(tmp_path, monkeypatch):
+    """A full sweep whose second upload fails records the first manifest's
+    identity only. The retry must not report a collision for the sibling that
+    still records nothing, and must finish recording the same identity."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    content = b"shared publisher table"
+    (package / "shared.csv").write_bytes(content)
+    source = tmp_path / "publisher-download.csv"
+    source.write_bytes(content)
+    manifest_a, manifest_b = _write_unidentified_shared_manifests(package, source)
+    expected_sha256 = hashlib.sha256(content).hexdigest()
+    uploads = []
+    failures = {"remaining": 1}
+
+    def uploader(location, local_path, *, wrangler_command):
+        uploads.append(location)
+        if len(uploads) == 2 and failures["remaining"]:
+            failures["remaining"] -= 1
+            return ArtifactCommandResult(
+                command=("failing-uploader",), returncode=1, stdout="", stderr="boom"
+            )
+        return ArtifactCommandResult(
+            command=("uploader",), returncode=0, stdout="", stderr=""
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", uploader)
+
+    first = publish_source_artifacts(package)
+    assert not first.valid
+    assert first.counts["uploaded_count"] == 1
+    assert first.counts["failed_count"] == 1
+    recorded = {
+        path.name: yaml.safe_load(path.read_text())["files"][2024]
+        for path in (manifest_a, manifest_b)
+    }
+    identified = [name for name, entry in recorded.items() if "sha256" in entry]
+    assert len(identified) == 1
+
+    inventory = inventory_source_artifacts(package)
+    assert inventory.valid, inventory.errors
+    assert not any("filename_collision" in error for error in inventory.errors)
+
+    retry = publish_source_artifacts(package)
+    assert retry.valid, retry.errors
+    assert retry.counts["uploaded_count"] == 1
+    assert retry.counts["skipped_count"] == 1
+    assert retry.counts["failed_count"] == 0
+    for path in (manifest_a, manifest_b):
+        entry = yaml.safe_load(path.read_text())["files"][2024]
+        assert entry["sha256"] == expected_sha256
+        assert entry["storage"]["r2"]["key"].endswith(f"/{expected_sha256}/shared.csv")
+    assert len(uploads) == 3
+
+
+def test_sweeps_refuse_identifying_a_shared_file_whose_bytes_changed(
+    tmp_path, monkeypatch
+):
+    """An unidentified sibling is not a collision, but identifying it would
+    hash the package-local bytes. When those bytes no longer match what the
+    identified owner records, every sweep refuses before any upload."""
+    package = tmp_path / "data" / "publisher" / "package"
+    package.mkdir(parents=True)
+    old_content = b"shared publisher table"
+    new_content = b"shared publisher table, revised"
+    (package / "shared.csv").write_bytes(new_content)
+    source = tmp_path / "publisher-download.csv"
+    source.write_bytes(new_content)
+    manifest_a, manifest_b = _write_unidentified_shared_manifests(package, source)
+    identified = yaml.safe_load(manifest_a.read_text())
+    identified["files"][2024]["sha256"] = hashlib.sha256(old_content).hexdigest()
+    identified["files"][2024]["size_bytes"] = len(old_content)
+    manifest_a.write_text(yaml.safe_dump(identified, sort_keys=False))
+    uploads = []
+
+    def unexpected_uploader(location, local_path, *, wrangler_command):
+        uploads.append(location)
+        return ArtifactCommandResult(
+            command=("uploader",), returncode=0, stdout="", stderr=""
+        )
+
+    monkeypatch.setattr("chronicle.artifacts._upload_r2_object", unexpected_uploader)
+
+    inventory = inventory_source_artifacts(package)
+    published = publish_source_artifacts(package)
+    sibling_only = publish_source_artifacts(
+        package, manifest_filename="manifest_b.yaml"
+    )
+
+    for sweep in (inventory, published, sibling_only):
+        assert not sweep.valid
+        assert any("two identities" in error for error in sweep.errors), sweep.errors
+    assert uploads == []
+    assert "sha256" not in yaml.safe_load(manifest_b.read_text())["files"][2024]
