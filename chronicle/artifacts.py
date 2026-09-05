@@ -1284,16 +1284,16 @@ def publish_source_artifacts(
 
         for package_manifest_name, package_manifest in package_manifests.items():
             package_manifest_path = Path(package_manifest_name)
-            package_source_id = (
-                source_id
-                if source_id is not None
-                else package_manifest.get("source_id")
-            )
-            package_id_value = (
-                package_id
-                if package_id is not None
-                else package_manifest.get("package_id")
-            )
+            # ``--source-id`` / ``--package-id`` complete or confirm the
+            # *selected* manifest's identity. An unselected sibling is only
+            # preflighted so the package boundary holds; it keeps its own
+            # identifiers, which may legitimately differ.
+            if package_manifest_path == manifest_path:
+                package_source_id = manifest_source_id
+                package_id_value = manifest_package_id
+            else:
+                package_source_id = package_manifest.get("source_id")
+                package_id_value = package_manifest.get("package_id")
             package_files = _manifest_files(package_manifest, package_manifest_path)
             for year, spec in package_files.items():
                 entry, _updated_spec = _publish_raw_manifest_entry(
