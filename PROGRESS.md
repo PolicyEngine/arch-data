@@ -18,6 +18,11 @@
 - Read GitNexus debugging guidance; graph tools are unavailable, so use local
   code tracing and failing-first regression tests.
 
+- Finding 2 reproduced before its fix: 13 unsafe publish staging cases
+  reached mocked side effects; the final-file symlink control passed. Direct
+  pytest exit 1, 13 failed and 1 passed. Exact command and observations are
+  recorded in the external report (`finding2-red-confirmed.log`).
+
 ## Next
 
 - Reproduce each finding with failing tests and record exact commands and

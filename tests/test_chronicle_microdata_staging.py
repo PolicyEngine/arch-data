@@ -8,7 +8,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from chronicle.artifacts import ArtifactCommandResult
+from chronicle.artifacts import (
+    ArtifactCommandResult,
+    microdata_staging_path,
+    publish_source_artifacts,
+)
 from chronicle.registration import ManifestAccessError
 from tests.test_chronicle_microdata_registration import (
     PUBLIC_BYTES,
@@ -22,12 +26,12 @@ from tests.test_chronicle_microdata_registration import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.mark.parametrize(
-    "destination",
-    [
+@pytest.fixture(
+    params=[
         "output-directory",
         "nested-output-directory",
         "repository-directory",
+        "repository-data-directory",
         "another-package-directory",
         "another-package-yml",
         "another-named-package",
@@ -40,9 +44,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
         "symlink-filename-component",
     ],
 )
-def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
-    tmp_path, monkeypatch, destination
-):
+def unsafe_microdata_staging(tmp_path, request):
+    destination = request.param
     output = tmp_path / "package"
     staging = tmp_path / "staging"
     if destination == "output-directory":
@@ -51,6 +54,8 @@ def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
         staging = output / "nested" / "staging"
     elif destination == "repository-directory":
         staging = REPO_ROOT / ".chronicle-test-staging-refusal" / "nested"
+    elif destination == "repository-data-directory":
+        staging = REPO_ROOT / "db" / "data" / ".chronicle-test-staging-refusal"
     elif destination in {
         "another-package-directory",
         "another-package-yml",
@@ -108,6 +113,13 @@ def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
                 else alias / "staging"
             )
 
+    return output, staging
+
+
+def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
+    monkeypatch, unsafe_microdata_staging
+):
+    output, staging = unsafe_microdata_staging
     effects = []
     monkeypatch.setattr(
         "chronicle.artifacts._registration_lock",
@@ -147,6 +159,70 @@ def test_fetch_refuses_unsafe_microdata_staging_before_publisher_read(
         _fetch_release(output, staging_dir=staging, upload_r2=True)
 
     assert effects == []
+
+
+def test_publish_refuses_unsafe_microdata_staging_before_read_or_upload(
+    tmp_path, monkeypatch, unsafe_microdata_staging
+):
+    output, staging = unsafe_microdata_staging
+    _serve(monkeypatch, PUBLIC_BYTES)
+    _fetch_release(output, staging_dir=tmp_path / "safe-staging")
+    manifest_path = output / "manifest.yaml"
+    before = manifest_path.read_bytes()
+    staged = microdata_staging_path(
+        staging_dir=staging,
+        source_id="census_acs",
+        package_id="census-acs-pums-2022-1yr",
+        year=2022,
+        sha256=PUBLIC_SHA,
+        filename="csv_hus.zip",
+    )
+    effects = []
+    original_is_file = Path.is_file
+    original_read_bytes = Path.read_bytes
+    # Simulate existing staged bytes without writing into any unsafe tree.
+    monkeypatch.setattr(
+        Path, "is_file", lambda path: path == staged or original_is_file(path)
+    )
+
+    def read_bytes(path):
+        if path == staged:
+            effects.append(("artifact_read", path))
+            return PUBLIC_BYTES
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+    monkeypatch.setattr(
+        "chronicle.artifacts._registration_lock",
+        lambda path: effects.append(("lock", path)) or nullcontext(),
+    )
+    monkeypatch.setattr(
+        "chronicle.artifacts._upload_r2_object",
+        lambda location, path, **kwargs: (
+            effects.append(("upload", path))
+            or ArtifactCommandResult(
+                command=("stub",), returncode=0, stdout="", stderr=""
+            )
+        ),
+    )
+    monkeypatch.setattr(
+        Path,
+        "write_text",
+        lambda path, content, **kwargs: effects.append(("manifest_write", path)),
+    )
+
+    report = publish_source_artifacts(output, staging_dir=staging)
+
+    assert effects == [], report
+    assert not report.valid
+    assert any(
+        ("staging" in error.lower() or "artifact_path_is_symlink" in error)
+        for error in (
+            *report.errors,
+            *(e for entry in report.entries for e in entry.errors),
+        )
+    )
+    assert manifest_path.read_bytes() == before
 
 
 @pytest.mark.parametrize("spelling", ["absolute", "relative", "parent-component"])
