@@ -2,8 +2,8 @@
 
 ## State
 
-- In progress, detached at `46560bc`; two peer-review findings to reproduce
-  before implementation. Prior lanes' journals below are preserved.
+- Both findings fixed on detached code commit `dfd3b99` (started `46560bc`).
+  Final full-suite verification is starting; prior journals are preserved.
 - Report: `/tmp/chronicle-227-fix/out.md`; this lane's evidence directory:
   `/tmp/chronicle-227-fix/bbd833a9-round2/`.
 
@@ -32,6 +32,10 @@
   Known-distinct public tables remain readable. Focused reader/artifact suite:
   106 passed; inherited hash-only diagnostic order is preserved.
 - Independent implementation review passes with no remaining findings.
+- Fix commits: registration `651571b`; reader `dfd3b99`. Reproduction commits:
+  `883c487`, `9c8738e`, and expanded reader controls `e543cea`.
+- Final `uv run ruff check .` and format check of all four changed Python
+  files pass with direct exit 0. Full pytest is next; code will remain fixed.
 
 ## Next
 
