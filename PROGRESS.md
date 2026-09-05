@@ -8,7 +8,8 @@
   `/tmp/chronicle-227-fix/bbd833a9-round1/prior-out.md`; new evidence lives
   in that same round-specific directory. Prior journals below are preserved.
 - All three findings are reproduced, fixed, and covered by regressions.
-  Independent review passes. Required final verification is beginning.
+  Independent review passes. Required full pytest is running on fixed code
+  commit `adb030c`; final Ruff lint and six-file formatting checks passed.
 
 ## Done
 
@@ -45,13 +46,16 @@
 - Finding 1 fixed by passing effective R2 digests to directory validation
   and reusing the shared owner-agreement validator with the observed digest
   from each local/cache/fetched/ZIP read, before return or cache writes.
-  Six failing-first regressions pass; positive fetch/ZIP controls added.
+  Six failing-first regressions pass; positive fetch/ZIP controls added. Final
+  focused source/shared-owner coverage passes: 72 passed, 341 deselected.
 - Whole-repository Ruff lint passes; formatting checks pass for all six
   changed Python files. No protected paths changed; prior journal preserved.
 
 ## Next
 
-- Run the full pytest suite with direct exit status on fixed code.
+- Await the full pytest suite direct exit status on fixed code. The invocation
+  uses UV offline, the cached OTS 0.7.2 executable, and removes live Supabase
+  credentials. Log: `bbd833a9-round1/final-pytest.log` beside the report.
 - Record final counts and commit map in the external report; commit final
   state/done/next journal and scope verification.
 - Keep detached HEAD; no push, branches, stash, tracked data, protected files,
