@@ -2,45 +2,53 @@
 
 ## State
 
-- Both findings fixed on detached code commit `dfd3b99` (started `46560bc`).
-  Final full-suite verification is starting; prior journals are preserved.
-- Report: `/tmp/chronicle-227-fix/out.md`; this lane's evidence directory:
-  `/tmp/chronicle-227-fix/bbd833a9-round2/`.
+- Complete. Started detached at `46560bc`; final code commit `dfd3b99` fixes
+  both findings. Only journal commits follow the tested code.
+- Full final pytest passes with direct exit 0: **1,737 passed, 1 skipped,
+  42 warnings in 1,461.69 seconds (24:21)**. Repository Ruff lint and formatting
+  checks for all four changed Python files pass with direct exit 0.
+- Report: `/tmp/chronicle-227-fix/out.md`; evidence:
+  `/tmp/chronicle-227-fix/bbd833a9-round2/`. Prior report preserved there as
+  `prior-out.md`; prior journals below remain unchanged.
 
 ## Done
 
-- Read the prior journal and previous fix/test diffs; confirmed clean detached
-  starting state. No source packages, contract schemas, or protected files
-  need modification. GitNexus tools are unavailable; trace using local source.
-- Established the external report and a committed state/done/next journal.
-- Finding 2 reproduced before implementation: 10 failures reached mocked
-  filesystem/replacement sentinels; 1 agreeing-owner/history control passed.
-  Evidence: `bbd833a9-round2/finding2-red.log`; no unsafe mutation occurred.
-- Finding 1 reproduced before implementation: all 32 alias cases failed
-  with DID NOT RAISE, including build_source_rows and artifact content through
-  cache/mock fetch with current/archived filename/digest and R2-only pins.
-- Expanded reader reproduction: 33 failures and 1 known-distinct control pass.
-  An unpinned table beside public microdata also needs identity before I/O;
-  otherwise its digest cannot be classified before fetching.
-- Finding 2 fixed: every current/history locator is validated explicitly,
-  current identity mismatches refuse, and the shared owner validator checks
-  every effective owner during both preparation passes. No artifact bytes
-  are read. Final standalone registration suite: 228 passed.
-- Finding 1 fixed: parser identity checks classify all microdata siblings by
-  current and archived filename/digest, including R2-only selected pins,
-  before artifact I/O and in the existing content validation callback.
-  Known-distinct public tables remain readable. Focused reader/artifact suite:
-  106 passed; inherited hash-only diagnostic order is preserved.
-- Independent implementation review passes with no remaining findings.
-- Fix commits: registration `651571b`; reader `dfd3b99`. Reproduction commits:
-  `883c487`, `9c8738e`, and expanded reader controls `e543cea`.
-- Final `uv run ruff check .` and format check of all four changed Python
-  files pass with direct exit 0. Full pytest is next; code will remain fixed.
+- Committed the initial state/done/next journal in `79ae427`, then committed
+  each finding's failing regressions before production implementation.
+- Finding 1: initial 32 red cases returned bytes or rows despite valid public
+  microdata sibling aliases; expanded run had 33 failures and 1 distinct-table
+  control pass. Test commits `9c8738e`, `e543cea`; fix `dfd3b99` classifies
+  sibling current/archived filenames and digests, including R2-only pins, before
+  artifact I/O and rechecks observed digests before return/cache mutation.
+  Unpinned table reads beside microdata require recorded identity before I/O;
+  known-distinct tables pass. All 106 focused reader/artifact cases pass.
+- Finding 2: 10 red cases reached mocked filesystem/replacement sentinels;
+  1 agreeing-owner/history control passed. Test commit `883c487`; fix `651571b`
+  explicitly validates every current/history locator and current identity,
+  then uses the same effective-owner validator as publication/inventory in both
+  preparation passes. Registration remains metadata-only; a read sentinel
+  protects that contract. Final standalone registration suite: 228 passed.
+- Exact reproduction commands, observed failures, test names, full commit SHAs,
+  supplemental runs, and implementation details are in the external report.
+- Final `uv run ruff check .`: direct exit 0, `All checks passed!`.
+  Final `uv run ruff format --check` for four changed Python files: direct
+  exit 0, `4 files already formatted`. Logs: `final-ruff.log`, `final-format.log`.
+- Full `uv run pytest -q -p no:cacheprovider`: direct exit 0, counts above;
+  log `final-pytest.log`. Used permitted UV cache, offline resolution, cached
+  real OTS 0.7.2 executable, and removed live Supabase credentials. No pytest
+  output pipeline and no code or test changes while the full suite ran.
+- Independent implementation and report audits pass. Scope/AST audit confirms
+  exactly the two implementation modules, two test modules, and this journal
+  changed; all 255 inherited test functions are unchanged. Six new functions
+  add 46 parametrized cases. Evidence: `scope-audit.json`.
+- No protected/data/OTS edits; all 15 UK checksum/size pins unchanged. No
+  source packages, contract schemas, or publisher facts changed. No GitHub
+  calls, pushes, branches, stash, or real publication.
 
 ## Next
 
-- Run focused verification, independent review, final Ruff checks, and the full
-  pytest suite with direct exit status; record counts and commit SHAs.
+- None. Both fixes, required verification, and final report are complete.
+  Commits remain on detached HEAD.
 
 # PR #227 Astra gate bbd833a9 — round 1 fix lane
 
