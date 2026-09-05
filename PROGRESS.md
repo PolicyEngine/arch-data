@@ -7,7 +7,8 @@
 - Report: `/tmp/chronicle-227-fix/out.md`. Prior report preserved in
   `/tmp/chronicle-227-fix/bbd833a9-round1/prior-out.md`; new evidence lives
   in that same round-specific directory. Prior journals below are preserved.
-- Implementation and regression work is beginning; no finding is fixed yet.
+- All findings reproduced and committed before fixes. Publication staging
+  and registration are fixed; source-reader verification is in progress.
 
 ## Done
 
@@ -36,11 +37,15 @@
   preflight and actual publication. All 33 staging/publication/locking tests
   pass; scoped Ruff lint and format checks pass (`finding2-green.log`).
 
+- Finding 3 fixed in `b820b18` by validating the complete proposed manifest
+  set with effective R2 digests in both preparation passes. All 263 registration
+  and package-directory tests pass; scoped Ruff lint/format pass. Fix uses the
+  existing validator and retains archived-collision checks.
+
 ## Next
 
-- Reproduce each finding with failing tests and record exact commands and
-  observed failures in the external report before implementing its fix.
-- Reuse the existing shared validators; commit every coherent step.
+- Finish the source-reader fix and review all final diffs.
+- Commit every coherent step and maintain the external evidence report.
 - Run repository Ruff lint, formatting checks for changed Python files, and
   the full pytest suite with direct exit status; record counts and commit map.
 - Keep detached HEAD; no push, branches, stash, tracked data, protected files,
