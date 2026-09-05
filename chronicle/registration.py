@@ -147,23 +147,30 @@ class StrictManifestLoader(yaml.SafeLoader):
     would read as one entry and the shadowed entry would be dropped by the
     next write. A manifest is the record the byte boundary is decided from,
     so a document the loader cannot represent faithfully is malformed.
+
+    ``<<`` merges are honoured with YAML precedence (an explicit key overrides
+    a merged one) but never by mutating a node: PyYAML's ``flatten_mapping``
+    rewrites the node in place, and because construction is lazy a later
+    merge of an anchored entry would turn that entry's inherited keys into
+    apparent explicit duplicates. Merge sources are expanded into a fresh
+    pair list instead, and every mapping reached through a merge gets the
+    same duplicate check as a mapping the document spells out directly.
     """
 
-    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
-        if not isinstance(node, yaml.MappingNode):
-            raise yaml.constructor.ConstructorError(
-                None,
-                None,
-                f"expected a mapping node, but found {node.id}",
-                node.start_mark,
-            )
-        # Duplicates are judged among the keys the document spells out, before
-        # ``<<`` merges are expanded: an explicit key that overrides a merged
-        # default is valid YAML (the explicit key wins), while two explicit
-        # spellings of one key are the silent shadowing this loader refuses.
-        explicit: set[Any] = set()
-        for key_node, _value_node in node.value:
-            if key_node.tag == "tag:yaml.org,2002:merge":
+    _MERGE_TAG = "tag:yaml.org,2002:merge"
+
+    def _explicit_pairs(self, node: Any, deep: bool) -> tuple[list[Any], list[Any]]:
+        """Split a mapping node into merge sources and its explicit pairs.
+
+        Refuses duplicate explicit keys on the node's own pair list, before any
+        merge is consulted.
+        """
+        merge_sources: list[Any] = []
+        explicit_pairs: list[Any] = []
+        seen: set[Any] = set()
+        for key_node, value_node in node.value:
+            if key_node.tag == self._MERGE_TAG:
+                merge_sources.append(value_node)
                 continue
             key = self.construct_object(key_node, deep=deep)
             try:
@@ -175,17 +182,60 @@ class StrictManifestLoader(yaml.SafeLoader):
                     f"found unhashable key ({exc})",
                     key_node.start_mark,
                 ) from exc
-            if key in explicit:
+            if key in seen:
                 raise yaml.constructor.ConstructorError(
                     "while constructing a mapping",
                     node.start_mark,
                     f"found duplicate key {key!r}",
                     key_node.start_mark,
                 )
-            explicit.add(key)
-        self.flatten_mapping(node)
+            seen.add(key)
+            explicit_pairs.append((key_node, value_node))
+        return merge_sources, explicit_pairs
+
+    def _merged_pairs(self, source: Any, deep: bool) -> list[Any]:
+        """Return the pairs a ``<<`` source contributes, validated, unmutated."""
+        if isinstance(source, yaml.MappingNode):
+            nested_sources, explicit = self._explicit_pairs(source, deep)
+            pairs: list[Any] = []
+            for nested in nested_sources:
+                pairs.extend(self._merged_pairs(nested, deep))
+            pairs.extend(explicit)
+            return pairs
+        if isinstance(source, yaml.SequenceNode):
+            pairs = []
+            for subnode in source.value:
+                if not isinstance(subnode, yaml.MappingNode):
+                    raise yaml.constructor.ConstructorError(
+                        "while constructing a mapping",
+                        source.start_mark,
+                        f"expected a mapping for merging, but found {subnode.id}",
+                        subnode.start_mark,
+                    )
+                pairs.extend(self._merged_pairs(subnode, deep))
+            return pairs
+        raise yaml.constructor.ConstructorError(
+            "while constructing a mapping",
+            source.start_mark,
+            f"expected a mapping or list of mappings for merging, but found {source.id}",
+            source.start_mark,
+        )
+
+    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
+        if not isinstance(node, yaml.MappingNode):
+            raise yaml.constructor.ConstructorError(
+                None,
+                None,
+                f"expected a mapping node, but found {node.id}",
+                node.start_mark,
+            )
+        merge_sources, explicit_pairs = self._explicit_pairs(node, deep)
+        merged_pairs: list[Any] = []
+        for source in merge_sources:
+            merged_pairs.extend(self._merged_pairs(source, deep))
         mapping: dict[Any, Any] = {}
-        for key_node, value_node in node.value:
+        # Merged pairs first, explicit pairs last: YAML precedence, last wins.
+        for key_node, value_node in [*merged_pairs, *explicit_pairs]:
             key = self.construct_object(key_node, deep=deep)
             mapping[key] = self.construct_object(value_node, deep=deep)
         return mapping
