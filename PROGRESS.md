@@ -27,6 +27,11 @@
   contradictory shared-file bytes (R2-only identities plus local/cache/fetched/ZIP
   unidentified bytes). Direct exit 1, six failed; evidence is in `finding1-red.log`.
 
+- Finding 3 reproduced before its fix: four unrelated existing sibling
+  collision variants reached filesystem-mutation sentinels; a conflict added
+  at lock acquisition reached replacement. Direct exit 1, five failed; exact
+  evidence is in `finding3-red.log` and the external report.
+
 ## Next
 
 - Reproduce each finding with failing tests and record exact commands and

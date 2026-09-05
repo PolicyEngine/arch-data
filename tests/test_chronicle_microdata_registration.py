@@ -16,6 +16,7 @@ repository guard in ``tests/test_chronicle_manifest_kind.py``.
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 import fcntl
 import hashlib
 import json
@@ -3529,3 +3530,119 @@ def test_package_validation_refuses_hash_only_archived_revision_alias(
         }
 
     assert expected_error in validate_package_directory(manifests)
+
+
+def _registration_sibling_collision(package: Path, collision: str) -> str:
+    """Write valid siblings whose disagreement is unrelated to the new entry."""
+    package.mkdir()
+    (package / "manifest.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "kind": "microdata_release",
+                "source_id": "dwp",
+                "package_id": "dwp-frs-2023-24",
+                "files": {},
+            }
+        )
+    )
+    if collision.startswith("archived-"):
+        first = _public_manifest_with_archived_revision()
+        filename = (
+            "archived-alias.tab" if collision == "archived-digest" else "ARCHIVED.TAB"
+        )
+        sha256 = FIXTURE_SHA if collision == "archived-digest" else OTHER_SHA
+        second = {
+            "kind": "microdata_release",
+            "files": {2023: [_attested_entry(filename=filename, sha256=sha256)]},
+        }
+        expected_error = (
+            f"archived_sha256_collision:{FIXTURE_SHA}"
+            if collision == "archived-digest"
+            else "archived_filename_collision:archived.tab"
+        )
+    else:
+        manifests = []
+        for digest in (FIXTURE_SHA, OTHER_SHA):
+            entry = {"filename": "table.csv"}
+            if collision == "r2-digest":
+                key = f"raw/dwp/dwp-tables/2023/{digest}/table.csv"
+                entry["storage"] = {
+                    "r2": {"provider": "r2", "uri": f"r2://ledger-raw/{key}"}
+                }
+            else:
+                entry["sha256"] = digest
+            manifests.append({"kind": "publisher_table", "files": {2023: entry}})
+        first, second = manifests
+        expected_error = "filename_collision_across_manifests:table.csv"
+    for name, manifest in (("first", first), ("second", second)):
+        (package / f"manifest_{name}.yaml").write_text(yaml.safe_dump(manifest))
+    return expected_error
+
+
+@pytest.mark.parametrize(
+    "collision",
+    ["declared-digest", "r2-digest", "archived-digest", "archived-filename"],
+)
+def test_registration_refuses_unrelated_sibling_collision_before_mutation(
+    tmp_path, monkeypatch, collision
+):
+    package = tmp_path / "package"
+    expected_error = _registration_sibling_collision(package, collision)
+    before = {path.name: path.read_bytes() for path in package.iterdir()}
+    lock_path = _registration_lock_path(package)
+    assert not lock_path.exists()
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    def unexpected_mutation(*args, **kwargs):
+        pytest.fail("existing sibling collision reached a filesystem mutation")
+
+    monkeypatch.setattr(Path, "mkdir", unexpected_mutation)
+    monkeypatch.setattr(
+        "chronicle.registration._registration_lock", unexpected_mutation
+    )
+    monkeypatch.setattr(
+        "chronicle.registration._atomic_replace_manifest", unexpected_mutation
+    )
+    with pytest.raises(HashOnlyRegistrationError, match=expected_error):
+        _register(package, filename="unrelated.tab", sha256="c" * 64)
+
+    assert not lock_path.exists()
+    assert {path.name: path.read_bytes() for path in package.iterdir()} == before
+
+
+def test_registration_rechecks_sibling_collision_under_lock_before_replacement(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "package"
+    expected_error = _registration_sibling_collision(package, "declared-digest")
+    sibling = package / "manifest_second.yaml"
+    sibling_bytes = sibling.read_bytes()
+    sibling.unlink()
+    original = (package / "manifest.yaml").read_bytes()
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+    lock_entries = []
+
+    @contextmanager
+    def collision_while_acquiring_lock(output):
+        assert output == package
+        lock_entries.append(output)
+        sibling.write_bytes(sibling_bytes)
+        yield
+
+    def unexpected_replacement(*args, **kwargs):
+        pytest.fail("sibling collision under the lock reached manifest replacement")
+
+    monkeypatch.setattr(
+        "chronicle.registration._registration_lock", collision_while_acquiring_lock
+    )
+    monkeypatch.setattr(
+        "chronicle.registration._atomic_replace_manifest", unexpected_replacement
+    )
+    with pytest.raises(HashOnlyRegistrationError, match=expected_error):
+        _register(package, filename="unrelated.tab", sha256="c" * 64)
+
+    assert lock_entries == [package]
+    assert (package / "manifest.yaml").read_bytes() == original
+    assert sibling.read_bytes() == sibling_bytes
