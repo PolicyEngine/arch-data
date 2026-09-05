@@ -2113,6 +2113,29 @@ def _assert_shared_owner_identities_agree(
         )
 
 
+def _effective_recorded_digest(
+    manifest_name: str, vintage: Any, entry: Mapping[str, Any]
+) -> str | None:
+    """Return the digest an entry's recorded R2 key encodes, if it has one.
+
+    Two manifests may identify one package-local file through identical
+    content-addressed R2 locators without declaring ``sha256``; refetching
+    those bytes records ``sha256`` on the selected manifest only. The
+    directory-level collision check must compare the identities the entries
+    *effectively* record -- the same identity :func:`_recorded_identity`
+    resolves -- so a sibling that only carries the locator does not read as
+    an empty digest. A malformed locator is the per-entry preflight's error,
+    not a collision: fall back to the declared field for it.
+    """
+    try:
+        recorded = _validated_recorded_r2(
+            entry, manifest_path=Path(manifest_name), year=vintage
+        )
+    except SourceArtifactManifestError:
+        return None
+    return None if recorded is None else recorded.sha256
+
+
 def _assert_package_file_owner_identities_agree(
     manifests: Mapping[str, dict[str, Any]],
 ) -> None:
@@ -2123,7 +2146,9 @@ def _assert_package_file_owner_identities_agree(
     as one package boundary before a selected manifest can upload anything.
     Entry-shape and local-file errors remain the per-entry preflight's job.
     """
-    collision_codes = validate_package_directory(manifests)
+    collision_codes = validate_package_directory(
+        manifests, entry_digest=_effective_recorded_digest
+    )
     if collision_codes:
         raise SourceArtifactManifestError(
             "Package manifests identify different bytes for one package-local "

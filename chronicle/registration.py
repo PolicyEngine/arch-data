@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import re
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 import unicodedata
 
 import yaml
@@ -84,25 +84,35 @@ def package_manifest_paths(package_dir: Path) -> list[Path]:
 
 def validate_package_directory(
     manifests: Mapping[str, Mapping[str, Any] | None],
+    *,
+    entry_digest: Callable[[str, Any, Mapping[str, Any]], str | None] | None = None,
 ) -> tuple[str, ...]:
     """Return filename-identity collisions across a package's manifests.
 
     Two manifests may name one physical file only when they record the same
     digest. A differing digest means the same package-local bytes have two
     incompatible identities, so no command may act through either record.
+
+    ``entry_digest(manifest_name, vintage, entry)`` resolves an entry's
+    *effective* recorded digest -- for example the one its content-addressed
+    R2 key encodes when the entry declares no ``sha256`` -- and returns
+    ``None`` to fall back to the declared ``sha256`` field. Without it only the
+    declared field is compared.
     """
     by_name: dict[str, list[tuple[str, str]]] = {}
     for name, manifest in manifests.items():
         files = manifest.get("files") if isinstance(manifest, Mapping) else None
         if not isinstance(files, Mapping):
             continue
-        for entry in files.values():
+        for vintage, entry in files.items():
             if not isinstance(entry, Mapping):
                 continue
             filename = entry.get("filename")
             if filename is None:
                 continue
-            digest = entry.get("sha256")
+            digest = entry_digest(name, vintage, entry) if entry_digest else None
+            if digest is None:
+                digest = entry.get("sha256")
             digest = digest.strip() if isinstance(digest, str) else ""
             by_name.setdefault(filename_key(filename), []).append((name, digest))
 
@@ -193,13 +203,30 @@ class StrictManifestLoader(yaml.SafeLoader):
             explicit_pairs.append((key_node, value_node))
         return merge_sources, explicit_pairs
 
-    def _merged_pairs(self, source: Any, deep: bool) -> list[Any]:
-        """Return the pairs a ``<<`` source contributes, validated, unmutated."""
+    def _merged_pairs(
+        self, source: Any, deep: bool, active: tuple[int, ...]
+    ) -> list[Any]:
+        """Return the pairs a ``<<`` source contributes, validated, unmutated.
+
+        ``active`` holds the mappings whose merges are being expanded on the
+        way to ``source``. A source that is already active merges itself,
+        directly or through nested merges, which has no expansion: refuse it
+        as a ``ConstructorError`` (a ``yaml.YAMLError`` every manifest reader
+        handles) rather than recursing until the interpreter gives up.
+        """
         if isinstance(source, yaml.MappingNode):
+            if id(source) in active:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping",
+                    source.start_mark,
+                    "found a recursive merge: a mapping merges itself",
+                    source.start_mark,
+                )
             nested_sources, explicit = self._explicit_pairs(source, deep)
+            nested_active = (*active, id(source))
             pairs: list[Any] = []
             for nested in nested_sources:
-                pairs.extend(self._merged_pairs(nested, deep))
+                pairs.extend(self._merged_pairs(nested, deep, nested_active))
             pairs.extend(explicit)
             return pairs
         if isinstance(source, yaml.SequenceNode):
@@ -216,7 +243,7 @@ class StrictManifestLoader(yaml.SafeLoader):
             # the later mappings first and the first mapping last.
             pairs = []
             for subnode in reversed(source.value):
-                pairs.extend(self._merged_pairs(subnode, deep))
+                pairs.extend(self._merged_pairs(subnode, deep, active))
             return pairs
         raise yaml.constructor.ConstructorError(
             "while constructing a mapping",
@@ -236,7 +263,7 @@ class StrictManifestLoader(yaml.SafeLoader):
         merge_sources, explicit_pairs = self._explicit_pairs(node, deep)
         merged_pairs: list[Any] = []
         for source in merge_sources:
-            merged_pairs.extend(self._merged_pairs(source, deep))
+            merged_pairs.extend(self._merged_pairs(source, deep, (id(node),)))
         mapping: dict[Any, Any] = {}
         # Merged pairs first, explicit pairs last: YAML precedence, last wins.
         for key_node, value_node in [*merged_pairs, *explicit_pairs]:
