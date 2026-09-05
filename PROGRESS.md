@@ -1,3 +1,33 @@
+# PR #227 Astra gate bbd833a9 — round 1 fix lane
+
+## State
+
+- Started on detached HEAD `cb4c7ef`; scope is the three supplied findings in
+  source reads, public microdata publication staging, and registration.
+- Report: `/tmp/chronicle-227-fix/out.md`. Prior report preserved in
+  `/tmp/chronicle-227-fix/bbd833a9-round1/prior-out.md`; new evidence lives
+  in that same round-specific directory. Prior journals below are preserved.
+- Implementation and regression work is beginning; no finding is fixed yet.
+
+## Done
+
+- Read prior lane journals and approved-agent rules; inspected the named code
+  and shared validators. This lane changes infrastructure and hermetic tests,
+  not publisher data, source packages, or contract schemas.
+- Established this committed state/done/next journal before implementation.
+- Read GitNexus debugging guidance; graph tools are unavailable, so use local
+  code tracing and failing-first regression tests.
+
+## Next
+
+- Reproduce each finding with failing tests and record exact commands and
+  observed failures in the external report before implementing its fix.
+- Reuse the existing shared validators; commit every coherent step.
+- Run repository Ruff lint, formatting checks for changed Python files, and
+  the full pytest suite with direct exit status; record counts and commit map.
+- Keep detached HEAD; no push, branches, stash, tracked data, protected files,
+  timestamp proofs, or UK pin edits.
+
 # PR #227 integration lane — merge current PR #226 head
 
 ## State
