@@ -22,6 +22,10 @@
 - Expanded reader reproduction: 33 failures and 1 known-distinct control pass.
   An unpinned table beside public microdata also needs identity before I/O;
   otherwise its digest cannot be classified before fetching.
+- Finding 2 fixed: every current/history locator is validated explicitly,
+  current identity mismatches refuse, and the shared owner validator checks
+  every effective owner during both preparation passes. No artifact bytes
+  are read. Final standalone registration suite: 228 passed.
 
 ## Next
 

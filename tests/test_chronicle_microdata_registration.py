@@ -3817,3 +3817,40 @@ def test_registration_accepts_agreeing_recorded_sibling_owners_and_history(
 
     assert report.filename == "unrelated.tab"
     assert sibling_path.read_bytes() == original
+
+
+def test_registration_does_not_read_unidentified_sibling_owner_bytes(
+    tmp_path, monkeypatch
+):
+    package = tmp_path / "package"
+    package.mkdir()
+    (package / "manifest.yaml").write_text(
+        yaml.safe_dump({"kind": "microdata_release", "files": {}})
+    )
+    content = b"public publisher table"
+    table_path = package / "table.csv"
+    table_path.write_bytes(content)
+    digest = hashlib.sha256(content).hexdigest()
+    sibling, _ = _registration_recorded_sibling()
+    locator = sibling["files"][2023]["storage"]["r2"]
+    for field in ("key", "uri"):
+        locator[field] = locator[field].replace(FIXTURE_SHA, digest)
+    sibling["files"][2024] = {"filename": "table.csv"}
+    sibling_path = package / "manifest_tables.yaml"
+    sibling_path.write_text(yaml.safe_dump(sibling))
+    original = sibling_path.read_bytes()
+    original_read_bytes = Path.read_bytes
+    _refuse_read(monkeypatch)
+    _forbid_uploads(monkeypatch)
+
+    def refuse_artifact_read(path):
+        if path == table_path:
+            pytest.fail("hash-only registration read a sibling artifact's bytes")
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", refuse_artifact_read)
+    report = _register(package, filename="unrelated.tab", sha256="c" * 64)
+
+    assert report.filename == "unrelated.tab"
+    assert sibling_path.read_bytes() == original
+    assert original_read_bytes(table_path) == content
