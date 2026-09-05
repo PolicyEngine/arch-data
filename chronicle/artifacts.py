@@ -4188,6 +4188,9 @@ def _effective_recorded_digest(
 
 def _assert_package_file_owner_identities_agree(
     manifests: Mapping[str, dict[str, Any]],
+    *,
+    observed_sha256: Mapping[str, str] | None = None,
+    check_local_files: bool = True,
 ) -> None:
     """Refuse contradictory identities for any package-local filename.
 
@@ -4195,6 +4198,10 @@ def _assert_package_file_owner_identities_agree(
     shared by every manifest in its directory. Validate every identified owner
     as one package boundary before a selected manifest can upload anything.
     Entry-shape and local-file errors remain the per-entry preflight's job.
+
+    Resource readers supply observed digests by filename and disable local
+    filesystem reads: their bytes may come from ZIP resources, cache, or a
+    publisher response, and must agree before they are returned or cached.
     """
     collision_codes = validate_package_directory(
         manifests, entry_digest=_effective_recorded_digest
@@ -4259,6 +4266,9 @@ def _assert_package_file_owner_identities_agree(
     # bytes. Those bytes must already be what the identified owners record,
     # otherwise identifying it would split one package-local file into two
     # identities. Check before any upload or manifest rewrite.
+    observed_by_filename = {
+        filename_key(name): digest for name, digest in (observed_sha256 or {}).items()
+    }
     for key, pending in unidentified.items():
         owners = owners_by_filename.get(key)
         if not owners:
@@ -4266,14 +4276,20 @@ def _assert_package_file_owner_identities_agree(
         expected = owners[0].identity
         assert expected is not None
         for manifest_path, vintage, recorded_name in pending:
-            try:
-                local = matching_directory_entry(manifest_path.parent, recorded_name)
-            except ValueError:
-                # Conflicting spellings are the per-entry preflight's refusal.
-                continue
-            if local is None or local.is_symlink() or not local.is_file():
-                continue
-            actual = hashlib.sha256(local.read_bytes()).hexdigest()
+            actual = observed_by_filename.get(key)
+            if actual is None:
+                if not check_local_files:
+                    continue
+                try:
+                    local = matching_directory_entry(
+                        manifest_path.parent, recorded_name
+                    )
+                except ValueError:
+                    # Conflicting spellings are the per-entry preflight's refusal.
+                    continue
+                if local is None or local.is_symlink() or not local.is_file():
+                    continue
+                actual = hashlib.sha256(local.read_bytes()).hexdigest()
             if actual == expected.sha256:
                 continue
             raise SourceArtifactManifestError(

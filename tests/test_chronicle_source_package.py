@@ -1346,6 +1346,54 @@ def test_source_reader_refuses_unpinned_bytes_that_contradict_shared_owner(
     )
 
 
+@pytest.mark.parametrize("identity", ["r2-only", "unpinned"])
+@pytest.mark.parametrize("location", ["fetch", "zip"])
+def test_source_reader_accepts_shared_owner_bytes_from_nonfilesystem_resources(
+    recorded_r2_artifact, tmp_path, monkeypatch, identity, location
+):
+    artifact, resource_dir, content, sibling = recorded_r2_artifact
+    entry = deepcopy(sibling)
+    entry.pop("sha256")
+    if identity == "r2-only":
+        sibling.pop("sha256")
+    else:
+        entry.pop("storage")
+        sibling.pop("storage")
+    for name, owner in (("manifest.yaml", entry), ("manifest_sibling.yaml", sibling)):
+        (resource_dir / name).write_text(
+            yaml.safe_dump({"kind": "publisher_table", "files": {2024: owner}})
+        )
+    before = {path.name: path.read_bytes() for path in resource_dir.iterdir()}
+    monkeypatch.chdir(tmp_path)
+    # Manifest labels passed to the shared validator are resource names;
+    # interpreting them as filesystem paths would read these unrelated bytes.
+    (tmp_path / "table.csv").write_bytes(b"unrelated working-directory bytes")
+    cache = tmp_path / "cache"
+    monkeypatch.setenv(SOURCE_ARTIFACT_CACHE_ENV, str(cache))
+    monkeypatch.setenv(SOURCE_ARTIFACT_FETCH_ENV, "1")
+    monkeypatch.setattr(
+        "chronicle.source_package._fetch_source_artifact_content", lambda url: content
+    )
+    if location == "zip":
+        buffer = BytesIO()
+        with ZipFile(buffer, "w") as archive:
+            for name, data in before.items():
+                archive.writestr(f"data/publisher/package/{name}", data)
+            archive.writestr("data/publisher/package/table.csv", content)
+        with ZipFile(buffer) as archive:
+            monkeypatch.setattr(
+                "chronicle.source_package.files", lambda _package: ZipPath(archive)
+            )
+            assert artifact._artifact_content(2024)[0] == content
+        assert not cache.exists()
+    else:
+        assert artifact._artifact_content(2024)[0] == content
+        assert [path.read_bytes() for path in cache.rglob("table.csv")] == [content]
+    assert all(
+        (resource_dir / name).read_bytes() == data for name, data in before.items()
+    )
+
+
 @pytest.mark.parametrize("entry_kind", ["directory", "fifo"])
 @pytest.mark.parametrize("resource_kind", ["manifest", "artifact"])
 def test_source_artifact_spec_refuses_non_regular_resource_before_open(

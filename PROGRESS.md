@@ -7,8 +7,8 @@
 - Report: `/tmp/chronicle-227-fix/out.md`. Prior report preserved in
   `/tmp/chronicle-227-fix/bbd833a9-round1/prior-out.md`; new evidence lives
   in that same round-specific directory. Prior journals below are preserved.
-- All findings reproduced and committed before fixes. Publication staging
-  and registration are fixed; source-reader verification is in progress.
+- All three findings are reproduced, fixed, and covered by regressions.
+  Independent review passes. Required final verification is beginning.
 
 ## Done
 
@@ -42,12 +42,18 @@
   and package-directory tests pass; scoped Ruff lint/format pass. Fix uses the
   existing validator and retains archived-collision checks.
 
+- Finding 1 fixed by passing effective R2 digests to directory validation
+  and reusing the shared owner-agreement validator with the observed digest
+  from each local/cache/fetched/ZIP read, before return or cache writes.
+  Six failing-first regressions pass; positive fetch/ZIP controls added.
+- Whole-repository Ruff lint passes; formatting checks pass for all six
+  changed Python files. No protected paths changed; prior journal preserved.
+
 ## Next
 
-- Finish the source-reader fix and review all final diffs.
-- Commit every coherent step and maintain the external evidence report.
-- Run repository Ruff lint, formatting checks for changed Python files, and
-  the full pytest suite with direct exit status; record counts and commit map.
+- Run the full pytest suite with direct exit status on fixed code.
+- Record final counts and commit map in the external report; commit final
+  state/done/next journal and scope verification.
 - Keep detached HEAD; no push, branches, stash, tracked data, protected files,
   timestamp proofs, or UK pin edits.
 

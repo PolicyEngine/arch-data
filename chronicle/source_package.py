@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import hashlib
 from dataclasses import dataclass, replace
 from importlib.resources import files
@@ -15,7 +16,12 @@ from zipfile import ZipFile
 import httpx
 import yaml
 
-from chronicle.artifacts import SourceArtifactManifestError, _validated_recorded_r2
+from chronicle.artifacts import (
+    SourceArtifactManifestError,
+    _assert_package_file_owner_identities_agree,
+    _effective_recorded_digest,
+    _validated_recorded_r2,
+)
 from chronicle.core import (
     ALLOWED_AGGREGATIONS,
     ALLOWED_ASSERTIONS,
@@ -1098,7 +1104,7 @@ class SourceArtifactSpec:
         *,
         sha256: str | None = None,
     ) -> None:
-        """Refuse a file another manifest in the directory registers hash-only.
+        """Refuse shared owners that disagree on bytes or permit hash-only access.
 
         The boundary is the file in the package directory, not the manifest
         that names it: a name or a digest registered ``licensed`` or
@@ -1172,7 +1178,9 @@ class SourceArtifactSpec:
                         "declare its digest before any source bytes may be read, "
                         "fetched, or cached beside a gated registration."
                     )
-        collision_errors = validate_package_directory(manifests)
+        collision_errors = validate_package_directory(
+            manifests, entry_digest=_effective_recorded_digest
+        )
         if collision_errors:
             raise ManifestAccessError(
                 f"{self.resource_directory} is not a valid package directory: "
@@ -1180,6 +1188,16 @@ class SourceArtifactSpec:
                 "be read until every manifest agrees on shared filenames and "
                 "digests."
             )
+        try:
+            _assert_package_file_owner_identities_agree(
+                manifests,
+                observed_sha256=(
+                    {str(spec["filename"]): sha256} if sha256 is not None else None
+                ),
+                check_local_files=False,
+            )
+        except SourceArtifactManifestError as exc:
+            raise ManifestAccessError(str(exc)) from exc
 
     def _artifact_content(
         self,
@@ -1221,7 +1239,19 @@ class SourceArtifactSpec:
             # The immutable object supplies the checksum when the manifest
             # omits it, so a publisher mismatch is refused before cache writes.
             spec = {**spec, "sha256": expected_sha}
-        content = _read_source_artifact_content(artifact_path, spec)
+
+        def validate_content_owner_identities(content: bytes) -> None:
+            self._assert_no_sibling_hash_only_registration(
+                spec,
+                manifest,
+                sha256=hashlib.sha256(content).hexdigest(),
+            )
+
+        content = _read_source_artifact_content(
+            artifact_path,
+            spec,
+            validate_content=validate_content_owner_identities,
+        )
         actual_sha = hashlib.sha256(content).hexdigest()
         if expected_sha:
             _validate_source_artifact_sha(
@@ -1236,11 +1266,6 @@ class SourceArtifactSpec:
                 f"{spec['filename']!r} contains sha256={actual_sha}. Refusing "
                 "to emit immutable source provenance for different bytes."
             )
-        self._assert_no_sibling_hash_only_registration(
-            spec,
-            manifest,
-            sha256=actual_sha,
-        )
         raw_r2 = (
             {
                 "provider": recorded_r2.provider,
@@ -2703,21 +2728,32 @@ def _single_year_spec(spec: Any, year: int) -> dict[str, str]:
 def _read_source_artifact_content(
     artifact_path: Any,
     spec: dict[str, Any],
+    *,
+    validate_content: Callable[[bytes], None] | None = None,
 ) -> bytes:
     """Read a source artifact from package data, cache, or explicit fetch.
 
     Refuses a hash-only entry before touching any of the three: none of them
     may hold its bytes, and the fetch branch would write them into the cache.
+    The optional package-owner check runs on every content path before a
+    return or cache write.
     """
     _assert_entry_bytes_readable(spec)
     try:
-        return artifact_path.read_bytes()
+        content = artifact_path.read_bytes()
     except FileNotFoundError:
         pass
+    else:
+        if validate_content is not None:
+            validate_content(content)
+        return content
 
     cache_path = _source_artifact_cache_path(spec)
     if cache_path.exists():
-        return cache_path.read_bytes()
+        content = cache_path.read_bytes()
+        if validate_content is not None:
+            validate_content(content)
+        return content
 
     if not env_flag(SOURCE_ARTIFACT_FETCH_ENV):
         raise FileNotFoundError(
@@ -2734,6 +2770,8 @@ def _read_source_artifact_content(
             expected_sha=str(expected_sha),
             filename=str(spec["filename"]),
         )
+    if validate_content is not None:
+        validate_content(content)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_bytes(content)
     return content
