@@ -1,3 +1,32 @@
+# PR #227 integration lane — merge current PR #226 head
+
+## State
+
+- Starting detached HEAD: `f778161f527c7976421e2096737a1988f93a498a`.
+- Incoming local commit verified with `git cat-file -t`:
+  `d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09` (commit).
+- Integrate with one `git merge --no-ff`; preserve both histories and all #227
+  registration, access, pin, locking, staging, and provenance contracts.
+- Report: `/tmp/chronicle-227-fix/out.md`; lane evidence:
+  `/tmp/chronicle-227-integration/`. Prior report will be preserved there.
+
+## Done
+
+- Confirmed clean detached worktree and read the prior journal/report, relevant
+  source/test surfaces, approved-role rules, and incoming implementation diff.
+- Split conflict resolution (artifacts versus loader/directory validation) and
+  assigned an independent semantic and inherited-test audit.
+
+## Next
+
+- Merge the incoming local head, resolve each conflict once, verify auto-merges,
+  and commit the integration with the conflict/semantic evidence.
+- Run repository Ruff, formatting on changed Python files, the exact full pytest
+  command with direct exit status, and the separately requested focused suite.
+- Commit final journal and write the final report outside the repository.
+- No push, branches, stash, GitHub network, protected files, tracked data edits,
+  or UK pin changes.
+
 # PR #227 Astra gate round 3
 
 ## State
