@@ -892,7 +892,11 @@ def fetch_source_artifact(
         year=vintage_key,
     )
     manifests = _package_manifests(output, manifest_path, existing_manifest)
-    owners = _manifest_file_owners(manifests, filename=artifact_filename)
+    owners = _manifest_file_owners(
+        manifests,
+        filename=artifact_filename,
+        initializing=(manifest_path, vintage_key),
+    )
     _assert_shared_owner_identities_agree(owners, filename=artifact_filename)
 
     try:
@@ -940,6 +944,7 @@ def fetch_source_artifact(
         _assert_siblings_record_these_bytes(
             manifests,
             manifest_path=manifest_path,
+            vintage=vintage_key,
             filename=artifact_filename,
             sha256=sha256,
         )
@@ -2040,8 +2045,17 @@ def _manifest_file_owners(
     manifests: Mapping[str, dict[str, Any]],
     *,
     filename: str,
+    initializing: tuple[Path, Any] | None = None,
 ) -> list[_ManifestFileOwner]:
-    """Return every entry in a package directory that names ``filename``."""
+    """Return every entry in a package directory that names ``filename``.
+
+    ``initializing`` names the ``(manifest_path, vintage)`` entry the calling
+    command is about to identify -- a predeclared entry (``filename`` and
+    ``source_url`` only) on its first fetch. That entry has no identity yet
+    and is not an owner; every other entry naming the file must already
+    record one, because Chronicle cannot tell whether overwriting the shared
+    bytes would change what an unidentified sibling means.
+    """
     wanted = filename_key(filename)
     owners: list[_ManifestFileOwner] = []
     for name, payload in manifests.items():
@@ -2069,6 +2083,13 @@ def _manifest_file_owners(
                 year=vintage,
             )
             if identity is None:
+                if (
+                    initializing is not None
+                    and manifest_path == initializing[0]
+                    and str(vintage) == str(initializing[1])
+                ):
+                    # The entry this command identifies: not an owner yet.
+                    continue
                 raise MalformedManifestError(
                     f"{manifest_path} entry {vintage!r} names "
                     f"{recorded_name!r} but records no sha256 identity. "
@@ -2234,11 +2255,14 @@ def _assert_siblings_record_these_bytes(
     manifests: Mapping[str, dict[str, Any]],
     *,
     manifest_path: Path,
+    vintage: Any,
     filename: str,
     sha256: str,
 ) -> None:
     """Refuse a default fetch that would stale another manifest's owner."""
-    for owner in _manifest_file_owners(manifests, filename=filename):
+    for owner in _manifest_file_owners(
+        manifests, filename=filename, initializing=(manifest_path, vintage)
+    ):
         if owner.manifest_path == manifest_path:
             continue
         identity = owner.identity
@@ -2447,7 +2471,9 @@ def _upsert_manifest(
         package_id=package_id,
     )
     manifests = _package_manifests(manifest_path.parent, manifest_path, payload)
-    owners = _manifest_file_owners(manifests, filename=filename)
+    owners = _manifest_file_owners(
+        manifests, filename=filename, initializing=(manifest_path, year)
+    )
     _assert_shared_owner_identities_agree(owners, filename=filename)
     payload.setdefault("source_id", source_id)
     payload.setdefault("package_id", package_id)
@@ -2490,6 +2516,7 @@ def _upsert_manifest(
         _assert_siblings_record_these_bytes(
             manifests,
             manifest_path=manifest_path,
+            vintage=key,
             filename=filename,
             sha256=sha256,
         )
