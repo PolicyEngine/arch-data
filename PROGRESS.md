@@ -53,6 +53,10 @@
   runs on mapping entries; complete-manifest validation rejects other shapes.
   All 33 scalar and inherited source-path cases pass (`source-entry-green.log`).
 
+- Finding 4 reproduced red in seven containment/symlink variants; fetch reached
+  the publisher and returned success instead of refusing unsafe staging.
+  Writes, uploads, and locks were mocked (`finding4-red.log`).
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.
