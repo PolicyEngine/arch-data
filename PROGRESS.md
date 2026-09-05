@@ -1,3 +1,26 @@
+# PR #227 Astra gate bbd833a9 — round 2 fix lane
+
+## State
+
+- In progress, detached at `46560bc`; two peer-review findings to reproduce
+  before implementation. Prior lanes' journals below are preserved.
+- Report: `/tmp/chronicle-227-fix/out.md`; this lane's evidence directory:
+  `/tmp/chronicle-227-fix/bbd833a9-round2/`.
+
+## Done
+
+- Read the prior journal and previous fix/test diffs; confirmed clean detached
+  starting state. No source packages, contract schemas, or protected files
+  need modification. GitNexus tools are unavailable; trace using local source.
+- Established the external report and a committed state/done/next journal.
+
+## Next
+
+- Reproduce sibling microdata aliases and registration owner/locator gaps with
+  failing no-side-effect tests, then commit each coherent test/fix step.
+- Run focused verification, independent review, final Ruff checks, and the full
+  pytest suite with direct exit status; record counts and commit SHAs.
+
 # PR #227 Astra gate bbd833a9 — round 1 fix lane
 
 ## State
