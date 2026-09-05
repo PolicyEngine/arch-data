@@ -66,6 +66,11 @@
   validation shares that check. Eight regressions and 258 package/registration
   cases pass; scoped Ruff lint and formatting pass.
 
+- Finding 3 fixed: emission verifies the checkout origin as the expected GitHub
+  repository and writes that verified identity into provenance. Unrelated,
+  missing, and wrong-host origins refuse; HTTPS/SSH variants pass. All 40
+  catalogue tests and scoped Ruff checks pass (`finding3-green.log`).
+
 ## Next
 
 - Reproduce and resolve the source-entry integration concern.

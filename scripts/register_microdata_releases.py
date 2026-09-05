@@ -53,6 +53,7 @@ import shlex
 import subprocess
 import sys
 from typing import Any
+from urllib.parse import urlsplit
 
 # Allow `python scripts/register_microdata_releases.py` from a checkout.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -737,6 +738,54 @@ def assert_consumer_repository_root(microcosm_root: Path) -> Path:
     return repository_root
 
 
+def verified_consumer_repository(microcosm_root: Path) -> str:
+    """Read the checkout's origin and require the expected GitHub repository.
+
+    Normalize HTTPS, SSH URL, and SSH scp-style remotes locally; no remote is
+    contacted. The returned repository identity is the value emission records.
+    """
+    assert_consumer_repository_root(microcosm_root)
+    try:
+        origin = subprocess.run(
+            ["git", "-C", str(microcosm_root), "remote", "get-url", "origin"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise CatalogueError(
+            "Cannot verify consumer repository identity: the checkout needs an "
+            f"origin remote for {CONSUMER_REPOSITORY} on github.com."
+        ) from exc
+
+    scp_remote = re.fullmatch(r"git@([^/:]+):(.+)", origin)
+    if scp_remote:
+        origin = f"ssh://git@{scp_remote[1]}/{scp_remote[2]}"
+    try:
+        remote = urlsplit(origin)
+        repository = remote.path.strip("/").removesuffix(".git")
+        valid_route = (
+            remote.hostname == "github.com"
+            and remote.scheme in ("https", "ssh")
+            and remote.port in (None, 443 if remote.scheme == "https" else 22)
+            and not remote.query
+            and not remote.fragment
+        )
+    except ValueError as exc:
+        raise CatalogueError(
+            "Cannot verify consumer repository identity: origin is not a valid "
+            f"GitHub remote for {CONSUMER_REPOSITORY}."
+        ) from exc
+    if not valid_route or repository.casefold() != CONSUMER_REPOSITORY.casefold():
+        # Avoid printing credentials embedded in an HTTPS remote URL.
+        raise CatalogueError(
+            f"Consumer repository identity from origin is "
+            f"{remote.hostname or 'unknown host'}/{repository}; expected "
+            f"github.com/{CONSUMER_REPOSITORY}. Refusing to emit consumer pins."
+        )
+    return repository
+
+
 def pin_commit(microcosm_root: Path, relative: str) -> str:
     """Return the last commit that changed a consumer manifest, read-only.
 
@@ -861,10 +910,10 @@ def parse_pin_commits(values: Sequence[str]) -> dict[str, str]:
     return commits
 
 
-def pinned_from(release: Release, commit: str) -> dict[str, str]:
+def pinned_from(release: Release, commit: str, repository: str) -> dict[str, str]:
     """Return the ``pinned_from`` block a consumer_pin registration records."""
     return {
-        "repository": CONSUMER_REPOSITORY,
+        "repository": repository,
         "path": release.manifest,
         "commit": commit,
     }
@@ -875,12 +924,14 @@ def emit(
     *,
     root: Path,
     pin_commits: Mapping[str, str],
+    consumer_repository: str,
     allow_reissue: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     """Write hash-only manifests for every registrable non-public release.
 
-    ``pin_commits`` maps each consumer manifest path to the commit its pins
-    are read from. Returns ``(registrations, blockers)``. A release Microcosm
+    ``pin_commits`` maps each consumer manifest path to the verified commit its
+    pins are read from; ``consumer_repository`` is the verified origin identity.
+    Returns ``(registrations, blockers)``. A release Microcosm
     pins without a checksum is a blocker, not a registration: no hash is ever
     invented.
     """
@@ -918,8 +969,10 @@ def emit(
             access=release.access,
             vintage=item.vintage,
             hash_source=HASH_SOURCE_CONSUMER_PIN,
-            attested_by=CONSUMER_REPOSITORY,
-            pinned_from=pinned_from(release, pin_commits[release.manifest]),
+            attested_by=consumer_repository,
+            pinned_from=pinned_from(
+                release, pin_commits[release.manifest], consumer_repository
+            ),
             size_bytes=item.size_bytes,
             source_page=release.source_page,
             access_route=release.access_route,
@@ -1189,6 +1242,9 @@ def main(argv: list[str] | None = None) -> int:
                     loaded_bytes=snapshots[manifest],
                 )
                 pin_commits[manifest] = commit
+            consumer_repository = (
+                verified_consumer_repository(microcosm_root) if pin_commits else ""
+            )
         except CatalogueError as exc:
             print(str(exc), file=sys.stderr)
             return 1
@@ -1197,6 +1253,7 @@ def main(argv: list[str] | None = None) -> int:
                 resolved,
                 root=args.root,
                 pin_commits=pin_commits,
+                consumer_repository=consumer_repository,
                 allow_reissue=args.allow_reissue,
             )
         except HashOnlyRegistrationError as exc:

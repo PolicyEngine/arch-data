@@ -223,9 +223,10 @@ def test_emit_from_the_fixture_reproduces_the_committed_manifests_byte_for_byte(
         script.resolve(FIXTURE_ROOT, script.CATALOGUE),
         root=root,
         pin_commits=PIN_COMMITS,
+        consumer_repository=script.CONSUMER_REPOSITORY,
     )
 
-    # The pure emitter receives already-verified pin commits; CLI-level tests
+    # The pure emitter receives verified commits and repository identity; CLI tests
     # below exercise the mandatory commit/blob verification itself.
     assert len(registrations) == 15
     assert [blocker["release"] for blocker in blockers] == ["statbel-be-silc-2023"]
@@ -258,6 +259,7 @@ def test_emit_is_idempotent_over_the_committed_manifests(tmp_path):
         script.resolve(FIXTURE_ROOT, script.CATALOGUE),
         root=root,
         pin_commits=PIN_COMMITS,
+        consumer_repository=script.CONSUMER_REPOSITORY,
     )
 
     assert all(r["replaced"] for r in registrations)
@@ -286,7 +288,12 @@ def test_emit_refuses_a_pin_that_drifted_from_the_committed_one(tmp_path):
     resolved = script.resolve(checkout, script.CATALOGUE)
 
     with pytest.raises(script.HashOnlyRegistrationError, match="--allow-reissue"):
-        script.emit(resolved, root=root, pin_commits=PIN_COMMITS)
+        script.emit(
+            resolved,
+            root=root,
+            pin_commits=PIN_COMMITS,
+            consumer_repository=script.CONSUMER_REPOSITORY,
+        )
     assert target.read_bytes() == FRS_MANIFEST.read_bytes()
 
 
@@ -327,9 +334,10 @@ def test_emit_refuses_an_unrelated_repository_with_matching_consumer_blobs(
     checkout, commit = _committed_fixture_checkout(
         tmp_path / "unrelated", origin=origin
     )
-    assert _git(checkout, "cat-file", "blob", f"{commit}:{UK_STAGES}") == (
-        checkout / UK_STAGES
-    ).read_text().strip()
+    assert (
+        _git(checkout, "cat-file", "blob", f"{commit}:{UK_STAGES}")
+        == (checkout / UK_STAGES).read_text().strip()
+    )
     root = tmp_path / "data"
     argv = [
         "--microcosm-root",
@@ -350,6 +358,41 @@ def test_emit_refuses_an_unrelated_repository_with_matching_consumer_blobs(
     assert "repository identity" in err
     assert "PolicyEngine/microcosm" in err
     assert "unrelated/lookalike-consumer" in err
+    assert not root.exists()
+
+
+@pytest.mark.parametrize("explicit", [False, True], ids=("automatic", "explicit"))
+@pytest.mark.parametrize(
+    "origin",
+    [None, "https://gitlab.com/PolicyEngine/microcosm.git"],
+    ids=("missing-origin", "different-host"),
+)
+def test_emit_refuses_a_missing_or_wrong_host_consumer_origin(
+    tmp_path, capsys, explicit, origin
+):
+    checkout, commit = _committed_fixture_checkout(tmp_path / "consumer")
+    if origin is None:
+        _git(checkout, "remote", "remove", "origin")
+    else:
+        _git(checkout, "remote", "set-url", "origin", origin)
+    root = tmp_path / "data"
+    argv = [
+        "--microcosm-root",
+        str(checkout),
+        "--root",
+        str(root),
+        "--release",
+        "dwp-frs-2023-24:adult",
+        "emit",
+    ]
+    if explicit:
+        argv += ["--microcosm-commit", commit]
+
+    exit_code, _out, err = _run(argv, capsys)
+
+    assert exit_code == 1
+    assert "repository identity" in err
+    assert "PolicyEngine/microcosm" in err
     assert not root.exists()
 
 
@@ -442,10 +485,21 @@ def test_emit_refuses_a_tree_object_as_an_explicit_commit(tmp_path, capsys):
 
 
 @pytest.mark.parametrize("explicit", [False, True], ids=("automatic", "explicit"))
+@pytest.mark.parametrize(
+    ("origin", "repository"),
+    [
+        ("https://github.com/PolicyEngine/microcosm.git", "PolicyEngine/microcosm"),
+        ("https://github.com/PolicyEngine/microcosm/", "PolicyEngine/microcosm"),
+        ("git@github.com:PolicyEngine/microcosm.git", "PolicyEngine/microcosm"),
+        ("ssh://git@github.com/PolicyEngine/microcosm.git", "PolicyEngine/microcosm"),
+        ("https://GITHUB.COM/policyengine/microcosm.git", "policyengine/microcosm"),
+    ],
+    ids=("https", "https-trailing-slash", "ssh-scp", "ssh-url", "case-normalized"),
+)
 def test_emit_accepts_a_commit_whose_blob_matches_the_loaded_manifest(
-    tmp_path, capsys, explicit
+    tmp_path, capsys, explicit, origin, repository
 ):
-    checkout, commit = _committed_fixture_checkout(tmp_path / "consumer")
+    checkout, commit = _committed_fixture_checkout(tmp_path / "consumer", origin=origin)
     root = tmp_path / "data"
     argv = [
         "--microcosm-root",
@@ -465,7 +519,13 @@ def test_emit_accepts_a_commit_whose_blob_matches_the_loaded_manifest(
     assert exit_code == 0, err
     assert len(json.loads(out)["registrations"]) == 1
     manifest = yaml.safe_load((root / "dwp/frs_2023_24/manifest.yaml").read_text())
-    assert manifest["files"][2023][0]["pinned_from"]["commit"] == commit
+    entry = manifest["files"][2023][0]
+    assert entry["pinned_from"] == {
+        "repository": repository,
+        "path": UK_STAGES,
+        "commit": commit,
+    }
+    assert entry["attested_by"] == repository
 
 
 def test_commit_validation_uses_the_snapshot_resolve_actually_parsed(tmp_path):
