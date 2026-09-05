@@ -17,3 +17,5 @@ Next:
 - Prepare draft PR and default-branch workflow copy; push if networking permits. Write final report to OUTPUT.md unless another output path is supplied.
 
 Progress policy: committed under the standing order; asked for clarification because the Record paragraph also says untracked.
+
+Done: pre-bump byte-equivalence proof at installed receipt 0.5.2: 18 passed in 29.66s (`uv run --frozen --no-sync -q pytest -q tests/test_receipt_shim_transparency.py`; isolated writable UV_CACHE_DIR, offline). The environment was copied from the 0.5.2 shim worktree; ordinary frozen sync initially lacked cached build dependencies. No shim/pin edits preceded this proof.
