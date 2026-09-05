@@ -2,51 +2,71 @@
 
 ## State
 
-- Starting detached HEAD: `f778161f527c7976421e2096737a1988f93a498a`.
-- Incoming local commit verified with `git cat-file -t`:
-  `d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09` (commit).
-- `git merge --no-ff d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09` is resolved.
-  Preserve both histories and all #227 registration, access, pin, locking,
-  staging, and provenance contracts; one integration merge commit follows.
-- Report: `/tmp/chronicle-227-fix/out.md`; lane evidence:
-  `/tmp/chronicle-227-integration/`. Prior report will be preserved there.
+- Integration committed once as `2c71acee53c4904f94c34977e31216e372fc88cb`.
+  Its second parent is the exact requested local PR #226 head
+  `d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09`. Both histories are preserved.
+- Started detached at `f778161f527c7976421e2096737a1988f93a498a`; initial lane
+  journal committed as `b6f5f15e515da1f260f8f3f360b326219ee15b53`.
+- Required verification finished on unchanged code commit `2c71ace`. Ruff
+  passes; both requested pytest suites exit 1 on the same nine imported tests.
+  Their fixtures omit `kind`, conflicting with #227's explicit-kind contract.
+- Production kind enforcement and all imported test bodies remain unchanged.
+  The instruction to pass those tests unchanged cannot also hold for these
+  kindless fixtures; a concrete fixture-only patch awaits clarification.
+- Final report: `/tmp/chronicle-227-fix/out.md`. Evidence:
+  `/tmp/chronicle-227-integration/`; prior report preserved as `prior-out.md`.
 
 ## Done
 
-- Confirmed clean detached worktree and read the prior journal/report, relevant
-  source/test surfaces, approved-role rules, and incoming implementation diff.
-- Split conflict resolution (artifacts versus loader/directory validation) and
-  assigned an independent semantic and inherited-test audit.
-
+- Verified `git cat-file -t d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09` returns
+  `commit`, then ran the requested `git merge --no-ff` against that object.
 - Resolved seven artifact hunks, two registration hunks, and the manifest-test
-  add/add. Preserved all imported test bodies and the #227 test suite.
-- Ported strict loader, effective digests, initializing owners, local-byte owner
-  agreement, selected-only publication overrides, and legacy derived-route rules.
-- Independent audit found a selected-sweep deduplication gap: two hermetic cases
-  reproduced uploads before identity refusal; selected-set preflight fixes both.
-- Cross-vintage refusal diagnostics preserved with complete proposal validation
-  ahead of the added owner checks. Four reconciliation cases pass; Ruff passes.
-- Incoming #226 fixtures omit `kind`, contradicting #227's required explicit-kind
-  contract. Kept production kind enforcement and tracked incoming tests unchanged;
-  requested clarification and prepared a temporary fixture-only demonstration.
-  Final gates will honestly report these failures unless the user authorizes
-  explicit kind declarations in those fixtures.
-- Resolved focused integration gate: 620 passed, 9 failed, 16 warnings in 11.23s
-  (direct exit 1); all failures are imported artifact fixtures missing `kind`.
-- Temporary fixture-only preview adds six `kind: publisher_table` declarations,
-  with no assertion/production edits: all 10 incoming artifact cases plus the
-  two sweep regressions pass (12 passed, 179 deselected, 12 warnings, exit 0).
-  Preview: `/tmp/chronicle-227-integration/fixture-kinds.patch`.
-- Per-hunk evidence and independent review are under the lane evidence directory.
+  add/add. The report records both sides, each resolution, and semantics 1–6.
+- Retained #226's non-mutating strict YAML loader and five unchanged loader
+  tests, effective digest resolver, unidentified-owner byte agreement,
+  initialization exemption, selected-only overrides, legacy derived routes,
+  and path/vintage matching for YAML-aliased owners.
+- Kept #227's kind/access/hash-only/licence contracts, consumer pins, locks,
+  complete proposal validation, external staging, archived alias refusals, and
+  repository-origin provenance. Cross-vintage refusal diagnostics still pass.
+- Fixed an integration hazard in publish preflight deduplication: all selected
+  manifests use their eventual override identities even when first encountered
+  as siblings. Both new regressions reproduced upload-before-refusal, then pass.
+- Independent audit verifies all 1,138 starting #227 test functions and all 14
+  new #226 test functions unchanged. Only the six expected paths changed; all
+  protected/data files, 15 UK pins, and the prior journal suffix are preserved.
+- Resolved focused integration run: direct exit 1, 620 passed, 9 failed,
+  16 warnings in 11.23s (`integration-resolved.log`). Remaining failures all
+  come from the incoming kindless fixtures.
+- Temporary compatibility preview adds exactly six `kind: publisher_table`
+  declarations and changes no assertion or production code. All 10 imported
+  artifact cases plus two sweep regressions pass: direct exit 0, 12 passed,
+  179 deselected, 12 warnings in 1.22s (`fixture-kinds-focused.log`). The patch
+  `/tmp/chronicle-227-integration/fixture-kinds.patch` is NOT applied to the repo.
+- Final required gates (root commands use `UV_CACHE_DIR=/tmp/chronicle-uv-cache`
+  and `UV_OFFLINE=1`; no pytest output pipeline):
+  - `uv run ruff check .`: direct exit 0, all checks passed.
+  - `uv run ruff format --check chronicle/artifacts.py chronicle/registration.py tests/test_chronicle_artifacts.py tests/test_chronicle_consumer_contract.py tests/test_chronicle_manifest_reading.py`:
+    direct exit 0, 5 files already formatted.
+  - `uv run pytest -q -p no:cacheprovider`: direct exit 1, 1,644 passed,
+    9 failed, 7 skipped, 42 warnings in 1,224.25s (20:24).
+  - Then separately: `uv run pytest -q -p no:cacheprovider tests/test_chronicle_artifacts.py tests/test_chronicle_manifest_reading.py tests/test_chronicle_source_package.py tests/test_chronicle_consumer_contract.py tests/test_chronicle_env.py`:
+    direct exit 1, 541 passed, 9 failed, 37 warnings in 199.97s (3:19).
+- Final logs: `final-ruff.log`, `final-format.log`, `final-full-pytest.log`,
+  `final-requested-focused.log` under the evidence directory. No code changed
+  between the tested merge commit and this final verification journal.
+- No push, branches, stash, rebase, GitHub network, real publication, protected
+  file edits, tracked `db/data/**` edits, or UK pin changes.
 
 ## Next
 
-- Commit the resolved integration, then execute the final verification gates.
-- Run repository Ruff, formatting on changed Python files, the exact full pytest
-  command with direct exit status, and the separately requested focused suite.
-- Commit final journal and write the final report outside the repository.
-- No push, branches, stash, GitHub network, protected files, tracked data edits,
-  or UK pin changes.
+- Resolve the contradictory unchanged-test / required-kind instructions. The
+  six-declaration fixture patch is concrete and separately proven; applying it
+  requires allowing that narrow change to the imported fixture data. A green
+  tracked-suite result is not claimed.
+- No further implementation defect was found by the independent audit. If the
+  fixture exception is accepted, apply the prepared patch as a small named
+  follow-up commit and repeat the final gates on that commit.
 
 # PR #227 Astra gate round 3
 
