@@ -32,6 +32,10 @@
   at lock acquisition reached replacement. Direct exit 1, five failed; exact
   evidence is in `finding3-red.log` and the external report.
 
+- Finding 2 fixed with the shared full staging validator in raw publication
+  preflight and actual publication. All 33 staging/publication/locking tests
+  pass; scoped Ruff lint and format checks pass (`finding2-green.log`).
+
 ## Next
 
 - Reproduce each finding with failing tests and record exact commands and

@@ -3639,14 +3639,20 @@ def _publish_raw_manifest_entry(
                     f"recorded={recorded_object.key}"
                 )
     if release and filename and sha256_expected:
-        artifact_path = microdata_staging_path(
-            staging_dir=staging_dir,
-            source_id=source_id,
-            package_id=package_id,
-            year=year,
-            sha256=str(sha256_expected),
-            filename=filename,
-        )
+        try:
+            artifact_path = _validated_microdata_staging_destination(
+                microdata_staging_path(
+                    staging_dir=staging_dir,
+                    source_id=source_id,
+                    package_id=package_id,
+                    year=year,
+                    sha256=str(sha256_expected),
+                    filename=filename,
+                ),
+                package_dir=manifest_path.parent,
+            )
+        except ManifestAccessError as error:
+            return refuse(f"unsafe_microdata_staging:{error}")
     else:
         artifact_path = local_entry or manifest_path.parent / filename
     if not filename:
