@@ -38,6 +38,61 @@ def test_strict_loader_keeps_yaml_merge_overrides_and_refuses_explicit_duplicate
         )
 
 
+def test_strict_loader_keeps_merge_sequence_precedence_for_artifact_selection():
+    """``<<: [first, second]`` selects ``first``'s values: earlier mappings in a
+    merge sequence take precedence over later ones (YAML merge-key semantics,
+    and what ``yaml.safe_load`` does), while an explicit key in the entry still
+    overrides every merged source. The selected ``filename``/``sha256`` pair is
+    what fetch, publish, and the source-package reader use to pick bytes, so
+    reversing the precedence silently selects a different artifact."""
+    from chronicle.registration import load_manifest_document
+
+    document = (
+        "first: &first\n"
+        "  filename: first.csv\n"
+        "  sha256: " + "aa" * 32 + "\n"
+        "  source_url: https://publisher.test/first\n"
+        "second: &second\n"
+        "  filename: second.csv\n"
+        "  sha256: " + "bb" * 32 + "\n"
+        "  source_url: https://publisher.test/second\n"
+        "  licence: second-only\n"
+        "files:\n"
+        "  2024:\n"
+        "    <<: [*first, *second]\n"
+        "  2023:\n"
+        "    <<: [*first, *second]\n"
+        "    filename: explicit.csv\n"
+        "  2022:\n"
+        "    <<: [{filename: inline-first.csv}, {filename: inline-second.csv}]\n"
+        "  2021:\n"
+        "    <<:\n"
+        "      - <<: [*second, *first]\n"
+        "        source_url: https://publisher.test/nested\n"
+        "      - *first\n"
+    )
+
+    strict = load_manifest_document(document)
+    reference = yaml.safe_load(document)
+    assert strict["files"] == reference["files"]
+
+    selected = strict["files"][2024]
+    assert selected["filename"] == "first.csv"
+    assert selected["sha256"] == "aa" * 32
+    assert selected["source_url"] == "https://publisher.test/first"
+    # Keys only the later source carries are still merged in.
+    assert selected["licence"] == "second-only"
+    # An explicit key beats every merged source; the rest still follow first.
+    assert strict["files"][2023]["filename"] == "explicit.csv"
+    assert strict["files"][2023]["sha256"] == "aa" * 32
+    assert strict["files"][2022]["filename"] == "inline-first.csv"
+    # Nested: the first sequence entry is itself a merge whose own explicit
+    # key wins inside it, and whose [second, first] order selects second.
+    nested = strict["files"][2021]
+    assert nested["filename"] == "second.csv"
+    assert nested["source_url"] == "https://publisher.test/nested"
+
+
 def test_strict_loader_does_not_mutate_anchored_entries_when_merged_later():
     """Constructing a later merge of an anchored entry must not turn that
     entry's inherited keys into 'explicit' ones: PyYAML constructs lazily and
