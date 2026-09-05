@@ -296,11 +296,14 @@ def _assert_siblings_record_these_bytes(
     manifests: Mapping[str, dict[str, Any]],
     *,
     manifest_path: Path,
+    vintage: Any,
     filename: str,
     sha256: str,
 ) -> None:
     """Refuse a default fetch that would stale another manifest's owner."""
-    for owner in _manifest_file_owners(manifests, filename=filename):
+    for owner in _manifest_file_owners(
+        manifests, filename=filename, initializing=(manifest_path, vintage)
+    ):
         if owner.manifest_path == manifest_path:
             continue
         identity = owner.identity
@@ -1135,10 +1138,15 @@ def fetch_source_artifact(
         _assert_siblings_record_these_bytes(
             manifests,
             manifest_path=manifest_path,
+            vintage=vintage_key,
             filename=artifact_filename,
             sha256=expected.sha256,
         )
-    owners = _manifest_file_owners(manifests, filename=artifact_filename)
+    owners = _manifest_file_owners(
+        manifests,
+        filename=artifact_filename,
+        initializing=(manifest_path, vintage_key),
+    )
     _assert_shared_owner_identities_agree(owners, filename=artifact_filename)
     try:
         existing_target = matching_directory_entry(output, artifact_filename)
@@ -1226,6 +1234,7 @@ def fetch_source_artifact(
         _assert_siblings_record_these_bytes(
             manifests,
             manifest_path=manifest_path,
+            vintage=vintage_key,
             filename=artifact_filename,
             sha256=sha256,
         )
@@ -1270,6 +1279,25 @@ def fetch_source_artifact(
         r2_location=r2_location if upload_r2 else None,
         _preflight_only=True,
     )
+
+    for owner in owners:
+        # The selected owner is (manifest, vintage key): a YAML anchor can make
+        # two vintages share one dict object, and object identity would skip
+        # both.
+        if owner.manifest_path == manifest_path and str(owner.vintage) == str(
+            vintage_key
+        ):
+            continue
+        _assert_recorded_identity_holds_these_bytes(
+            owner.identity,
+            manifest_path=owner.manifest_path,
+            year=owner.vintage,
+            filename=artifact_filename,
+            sha256=sha256,
+            size_bytes=size_bytes,
+            r2_bucket=r2_bucket,
+            record_revision=record_revision,
+        )
 
     if release:
         # Public microdata never lands in the package tree: it is staged in an
@@ -1688,7 +1716,9 @@ def inventory_source_artifacts(
                 )
             package_errors.extend(
                 f"{code}: {manifest_path}"
-                for code in validate_package_directory(package_manifests)
+                for code in validate_package_directory(
+                    package_manifests, entry_digest=_effective_recorded_digest
+                )
             )
         if package_manifests is not None:
             try:
@@ -2847,11 +2877,17 @@ def _upsert_manifest(
     _assert_no_hash_only_bytes(
         manifests, sha256=sha256, filename=filename, what="the fetched bytes"
     )
-    owners = _manifest_file_owners(manifests, filename=filename)
+    owners = _manifest_file_owners(
+        manifests, filename=filename, initializing=(manifest_path, year)
+    )
     _assert_shared_owner_identities_agree(owners, filename=filename)
     if not record_revision:
         _assert_siblings_record_these_bytes(
-            manifests, manifest_path=manifest_path, filename=filename, sha256=sha256
+            manifests,
+            manifest_path=manifest_path,
+            vintage=year,
+            filename=filename,
+            sha256=sha256,
         )
     payload.setdefault("source_id", source_id)
     payload.setdefault("package_id", package_id)
@@ -2988,7 +3024,7 @@ def _upsert_manifest(
     changed_paths = {manifest_path}
     if record_revision and revision:
         for owner in owners:
-            if owner.manifest_path == manifest_path and owner.spec is recorded_spec:
+            if owner.manifest_path == manifest_path and str(owner.vintage) == str(key):
                 continue
             revised_entry = dict(owner.spec)
             revised_entry.update(
@@ -3052,6 +3088,20 @@ def _upsert_manifest(
                     f"{path} entry {proposed_year!r}: recorded_r2_identity_mismatch"
                 )
     _assert_package_file_owner_identities_agree(manifests)
+
+    for owner in owners:
+        if owner.manifest_path == manifest_path and str(owner.vintage) == str(key):
+            continue
+        _assert_recorded_identity_holds_these_bytes(
+            owner.identity,
+            manifest_path=owner.manifest_path,
+            year=owner.vintage,
+            filename=filename,
+            sha256=sha256,
+            size_bytes=size_bytes,
+            r2_bucket=(new_r2 or {}).get("bucket") or default_r2_raw_bucket(),
+            record_revision=record_revision,
+        )
     rendered = {
         path: yaml.safe_dump(manifests[str(path)], sort_keys=False, allow_unicode=True)
         for path in changed_paths
@@ -3958,8 +4008,16 @@ def is_derived_r2_route(bucket: str, key: str) -> bool:
             default_prefix=default_r2_derived_prefix(),
         ),
     }
-    return bucket in derived_buckets or any(
-        key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
+    # Configured routes extend the boundary; they never narrow it. A bucket
+    # ending in ``-derived`` (any case) or a ``derived/`` key was derived
+    # before routes became configurable, and archived facts still cite such
+    # routes, so the legacy spelling rule stays alongside the configured set.
+    return (
+        bucket in derived_buckets
+        or bucket.casefold().endswith("-derived")
+        or any(
+            key == prefix or key.startswith(f"{prefix}/") for prefix in derived_prefixes
+        )
     )
 
 
@@ -4002,8 +4060,17 @@ def _manifest_file_owners(
     manifests: Mapping[str, dict[str, Any]],
     *,
     filename: str,
+    initializing: tuple[Path, Any] | None = None,
 ) -> list[_ManifestFileOwner]:
-    """Return every entry in a package directory that names ``filename``."""
+    """Return every entry in a package directory that names ``filename``.
+
+    ``initializing`` names the ``(manifest_path, vintage)`` entry the calling
+    command is about to identify -- a predeclared entry (``filename`` and
+    ``source_url`` only) on its first fetch. That entry has no identity yet
+    and is not an owner; every other entry naming the file must already
+    record one, because Chronicle cannot tell whether overwriting the shared
+    bytes would change what an unidentified sibling means.
+    """
     wanted = filename_key(filename)
     owners: list[_ManifestFileOwner] = []
     for name, payload in manifests.items():
@@ -4038,6 +4105,13 @@ def _manifest_file_owners(
                 year=vintage,
             )
             if identity is None:
+                if (
+                    initializing is not None
+                    and manifest_path == initializing[0]
+                    and str(vintage) == str(initializing[1])
+                ):
+                    # The entry this command identifies: not an owner yet.
+                    continue
                 raise MalformedManifestError(
                     f"{manifest_path} entry {vintage!r} names "
                     f"{recorded_name!r} but records no sha256 identity. "
@@ -4082,6 +4156,30 @@ def _assert_shared_owner_identities_agree(
         )
 
 
+def _effective_recorded_digest(
+    manifest_name: str, vintage: Any, entry: Mapping[str, Any]
+) -> str | None:
+    """Return the digest an entry's recorded R2 key encodes, if it has one.
+
+    Two manifests may identify one package-local file through identical
+    content-addressed R2 locators without declaring ``sha256``; refetching
+    those bytes records ``sha256`` on the selected manifest only. The
+    directory-level collision check must compare the identities the entries
+    *effectively* record -- the same identity :func:`_recorded_identity`
+    resolves -- so a sibling that only carries the locator does not read as
+    an empty digest. A malformed locator is the per-entry preflight's error,
+    not a collision: return None and let directory validation use the declared
+    field.
+    """
+    try:
+        recorded = _validated_recorded_r2(
+            entry, manifest_path=Path(manifest_name), year=vintage
+        )
+    except SourceArtifactManifestError:
+        return None
+    return None if recorded is None else recorded.sha256
+
+
 def _assert_package_file_owner_identities_agree(
     manifests: Mapping[str, dict[str, Any]],
 ) -> None:
@@ -4092,7 +4190,9 @@ def _assert_package_file_owner_identities_agree(
     as one package boundary before a selected manifest can upload anything.
     Entry-shape and local-file errors remain the per-entry preflight's job.
     """
-    collision_codes = validate_package_directory(manifests)
+    collision_codes = validate_package_directory(
+        manifests, entry_digest=_effective_recorded_digest
+    )
     if collision_codes:
         raise SourceArtifactManifestError(
             "Package manifests identify different bytes for one package-local "
@@ -4102,6 +4202,7 @@ def _assert_package_file_owner_identities_agree(
 
     owners_by_filename: dict[str, list[_ManifestFileOwner]] = {}
     display_names: dict[str, str] = {}
+    unidentified: dict[str, list[tuple[Path, Any, str]]] = {}
     for name, payload in manifests.items():
         manifest_path = Path(name)
         if (
@@ -4127,10 +4228,13 @@ def _assert_package_file_owner_identities_agree(
                 # The complete per-entry preflight reports the precise locator
                 # or history error without letting another entry upload first.
                 continue
-            if identity is None:
-                continue
             key = filename_key(recorded_name)
             display_names.setdefault(key, str(recorded_name))
+            if identity is None:
+                unidentified.setdefault(key, []).append(
+                    (manifest_path, vintage, str(recorded_name))
+                )
+                continue
             owners_by_filename.setdefault(key, []).append(
                 _ManifestFileOwner(
                     manifest_path=manifest_path,
@@ -4144,6 +4248,37 @@ def _assert_package_file_owner_identities_agree(
             owners,
             filename=display_names[key],
         )
+    # An entry that records no identity yet is not a collision (nothing to
+    # contradict), but the command that identifies it will hash the shared
+    # bytes. Those bytes must already be what the identified owners record,
+    # otherwise identifying it would split one package-local file into two
+    # identities. Check before any upload or manifest rewrite.
+    for key, pending in unidentified.items():
+        owners = owners_by_filename.get(key)
+        if not owners:
+            continue
+        expected = owners[0].identity
+        assert expected is not None
+        for manifest_path, vintage, recorded_name in pending:
+            try:
+                local = matching_directory_entry(manifest_path.parent, recorded_name)
+            except ValueError:
+                # Conflicting spellings are the per-entry preflight's refusal.
+                continue
+            if local is None or local.is_symlink() or not local.is_file():
+                continue
+            actual = hashlib.sha256(local.read_bytes()).hexdigest()
+            if actual == expected.sha256:
+                continue
+            raise SourceArtifactManifestError(
+                f"{manifest_path} entry {vintage!r} names {recorded_name!r} "
+                f"without a recorded identity, and the package-local bytes "
+                f"(sha256={actual}) are not what {owners[0].manifest_path} entry "
+                f"{owners[0].vintage!r} records for it (sha256="
+                f"{expected.sha256}). Identifying this entry would give one "
+                "package-local file two identities; reconcile the manifests "
+                "or the file before publishing or inventorying the directory."
+            )
 
 
 def _storage_for_fetched_identity(
@@ -4291,7 +4426,9 @@ def _publish_source_artifacts_unlocked(
                 selected_entry_errors = package_entry_errors
         structural_errors.extend(
             f"{code}: {manifest_path}"
-            for code in validate_package_directory(package_manifests)
+            for code in validate_package_directory(
+                package_manifests, entry_digest=_effective_recorded_digest
+            )
         )
         try:
             _assert_package_file_owner_identities_agree(package_manifests)
@@ -4354,14 +4491,17 @@ def _publish_source_artifacts_unlocked(
             package_kind, _ = safe_manifest_kind(
                 package_manifest, manifest_path=package_path
             )
+            # Preflight every selected manifest with the identity publication
+            # will use, even if it is first encountered as another's sibling.
+            # Unselected siblings retain their own identifiers.
             package_source_id = (
                 source_id
-                if source_id is not None
+                if source_id is not None and package_path in manifest_paths
                 else package_manifest.get("source_id")
             )
             package_id_value = (
                 package_id
-                if package_id is not None
+                if package_id is not None and package_path in manifest_paths
                 else package_manifest.get("package_id")
             )
             for year, spec in _manifest_files(package_manifest, package_path).items():

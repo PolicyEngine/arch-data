@@ -42,7 +42,7 @@ and ``2023`` and ``'2023'`` are one vintage key.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 import fcntl
@@ -164,19 +164,31 @@ class StrictManifestLoader(yaml.SafeLoader):
     would read as one entry and the shadowed entry would be dropped by the
     next write. A manifest is the record the byte boundary is decided from,
     so a document the loader cannot represent faithfully is malformed.
+
+    ``<<`` merges are honoured with YAML precedence (an explicit key overrides
+    a merged one) but never by mutating a node: PyYAML's ``flatten_mapping``
+    rewrites the node in place, and because construction is lazy a later
+    merge of an anchored entry would turn that entry's inherited keys into
+    apparent explicit duplicates. Merge sources are expanded into a fresh
+    pair list instead, and every mapping reached through a merge gets the
+    same duplicate check as a mapping the document spells out directly.
     """
 
-    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
-        if not isinstance(node, yaml.MappingNode):
-            raise yaml.constructor.ConstructorError(
-                None,
-                None,
-                f"expected a mapping node, but found {node.id}",
-                node.start_mark,
-            )
-        self.flatten_mapping(node)
-        mapping: dict[Any, Any] = {}
+    _MERGE_TAG = "tag:yaml.org,2002:merge"
+
+    def _explicit_pairs(self, node: Any, deep: bool) -> tuple[list[Any], list[Any]]:
+        """Split a mapping node into merge sources and its explicit pairs.
+
+        Refuses duplicate explicit keys on the node's own pair list, before any
+        merge is consulted.
+        """
+        merge_sources: list[Any] = []
+        explicit_pairs: list[Any] = []
+        seen: set[Any] = set()
         for key_node, value_node in node.value:
+            if key_node.tag == self._MERGE_TAG:
+                merge_sources.append(value_node)
+                continue
             key = self.construct_object(key_node, deep=deep)
             try:
                 hash(key)
@@ -187,13 +199,82 @@ class StrictManifestLoader(yaml.SafeLoader):
                     f"found unhashable key ({exc})",
                     key_node.start_mark,
                 ) from exc
-            if key in mapping:
+            if key in seen:
                 raise yaml.constructor.ConstructorError(
                     "while constructing a mapping",
                     node.start_mark,
                     f"found duplicate key {key!r}",
                     key_node.start_mark,
                 )
+            seen.add(key)
+            explicit_pairs.append((key_node, value_node))
+        return merge_sources, explicit_pairs
+
+    def _merged_pairs(
+        self, source: Any, deep: bool, active: tuple[int, ...]
+    ) -> list[Any]:
+        """Return the pairs a ``<<`` source contributes, validated, unmutated.
+
+        ``active`` holds the mappings whose merges are being expanded on the
+        way to ``source``. A source that is already active merges itself,
+        directly or through nested merges, which has no expansion: refuse it
+        as a ``ConstructorError`` (a ``yaml.YAMLError`` every manifest reader
+        handles) rather than recursing until the interpreter gives up.
+        """
+        if isinstance(source, yaml.MappingNode):
+            if id(source) in active:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping",
+                    source.start_mark,
+                    "found a recursive merge: a mapping merges itself",
+                    source.start_mark,
+                )
+            nested_sources, explicit = self._explicit_pairs(source, deep)
+            nested_active = (*active, id(source))
+            pairs: list[Any] = []
+            for nested in nested_sources:
+                pairs.extend(self._merged_pairs(nested, deep, nested_active))
+            pairs.extend(explicit)
+            return pairs
+        if isinstance(source, yaml.SequenceNode):
+            for subnode in source.value:
+                if not isinstance(subnode, yaml.MappingNode):
+                    raise yaml.constructor.ConstructorError(
+                        "while constructing a mapping",
+                        source.start_mark,
+                        f"expected a mapping for merging, but found {subnode.id}",
+                        subnode.start_mark,
+                    )
+            # YAML merge-key precedence: earlier mappings in a ``<<`` sequence
+            # win over later ones. Pairs are assigned last-wins, so contribute
+            # the later mappings first and the first mapping last.
+            pairs = []
+            for subnode in reversed(source.value):
+                pairs.extend(self._merged_pairs(subnode, deep, active))
+            return pairs
+        raise yaml.constructor.ConstructorError(
+            "while constructing a mapping",
+            source.start_mark,
+            f"expected a mapping or list of mappings for merging, but found {source.id}",
+            source.start_mark,
+        )
+
+    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
+        if not isinstance(node, yaml.MappingNode):
+            raise yaml.constructor.ConstructorError(
+                None,
+                None,
+                f"expected a mapping node, but found {node.id}",
+                node.start_mark,
+            )
+        merge_sources, explicit_pairs = self._explicit_pairs(node, deep)
+        merged_pairs: list[Any] = []
+        for source in merge_sources:
+            merged_pairs.extend(self._merged_pairs(source, deep, (id(node),)))
+        mapping: dict[Any, Any] = {}
+        # Merged pairs first, explicit pairs last: YAML precedence, last wins.
+        for key_node, value_node in [*merged_pairs, *explicit_pairs]:
+            key = self.construct_object(key_node, deep=deep)
             mapping[key] = self.construct_object(value_node, deep=deep)
         return mapping
 
@@ -535,6 +616,8 @@ def hash_only_registrations(
 
 def validate_package_directory(
     manifests: Mapping[str, Mapping[str, Any] | None],
+    *,
+    entry_digest: Callable[[str, Any, Mapping[str, Any]], str | None] | None = None,
 ) -> tuple[str, ...]:
     """Return the collision codes across every manifest a directory keeps.
 
@@ -544,16 +627,29 @@ def validate_package_directory(
     manifest and hash-only in another, public under two digests, or a digest
     held public in one and hash-only in another, is one file that two records
     disagree about, and no command may act through either record.
+
+    A public entry without a recorded digest cannot contradict an identified
+    public owner: the command that first identifies it checks the shared bytes.
+    Its filename still participates in public/hash-only access conflicts.
+
+    ``entry_digest(manifest_name, vintage, entry)`` resolves an entry's effective
+    recorded digest, such as the digest encoded in its content-addressed R2 key.
+    Returning ``None`` falls back to the declared ``sha256`` field; without a
+    resolver only that field is compared. Archived identities are checked
+    independently, including historical locators whose entry metadata changed.
     """
     by_name: dict[str, list[tuple[str, bool, str]]] = {}
     by_digest: dict[str, list[tuple[str, bool]]] = {}
     archived_names: set[str] = set()
     archived_digests: set[str] = set()
-    for name, _key, _index, entry in iter_directory_entries(manifests):
+    for name, vintage, _index, entry in iter_directory_entries(manifests):
         if not isinstance(entry, Mapping):
             continue
         hash_only = is_hash_only(safe_entry_access(entry))
-        digest = _text(entry.get("sha256")) or ""
+        digest = entry_digest(name, vintage, entry) if entry_digest else None
+        if digest is None:
+            digest = entry.get("sha256")
+        digest = _text(digest) or ""
         filename = entry.get("filename")
         if filename is not None:
             by_name.setdefault(filename_key(filename), []).append(
@@ -574,7 +670,7 @@ def validate_package_directory(
         if len({name for name, _hash_only, _digest in records}) < 2:
             continue
         classes = {hash_only for _name, hash_only, _digest in records}
-        digests = {digest for _name, _hash_only, digest in records}
+        digests = {digest for _name, _hash_only, digest in records if digest}
         if len(classes) > 1 or (not classes.pop() and len(digests) > 1):
             errors.append(f"filename_collision_across_manifests:{key}")
     for digest, records in by_digest.items():

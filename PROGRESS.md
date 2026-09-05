@@ -5,8 +5,9 @@
 - Starting detached HEAD: `f778161f527c7976421e2096737a1988f93a498a`.
 - Incoming local commit verified with `git cat-file -t`:
   `d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09` (commit).
-- Integrate with one `git merge --no-ff`; preserve both histories and all #227
-  registration, access, pin, locking, staging, and provenance contracts.
+- `git merge --no-ff d544ffe77ffd0d2cb3551fb6f2ec378979e5fa09` is resolved.
+  Preserve both histories and all #227 registration, access, pin, locking,
+  staging, and provenance contracts; one integration merge commit follows.
 - Report: `/tmp/chronicle-227-fix/out.md`; lane evidence:
   `/tmp/chronicle-227-integration/`. Prior report will be preserved there.
 
@@ -17,10 +18,30 @@
 - Split conflict resolution (artifacts versus loader/directory validation) and
   assigned an independent semantic and inherited-test audit.
 
+- Resolved seven artifact hunks, two registration hunks, and the manifest-test
+  add/add. Preserved all imported test bodies and the #227 test suite.
+- Ported strict loader, effective digests, initializing owners, local-byte owner
+  agreement, selected-only publication overrides, and legacy derived-route rules.
+- Independent audit found a selected-sweep deduplication gap: two hermetic cases
+  reproduced uploads before identity refusal; selected-set preflight fixes both.
+- Cross-vintage refusal diagnostics preserved with complete proposal validation
+  ahead of the added owner checks. Four reconciliation cases pass; Ruff passes.
+- Incoming #226 fixtures omit `kind`, contradicting #227's required explicit-kind
+  contract. Kept production kind enforcement and tracked incoming tests unchanged;
+  requested clarification and prepared a temporary fixture-only demonstration.
+  Final gates will honestly report these failures unless the user authorizes
+  explicit kind declarations in those fixtures.
+- Resolved focused integration gate: 620 passed, 9 failed, 16 warnings in 11.23s
+  (direct exit 1); all failures are imported artifact fixtures missing `kind`.
+- Temporary fixture-only preview adds six `kind: publisher_table` declarations,
+  with no assertion/production edits: all 10 incoming artifact cases plus the
+  two sweep regressions pass (12 passed, 179 deselected, 12 warnings, exit 0).
+  Preview: `/tmp/chronicle-227-integration/fixture-kinds.patch`.
+- Per-hunk evidence and independent review are under the lane evidence directory.
+
 ## Next
 
-- Merge the incoming local head, resolve each conflict once, verify auto-merges,
-  and commit the integration with the conflict/semantic evidence.
+- Commit the resolved integration, then execute the final verification gates.
 - Run repository Ruff, formatting on changed Python files, the exact full pytest
   command with direct exit status, and the separately requested focused suite.
 - Commit final journal and write the final report outside the repository.
